@@ -19,7 +19,6 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.ir
 
-import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.types.IrType
