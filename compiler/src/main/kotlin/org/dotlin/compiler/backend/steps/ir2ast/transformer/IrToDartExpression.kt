@@ -62,7 +62,7 @@ object IrToDartExpressionTransformer : IrTransformer<DartExpression> {
         val right by lazy { irRight.accept(context) }
 
         fun parenthesize(exp: DartExpression) = when (exp) {
-            is DartConditionalExpression -> exp.parenthesize()
+            is DartConditionalExpression, is DartAsExpression -> exp.parenthesize()
             else -> exp
         }
 
