@@ -27,6 +27,9 @@ import org.junit.jupiter.api.Test
 @DisplayName("Compile: Extension")
 class Extension : BaseTest {
 
+    @Suppress("PropertyName")
+    val TestExt = "\$TestExt"
+
     @Test
     fun extension() = assertCompile {
         kotlin(
@@ -37,9 +40,6 @@ class Extension : BaseTest {
             """
         )
 
-        @Suppress("LocalVariableName")
-        val TestExt = "\$TestExt"
-
         dart(
             """
             class Test {
@@ -48,6 +48,60 @@ class Extension : BaseTest {
             
             extension $TestExt on Test {
               void doIt() {}
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `extension getter`() = assertCompile {
+        kotlin(
+            """
+            class Test
+
+            val Test.number: Int get() = 3
+            """
+        )
+
+        dart(
+            """
+            class Test {
+              Test() : super();
+            }
+            
+            extension $TestExt on Test {
+              int get number {
+                return 3;
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `extension getter and setter`() = assertCompile {
+        kotlin(
+            """
+            class Test
+
+            var Test.number: Int
+                get() = 3
+                set(value: Int) {}
+            """
+        )
+
+        dart(
+            """
+            class Test {
+              Test() : super();
+            }
+
+            extension $TestExt on Test {
+              int get number {
+                return 3;
+              }
+
+              void set number(int value) {}
             }
             """
         )

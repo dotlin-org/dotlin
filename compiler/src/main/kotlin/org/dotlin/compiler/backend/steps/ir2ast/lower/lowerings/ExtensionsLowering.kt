@@ -30,6 +30,8 @@ import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.file
+import org.jetbrains.kotlin.ir.util.isGetter
+import org.jetbrains.kotlin.ir.util.isSetter
 import org.jetbrains.kotlin.name.Name
 
 class ExtensionsLowering(private val context: DartLoweringContext) : IrDeclarationTransformer {
@@ -37,7 +39,10 @@ class ExtensionsLowering(private val context: DartLoweringContext) : IrDeclarati
 
     override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         val extensionReceiver = when (declaration) {
-            is IrFunction -> declaration.extensionReceiverParameter
+            is IrFunction -> when {
+                !declaration.isGetter && !declaration.isSetter -> declaration.extensionReceiverParameter
+                else -> return noChange()
+            }
             is IrProperty -> declaration.getter?.extensionReceiverParameter
             else -> return noChange()
         } ?: return noChange()
