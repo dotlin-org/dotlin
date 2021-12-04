@@ -83,8 +83,6 @@ class PropertySimplifyingLowering(val context: DartLoweringContext) : IrDeclarat
             return add(irField) and remove(irProperty)
         }
 
-
-
         // Otherwise, we replace the property with the relevant getter and setter.
         return irProperty.run {
             val addBackingField = when {

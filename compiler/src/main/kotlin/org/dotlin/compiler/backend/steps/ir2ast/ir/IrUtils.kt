@@ -24,6 +24,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.toDart
 import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
 import org.jetbrains.kotlin.backend.common.ir.*
+import org.jetbrains.kotlin.backend.common.ir.isStatic
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
@@ -360,6 +361,12 @@ fun IrProperty.markAsToBeInitializedInFieldInitializerList(defaultValue: IrExpre
 }
 
 fun IrProperty.unsetInitializerOrigin() = backingField!!.unsetInitializerOrigin()
+
+/**
+ * Also keeps in account that extensions are lowered into classes.
+ */
+val IrFunction.isStatic: Boolean
+    get() = isStatic && (parent as IrClass).origin != IrDartDeclarationOrigin.EXTENSION
 
 val IrFunction.isImplicitGetter: Boolean
     get() = isGetter && origin == IrDeclarationOrigin.DEFAULT_PROPERTY_ACCESSOR
