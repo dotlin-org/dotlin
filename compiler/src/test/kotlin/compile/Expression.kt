@@ -344,4 +344,46 @@ class Expression : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `string interpolation with variable`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                val amount = "Three"
+                "${'$'}amount were given to the Elves, immortal, wisest and fairest of all beings."
+            }
+            """
+        )
+
+        dart(
+            """
+            void main() {
+              final String amount = 'Three';
+              '${'$'}{amount} were given to the Elves, immortal, wisest and fairest of all beings.';
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `string interpolation with more complex expression`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                val areDwarves = true
+                "${'$'}{if (areDwarves) "Seven" else "Three"} to the Dwarf-Lords, great miners and craftsmen of ..."
+            }
+            """
+        )
+
+        dart(
+            """
+            void main() {
+              final bool areDwarves = true;
+              '${'$'}{areDwarves ? 'Seven' : 'Three'} to the Dwarf-Lords, great miners and craftsmen of ...';
+            }
+            """
+        )
+    }
 }

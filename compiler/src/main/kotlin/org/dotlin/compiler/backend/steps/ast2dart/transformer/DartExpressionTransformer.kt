@@ -20,6 +20,7 @@
 package org.dotlin.compiler.backend.steps.ast2dart.transformer
 
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
+import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.dart.ast.expression.*
 import org.dotlin.compiler.dart.ast.expression.DartAssignmentOperator.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
@@ -152,15 +153,29 @@ object DartExpressionTransformer : DartAstNodeTransformer {
         }
 
     // Literals
-    override fun visitSimpleStringLiteral(literal: DartSimpleStringLiteral, context: DartGenerationContext): String {
-        val rawToken = if (literal.isRaw) "r" else ""
-        val quoteToken = if (literal.isSingleQuoted) "'" else "\""
-        val value = literal.value
+    override fun visitSimpleStringLiteral(literal: DartSimpleStringLiteral, context: DartGenerationContext) =
+        literal.transformBy {
+            val value = literal.value
 
-        // TODO: Handle multiline
+            // TODO: Handle multiline
 
-        return "$rawToken$quoteToken$value$quoteToken"
-    }
+            "$rawToken$quoteToken$value$quoteToken"
+        }
+
+    override fun visitStringInterpolation(literal: DartStringInterpolation, context: DartGenerationContext) =
+        literal.transformBy {
+            val elements = literal.elements.joinToString(separator = "") { it.accept(context) }
+
+            "$rawToken$quoteToken$elements$quoteToken"
+        }
+
+    override fun visitInterpolationString(element: DartInterpolationString, context: DartGenerationContext) =
+        element.value
+
+    override fun visitInterpolationExpression(
+        element: DartInterpolationExpression,
+        context: DartGenerationContext
+    ) = "\${${element.expression.accept(context)}}"
 
     override fun visitNullLiteral(literal: DartNullLiteral, context: DartGenerationContext) = "null"
 
@@ -183,7 +198,17 @@ object DartExpressionTransformer : DartAstNodeTransformer {
 
     override fun visitSimpleIdentifier(identifier: DartSimpleIdentifier, context: DartGenerationContext) =
         identifier.value
+
+    private fun DartSingleStringLiteral.transformBy(
+        block: DartSingleStringLiteralDefaults.() -> String
+    ) = DartSingleStringLiteralDefaults(
+        rawToken = if (isRaw) "r" else "",
+        quoteToken = if (isSingleQuoted) "'" else "\""
+    ).let { block(it) }
+
+    private data class DartSingleStringLiteralDefaults(val rawToken: String, val quoteToken: String)
 }
 
 fun DartExpression.accept(context: DartGenerationContext) = accept(DartExpressionTransformer, context)
 fun DartArgumentList.accept(context: DartGenerationContext) = accept(DartExpressionTransformer, context)
+fun DartInterpolationElement.accept(context: DartGenerationContext) = accept(DartExpressionTransformer, context)

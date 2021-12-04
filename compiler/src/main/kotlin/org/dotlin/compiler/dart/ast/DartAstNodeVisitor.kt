@@ -113,6 +113,11 @@ interface DartAstNodeVisitor<R, C> {
 
     // Expressions: Literals
     fun visitSimpleStringLiteral(literal: DartSimpleStringLiteral, context: C): R = throwUnsupported()
+
+    fun visitStringInterpolation(literal: DartStringInterpolation, context: C): R = throwUnsupported()
+    fun visitInterpolationString(element: DartInterpolationString, context: C): R = throwUnsupported()
+    fun visitInterpolationExpression(element: DartInterpolationExpression, context: C): R = throwUnsupported()
+
     fun visitNullLiteral(literal: DartNullLiteral, context: C): R = throwUnsupported()
     fun visitBooleanLiteral(literal: DartBooleanLiteral, context: C): R = throwUnsupported()
     fun visitIntegerLiteral(literal: DartIntegerLiteral, context: C): R = throwUnsupported()
