@@ -28,6 +28,7 @@ private val lowerings = listOf(
     ::ObjectLowering,
     ::EnumLowering,
     ::StringLowering,
+    ::ConjunctionsDisjunctionsLowering,
     ::ComplexParametersLowering,
     ::PropertiesReferencingThisLowering,
     ::PropertiesReferencingParametersLowering,
