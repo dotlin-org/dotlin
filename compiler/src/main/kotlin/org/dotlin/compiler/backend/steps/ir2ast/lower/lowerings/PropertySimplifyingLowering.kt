@@ -28,9 +28,12 @@ import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetFieldImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrSetFieldImpl
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.isGetter
+import org.jetbrains.kotlin.ir.util.isSetter
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
+import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.Name
 
@@ -61,21 +64,32 @@ class PropertySimplifyingLowering(val context: DartLoweringContext) : IrDeclarat
             irProperty.file.transformChildrenVoid(
                 object : IrElementTransformerVoid() {
                     override fun visitCall(expression: IrCall): IrExpression {
+                        expression.transformChildrenVoid(this)
+
                         val owner = expression.symbol.owner
 
-                        if (!owner.isGetter) return expression
+                        if (!owner.isGetter && !owner.isSetter) return expression
 
-                        if (owner.symbol == irProperty.getter!!.symbol) {
-                            return IrGetFieldImpl(
+                        val receiver = expression.dispatchReceiver ?: expression.extensionReceiver
+
+                        return when (owner.symbol) {
+                            irProperty.getter?.symbol -> IrGetFieldImpl(
                                 UNDEFINED_OFFSET,
                                 UNDEFINED_OFFSET,
                                 irField.symbol,
                                 type = irField.type,
-                                receiver = expression.dispatchReceiver ?: expression.extensionReceiver
+                                receiver = receiver
                             )
+                            irProperty.setter?.symbol -> IrSetFieldImpl(
+                                UNDEFINED_OFFSET,
+                                UNDEFINED_OFFSET,
+                                irField.symbol,
+                                receiver = receiver,
+                                value = expression.valueArguments.single(),
+                                type = irField.type
+                            )
+                            else -> expression
                         }
-
-                        return expression
                     }
                 }
             )

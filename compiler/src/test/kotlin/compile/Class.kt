@@ -74,6 +74,62 @@ class Class : BaseTest {
         }
 
         @Test
+        fun `class with single simple property in body and calling getter`() = assertCompile {
+            kotlin(
+                """
+                class Test {
+                    val property = 96
+                }
+
+                fun main() {
+                    Test().property
+                }
+                """
+            )
+
+            dart(
+                """
+                class Test {
+                  Test() : super();
+                  final int property = 96;
+                }
+
+                void main() {
+                  Test().property;
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `class with single simple property in body and calling setter`() = assertCompile {
+            kotlin(
+                """
+                class Test {
+                    var property = 96
+                }
+
+                fun main() {
+                    Test().property = 123
+                }
+                """
+            )
+
+            dart(
+                """
+                class Test {
+                  Test() : super();
+                  int property = 96;
+                }
+
+                void main() {
+                  Test().property = 123;
+                }
+                """
+            )
+        }
+
+        @Test
         fun `class with single property in primary constructor`() = assertCompile {
             kotlin(
                 """
