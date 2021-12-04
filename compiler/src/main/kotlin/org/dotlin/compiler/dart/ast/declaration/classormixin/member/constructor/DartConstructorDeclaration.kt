@@ -39,8 +39,8 @@ data class DartConstructorDeclaration(
     override val documentationComment: String? = null,
 ) : DartClassMember, DartFunctionDeclaration {
 
-    override var isGetter: Boolean = false
-    override var isSetter: Boolean = false
+    override val isGetter: Boolean = false
+    override val isSetter: Boolean = false
 
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
         visitor.visitConstructorDeclaration(this, context)

@@ -22,10 +22,10 @@ package org.dotlin.compiler.dart.ast.expression.literal
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 
 data class DartSimpleStringLiteral(
-    var value: String,
-    override var isRaw: Boolean = false,
-    override var isMultiline: Boolean = false,
-    override var isSingleQuoted: Boolean = true,
+    val value: String,
+    override val isRaw: Boolean = false,
+    override val isMultiline: Boolean = false,
+    override val isSingleQuoted: Boolean = true,
 ) : DartSingleStringLiteral {
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
         visitor.visitSimpleStringLiteral(this, context)
