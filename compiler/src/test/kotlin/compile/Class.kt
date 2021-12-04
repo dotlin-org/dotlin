@@ -1945,4 +1945,104 @@ class Class : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `class with init block`() = assertCompile {
+        kotlin(
+            """
+            class Test {
+                init {
+                    3 + 3
+                }
+            }
+            """
+        )
+
+        dart(
+            """
+            class Test {
+              Test() : super() {
+                3 + 3;
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `class with two init blocks`() = assertCompile {
+        kotlin(
+            """
+            class Test {
+                init {
+                    3 + 3
+                }
+
+                init {
+                    6 + 6
+                }
+            }
+            """
+        )
+
+        dart(
+            """
+            class Test {
+              Test() : super() {
+                3 + 3;
+                6 + 6;
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `class with init block and constructor parameter`() = assertCompile {
+        kotlin(
+            """
+            class Test(param: Int) {
+                init {
+                    param + 3
+                }
+            }
+            """
+        )
+
+        dart(
+            """
+            class Test {
+              Test(int param) : super() {
+                param + 3;
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `class with init block and secondary constructor`() = assertCompile {
+        kotlin(
+            """
+            class Test(param: Int) {
+                init {
+                    param + 3
+                }
+
+                constructor() : this(54)
+            }
+            """
+        )
+
+        dart(
+            """
+            class Test {
+              Test(int param) : super() {
+                param + 3;
+              }
+              Test.${'$'}constructor${'$'}1() : this(54);
+            }
+            """
+        )
+    }
 }
