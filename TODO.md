@@ -50,9 +50,10 @@
   - [ ] Objects
     - [ ] Companion objects
   - [ ] Class members
-    - [ ] Constructors
+    - [x] Constructors
       - [x] Primary constructors
       - [x] Secondary constructors
+      - [x] Initializer blocks
     - [ ] Properties
       - [x] Getters
       - [x] Setters
