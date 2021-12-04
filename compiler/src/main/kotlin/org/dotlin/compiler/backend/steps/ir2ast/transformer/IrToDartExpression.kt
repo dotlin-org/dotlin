@@ -41,9 +41,11 @@ import org.jetbrains.kotlin.ir.types.isString
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartExpressionTransformer : IrTransformer<DartExpression> {
     override fun visitExpression(expression: IrExpression, context: DartTransformContext): DartExpression {
-        if (expression is IrNullAwareExpression) return visitNullAwareExpression(expression, context)
-
-        return super.visitExpression(expression, context)
+        return when (expression) {
+            is IrNullAwareExpression -> visitNullAwareExpression(expression, context)
+            is IrBinaryInfixExpression -> visitBinaryInfixExpression(expression, context)
+            else -> super.visitExpression(expression, context)
+        }
     }
 
     override fun visitExpressionBody(irBody: IrExpressionBody, data: DartTransformContext) =
@@ -286,8 +288,7 @@ object IrToDartExpressionTransformer : IrTransformer<DartExpression> {
         val type = irTypeOperatorCall.typeOperand.toDart(context)
 
         return when (irTypeOperatorCall.operator) {
-            CAST -> DartAsExpression(expression, type)
-            IMPLICIT_CAST -> TODO()
+            CAST, IMPLICIT_CAST -> DartAsExpression(expression, type)
             IMPLICIT_NOTNULL -> TODO()
             IMPLICIT_COERCION_TO_UNIT -> expression
             IMPLICIT_INTEGER_COERCION -> TODO()
@@ -354,6 +355,19 @@ object IrToDartExpressionTransformer : IrTransformer<DartExpression> {
                 }
             }
         )
+    }
+
+    private fun visitBinaryInfixExpression(
+        binaryInfix: IrBinaryInfixExpression,
+        context: DartTransformContext
+    ): DartExpression {
+        val left = binaryInfix.left.accept(context)
+        val right = binaryInfix.right.accept(context)
+
+        return when(binaryInfix) {
+            is IrConjunctionExpression -> DartConjunctionExpression(left, right)
+            is IrDisjunctionExpression -> DartDisjunctionExpression(left, right)
+        }
     }
 }
 

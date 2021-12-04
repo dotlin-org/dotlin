@@ -386,4 +386,80 @@ class Expression : BaseTest {
             """
         )
     }
+
+    @Test
+    fun conjunction() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                true && 2 == 0
+            }
+            """
+        )
+
+        dart(
+            """
+            void main() {
+              true && 2 == 0;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun disjunction() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                true || 2 == 0
+            }
+            """
+        )
+
+        dart(
+            """
+            void main() {
+              true || 2 == 0;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `multiple conjunction`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                3 == 0 && 2 == 0 && 1 == 0
+            }
+            """
+        )
+
+        dart(
+            """
+            void main() {
+              3 == 0 && 2 == 0 && 1 == 0;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `multiple disjunction`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                3 == 0 || 2 == 0 || 1 == 0
+            }
+            """
+        )
+
+        dart(
+            """
+            void main() {
+              3 == 0 || 2 == 0 || 1 == 0;
+            }
+            """
+        )
+    }
 }

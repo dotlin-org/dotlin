@@ -21,7 +21,7 @@ package org.dotlin.compiler.dart.ast.expression
 
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 
-interface DartBinaryInfixExpression : DartExpression {
+sealed interface DartBinaryInfixExpression : DartExpression {
     val left: DartExpression
     val operator: DartBinaryInfixOperator
     val right: DartExpression
@@ -108,8 +108,19 @@ data class DartEqualityExpression(
     override val operator = DartBinaryInfixOperator("==")
 }
 
+data class DartConjunctionExpression(
+    override val left: DartExpression,
+    override val right: DartExpression,
+) : DartBinaryInfixExpression {
+    override val operator = DartBinaryInfixOperator("&&")
+}
 
-
+data class DartDisjunctionExpression(
+    override val left: DartExpression,
+    override val right: DartExpression,
+) : DartBinaryInfixExpression {
+    override val operator = DartBinaryInfixOperator("||")
+}
 
 
 
