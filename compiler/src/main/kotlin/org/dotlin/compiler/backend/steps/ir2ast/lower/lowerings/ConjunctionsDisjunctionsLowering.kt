@@ -56,10 +56,12 @@ class ConjunctionsDisjunctionsLowering(private val context: DartLoweringContext)
             else -> irWhen.branches.last().result
         }
 
+        val type = context.irBuiltIns.booleanType
+
         return replaceWith(
             when {
-                isConjunction -> IrConjunctionExpression(context, left, right)
-                else -> IrDisjunctionExpression(context, left, right)
+                isConjunction -> IrConjunctionExpression(left, right, type)
+                else -> IrDisjunctionExpression(left, right, type)
             }
         )
     }
