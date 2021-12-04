@@ -25,9 +25,7 @@ import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 
-sealed class IrBinaryInfixExpression(context: BackendContext) : IrExpression() {
-    override var type: IrType = context.irBuiltIns.booleanType
-
+sealed class IrBinaryInfixExpression(override var type: IrType) : IrExpression() {
     abstract val left: IrExpression
     abstract val right: IrExpression
 
@@ -43,13 +41,13 @@ sealed class IrBinaryInfixExpression(context: BackendContext) : IrExpression() {
 }
 
 class IrConjunctionExpression(
-    context: BackendContext,
     override val left: IrExpression,
     override val right: IrExpression,
-) : IrBinaryInfixExpression(context)
+    override var type: IrType,
+) : IrBinaryInfixExpression(type)
 
 class IrDisjunctionExpression(
-    context: BackendContext,
     override val left: IrExpression,
     override val right: IrExpression,
-) : IrBinaryInfixExpression(context)
+    override var type: IrType,
+) : IrBinaryInfixExpression(type)

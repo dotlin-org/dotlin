@@ -44,6 +44,7 @@ import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
+import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.util.collectionUtils.filterIsInstanceAnd
 
@@ -458,13 +459,13 @@ fun IrFactory.buildConstructorFrom(from: IrConstructor, builder: IrFunctionBuild
 }
 
 private fun <T : IrFunction> T.copyPropertiesFrom(from: IrFunction): T = apply {
-    body = from.body?.deepCopyWithSymbols(this)
+    body = from.body?.deepCopy(this)
     parent = from.parent
     copyValueParametersFrom(from, substitutionMap = emptyMap())
     copyTypeParametersFrom(from)
 
-    extensionReceiverParameter = from.extensionReceiverParameter?.deepCopyWithSymbols(this)
-    dispatchReceiverParameter = from.dispatchReceiverParameter?.deepCopyWithSymbols(this)
+    extensionReceiverParameter = from.extensionReceiverParameter?.deepCopy(this)
+    dispatchReceiverParameter = from.dispatchReceiverParameter?.deepCopy(this)
 
     if (this is IrSimpleFunction && from is IrSimpleFunction) {
         overriddenSymbols = from.overriddenSymbols
@@ -511,7 +512,7 @@ fun IrClass.deepCopyWith(builder: IrClassBuilder.() -> Unit = {}): IrClass {
         val original = this@deepCopyWith
 
         parent = original.parent
-        val copyOfOriginal = original.deepCopyWithSymbols(parent)
+        val copyOfOriginal = original.deepCopy(parent)
         declarations += copyOfOriginal.declarations
         superTypes = original.superTypes
         remapDeclarationParents(from = copyOfOriginal)
@@ -543,7 +544,7 @@ fun IrProperty.deepCopyWith(builder: IrPropertyBuilder.() -> Unit): IrProperty {
         val original = this@deepCopyWith
 
         parent = original.parent
-        val copyOfOriginal = original.deepCopyWithSymbols(parent)
+        val copyOfOriginal = original.deepCopy(parent)
         backingField = copyOfOriginal.backingField
         getter = copyOfOriginal.getter
         setter = copyOfOriginal.setter
@@ -569,7 +570,7 @@ fun IrField.deepCopyWith(builder: IrFieldBuilder.() -> Unit): IrField {
         val original = this@deepCopyWith
 
         parent = original.parent
-        val copyOfOriginal = original.deepCopyWithSymbols(parent)
+        val copyOfOriginal = original.deepCopy(parent)
 
         this.correspondingPropertySymbol = original.correspondingPropertySymbol
         initializer = copyOfOriginal.initializer
