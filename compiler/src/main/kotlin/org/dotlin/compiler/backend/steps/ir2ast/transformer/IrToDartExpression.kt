@@ -341,6 +341,20 @@ object IrToDartExpressionTransformer : IrTransformer<DartExpression> {
         irNullAware: IrNullAwareExpression,
         context: DartTransformContext
     ): DartExpression = (irNullAware.expression.accept(context) as DartPossiblyNullAwareExpression).asNullAware()
+
+    override fun visitStringConcatenation(
+        expression: IrStringConcatenation,
+        context: DartTransformContext
+    ): DartExpression {
+        return DartStringInterpolation(
+            elements = expression.arguments.map {
+                when {
+                    it is IrConst<*> && it.kind == IrConstKind.String -> DartInterpolationString(it.value as String)
+                    else -> DartInterpolationExpression(it.accept(context))
+                }
+            }
+        )
+    }
 }
 
 fun IrExpression.accept(context: DartTransformContext) = accept(IrToDartExpressionTransformer, context)
