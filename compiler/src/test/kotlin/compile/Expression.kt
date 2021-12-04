@@ -462,4 +462,33 @@ class Expression : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `implicit cast`() = assertCompile {
+        kotlin(
+            """
+            class Hobbit(val name: String)
+            fun search(obj: Any) {
+                if (obj is Hobbit && obj.name == "Frodo") {
+                    "I see you"
+                }
+            }
+            """
+        )
+
+        dart(
+            """
+            class Hobbit {
+              Hobbit(this.name) : super();
+              final String name;
+            }
+
+            void search(Object obj) {
+              if (obj is Hobbit && (obj as Hobbit).name == 'Frodo') {
+                'I see you';
+              }
+            }
+            """
+        )
+    }
 }
