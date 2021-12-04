@@ -1,0 +1,158 @@
+# TODO
+
+### Language features
+- [x] Top level functions
+- [ ] Built-ins
+  - [ ] Annotation
+  - [ ] Any
+  - [ ] Arrays
+    - [ ] Array
+    - [ ] ByteArray
+    - [ ] CharArray
+    - [ ] ShortArray
+    - [ ] IntArray
+    - [ ] LongArray
+    - [ ] FloatArray
+    - [ ] DoubleArray
+    - [ ] BooleanArray
+  - [ ] Boolean
+  - [ ] Char
+  - [ ] CharSequence
+  - [ ] Collections
+  - [ ] Comparable
+  - [ ] Enum
+  - [ ] Iterator
+  - [ ] Library
+  - [ ] Nothing
+  - [ ] Number
+  - [ ] Primitives
+    - [ ] Byte
+    - [ ] Short
+    - [ ] Int
+    - [ ] Long
+    - [ ] Float
+    - [ ] Double
+  - [ ] String
+  - [ ] Throwable
+- [ ] Classes
+  - [x] Regular classes
+  - [x] Abstract classes
+  - [ ] Nested classes
+  - [ ] Inner classes
+  - [ ] Inline (value) classes
+  - [ ] Data classes
+  - [ ] Sealed classes
+  - [ ] Enum classes
+  - [ ] Annotation classes
+  - [ ] Interfaces
+    - [x] Regular interfaces
+    - [ ] SAM interfaces
+  - [ ] Objects
+    - [ ] Companion objects
+  - [ ] Class members
+    - [ ] Constructors
+      - [x] Primary constructors
+      - [x] Secondary constructors
+    - [ ] Properties
+      - [x] Getters
+      - [x] Setters
+      - [x] Properties with backing fields
+      - [ ] Delegated properties
+      - [ ] Inline properties
+    - [x] Methods
+  - [x] Inheritance
+  - [x] Overrides
+  - [ ] Delegation
+- [ ] Function types
+- [ ] Inline
+  - [ ] Inline functions
+  - [ ] `noinline`
+  - [ ] Non-local returns
+- [ ] Expressions
+  - [x] Literals
+    - [ ] Int literals
+      - [x] Decimal literals
+      - [x] Hexadecimal literals
+    - [x] Float literals
+    - [x] Double literals
+    - [x] Character literals
+    - [ ] String literals
+      - [x] Single string literal
+      - [ ] Multiline string literal
+      - [ ] String interpolations
+  - [ ] Try catch expressions
+  - [x] Conditional expressions
+  - [x] When expressions
+  - [x] Disjunctions
+  - [x] Conjunctions
+  - [x] Comparisons
+  - [ ] Equality
+    - [x] Structural equality
+    - [ ] Referential equality
+    - [ ] Float equality specifics
+  - [x] Type checking expression
+  - [ ] Containment check expression
+  - [ ] Elvis expressions
+  - [ ] Range expressions
+  - [x] Additions
+  - [x] Multiplications
+  - [x] Cast expressions
+  - [ ] Prefix increment expressions
+  - [ ] Prefix decrement expressions
+  - [ ] Unary minus expressions
+  - [ ] Unary plus expressions
+  - [ ] Logical not expressions
+  - [ ] Postfix increment expressions
+  - [ ] Postfix decrement expressions
+  - [ ] Not-null assertions
+  - [ ] Indexing expressions
+  - [x] Function calls
+  - [x] Constructor calls
+  - [x] Property access expressions
+  - [ ] Callable references
+  - [ ] Spread expression
+  - [ ] Anonymous functions
+  - [ ] Lambda literals
+  - [ ] Object expressions
+  - [ ] This expressions
+    - [x] Non-qualified this
+    - [ ] Qualified this (`this@label`)
+    - [ ] Function literal this
+  - [ ] Super expressions
+  - [ ] Jump expressions
+    - [x] Throw expressions
+    - [x] Return expressions
+    - [ ] Continue expressions
+    - [ ] Break expressions
+- [ ] Statements
+  - [x] Assignments
+  - [ ] Loops
+    - [ ] For loop
+    - [ ] While loop
+- [ ] Visibility
+  - [x] Private
+  - [ ] Protected
+  - [ ] Internal
+- [x] Operator overloading
+- [ ] Extensions
+    - [ ] Extension methods
+    - [ ] Extension properties
+    - [ ] Companion object extensions
+- [ ] Generics
+  - [ ] Variance (in, out)
+  - [ ] Constraints
+    - [ ] One upper bound
+    - [ ] Multiple upper bounds
+- [ ] Exceptions
+- [ ] Nothing type
+- [ ] Function overloading
+- [ ] Coroutines
+- [ ] Type aliases
+- [ ] Annotations
+- [ ] Destructuring
+- [ ] Reflection
+  - [ ] Class literals
+
+### Misc
+- [ ] Remove most if not all JS IR references from compiler
+- [ ] Disable type erasure hints and analysis errors
