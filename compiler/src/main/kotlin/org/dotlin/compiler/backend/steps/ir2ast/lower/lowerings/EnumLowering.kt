@@ -154,13 +154,11 @@ class EnumLowering(private val context: DartLoweringContext) : IrDeclarationTran
         // compareTo will be defined in Enum<T> itself, mark as fake override.
         enum.declarations.apply {
             methodWithName("compareTo").let { old ->
-                val new = context.irFactory.buildFunFrom(old) {
+                val new = old.deepCopyWith {
                     isFakeOverride = true
                 }
 
                 replace(old, new)
-
-                enum.file.remap(old to new)
             }
         }
 

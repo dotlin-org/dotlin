@@ -19,7 +19,6 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrivate
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.backend.common.ir.copyTypeParametersFrom
 import org.jetbrains.kotlin.backend.common.ir.copyValueParametersFrom
@@ -35,20 +34,16 @@ class ConstructorNamesLowering(private val context: DartLoweringContext) : IrDec
     override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrConstructor) return noChange()
         // No change necessary in this case.
-        if (declaration.isPrimary && !declaration.isPrivate) return noChange()
+        if (declaration.isPrimary) return noChange()
 
         val irConstructor = declaration
         val parentClass = irConstructor.parentClassOrNull!!
 
-        val name = if (irConstructor.isPrimary && irConstructor.isPrivate)
-            Name.identifier("_")
-        // '$constructor$1', '$constructor$2', etc.
-        else
-            Name.identifier(
-                "\$constructor$" + parentClass.declarations
-                    .filterIsInstance<IrConstructor>()
-                    .indexOf(irConstructor)
-            )
+        val name = Name.identifier(
+            "\$constructor$" + parentClass.declarations
+                .filterIsInstance<IrConstructor>()
+                .indexOf(irConstructor)
+        )
 
         return just {
             replaceWith(

@@ -59,7 +59,6 @@ class PropertySimplifyingLowering(val context: DartLoweringContext) : IrDeclarat
                 initializer = irProperty.backingField?.initializer
             }
 
-            // TODO: Add this functionality to IrTransformer
             irProperty.file.transformChildrenVoid(
                 object : IrElementTransformerVoid() {
                     override fun visitCall(expression: IrCall): IrExpression {
@@ -104,13 +103,8 @@ class PropertySimplifyingLowering(val context: DartLoweringContext) : IrDeclarat
                     val oldBackingField = backingField!!
 
                     // We replace it with a properly named field first.
-                    val newBackingField = context.irFactory.buildField {
-                        updateFrom(oldBackingField)
+                    val newBackingField = oldBackingField.deepCopyWith {
                         name = Name.identifier("$" + oldBackingField.name.identifier)
-                    }.apply {
-                        correspondingPropertySymbol = irProperty.symbol
-                        parent = oldBackingField.parent
-                        initializer = oldBackingField.initializer
                     }
 
                     backingField = newBackingField
@@ -122,7 +116,7 @@ class PropertySimplifyingLowering(val context: DartLoweringContext) : IrDeclarat
 
             val addGetter = when {
                 !hasImplicitGetter -> getter?.let {
-                    val newGetter = context.irFactory.buildFunFrom(it) {
+                    val newGetter = it.deepCopyWith {
                         name = irProperty.name
                     }.apply {
                         correspondingPropertySymbol = irProperty.symbol
@@ -137,7 +131,7 @@ class PropertySimplifyingLowering(val context: DartLoweringContext) : IrDeclarat
 
             val addSetter = when {
                 !hasImplicitSetter -> setter?.let {
-                    val newSetter = context.irFactory.buildFunFrom(it) {
+                    val newSetter = it.deepCopyWith {
                         name = irProperty.name
                     }.apply {
                         correspondingPropertySymbol = irProperty.symbol

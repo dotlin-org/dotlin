@@ -34,7 +34,6 @@ private val lowerings = listOf(
     ::PropertiesReferencingParametersLowering,
     ::OverriddenParametersLowering,
     ::DefaultInterfaceImplementationsLowering,
-    ::ThrowableLowering,
     ::OperatorsLowering,
     ::ConstructorNamesLowering,
     ::ExtensionsLowering,

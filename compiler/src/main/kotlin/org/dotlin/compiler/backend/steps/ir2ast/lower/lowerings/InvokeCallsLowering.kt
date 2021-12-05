@@ -19,10 +19,8 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.buildFunFrom
+import org.dotlin.compiler.backend.steps.ir2ast.ir.deepCopyWith
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.jetbrains.kotlin.backend.common.ir.copyTypeParametersFrom
-import org.jetbrains.kotlin.backend.common.ir.copyValueParametersFrom
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -32,7 +30,7 @@ import org.jetbrains.kotlin.ir.util.copyTypeAndValueArgumentsFrom
 import org.jetbrains.kotlin.name.Name
 
 /**
- * This operator mostly applies to anonymous function expressions that are invoked.
+ * This lowering mostly applies to anonymous function expressions that are invoked.
  */
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 class InvokeCallsLowering(private val context: DartLoweringContext) : IrExpressionTransformer {
@@ -44,11 +42,8 @@ class InvokeCallsLowering(private val context: DartLoweringContext) : IrExpressi
         // In most cases the operator is already correctly changed, so we don't have to anything here.
         if (invokeMethod.name.identifier == "call") return noChange()
 
-        val callMethod = context.irFactory.buildFunFrom(invokeMethod) {
+        val callMethod = invokeMethod.deepCopyWith {
             name = Name.identifier("call")
-        }.apply {
-            copyValueParametersFrom(invokeMethod, substitutionMap = emptyMap())
-            copyTypeParametersFrom(invokeMethod)
         }
 
         return replaceWith(

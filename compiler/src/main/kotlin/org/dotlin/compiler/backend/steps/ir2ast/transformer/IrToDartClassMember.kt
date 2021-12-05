@@ -128,8 +128,14 @@ object IrToDartClassMemberTransformer : IrTransformer<DartClassMember?> {
 
         val irProperty = irField.correspondingProperty
 
-        val (isFinal, isConst, isAbstract) = irProperty.let {
-            listOf(it?.isVar != true, irField.isDartConst() || it?.isConst == true, it?.modality == Modality.ABSTRACT)
+        val isFinal: Boolean
+        val isConst: Boolean
+        val isAbstract: Boolean
+
+        irProperty.let {
+            isFinal = it?.isVar != true
+            isConst = irField.isDartConst() || it?.isConst == true
+            isAbstract = it?.modality == Modality.ABSTRACT
         }
 
         val initializer = when {

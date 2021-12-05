@@ -21,7 +21,6 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.dotlin.compiler.backend.steps.ir2ast.lower.RemapLevel.CLASS
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
 import org.jetbrains.kotlin.backend.common.ir.createParameterDeclarations
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
@@ -206,7 +205,7 @@ class ComplexParametersLowering(private val context: DartLoweringContext) : IrDe
         }
 
         return newIrValueParameter?.let {
-            just { replaceWith(it, remapAt = CLASS) }
+            just { replaceWith(it) }
         } ?: noChange()
     }
 

@@ -56,12 +56,10 @@ class OperatorsLowering(private val context: DartLoweringContext) : IrDeclaratio
         if (irIdentifier == "invoke") {
             return just {
                 replaceWith(
-                    context.irFactory.buildFunFrom(irFunction) {
+                    irFunction.deepCopyWith {
                         name = Name.identifier("call")
                         isOperator = false
                         origin = operatorOrigin
-
-                        // TODO: valueParameters, typeParameters
                     }
                 )
             }
@@ -73,7 +71,7 @@ class OperatorsLowering(private val context: DartLoweringContext) : IrDeclaratio
             // For compareTo, we add 4 operators ('<', '>', '<=' and '>=') in Dart.
             irIdentifier == "compareTo" && !irFunction.isOverride -> {
                 listOf("<", ">", "<=", ">=").map { operatorIdentifier ->
-                    context.irFactory.buildFunFrom(irFunction) {
+                    irFunction.deepCopyWith(remapReferences = false) {
                         name = Name.identifier(operatorIdentifier)
                         isOperator = true
                         returnType = context.irBuiltIns.booleanType
@@ -92,7 +90,7 @@ class OperatorsLowering(private val context: DartLoweringContext) : IrDeclaratio
                         val otherParam = irFunction.valueParameters.first().copy(parent = this)
 
                         body = context.irFactory.createExpressionBody(
-                            context.createIrBuilder(symbol).buildStatement {
+                            context.buildStatement(symbol) {
                                 primitiveOp2(
                                     UNDEFINED_OFFSET,
                                     UNDEFINED_OFFSET,
@@ -166,7 +164,7 @@ class OperatorsLowering(private val context: DartLoweringContext) : IrDeclaratio
                     else -> throw UnsupportedOperationException()
                 }
 
-                context.irFactory.buildFunFrom(irFunction) {
+                irFunction.deepCopyWith {
                     name = Name.identifier(operatorIdentifier)
                     isOperator = true
                     origin = operatorOrigin
@@ -182,7 +180,7 @@ class OperatorsLowering(private val context: DartLoweringContext) : IrDeclaratio
         )
 
         return replaceWith(
-            context.irFactory.buildFunFrom(irFunction) {
+            irFunction.deepCopyWith {
                 // This function should not marked as an operator anymore, since only the newly added operator method
                 // will be the actual Dart operator, if it's added.
                 isOperator = false
@@ -204,12 +202,6 @@ class OperatorsLowering(private val context: DartLoweringContext) : IrDeclaratio
             extensionReceiver = irGet(irFunction.extensionReceiverParameter!!.symbol)
         }
     }
-
-    private val IrFunction.relevantReceiver: IrValueParameter
-        get() = if (dispatchReceiverParameter != null)
-            dispatchReceiverParameter!!
-        else
-            extensionReceiverParameter!!
 
     private fun IrValueParameter.copy(parent: IrFunction): IrValueParameter = copy(
         parent = parent,

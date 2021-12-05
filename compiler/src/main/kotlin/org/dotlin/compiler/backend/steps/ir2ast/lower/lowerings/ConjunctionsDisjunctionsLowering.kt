@@ -19,8 +19,8 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrConjunctionExpression
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDisjunctionExpression
+import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrConjunctionExpression
+import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrDisjunctionExpression
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
 import org.jetbrains.kotlin.ir.expressions.IrExpression
