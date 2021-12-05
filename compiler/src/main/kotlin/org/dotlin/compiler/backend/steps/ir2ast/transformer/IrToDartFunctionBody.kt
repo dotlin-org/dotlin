@@ -31,7 +31,7 @@ import org.jetbrains.kotlin.ir.expressions.IrExpressionBody
 import org.jetbrains.kotlin.ir.expressions.IrSyntheticBody
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-class IrToDartFunctionBodyTransformer(private val allowEmpty: Boolean) : IrTransformer<DartFunctionBody> {
+class IrToDartFunctionBodyTransformer(private val allowEmpty: Boolean) : IrDartAstTransformer<DartFunctionBody> {
     // TODO: isAsync, isGenerator
 
     override fun visitBlockBody(irBody: IrBlockBody, context: DartTransformContext): DartFunctionBody {

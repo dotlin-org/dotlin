@@ -30,7 +30,7 @@ import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.*
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-object IrToDartStatementTransformer : IrTransformer<DartStatement> {
+object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement> {
     override fun visitReturn(expression: IrReturn, context: DartTransformContext) =
         DartReturnStatement(expression.value.accept(context))
 
