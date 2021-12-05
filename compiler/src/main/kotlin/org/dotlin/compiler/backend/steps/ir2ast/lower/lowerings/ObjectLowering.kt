@@ -23,6 +23,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.backend.common.ir.addChild
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
+import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.declarations.buildField
 import org.jetbrains.kotlin.ir.builders.irGetField
@@ -39,13 +40,15 @@ class ObjectLowering(private val context: DartLoweringContext) : IrDeclarationTr
         if (declaration !is IrClass || !declaration.isObject) return noChange()
 
         val obj = declaration.deepCopyWith {
-            name = if (declaration.isCompanion)
-                Name.identifier("$" + declaration.parentAsClass.name.identifier + "Companion")
-            else
-                declaration.name
+            name = when {
+                declaration.isCompanion -> Name.identifier("$" + declaration.parentAsClass.name.identifier + "Companion")
+                else -> declaration.name
+            }
 
             origin = IrDartDeclarationOrigin.OBJECT
         }.apply {
+            primaryConstructor!!.visibility = DescriptorVisibilities.PRIVATE
+
             addChild(
                 context.irFactory.buildField {
                     isStatic = true
@@ -53,7 +56,7 @@ class ObjectLowering(private val context: DartLoweringContext) : IrDeclarationTr
                     name = Name.identifier("\$instance")
                 }.apply {
                     initializer = IrExpressionBodyImpl(
-                        context.createIrBuilder(symbol).buildStatement {
+                        context.buildStatement(symbol) {
                             IrConstructorCallImpl(
                                 UNDEFINED_OFFSET, UNDEFINED_OFFSET,
                                 type = defaultType,
@@ -70,7 +73,9 @@ class ObjectLowering(private val context: DartLoweringContext) : IrDeclarationTr
         }
 
         if (obj.isCompanion) {
-            obj.parentAsClass.addChild(
+            declaration.file.addChild(obj)
+
+            return remove() and add(
                 context.irFactory.buildField {
                     isStatic = true
                     type = obj.defaultType
@@ -86,12 +91,8 @@ class ObjectLowering(private val context: DartLoweringContext) : IrDeclarationTr
                     )
                 }
             )
-
         }
 
-        declaration.file.addChild(obj)
-
-        // Remove the original object.
-        return just { remove() }
+        return just { replaceWith(obj) }
     }
 }

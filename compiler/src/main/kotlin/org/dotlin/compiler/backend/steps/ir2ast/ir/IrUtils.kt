@@ -21,6 +21,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.ir
 
 import org.dotlin.compiler.backend.steps.falseIfNull
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
+import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrExpressionBodyWithOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.toDart
 import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
 import org.jetbrains.kotlin.backend.common.ir.*
@@ -36,10 +37,6 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
-import org.jetbrains.kotlin.ir.symbols.impl.IrClassSymbolImpl
-import org.jetbrains.kotlin.ir.symbols.impl.IrConstructorSymbolImpl
-import org.jetbrains.kotlin.ir.symbols.impl.IrFieldSymbolImpl
-import org.jetbrains.kotlin.ir.symbols.impl.IrPropertySymbolImpl
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
@@ -114,7 +111,10 @@ val IrValueParameter.propertyDependents: Sequence<IrProperty>
     get() = parentClassProperties.filter { it.hasReferenceTo(this) }
 
 fun IrValueParameter.asAssignable(origin: IrDeclarationOrigin = this.origin) =
-    copyTo(parent as IrFunction, isAssignable = true, origin = origin)
+    deepCopyWith {
+        isAssignable = true
+        this.origin = origin
+    }
 
 fun IrExpression.hasReferenceTo(parameter: IrValueParameter) =
     hasDirectReferenceTo(parameter) || hasIndirectReferenceTo(parameter)
@@ -254,20 +254,6 @@ fun IrDeclarationContainer.propertyWithName(name: String) = declarationWithName<
 fun IrDeclarationContainer.getterWithName(name: String) = propertyWithName(name).getter!!
 fun IrDeclarationContainer.setterWithName(name: String) = propertyWithName(name).setter!!
 fun IrDeclarationContainer.fieldWithName(name: String) = declarationWithName<IrField>(name)
-
-inline fun <reified T : IrDeclarationWithName> MutableList<IrDeclaration>.addIfNotExists(
-    name: Name,
-    block: (Name) -> T
-): T {
-    val found = filterIsInstanceAnd<T> { it.name == name }.firstOrNull()
-    if (found != null) {
-        return found
-    }
-
-    val value = block(name)
-    add(value)
-    return value
-}
 
 inline fun <reified T : IrDeclarationWithName> MutableList<IrDeclaration>.addIfNotExists(declaration: T): T {
     val found = filterIsInstanceAnd<T> { it.name == declaration.name }.firstOrNull()
@@ -427,50 +413,6 @@ val IrField.isExplicitBackingField: Boolean
 val IrType.owner: IrDeclarationWithName
     get() = classifierOrFail.owner as IrDeclarationWithName
 
-fun IrFactory.buildFunFrom(
-    from: IrFunction,
-    builder: IrFunctionBuilder.() -> Unit
-): IrSimpleFunction {
-    return buildFun {
-        updateFrom(from)
-        name = from.name
-        returnType = from.returnType
-        builder()
-    }.copyPropertiesFrom(from)
-}
-
-fun IrFactory.buildConstructorFrom(from: IrConstructor, builder: IrFunctionBuilder.() -> Unit): IrConstructor {
-    return IrFunctionBuilder().run {
-        name = Name.special("<init>")
-
-        updateFrom(from)
-        returnType = from.returnType
-        builder()
-
-        createConstructor(
-            UNDEFINED_OFFSET,
-            UNDEFINED_OFFSET,
-            origin,
-            IrConstructorSymbolImpl(),
-            name, visibility, returnType, isInline, isExternal, isPrimary, isExpect
-        )
-    }.copyPropertiesFrom(from)
-}
-
-private fun <T : IrFunction> T.copyPropertiesFrom(from: IrFunction): T = apply {
-    body = from.body?.deepCopy(this)
-    parent = from.parent
-    copyValueParametersFrom(from, substitutionMap = emptyMap())
-    copyTypeParametersFrom(from)
-
-    extensionReceiverParameter = from.extensionReceiverParameter?.deepCopy(this)
-    dispatchReceiverParameter = from.dispatchReceiverParameter?.deepCopy(this)
-
-    if (this is IrSimpleFunction && from is IrSimpleFunction) {
-        overriddenSymbols = from.overriddenSymbols
-    }
-}
-
 fun IrBuilderWithScope.irCall(
     callee: IrFunction,
     receiver: IrExpression? = null,
@@ -485,96 +427,6 @@ fun IrBuilderWithScope.irCall(
 
         valueArguments.forEachIndexed { index, arg -> putValueArgument(index, arg) }
     }
-
-fun IrClass.deepCopyWith(builder: IrClassBuilder.() -> Unit = {}): IrClass {
-    val classBuilder = IrClassBuilder().also { it.updateFrom(this) }
-    builder(classBuilder)
-
-    return factory.createClass(
-        startOffset,
-        endOffset,
-        classBuilder.origin,
-        IrClassSymbolImpl(),
-        classBuilder.name,
-        classBuilder.kind,
-        classBuilder.visibility,
-        classBuilder.modality,
-        classBuilder.isCompanion,
-        classBuilder.isInner,
-        classBuilder.isData,
-        classBuilder.isExternal,
-        classBuilder.isInline,
-        classBuilder.isExpect,
-        classBuilder.isFun,
-        source,
-    ).apply {
-        val original = this@deepCopyWith
-
-        parent = original.parent
-        val copyOfOriginal = original.deepCopy(parent)
-        declarations += copyOfOriginal.declarations
-        superTypes = original.superTypes
-        remapDeclarationParents(from = copyOfOriginal)
-        createParameterDeclarations()
-    }
-}
-
-fun IrProperty.deepCopyWith(builder: IrPropertyBuilder.() -> Unit): IrProperty {
-    val propertyBuilder = IrPropertyBuilder().also { it.updateFrom(this) }
-    builder(propertyBuilder)
-
-    return factory.createProperty(
-        startOffset,
-        endOffset,
-        propertyBuilder.origin,
-        IrPropertySymbolImpl(),
-        propertyBuilder.name,
-        propertyBuilder.visibility,
-        propertyBuilder.modality,
-        propertyBuilder.isVar,
-        propertyBuilder.isConst,
-        propertyBuilder.isLateinit,
-        propertyBuilder.isDelegated,
-        propertyBuilder.isExternal,
-        propertyBuilder.isExpect,
-        propertyBuilder.isFakeOverride,
-        propertyBuilder.containerSource,
-    ).apply {
-        val original = this@deepCopyWith
-
-        parent = original.parent
-        val copyOfOriginal = original.deepCopy(parent)
-        backingField = copyOfOriginal.backingField
-        getter = copyOfOriginal.getter
-        setter = copyOfOriginal.setter
-    }
-}
-
-fun IrField.deepCopyWith(builder: IrFieldBuilder.() -> Unit): IrField {
-    val fieldBuilder = IrFieldBuilder().also { it.updateFrom(this) }
-    builder(fieldBuilder)
-
-    return factory.createField(
-        startOffset,
-        endOffset,
-        fieldBuilder.origin,
-        IrFieldSymbolImpl(),
-        fieldBuilder.name,
-        fieldBuilder.type,
-        fieldBuilder.visibility,
-        fieldBuilder.isFinal,
-        fieldBuilder.isExternal,
-        fieldBuilder.isStatic,
-    ).apply {
-        val original = this@deepCopyWith
-
-        parent = original.parent
-        val copyOfOriginal = original.deepCopy(parent)
-
-        this.correspondingPropertySymbol = original.correspondingPropertySymbol
-        initializer = copyOfOriginal.initializer
-    }
-}
 
 fun IrValueParameter.copy(
     parent: IrFunction = this.parent as IrFunction,
@@ -597,11 +449,6 @@ fun IrFunction.isEqualsOverriddenFromAny() =
                 ?.parentClassOrNull
                 ?.defaultType
                 ?.isAny() ?: false
-
-fun IrDeclarationContainer.moveChild(move: Pair<IrDeclaration, IrDeclarationContainer>) {
-    declarations.remove(move.first)
-    move.second.addChild(move.first)
-}
 
 fun IrElement.isDartConst(): Boolean = when (this) {
     // The constructor of _$DefaultMarker is always const.

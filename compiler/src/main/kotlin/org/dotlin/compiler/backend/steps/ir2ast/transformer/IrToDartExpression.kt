@@ -21,6 +21,10 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
+import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrBinaryInfixExpression
+import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrConjunctionExpression
+import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrDisjunctionExpression
+import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrNullAwareExpression
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.*
 import org.dotlin.compiler.dart.ast.collection.DartCollectionElementList
 import org.dotlin.compiler.dart.ast.expression.*
@@ -364,7 +368,7 @@ object IrToDartExpressionTransformer : IrTransformer<DartExpression> {
         val left = binaryInfix.left.accept(context)
         val right = binaryInfix.right.accept(context)
 
-        return when(binaryInfix) {
+        return when (binaryInfix) {
             is IrConjunctionExpression -> DartConjunctionExpression(left, right)
             is IrDisjunctionExpression -> DartDisjunctionExpression(left, right)
         }

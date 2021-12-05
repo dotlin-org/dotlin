@@ -17,7 +17,7 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.backend.steps.ir2ast.ir
+package org.dotlin.compiler.backend.steps.ir2ast.ir.element
 
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.impl.IrFactoryImpl

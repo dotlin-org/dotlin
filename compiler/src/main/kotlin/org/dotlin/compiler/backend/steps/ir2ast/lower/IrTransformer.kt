@@ -21,17 +21,13 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.remap
 import org.dotlin.compiler.backend.steps.ir2ast.ir.singleOrNullIfEmpty
-import org.dotlin.compiler.backend.steps.ir2ast.lower.RemapLevel.*
 import org.dotlin.compiler.backend.steps.replace
 import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
-import org.jetbrains.kotlin.ir.util.file
-import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.ir.visitors.*
 
 typealias Transform<E> = (E) -> Transformations<E>
@@ -157,7 +153,7 @@ fun IrDeclarationContainer.transformDeclarations(block: Transform<IrDeclaration>
     var i = 0
     declarations.toList().forEach { irDeclaration ->
         block(irDeclaration).forEach {
-            i += declarations.transform(parent = this as IrDeclarationParent, it, at = i)
+            i += declarations.transform(it, at = i)
         }
 
         when (irDeclaration) {
@@ -212,46 +208,13 @@ fun IrDeclarationContainer.transformDeclarations(block: Transform<IrDeclaration>
     }
 }
 
-private fun <E : IrDeclaration> Transformation<E>.setParents(parent: IrDeclarationParent) {
-    when (this) {
-        is Transformation.Replace -> new.parent = parent
-        is Transformation.Add -> element.parent = parent
-        else -> {}
-    }
-}
 
-private fun <E : IrDeclaration> Transformation<E>.remapReferences(
-    old: () -> IrDeclaration
-) {
-    if (this !is Transformation.Replace) return
-
-    val parent = when (remapAt) {
-        NONE -> return
-        PARENT -> new.parent
-        CLASS -> new.parentClassOrNull ?: return
-        FILE -> new.file
-    }
-
-    parent.remap((this.old ?: old()) to new)
-
-    // IrValueParameters can be referenced in the class, remap them as well.
-    val actualOld = this.old ?: old()
-    if (actualOld is IrConstructor && new is IrConstructor) {
-        actualOld.valueParameters.zip((new as IrConstructor).valueParameters)
-            .map { (oldParam, newParam) -> Transformation.Replace(oldParam, newParam, remapAt = CLASS) }
-            .forEach { it.remapReferences { it.old!! } }
-    }
-}
 
 @JvmName("transformDeclarations")
 private fun MutableList<IrDeclaration>.transform(
-    parent: IrDeclarationParent,
     transformation: Transformation<IrDeclaration>,
     at: Int
 ): Int {
-    transformation.setParents(parent)
-    transformation.remapReferences(old = { this[at] })
-
     @Suppress("UNCHECKED_CAST")
     return (this as MutableList<IrElement>).transform(transformation as Transformation<IrElement>, at)
 }
@@ -298,7 +261,6 @@ private fun IrFunction.transform(block: Transform<IrDeclaration>) {
     valueParameters.forEachIndexed { index, element ->
         block(element).singleOrNullIfEmpty()?.let {
             mutableValueParameters.transform(
-                parent = element.parent,
                 it,
                 at = index
             )
@@ -318,10 +280,6 @@ private inline fun <reified E1 : E2, reified E2 : IrElement> E1.transformSingle(
 ) {
     val transformation = block(this)
         .singleOrNullIfEmpty { "Cannot transform single element with multiple transformations" } ?: return
-
-    if (transformation is Transformation.Replace && transformation.new is IrDeclaration) {
-        (transformation as Transformation.Replace<IrDeclaration>).remapReferences { this as IrDeclaration }
-    }
 
     transformation.replacementOf(this, isSubject = true)?.let {
         if (it is E1) {
@@ -350,19 +308,11 @@ sealed class Transformation<E : IrElement> {
     class Replace<E : IrElement>(
         val old: E?,
         val new: E,
-        val remapAt: RemapLevel = FILE
     ) : Transformation<E>()
 
     class Add<E : IrElement>(val element: E) : Transformation<E>()
 
     class Remove<E : IrElement>(val element: E? = null) : Transformation<E>()
-}
-
-enum class RemapLevel {
-    NONE,
-    PARENT,
-    CLASS,
-    FILE,
 }
 
 infix fun <E : IrElement> Transformation<E>.and(other: Transformation<E>) = sequenceOf(this, other)
@@ -385,11 +335,11 @@ infix fun <E : IrElement> Iterable<Transformation<E>>.and(other: Sequence<Transf
 fun <E : IrElement> IrTransformer<E, *>.just(transformation: Transformation<E>) = sequenceOf(transformation)
 fun <E : IrElement> IrTransformer<E, *>.just(transformation: () -> Transformation<E>) = just(transformation())
 
-fun <E : IrElement> IrTransformer<E, *>.replace(element: E, with: E, remapAt: RemapLevel = FILE) =
+fun <E : IrElement> IrTransformer<E, *>.replace(element: E, with: E) =
     Transformation.Replace(old = element, new = with)
 
-fun <E : IrElement> IrTransformer<E, *>.replaceWith(element: E, remapAt: RemapLevel = FILE) =
-    Transformation.Replace(old = null, new = element, remapAt = remapAt)
+fun <E : IrElement> IrTransformer<E, *>.replaceWith(element: E) =
+    Transformation.Replace(old = null, new = element)
 
 fun <E : IrElement> IrTransformer<E, *>.add(element: E) = Transformation.Add(element)
 fun <E : IrElement> IrTransformer<E, *>.remove(element: E? = null) = Transformation.Remove(element)

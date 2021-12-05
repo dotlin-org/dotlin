@@ -127,8 +127,8 @@ class StringLowering(private val context: DartLoweringContext) : IrDeclarationTr
     ) {
         val method = methodWithName(methodName)
 
-        val newMethod = context.irFactory.buildFunFrom(method) {
-            isOperator?.let { this@buildFunFrom.isOperator = isOperator }
+        val newMethod = method.deepCopyWith {
+            isOperator?.let { this.isOperator = isOperator }
         }.apply {
             extensionReceiverParameter = method.dispatchReceiverParameter?.copy()
 
@@ -142,7 +142,6 @@ class StringLowering(private val context: DartLoweringContext) : IrDeclarationTr
         }
 
         method.file.apply {
-            remap(method to newMethod)
             addChild(newMethod)
         }
     }

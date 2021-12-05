@@ -19,7 +19,10 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.*
+import org.dotlin.compiler.backend.steps.ir2ast.ir.asAssignable
+import org.dotlin.compiler.backend.steps.ir2ast.ir.hasDirectReferenceTo
+import org.dotlin.compiler.backend.steps.ir2ast.ir.isInitializerForComplexParameter
+import org.dotlin.compiler.backend.steps.ir2ast.ir.resolveOverride
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
@@ -65,7 +68,8 @@ class OverriddenParametersLowering(private val context: DartLoweringContext) : I
                         is IrExpressionBody -> expression = initializerStatement
                     }
 
-                    remap(overriddenParameter to newIrValueParameter)
+                    // TODO: Copy
+                    //remap(overriddenParameter to newIrValueParameter)
                 }
             }
 

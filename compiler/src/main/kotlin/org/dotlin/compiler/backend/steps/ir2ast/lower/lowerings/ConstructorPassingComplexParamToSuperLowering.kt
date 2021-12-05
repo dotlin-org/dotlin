@@ -21,8 +21,8 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
+import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.irCallConstructor
 import org.jetbrains.kotlin.ir.builders.irGet
@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.ir.builders.irReturn
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
+import org.jetbrains.kotlin.ir.util.statements
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.Name
@@ -44,7 +45,6 @@ class ConstructorPassingComplexParamToSuperLowering(private val context: DartLow
 
         val originalComplexParams = originalConstructor.valueParameters.filter { it.wasComplex() }
         val originalBody = originalConstructor.body as? IrBlockBody ?: return noChange()
-        val initializersForComplexParams = originalBody.statements.filter { it.isInitializerForComplexParameter }
 
         val superCall = originalBody.statements
             .filterIsInstance<IrDelegatingConstructorCall>()
@@ -60,24 +60,23 @@ class ConstructorPassingComplexParamToSuperLowering(private val context: DartLow
 
         val originalByActualParams: Map<IrValueParameter, IrValueParameter>
 
-        val actualConstructor = context.irFactory.buildConstructorFrom(declaration) {
+        val actualConstructor = originalConstructor.deepCopyWith(remapReferences = false) {
             name = Name.identifier("$")
             visibility = DescriptorVisibilities.PRIVATE
             origin = IrDartDeclarationOrigin.FACTORY_REDIRECT
         }.apply {
-            parent = originalConstructor.parent
-
             origin = IrDartDeclarationOrigin.FACTORY_REDIRECT_ACTUAL
             originalByActualParams = originalConstructor.valueParameters
                 .associateWith {
-                    it.copy(
-                        parent = this,
-                        origin = if (it.wasComplex())
-                            IrDartDeclarationOrigin.FACTORY_REDIRECT_ACTUAL_PARAM
-                        else
-                            it.origin,
+                    it.deepCopyWith {
+                        origin = when {
+                            it.wasComplex() -> IrDartDeclarationOrigin.FACTORY_REDIRECT_ACTUAL_PARAM
+                            else -> it.origin
+                        }
                         type = (it.origin as? IrDartDeclarationOrigin.COMPLEX_PARAM)?.originalType ?: it.type
-                    ).apply {
+                    }.apply {
+                        correspondingProperty
+
                         if (it.wasComplex()) {
                             defaultValue = null
                         }
@@ -86,7 +85,7 @@ class ConstructorPassingComplexParamToSuperLowering(private val context: DartLow
 
             valueParameters = originalByActualParams.values.toList()
 
-            body = originalBody.apply {
+            (body as IrBlockBody).apply {
                 statements.apply {
                     removeAll(initializersForComplexParams)
 
@@ -122,8 +121,6 @@ class ConstructorPassingComplexParamToSuperLowering(private val context: DartLow
                 }
             }
 
-            parent.remap(originalByActualParams)
-
             // Unmark property parameters as to be initialized in the field initializer list, since a factory
             // doesn't support that.
             valueParameters
@@ -138,19 +135,16 @@ class ConstructorPassingComplexParamToSuperLowering(private val context: DartLow
         }
 
 
-        val factoryConstructor = context.irFactory.buildConstructorFrom(originalConstructor) {
-            name = Name.special("<init>")
+        val factoryConstructor = originalConstructor.deepCopyWith {
             origin = IrDartDeclarationOrigin.FACTORY_REDIRECT
         }.apply {
-            parent = originalConstructor.parent
-
             valueParameters = originalConstructor.valueParameters.copy(parent = this@apply)
 
             body = context.irFactory.createBlockBody(
                 UNDEFINED_OFFSET,
                 UNDEFINED_OFFSET,
-                initializersForComplexParams +
-                        context.createIrBuilder(actualConstructor.symbol).buildStatement {
+                body!!.initializersForComplexParams +
+                        context.buildStatement(symbol) {
                             irReturn(
                                 irCallConstructor(actualConstructor.symbol, emptyList()).apply {
                                     actualConstructor.valueParameters.onEach {
@@ -166,8 +160,6 @@ class ConstructorPassingComplexParamToSuperLowering(private val context: DartLow
                 // that.
                 body.statements.forEach { statement ->
                     if (statement.isInitializerForComplexParameter) {
-                        val param = statement.parameterItAssignsTo!!
-
                         statement.replaceExpressions { exp ->
                             if (exp !is IrGetField
                                 || exp.origin !is IrDartStatementOrigin.COMPLEX_PARAM_PROPERTY_REFERENCE_REMAPPED
@@ -190,4 +182,7 @@ class ConstructorPassingComplexParamToSuperLowering(private val context: DartLow
 
         return replaceWith(actualConstructor) and add(factoryConstructor)
     }
+
+    private val IrBody.initializersForComplexParams: List<IrStatement>
+        get() = statements.filter { it.isInitializerForComplexParameter }
 }
