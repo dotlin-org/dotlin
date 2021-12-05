@@ -31,7 +31,7 @@ import org.dotlin.compiler.dart.ast.parameter.isDefault
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-object IrToDartArgumentListTransformer : IrTransformer<DartArgumentList> {
+object IrToDartArgumentListTransformer : IrDartAstTransformer<DartArgumentList> {
     override fun visitFunctionAccess(
         irCallLike: IrFunctionAccessExpression,
         context: DartTransformContext

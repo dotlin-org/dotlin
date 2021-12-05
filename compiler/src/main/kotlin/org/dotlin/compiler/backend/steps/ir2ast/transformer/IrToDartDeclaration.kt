@@ -39,7 +39,7 @@ import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-object IrToDartDeclarationTransformer : IrTransformer<DartCompilationUnitMember> {
+object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnitMember> {
     override fun visitFunction(irFunction: IrFunction, context: DartTransformContext) = irFunction.transformBy(context) {
         DartTopLevelFunctionDeclaration(
             name = name!!,

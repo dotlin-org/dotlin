@@ -25,7 +25,7 @@ import org.dotlin.compiler.dart.ast.DartAstNode
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 
-interface IrTransformer<N : DartAstNode?> : IrElementVisitor<N, DartTransformContext> {
+interface IrDartAstTransformer<N : DartAstNode?> : IrElementVisitor<N, DartTransformContext> {
     override fun visitElement(element: IrElement, data: DartTransformContext): N {
         todo(element)
     }

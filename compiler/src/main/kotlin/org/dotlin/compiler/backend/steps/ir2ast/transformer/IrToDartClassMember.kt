@@ -44,7 +44,7 @@ import org.jetbrains.kotlin.ir.util.isSetter
 import org.jetbrains.kotlin.ir.util.parentAsClass
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-object IrToDartClassMemberTransformer : IrTransformer<DartClassMember?> {
+object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
     override fun visitSimpleFunction(irFunction: IrSimpleFunction, context: DartTransformContext) =
         irFunction.transformBy(context) {
             DartMethodDeclaration(

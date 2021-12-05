@@ -43,7 +43,7 @@ import org.jetbrains.kotlin.ir.types.isInt
 import org.jetbrains.kotlin.ir.types.isString
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-object IrToDartExpressionTransformer : IrTransformer<DartExpression> {
+object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
     override fun visitExpression(expression: IrExpression, context: DartTransformContext): DartExpression {
         return when (expression) {
             is IrNullAwareExpression -> visitNullAwareExpression(expression, context)

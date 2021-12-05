@@ -25,7 +25,7 @@ import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.util.isEffectivelyExternal
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-object IrToDartCompilationUnitTransformer : IrTransformer<DartCompilationUnit> {
+object IrToDartCompilationUnitTransformer : IrDartAstTransformer<DartCompilationUnit> {
     override fun visitFile(irFile: IrFile, context: DartTransformContext) = DartCompilationUnit(
         declarations = irFile.declarations
             .filterNot { it.isEffectivelyExternal() }
