@@ -87,7 +87,7 @@ object KotlinToDartCompiler {
 
         val ir = sourceToIr(env, config, dependencies)
 
-        // The klib file must be written before compiling to Dart source, since it will chang the IR in place.
+        // The klib file must be written before compiling to Dart source, since it will change the IR in place.
         if (klib) {
             writeToKlib(env, config, ir, outputFile)
         }
