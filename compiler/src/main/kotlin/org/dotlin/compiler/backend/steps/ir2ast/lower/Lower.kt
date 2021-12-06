@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 
 private val lowerings = listOf(
     ::ObjectLowering,
+    ::NestedClassLowering,
     ::EnumLowering,
     ::StringLowering,
     ::ConjunctionsDisjunctionsLowering,

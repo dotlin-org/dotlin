@@ -37,7 +37,7 @@
 - [ ] Classes
   - [x] Regular classes
   - [x] Abstract classes
-  - [ ] Nested classes
+  - [x] Nested classes
   - [ ] Inner classes
   - [ ] Inline (value) classes
   - [ ] Data classes
