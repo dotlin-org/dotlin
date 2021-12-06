@@ -291,14 +291,13 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         val expression = irTypeOperatorCall.argument.accept(context)
         val type = irTypeOperatorCall.typeOperand.toDart(context)
 
-        return when (irTypeOperatorCall.operator) {
+        return when (val operator = irTypeOperatorCall.operator) {
             CAST, IMPLICIT_CAST -> DartAsExpression(expression, type)
             IMPLICIT_NOTNULL -> TODO()
             IMPLICIT_COERCION_TO_UNIT -> expression
             IMPLICIT_INTEGER_COERCION -> TODO()
             SAFE_CAST -> TODO()
-            INSTANCEOF -> DartIsExpression(expression, type)
-            NOT_INSTANCEOF -> TODO()
+            INSTANCEOF, NOT_INSTANCEOF -> DartIsExpression(expression, type, isNegated = operator == NOT_INSTANCEOF)
             SAM_CONVERSION -> TODO()
             IMPLICIT_DYNAMIC_CAST -> TODO()
             REINTERPRET_CAST -> TODO()
