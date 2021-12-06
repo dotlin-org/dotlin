@@ -491,4 +491,42 @@ class Expression : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `instance of`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                9 is Int
+            }
+            """
+        )
+
+        dart(
+            """
+            void main() {
+              9 is int;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `not instance of`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                9 !is Int
+            }
+            """
+        )
+
+        dart(
+            """
+            void main() {
+              9 is! int;
+            }
+            """
+        )
+    }
 }

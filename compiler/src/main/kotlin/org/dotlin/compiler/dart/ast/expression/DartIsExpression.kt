@@ -25,6 +25,7 @@ import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
 data class DartIsExpression(
     val expression: DartExpression,
     val type: DartTypeAnnotation,
+    val isNegated: Boolean = false
 ) : DartExpression {
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) =
         visitor.visitIsExpression(this, context)

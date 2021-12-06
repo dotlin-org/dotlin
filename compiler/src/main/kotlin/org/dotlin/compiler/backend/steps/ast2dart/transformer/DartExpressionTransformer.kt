@@ -122,8 +122,9 @@ object DartExpressionTransformer : DartAstNodeTransformer {
     override fun visitIsExpression(isExpression: DartIsExpression, context: DartGenerationContext) = isExpression.let {
         val expression = it.expression.accept(context)
         val type = it.type.accept(context)
+        val negation = if (it.isNegated) "!" else ""
 
-        "$expression is $type"
+        "$expression is${negation} $type"
     }
 
     override fun visitAsExpression(asExpression: DartAsExpression, context: DartGenerationContext) = asExpression.let {
