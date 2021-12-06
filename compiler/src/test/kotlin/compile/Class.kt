@@ -2045,4 +2045,94 @@ class Class : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `nested class`() = assertCompile {
+        kotlin(
+            """
+            class Tree {
+                class Branch
+            }
+            """
+        )
+
+        dart(
+            """
+            class Tree {
+              Tree() : super();
+            }
+
+            class Tree${'$'}Branch {
+              Tree${'$'}Branch() : super();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `double nested class`() = assertCompile {
+        kotlin(
+            """
+            class Tree {
+                class Branch {
+                    class Leaf
+                }
+            }
+            """
+        )
+
+        dart(
+            """
+            class Tree {
+              Tree() : super();
+            }
+
+            class Tree${'$'}Branch${'$'}Leaf {
+              Tree${'$'}Branch${'$'}Leaf() : super();
+            }
+
+            class Tree${'$'}Branch {
+              Tree${'$'}Branch() : super();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `calling constructor of double nested class`() = assertCompile {
+        kotlin(
+            """
+            class Tree {
+                class Branch {
+                    class Leaf
+                }
+            }
+
+            fun main() {
+                Tree.Branch.Leaf()
+            }
+            """
+        )
+
+        dart(
+            """
+            class Tree {
+              Tree() : super();
+            }
+
+            void main() {
+              Tree${'$'}Branch${'$'}Leaf();
+            }
+
+            class Tree${'$'}Branch${'$'}Leaf {
+              Tree${'$'}Branch${'$'}Leaf() : super();
+            }
+
+            class Tree${'$'}Branch {
+              Tree${'$'}Branch() : super();
+            }
+            """
+        )
+    }
+
 }
