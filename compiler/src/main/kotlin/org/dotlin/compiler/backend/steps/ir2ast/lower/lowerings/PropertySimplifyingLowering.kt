@@ -109,7 +109,7 @@ class PropertySimplifyingLowering(val context: DartLoweringContext) : IrDeclarat
 
                     backingField = newBackingField
 
-                    add(newBackingField) and replace(oldBackingField, with = newBackingField)
+                    add(newBackingField)
                 }
                 else -> null
             }
@@ -124,7 +124,7 @@ class PropertySimplifyingLowering(val context: DartLoweringContext) : IrDeclarat
 
                     irProperty.getter = newGetter
 
-                    add(newGetter) and replace(it, with = newGetter)
+                    add(newGetter)
                 }
                 else -> null
             }
@@ -139,13 +139,13 @@ class PropertySimplifyingLowering(val context: DartLoweringContext) : IrDeclarat
 
                     irProperty.setter = newSetter
 
-                    add(newSetter) and replace(it, with = newSetter)
+                    add(newSetter)
                 }
                 else -> null
             }
 
             sequenceOf(addBackingField, addGetter, addSetter)
-                .filterNotNull().flatten() and remove(irProperty)
+                .filterNotNull() and remove(irProperty)
         }
     }
 }
