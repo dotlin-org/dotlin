@@ -20,11 +20,11 @@
 package org.dotlin.compiler
 
 import com.intellij.openapi.util.Disposer
-import org.dotlin.compiler.backend.compileToDartSource
-import org.dotlin.compiler.backend.compileToKlib
+import org.dotlin.compiler.backend.compileIrToDartSource
 import org.dotlin.compiler.backend.steps.ast2dart.dartAstToDartSource
 import org.dotlin.compiler.backend.steps.ir2ast.irToDartAst
 import org.dotlin.compiler.backend.steps.ir2klib.writeToKlib
+import org.dotlin.compiler.backend.steps.src2ir.IrResult
 import org.dotlin.compiler.backend.steps.src2ir.sourceToIr
 import org.jetbrains.kotlin.backend.common.serialization.metadata.KlibMetadataVersion
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
@@ -38,6 +38,9 @@ import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.konan.file.file
+import org.jetbrains.kotlin.konan.file.File as KonanFile
+import org.jetbrains.kotlin.konan.file.zipFileSystem
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
@@ -57,7 +60,13 @@ object KotlinToDartCompiler {
                 .writeText(kotlin)
         }
 
-        var dartSource = compileToDartSource(setOf(tmpDir), dependencies, showFiles = false)
+        val (env, config) = prepareCompile(setOf(tmpDir), showFiles = false)
+
+        var dartSource = compileToDartSource(
+            ir = sourceToIr(env, config, dependencies),
+            config
+        )
+
         if (format) {
             dartSource = dartFormat(dartSource).removeSuffix("\n")
         }
@@ -75,17 +84,40 @@ object KotlinToDartCompiler {
         format: Boolean = false,
         klib: Boolean = false
     ) {
+        val (env, config) = prepareCompile(sourceRoots, showFiles = true)
+
+        val ir = sourceToIr(env, config, dependencies)
+
+        // The klib file must be written before compiling to Dart source, since it will chang the IR in place.
         if (klib) {
-            compileToKlib(sourceRoots, dependencies, outputFile)
+            writeToKlib(env, config, ir, outputFile)
         }
 
-        val dartSource = compileToDartSource(sourceRoots, dependencies, showFiles = true)
+        val dartSource = compileToDartSource(ir, config)
 
-        outputFile.parentFile?.mkdirs()
-        outputFile.writeText(dartSource)
+        when {
+            klib -> {
+                // If we're compiling to a klib, we want to put the Dart source in the klib.
+                KonanFile(outputFile.absolutePath).zipFileSystem().use {
+                    val source = when {
+                        format -> dartFormat(dartSource)
+                        else -> dartSource
+                    }
 
-        if (format) {
-            dartFormat(outputFile)
+                    it.file("dart/main.dart").apply {
+                        parentFile.mkdirs()
+                        writeText(source)
+                    }
+                }
+            }
+            else -> outputFile.apply {
+                parentFile?.mkdirs()
+                writeText(dartSource)
+
+                if (format) {
+                    dartFormat(this)
+                }
+            }
         }
     }
 
@@ -122,36 +154,14 @@ object KotlinToDartCompiler {
     }
 
     /**
-     * Compiles the given Kotlin source roots and returns the Dart code.
+     * Compiles the given Kotlin IR and returns the Dart source.
      */
     private fun compileToDartSource(
-        sourceRoots: Set<Path>,
-        dependencies: Set<File> = emptySet(),
-        showFiles: Boolean)
-    : String {
-        val (env, config) = prepareCompile(sourceRoots, showFiles)
-
-        return compileToDartSource(
-            sourceToIr = { sourceToIr(env, config, dependencies) },
-            irToDartAst = { module -> irToDartAst(config, module) },
-            dartAstToDartSource = ::dartAstToDartSource
-        )
-    }
-
-    /**
-     * Compiles the given Kotlin source roots and writes to a Klib.
-     */
-    private fun compileToKlib(
-        sourceRoots: Set<Path>,
-        dependencies: Set<File> = emptySet(),
-        outputFile: File
-    ) {
-        val (env, config) = prepareCompile(sourceRoots, showFiles = true, outputFile)
-
-        compileToKlib(
-            sourceToIr = { sourceToIr(env, config, dependencies) },
-            writeToKlib = { irResult -> writeToKlib(env, config, irResult, outputFile) }
-        )
+        ir: IrResult,
+        config: CompilerConfiguration,
+    ): String {
+        val dartAst = irToDartAst(config, ir.module)
+        return dartAstToDartSource(dartAst)
     }
 
     class Arguments : CommonCompilerArguments()
