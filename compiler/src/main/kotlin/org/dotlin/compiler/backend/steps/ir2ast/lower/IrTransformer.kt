@@ -21,16 +21,17 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.singleOrNullIfEmpty
 import org.dotlin.compiler.backend.steps.replace
 import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.expressions.*
-import org.jetbrains.kotlin.ir.visitors.*
-
-typealias Transform<E> = (E) -> Transformations<E>
+import org.jetbrains.kotlin.ir.expressions.IrBlockBody
+import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrExpressionBody
+import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
+import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
+import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 
 typealias Transformations<E> = Sequence<Transformation<E>>
 
@@ -43,6 +44,26 @@ interface IrSingleTransformer<E : IrElement> : IrTransformer<E, Transformation<E
 interface IrMultipleTransformer<E : IrElement> : IrTransformer<E, Transformations<E>>
 
 interface IrDeclarationTransformer : IrMultipleTransformer<IrDeclaration>, FileLoweringPass {
+    @Suppress("UNCHECKED_CAST")
+    private fun IrDeclarationContainer.transformDeclarations(
+        transform: (IrDeclaration) -> Transformations<IrDeclaration>
+    ) {
+        declarations.transformBy(::transform, also = {
+            if (it is IrDeclarationContainer) {
+                it.transformDeclarations(transform)
+            }
+
+            if (it is IrFunction) {
+                it.apply {
+                    valueParameters = valueParameters.toMutableList<IrDeclaration>()
+                        .apply {
+                            transformBy(::transform)
+                        } as List<IrValueParameter>
+                }
+            }
+        })
+    }
+
     override fun lower(irFile: IrFile) = irFile.transformDeclarations(::transform)
 
     override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration>
@@ -64,18 +85,7 @@ interface IrExpressionTransformer : IrSingleTransformer<IrExpression>, FileLower
                 override fun visitExpression(expression: IrExpression, parent: IrDeclarationParent): IrExpression {
                     expression.transformChildren(this, parent)
 
-                    return when (val transformation = transform(expression, parent)) {
-                        is Transformation.Replace -> {
-                            if (transformation.old != null) {
-                                throw UnsupportedOperationException("Cannot replace another expression")
-                            }
-
-                            transformation.new
-                        }
-                        is Transformation.Add -> throw UnsupportedOperationException("Cannot add an expression")
-                        is Transformation.Remove -> throw UnsupportedOperationException("Cannot remove an expression")
-                        else -> expression
-                    }
+                    return expression.transformBy { transform(it, parent) }
                 }
             },
             irFile
@@ -89,54 +99,41 @@ interface IrExpressionTransformer : IrSingleTransformer<IrExpression>, FileLower
 
 interface IrStatementTransformer : IrMultipleTransformer<IrStatement>, FileLoweringPass {
     override fun lower(irFile: IrFile) {
-        irFile.acceptChildrenVoid(object : IrElementVisitorVoid {
-            override fun visitBlockBody(body: IrBlockBody) {
-                super.visitBlockBody(body)
+        irFile.acceptChildrenVoid(
+            object : IrElementVisitorVoid {
+                override fun visitBlockBody(body: IrBlockBody) {
+                    super.visitBlockBody(body)
 
-                var i = 0
-
-                body.statements.toList().forEach { statement ->
-                    transform(statement, body).forEach { transformation ->
-                        i += body.statements.transform(transformation, at = i)
-                    }
-
-                    i++
+                    body.statements.transformBy({ transform(it, body) })
                 }
-            }
 
-            override fun visitElement(element: IrElement) = element.acceptChildrenVoid(this)
-        })
+                override fun visitElement(element: IrElement) = element.acceptChildrenVoid(this)
+            }
+        )
     }
 
-    override fun transform(element: IrStatement) = throw UnsupportedOperationException("This should not be used.")
-
-    fun transform(statement: IrStatement, body: IrBlockBody): Transformations<IrStatement>
+    override fun transform(statement: IrStatement) = noChange()
+    fun transform(statement: IrStatement, body: IrBlockBody): Transformations<IrStatement> = transform(statement)
 }
 
 interface IrBodyExpressionTransformer : IrSingleTransformer<IrExpression>, FileLoweringPass {
     override fun lower(irFile: IrFile) {
-        irFile.acceptChildrenVoid(object : IrElementVisitorVoid {
-            override fun visitExpressionBody(body: IrExpressionBody) {
-                super.visitExpressionBody(body)
+        irFile.acceptChildrenVoid(
+            object : IrElementVisitorVoid {
+                override fun visitExpressionBody(body: IrExpressionBody) {
+                    super.visitExpressionBody(body)
 
-                @Suppress("UNCHECKED_CAST")
-                body.expression.transformSingle({ exp ->
-                    transform(exp, body)?.let {
-                        require(it !is Transformation.Remove) { "Cannot remove expression from expression body" }
-                        sequenceOf(it)
-                    } ?: emptySequence()
-                }) {
-                    body.expression = it!!
+                    body.expression = body.expression.transformBy { transform(it, body) }
                 }
-            }
 
-            override fun visitElement(element: IrElement) = element.acceptChildrenVoid(this)
-        })
+                override fun visitElement(element: IrElement) = element.acceptChildrenVoid(this)
+            }
+        )
     }
 
-    override fun transform(element: IrExpression) = throw UnsupportedOperationException("This should not be used.")
+    override fun transform(expression: IrExpression) = noChange()
 
-    fun transform(expression: IrExpression, body: IrExpressionBody): Transformation<IrExpression>?
+    fun transform(expression: IrExpression, body: IrExpressionBody) = transform(expression)
 }
 
 interface IrStatementAndBodyExpressionTransformer : FileLoweringPass {
@@ -149,169 +146,54 @@ interface IrStatementAndBodyExpressionTransformer : FileLoweringPass {
     }
 }
 
-fun IrDeclarationContainer.transformDeclarations(block: Transform<IrDeclaration>) {
+fun <E : IrElement> MutableList<E>.transformBy(
+    transform: (E) -> Transformations<E>,
+    also: (E) -> Unit = {}
+) {
     var i = 0
-    declarations.toList().forEach { irDeclaration ->
-        block(irDeclaration).forEach {
-            i += declarations.transform(it, at = i)
-        }
+    toList().forEach { childElement ->
+        also(childElement)
 
-        when (irDeclaration) {
-            is IrProperty -> irDeclaration.transform(block)
-            is IrFunction -> irDeclaration.transform(block)
+        transform(childElement).forEach {
+            when (it) {
+                is Transformation.Add -> {
+                    add(i + 1, it.element)
+                    i += 1
+                }
+                is Transformation.Replace -> when (it.old) {
+                    null -> this[i] = it.new
+                    else -> replace(it.old, it.new)
+                }
+
+                is Transformation.Remove -> {
+                    remove(it.element ?: childElement)
+                    i -= 1
+                }
+            }
         }
 
         i++
-
-        if (irDeclaration is IrDeclarationContainer) {
-            irDeclaration.transformDeclarations(block)
-        }
-
-        // We check for local declarations and expressions with declarations.
-        irDeclaration.transformChildrenVoid(
-            object : IrElementTransformerVoid() {
-                override fun visitBody(body: IrBody): IrBody {
-                    if (body !is IrBlockBody) return body
-
-                    body.statements.apply {
-                        filterIsInstance<IrDeclaration>().forEach { localDeclaration ->
-                            block(localDeclaration).forEach { transformation ->
-                                when (transformation) {
-                                    is Transformation.Replace<IrDeclaration> -> {
-                                        val old = transformation.old ?: localDeclaration
-                                        replace(old, transformation.new)
-                                    }
-                                    is Transformation.Add -> add(indexOf(localDeclaration), transformation.element)
-                                    is Transformation.Remove -> remove(localDeclaration)
-                                }
-
-                                if (localDeclaration is IrDeclarationContainer) {
-                                    localDeclaration.transformDeclarations(block)
-                                    // We don't want to visit bodies with this transformer, otherwise we'll have an
-                                    // in infinite loop.
-                                    return@visitBody body
-                                }
-                            }
-                        }
-                    }
-
-                    return super.visitBody(body)
-                }
-
-                override fun visitFunctionExpression(expression: IrFunctionExpression): IrExpression {
-                    expression.function.transformSingle(block) { expression.function = it!! }
-
-                    return super.visitFunctionExpression(expression)
-                }
-            }
-        )
     }
 }
 
-
-
-@JvmName("transformDeclarations")
-private fun MutableList<IrDeclaration>.transform(
-    transformation: Transformation<IrDeclaration>,
-    at: Int
-): Int {
-    @Suppress("UNCHECKED_CAST")
-    return (this as MutableList<IrElement>).transform(transformation as Transformation<IrElement>, at)
-}
-
-@JvmName("transformElements")
-private fun <E : IrElement> MutableList<E>.transform(transformation: Transformation<E>, at: Int): Int {
-    var i = 0
-
-    when (transformation) {
+fun <E : IrExpression> E.transformBy(transform: (E) -> Transformation<E>?): E {
+    return when (val transformation = transform(this)) {
         is Transformation.Replace -> {
-            val oldIndex = transformation.old?.let { indexOf(it) }
-
-            when {
-                oldIndex == null -> this[at] = transformation.new
-                oldIndex >= 0 -> this[oldIndex] = transformation.new
+            if (transformation.old != null && transformation.old !== this) {
+                throw UnsupportedOperationException("Cannot replace another expression")
             }
+
+            transformation.new
         }
-        is Transformation.Add -> {
-            // Add the element after this one.
-            add(at + 1, transformation.element)
-            i = 1
-        }
-        is Transformation.Remove -> {
-            when (transformation.element) {
-                null -> removeAt(at)
-                else -> remove(transformation.element)
-            }
-            i = -1
-        }
-    }
-
-    return i
-}
-
-private fun IrProperty.transform(block: Transform<IrDeclaration>) {
-    getter?.transformSingle(block) { getter = it }
-    setter?.transformSingle(block) { setter = it }
-    backingField?.transformSingle(block) { backingField = it }
-}
-
-@Suppress("UNCHECKED_CAST")
-private fun IrFunction.transform(block: Transform<IrDeclaration>) {
-    val mutableValueParameters = valueParameters.toMutableList() as MutableList<IrDeclaration>
-    valueParameters.forEachIndexed { index, element ->
-        block(element).singleOrNullIfEmpty()?.let {
-            mutableValueParameters.transform(
-                it,
-                at = index
-            )
-        }
-    }
-
-    valueParameters = mutableValueParameters as MutableList<IrValueParameter>
-}
-
-/**
- * Applies the transformation to a field.
- */
-@Suppress("UNCHECKED_CAST")
-private inline fun <reified E1 : E2, reified E2 : IrElement> E1.transformSingle(
-    block: Transform<E2>,
-    setBlock: (E1?) -> Unit
-) {
-    val transformation = block(this)
-        .singleOrNullIfEmpty { "Cannot transform single element with multiple transformations" } ?: return
-
-    transformation.replacementOf(this, isSubject = true)?.let {
-        if (it is E1) {
-            setBlock(it)
-            return
-        }
-    }
-
-    if (transformation.isRemoval(of = this, isSubject = true)) {
-        setBlock(null)
-        return
+        is Transformation.Add -> throw UnsupportedOperationException("Cannot add an expression")
+        is Transformation.Remove -> throw UnsupportedOperationException("Cannot remove an expression")
+        else -> this
     }
 }
-
-@Suppress("UNCHECKED_CAST")
-private fun <E : IrElement, T : Transformation<E>> T.replacementOf(element: E, isSubject: Boolean = false) = when {
-    this is Transformation.Replace<*> && ((isSubject && old == null) || old === element) -> new as E
-    else -> null
-}
-
-@Suppress("UNCHECKED_CAST")
-private fun <E : IrElement, T : Transformation<E>> T.isRemoval(of: E, isSubject: Boolean = false) =
-    this is Transformation.Remove<*> && ((isSubject && element == null) || element === of)
 
 sealed class Transformation<E : IrElement> {
-    class Replace<E : IrElement>(
-        val old: E?,
-        val new: E,
-    ) : Transformation<E>()
-
+    class Replace<E : IrElement>(val old: E?, val new: E) : Transformation<E>()
     class Add<E : IrElement>(val element: E) : Transformation<E>()
-
     class Remove<E : IrElement>(val element: E? = null) : Transformation<E>()
 }
 
