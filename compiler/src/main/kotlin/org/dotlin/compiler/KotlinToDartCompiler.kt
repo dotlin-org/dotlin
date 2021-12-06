@@ -20,7 +20,6 @@
 package org.dotlin.compiler
 
 import com.intellij.openapi.util.Disposer
-import org.dotlin.compiler.backend.compileIrToDartSource
 import org.dotlin.compiler.backend.steps.ast2dart.dartAstToDartSource
 import org.dotlin.compiler.backend.steps.ir2ast.irToDartAst
 import org.dotlin.compiler.backend.steps.ir2klib.writeToKlib
