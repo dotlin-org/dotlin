@@ -78,13 +78,11 @@ interface IrExpressionTransformer : IrSingleTransformer<IrExpression>, FileLower
                     parent: IrDeclarationParent
                 ): IrStatement {
                     val newParent = if (declaration is IrDeclarationParent) declaration else parent
-
                     return super.visitDeclaration(declaration, newParent)
                 }
 
                 override fun visitExpression(expression: IrExpression, parent: IrDeclarationParent): IrExpression {
                     expression.transformChildren(this, parent)
-
                     return expression.transformBy { transform(it, parent) }
                 }
             },
