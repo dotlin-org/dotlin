@@ -17,7 +17,7 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.backend.steps.src2ir
+package org.dotlin.compiler.backend
 
 import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinExportChecker
 import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinMangleComputer

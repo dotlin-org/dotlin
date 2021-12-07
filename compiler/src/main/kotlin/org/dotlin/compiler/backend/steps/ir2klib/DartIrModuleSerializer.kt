@@ -19,20 +19,24 @@
 
 package org.dotlin.compiler.backend.steps.ir2klib
 
+import org.dotlin.compiler.backend.DartIrMangler
 import org.jetbrains.kotlin.backend.common.serialization.*
 import org.jetbrains.kotlin.ir.IrBuiltIns
+import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsUniqIdClashTracker
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.util.IrMessageLogger
 
 class DartIrModuleSerializer(
     messageLogger: IrMessageLogger,
-    private val builtIns: IrBuiltIns,
+    builtIns: IrBuiltIns,
 ) : IrModuleSerializer<IrFileSerializer>(messageLogger, CompatibilityMode.CURRENT) {
+
+    private val declarationTable = DeclarationTable(DartGlobalDeclarationTable(builtIns))
 
     override fun createSerializerForFile(file: IrFile): IrFileSerializer =
         IrFileSerializer(
             messageLogger,
-            DeclarationTable(DartGlobalDeclarationTable(builtIns)),
+            declarationTable,
             expectDescriptorToSymbol = mutableMapOf(),
             skipExpects = true,
             compatibilityMode = compatibilityMode
@@ -40,7 +44,7 @@ class DartIrModuleSerializer(
 }
 
 class DartGlobalDeclarationTable(builtIns: IrBuiltIns) :
-    GlobalDeclarationTable(DartMangler()) {
+    GlobalDeclarationTable(DartIrMangler, JsUniqIdClashTracker() /* TODO: JS reference */) {
     init {
         loadKnownBuiltins(builtIns)
     }

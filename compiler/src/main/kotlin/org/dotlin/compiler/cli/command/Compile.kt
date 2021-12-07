@@ -77,10 +77,10 @@ class Compile : CliktCommand(name = "dotlin") {
 
         KotlinToDartCompiler.compile(
             sourceRoots!!,
-            output!!,
             dependencies,
             format,
-            klib = output!!.extension == ".klib"
+            klib = output!!.extension == ".klib",
+            output!!,
         )
     }
 }

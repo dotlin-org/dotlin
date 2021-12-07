@@ -26,7 +26,6 @@ import org.jetbrains.kotlin.backend.common.serialization.IrModuleDeserializer
 import org.jetbrains.kotlin.backend.common.serialization.KotlinIrLinker
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.ir.IrBuiltIns
-import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsManglerIr
 import org.jetbrains.kotlin.ir.builders.TranslationPluginContext
 import org.jetbrains.kotlin.ir.types.IrTypeSystemContextImpl
 import org.jetbrains.kotlin.ir.util.IrMessageLogger
@@ -46,8 +45,7 @@ class DartIrLinker(
     override val fakeOverrideBuilder = FakeOverrideBuilder(
         this,
         symbolTable,
-        // TODO: JS reference
-        JsManglerIr,
+        DartIrMangler,
         IrTypeSystemContextImpl(builtIns),
     )
 

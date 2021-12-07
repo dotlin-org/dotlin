@@ -17,20 +17,24 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package compile.builtins
+package compile.klib
 
 import BaseTest
 import assertCanCompileLib
-import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import stdlibKlib
+import stdlibSrc
+import java.io.File
 import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.Path
 
-@Disabled
+
 @OptIn(ExperimentalPathApi::class)
+@DisplayName("Compile: Klib: Standard Library")
 class StandardLibrary : BaseTest {
     @Test
-    fun all() = assertCanCompileLib {
-        path = Path("../libraries/stdlib/src/kotlin")
+    fun stdlib() = assertCanCompileLib {
+        path = stdlibSrc
+        dependencies = setOf()
     }
 }

@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.src2ir
 
+import org.dotlin.compiler.backend.DartDescriptorBasedMangler
 import org.dotlin.compiler.backend.DartIrLinker
 import org.dotlin.compiler.backend.DotlinCompilerError
 import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDescriptor
@@ -45,6 +46,7 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi2ir.Psi2IrConfiguration
 import org.jetbrains.kotlin.psi2ir.Psi2IrTranslator
+import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.util.DummyLogger
 import org.jetbrains.kotlin.utils.addToStdlib.cast
@@ -176,7 +178,9 @@ private fun loadIr(
 
     return IrResult(
         module,
-        resolvedLibs
+        resolvedLibs,
+        psi2IrContext.bindingContext,
+        symbolTable
     )
 }
 
@@ -201,4 +205,6 @@ private val ModuleDescriptorImpl.dependencies: Set<ModuleDescriptorImpl>
 data class IrResult(
     val module: IrModuleFragment,
     val resolvedLibs: KotlinLibraryResolveResult,
+    val bindingContext: BindingContext,
+    val symbolTable: SymbolTable,
 )
