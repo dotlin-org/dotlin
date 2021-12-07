@@ -17,7 +17,7 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.backend.steps.ir2klib
+package org.dotlin.compiler.backend
 
 import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinExportChecker
 import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinMangleComputer
@@ -27,21 +27,22 @@ import org.jetbrains.kotlin.backend.common.serialization.mangle.ir.IrExportCheck
 import org.jetbrains.kotlin.backend.common.serialization.mangle.ir.IrMangleComputer
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 
-class DartMangler : IrBasedKotlinManglerImpl() {
+object DartIrMangler : IrBasedKotlinManglerImpl() {
     override fun getExportChecker(compatibleMode: Boolean): KotlinExportChecker<IrDeclaration> =
         DartIrExportChecker(compatibleMode)
 
     override fun getMangleComputer(mode: MangleMode, compatibleMode: Boolean): KotlinMangleComputer<IrDeclaration> =
-        DartIrManglerComputer(mode, compatibleMode)
+        DartIrManglerComputer(StringBuilder(256), mode, compatibleMode)
 
     private class DartIrExportChecker(compatibleMode: Boolean) : IrExportCheckerVisitor(compatibleMode) {
         override fun IrDeclaration.isPlatformSpecificExported() = false
     }
 
     private class DartIrManglerComputer(
+        builder: StringBuilder,
         mode: MangleMode,
         compatibleMode: Boolean
-    ) : IrMangleComputer(StringBuilder(256), mode, compatibleMode) {
-        override fun copy(newMode: MangleMode): IrMangleComputer = DartIrManglerComputer(newMode, compatibleMode)
+    ) : IrMangleComputer(builder, mode, compatibleMode) {
+        override fun copy(newMode: MangleMode): IrMangleComputer = DartIrManglerComputer(builder, newMode, compatibleMode)
     }
 }

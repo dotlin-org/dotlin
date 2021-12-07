@@ -17,7 +17,22 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import org.dotlin.compiler.KotlinToDartCompiler
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayNameGeneration
 
 @DisplayNameGeneration(FunctionDisplayNameGenerator::class)
-interface BaseTest
+interface BaseTest {
+    companion object {
+        @BeforeAll
+        @JvmStatic
+        fun compileStdlib() {
+            KotlinToDartCompiler.compile(
+                sourceRoots = setOf(stdlibSrc),
+                outputFile = stdlibKlib,
+                dependencies = emptySet(),
+                klib = true
+            )
+        }
+    }
+}

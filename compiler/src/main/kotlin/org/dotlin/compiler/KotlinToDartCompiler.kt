@@ -38,20 +38,26 @@ import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.konan.file.file
-import org.jetbrains.kotlin.konan.file.File as KonanFile
 import org.jetbrains.kotlin.konan.file.zipFileSystem
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createFile
 import kotlin.io.path.createTempDirectory
+import org.jetbrains.kotlin.konan.file.File as KonanFile
 
 object KotlinToDartCompiler {
     /**
      * Compiles the given Kotlin code and returns Dart code.
      */
     @OptIn(ExperimentalPathApi::class)
-    fun compile(kotlin: String, dependencies: Set<File> = emptySet(), format: Boolean = false): String {
+    fun compile(
+        kotlin: String,
+        dependencies: Set<File> = emptySet(),
+        format: Boolean = false,
+        klib: Boolean = false,
+        outputFile: File? = null
+    ): String {
         val tmpDir = createTempDirectory().also {
             it.resolve("main.kt")
                 .createFile()
@@ -59,65 +65,53 @@ object KotlinToDartCompiler {
                 .writeText(kotlin)
         }
 
-        val (env, config) = prepareCompile(setOf(tmpDir), showFiles = false)
-
-        var dartSource = compileToDartSource(
-            ir = sourceToIr(env, config, dependencies),
-            config
+        return compile(
+            sourceRoots = setOf(tmpDir),
+            dependencies,
+            format,
+            klib,
+            outputFile,
         )
-
-        if (format) {
-            dartSource = dartFormat(dartSource).removeSuffix("\n")
-        }
-
-        return dartSource
     }
 
-    /**
-     * Compiles the given Kotlin source roots and writes it to [outputFile].
-     */
     fun compile(
         sourceRoots: Set<Path>,
-        outputFile: File,
         dependencies: Set<File>,
         format: Boolean = false,
-        klib: Boolean = false
-    ) {
+        klib: Boolean = false,
+        outputFile: File? = null,
+    ): String {
         val (env, config) = prepareCompile(sourceRoots, showFiles = true)
 
         val ir = sourceToIr(env, config, dependencies)
 
-        // The klib file must be written before compiling to Dart source, since it will change the IR in place.
-        if (klib) {
-            writeToKlib(env, config, ir, outputFile)
+        // By lazy is important here, the klib must be written before compiling to Dart source,
+        // since it will change the IR in place.
+        val dartSource by lazy {
+            compileToDartSource(ir, config).let { if (format) dartFormat(it) else it }
         }
-
-        val dartSource = compileToDartSource(ir, config)
 
         when {
             klib -> {
+                if (outputFile == null) error("outputFile must not be null if writing to a klib")
+
+                writeToKlib(env, config, ir, outputFile)
+
                 // If we're compiling to a klib, we want to put the Dart source in the klib.
                 KonanFile(outputFile.absolutePath).zipFileSystem().use {
-                    val source = when {
-                        format -> dartFormat(dartSource)
-                        else -> dartSource
-                    }
-
                     it.file("dart/main.dart").apply {
                         parentFile.mkdirs()
-                        writeText(source)
+                        writeText(dartSource)
                     }
                 }
             }
-            else -> outputFile.apply {
+            else -> outputFile?.apply {
                 parentFile?.mkdirs()
                 writeText(dartSource)
-
-                if (format) {
-                    dartFormat(this)
-                }
             }
         }
+
+        return dartSource.removeSuffix("\n")
     }
 
     private fun prepareCompile(sourceRoots: Set<Path>, showFiles: Boolean, outputFile: File? = null)
@@ -159,7 +153,7 @@ object KotlinToDartCompiler {
         ir: IrResult,
         config: CompilerConfiguration,
     ): String {
-        val dartAst = irToDartAst(config, ir.module)
+        val dartAst = irToDartAst(config, ir)
         return dartAstToDartSource(dartAst)
     }
 
@@ -195,9 +189,5 @@ object KotlinToDartCompiler {
         val output = String(stdout.readBytes())
 
         return if (output.isNotEmpty()) output else code
-    }
-
-    private fun dartFormat(file: File) {
-        execDartFormat(file.absolutePath)
     }
 }

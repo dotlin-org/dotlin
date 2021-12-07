@@ -19,11 +19,15 @@
 
 import org.dotlin.compiler.KotlinToDartCompiler
 import org.intellij.lang.annotations.Language
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import java.io.File
 import java.nio.file.Path
+import kotlin.io.path.Path
 import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.createTempFile
+import kotlin.io.path.writeText
 import kotlin.test.assertEquals
 
 abstract class CompilerAssertion {
@@ -59,8 +63,7 @@ inline fun assertCompile(block: AssertCompile.() -> Unit) {
     val compiledDart = assertDoesNotThrow {
         KotlinToDartCompiler.compile(
             kotlin,
-            // TODO: Use our own compiled stdlib when we can.
-            dependencies = setOf(File("kotlin-stdlib-js-1.5.0-M1.klib")),
+            dependencies = setOf(stdlibKlib),
             format = true
         )
     }
@@ -80,8 +83,13 @@ inline fun <reified E : Throwable> assertCompileThrows(block: AssertCompileThrow
 }
 
 
-class AssertCompileLibrary {
-    lateinit var path: Path
+class AssertCompileLibrary : CompilerAssertion() {
+    var path: Path? = null
+
+    var dependencies = setOf(stdlibKlib)
+
+    val source: String
+        get() = kotlin
 }
 
 @OptIn(ExperimentalPathApi::class)
@@ -89,15 +97,29 @@ inline fun assertCanCompileLib(block: AssertCompileLibrary.() -> Unit) {
     val args = AssertCompileLibrary()
     block(args)
 
+    val output = File("build/output.klib")
+
     assertDoesNotThrow {
-        KotlinToDartCompiler.compile(
-            sourceRoots = setOf(args.path),
-            outputFile = File("output.klib"),
-            dependencies = emptySet(),
-            klib = true
-        )
+        when (val path = args.path) {
+            null -> KotlinToDartCompiler.compile(
+                args.source,
+                outputFile = output,
+                dependencies = args.dependencies,
+                klib = true
+            )
+            else -> KotlinToDartCompiler.compile(
+                sourceRoots = setOf(path),
+                outputFile = output,
+                dependencies = args.dependencies,
+                klib = true
+            )
+        }
     }
 }
+
+@OptIn(ExperimentalPathApi::class)
+val stdlibSrc = Path("../libraries/stdlib/src")
+val stdlibKlib = File("build/stdlib.klib")
 
 /**
  * Used to reference the `_$DefaultValue` Dart type in multiline

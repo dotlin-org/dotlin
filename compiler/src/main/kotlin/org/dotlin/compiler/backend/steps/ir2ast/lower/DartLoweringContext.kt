@@ -26,7 +26,6 @@ import org.jetbrains.kotlin.backend.common.ir.Ir
 import org.jetbrains.kotlin.backend.common.ir.SharedVariablesManager
 import org.jetbrains.kotlin.backend.common.ir.Symbols
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
-import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDescriptor
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
@@ -53,11 +52,9 @@ import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.types.Variance
 
-// TODO: JS reference
-object DartManglerDesc : AbstractJsDescriptorMangler()
-
 class DartLoweringContext(
     override val configuration: CompilerConfiguration,
+    private val symbolTable: SymbolTable,
     irModuleFragment: IrModuleFragment
 ) : CommonBackendContext {
     override val builtIns = irModuleFragment.descriptor.builtIns
@@ -73,8 +70,8 @@ class DartLoweringContext(
     override val ir: Ir<CommonBackendContext> = object : Ir<DartLoweringContext>(this, irModuleFragment) {
         override val symbols = object : Symbols<DartLoweringContext>(
             this@DartLoweringContext,
-            this@DartLoweringContext.irBuiltIns,
-            SymbolTable(IdSignatureDescriptor(DartManglerDesc), irFactory)
+            irBuiltIns,
+            symbolTable,
         ) {
             override val coroutineContextGetter: IrSimpleFunctionSymbol
                 get() = TODO("Not yet implemented")

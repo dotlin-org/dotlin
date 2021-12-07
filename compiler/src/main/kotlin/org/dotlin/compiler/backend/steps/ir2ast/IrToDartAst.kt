@@ -21,20 +21,19 @@ package org.dotlin.compiler.backend.steps.ir2ast
 
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lower
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.IrToDartCompilationUnitTransformer
+import org.dotlin.compiler.backend.steps.src2ir.IrResult
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-
 
 fun irToDartAst(
     configuration: CompilerConfiguration,
-    irModule: IrModuleFragment
+    ir: IrResult
 ): List<DartCompilationUnit> {
-    irModule.lower(configuration)
+    ir.module.lower(configuration, ir.symbolTable)
 
     val context = DartTransformContext()
     val units = mutableListOf<DartCompilationUnit>()
-    for (file in irModule.files) {
+    for (file in ir.module.files) {
         units.add(file.accept(IrToDartCompilationUnitTransformer, context))
     }
 
