@@ -20,14 +20,19 @@
 package org.dotlin.compiler.backend.steps.ir2ast.transformer.util
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
-import org.dotlin.compiler.backend.steps.ir2ast.ir.*
+import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrivate
+import org.dotlin.compiler.backend.steps.ir2ast.ir.owner
+import org.dotlin.compiler.backend.steps.ir2ast.ir.toDart
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.dotlin.compiler.dart.ast.type.DartNamedType
 import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
 import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationWithName
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationWithVisibility
-import org.jetbrains.kotlin.ir.types.*
+import org.jetbrains.kotlin.ir.types.IrDynamicType
+import org.jetbrains.kotlin.ir.types.IrSimpleType
+import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.isNullable
 
 fun IrType.toDart(context: DartTransformContext): DartTypeAnnotation {
     // TODO: Check for function type
