@@ -19,7 +19,6 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
-import org.dotlin.compiler.backend.steps.falseIfNull
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrBinaryInfixExpression
@@ -35,7 +34,6 @@ import org.dotlin.compiler.dart.ast.expression.invocation.DartMethodInvocation
 import org.dotlin.compiler.dart.ast.expression.literal.*
 import org.dotlin.compiler.dart.ast.type.DartNamedType
 import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrField
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.*
