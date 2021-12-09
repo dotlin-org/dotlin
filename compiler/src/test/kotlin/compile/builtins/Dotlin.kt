@@ -21,7 +21,6 @@ package compile.builtins
 
 import BaseTest
 import assertCompile
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
@@ -79,6 +78,49 @@ class Dotlin : BaseTest {
 
             void main() {
               Hobbit().isProudfoot;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartGetter override`() = assertCompile {
+        kotlin(
+            """
+            open class Hobbit {
+                @DartGetter
+                open fun isProudfoot(): Boolean = false
+            }
+
+            class Proudfoot : Hobbit() {
+                override fun isProudfoot(): Boolean = true
+            }
+
+            fun main() {
+                Proudfoot().isProudfoot()
+            }
+            """
+        )
+
+        dart(
+            """
+            class Hobbit {
+              Hobbit() : super();
+              bool get isProudfoot {
+                return false;
+              }
+            }
+
+            class Proudfoot extends Hobbit {
+              Proudfoot() : super();
+              @override
+              bool get isProudfoot {
+                return true;
+              }
+            }
+
+            void main() {
+              Proudfoot().isProudfoot;
             }
             """
         )

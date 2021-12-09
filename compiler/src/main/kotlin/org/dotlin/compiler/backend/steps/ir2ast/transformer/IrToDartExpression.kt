@@ -141,7 +141,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                     right = parenthesize(irCallLike.getValueArgument(1)!!.accept(context)),
                 )
             else -> {
-                val hasDartGetterAnnotation = irCallLike.symbol.owner.hasAnnotation(DotlinAnnotations.dartGetter)
+                val hasDartGetterAnnotation = irCallLike.symbol.owner.hasDartGetterAnnotation()
 
                 when {
                     origin == IrStatementOrigin.GET_PROPERTY || origin == IrStatementOrigin.GET_LOCAL_PROPERTY

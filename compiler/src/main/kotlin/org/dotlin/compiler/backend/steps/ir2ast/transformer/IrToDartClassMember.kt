@@ -51,7 +51,7 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
                     parameters = parameters,
                     body = irFunction.body.accept(context)
                 ),
-                isGetter = irFunction.isGetter || irFunction.hasAnnotation(DotlinAnnotations.dartGetter),
+                isGetter = irFunction.isGetter || irFunction.hasDartGetterAnnotation(),
                 isSetter = irFunction.isSetter,
                 isOperator = irFunction.isOperator,
                 isStatic = irFunction.isStatic,
