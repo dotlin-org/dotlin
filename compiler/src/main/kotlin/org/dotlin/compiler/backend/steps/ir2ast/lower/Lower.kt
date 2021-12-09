@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.SymbolTable
 
 private val lowerings = listOf(
+    ::DartNameLowering,
     ::ObjectLowering,
     ::NestedClassLowering,
     ::EnumLowering,
