@@ -85,7 +85,7 @@ class ObjectLowering(private val context: DartLoweringContext) : IrDeclarationTr
                         context.createIrBuilder(symbol).buildStatement {
                             irGetField(
                                 receiver = irGetObject(obj.symbol),
-                                field = obj.fieldWithName("\$instance") ,
+                                field = obj.fieldWithName("\$instance"),
                             )
                         }
                     )

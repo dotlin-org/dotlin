@@ -41,12 +41,14 @@ class Compile : CliktCommand(name = "dotlin") {
         .optional()
 
     private val output: File? by argument()
-        .help("""
+        .help(
+            """
             Path of output file to compile to.
             
             If the extension of the file is .dart, Dart source will be generated. If the
             extension of the file is .klib, a Klib will be generated.
-        """.trimIndent())
+            """.trimIndent()
+        )
         .file(
             mustExist = false,
             canBeDir = false,

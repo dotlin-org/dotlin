@@ -34,8 +34,7 @@ sealed class IrDartDeclarationOrigin(private val name: String) : IrDeclarationOr
      */
     object COMPLEX_PARAM_DEFAULT_VALUE : IrDartDeclarationOrigin("COMPLEX_PARAM_DEFAULT_VALUE_MARKER")
 
-    data class COMPLEX_PARAM(val originalType: IrType)
-        : IrDartDeclarationOrigin("COMPLEX_PARAM")
+    data class COMPLEX_PARAM(val originalType: IrType) : IrDartDeclarationOrigin("COMPLEX_PARAM")
 
     object SYNTHETIC_OPERATOR : IrDartDeclarationOrigin("SYNTHETIC_OPERATOR")
 

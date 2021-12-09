@@ -43,6 +43,7 @@ object DartIrMangler : IrBasedKotlinManglerImpl() {
         mode: MangleMode,
         compatibleMode: Boolean
     ) : IrMangleComputer(builder, mode, compatibleMode) {
-        override fun copy(newMode: MangleMode): IrMangleComputer = DartIrManglerComputer(builder, newMode, compatibleMode)
+        override fun copy(newMode: MangleMode): IrMangleComputer =
+            DartIrManglerComputer(builder, newMode, compatibleMode)
     }
 }

@@ -35,7 +35,10 @@ import org.jetbrains.kotlin.name.Name
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 class WhensWithSubjectExpressionsLowering(private val context: DartLoweringContext) : IrExpressionTransformer {
-    override fun transform(expression: IrExpression, containerParent: IrDeclarationParent): Transformation<IrExpression>? {
+    override fun transform(
+        expression: IrExpression,
+        containerParent: IrDeclarationParent
+    ): Transformation<IrExpression>? {
         if (expression !is IrBlock || expression.origin != IrStatementOrigin.WHEN) return noChange()
 
         val whenExpression = expression.statements.last() as IrWhen
