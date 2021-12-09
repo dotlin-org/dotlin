@@ -22,6 +22,7 @@ package kotlin
  * Represents a value which is either `true` or `false`. In Dart, values of this type are
  * represented as values of type `bool`.
  */
+@DartBuiltIn()
 @DartName("bool")
 public class Boolean private constructor() : Comparable<Boolean> {
     /**

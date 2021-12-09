@@ -56,6 +56,8 @@ class Dotlin : BaseTest {
     fun `@DartGetter`() = assertCompile {
         kotlin(
             """
+            @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
             class Hobbit {
                 @DartGetter
                 fun isProudfoot(): Boolean = true
@@ -87,6 +89,8 @@ class Dotlin : BaseTest {
     fun `@DartGetter override`() = assertCompile {
         kotlin(
             """
+            @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
             open class Hobbit {
                 @DartGetter
                 open fun isProudfoot(): Boolean = false
@@ -121,6 +125,30 @@ class Dotlin : BaseTest {
 
             void main() {
               Proudfoot().isProudfoot;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartBuiltIn`() = assertCompile {
+        kotlin(
+            """
+            @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
+            @DartBuiltIn
+            class Test
+
+            fun main() {
+                Test()
+            }
+            """
+        )
+
+        dart(
+            """
+            void main() {
+              Test();
             }
             """
         )
