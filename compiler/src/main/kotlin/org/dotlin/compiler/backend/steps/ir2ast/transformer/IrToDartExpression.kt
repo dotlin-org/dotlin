@@ -26,6 +26,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrConjunctionExpressi
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrDisjunctionExpression
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrNullAwareExpression
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.*
+import org.dotlin.compiler.backend.steps.util.hasDartGetterAnnotation
 import org.dotlin.compiler.dart.ast.collection.DartCollectionElementList
 import org.dotlin.compiler.dart.ast.expression.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier

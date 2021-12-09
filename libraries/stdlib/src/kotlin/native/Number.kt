@@ -20,6 +20,7 @@ package kotlin
 /**
  * Superclass for all platform classes representing numeric values.
  */
+@DartBuiltIn()
 @DartName("num")
 public abstract class Number {
     /**

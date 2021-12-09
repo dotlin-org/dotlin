@@ -27,16 +27,3 @@ package dotlin
     AnnotationTarget.FILE
 )
 annotation class DartName(val name: String)
-
-/**
- * Specifies that the annotated method will be a getter in Dart.
- *
- * Can only be used on methods with no parameters and a return type that's not [Unit].
- *
- * Applies to any overrides in subtypes as well.
- *
- * **Note:** This annotation should not be used in general. This annotation exists purely for
- * standard library compilation.
- */
-@Target(AnnotationTarget.FUNCTION)
-annotation class DartGetter

@@ -17,7 +17,7 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.backend.steps.ir2ast.transformer.util
+package org.dotlin.compiler.backend.steps.util
 
 import org.dotlin.compiler.backend.steps.falseIfNull
 import org.jetbrains.kotlin.ir.declarations.IrAnnotationContainer
@@ -31,6 +31,7 @@ import org.jetbrains.kotlin.name.FqName
 object DotlinAnnotations {
     const val dartName = "dotlin.DartName"
     const val dartGetter = "dotlin.DartGetter"
+    const val dartBuiltIn = "dotlin.DartBuiltIn"
 }
 
 @Suppress("UNCHECKED_CAST")
