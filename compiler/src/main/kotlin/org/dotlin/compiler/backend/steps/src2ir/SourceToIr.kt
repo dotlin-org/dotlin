@@ -21,9 +21,9 @@ package org.dotlin.compiler.backend.steps.src2ir
 
 import org.dotlin.compiler.backend.DartDescriptorBasedMangler
 import org.dotlin.compiler.backend.DartIrLinker
-import org.dotlin.compiler.backend.DotlinCompilerError
+import org.dotlin.compiler.backend.DartKotlinBuiltIns
+import org.dotlin.compiler.backend.steps.src2ir.analyze.DartKotlinAnalyzer
 import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDescriptor
-import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.cli.common.messages.AnalyzerWithCompilerReport
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
@@ -31,7 +31,6 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.descriptors.konan.kotlinLibrary
-import org.jetbrains.kotlin.ir.backend.js.TopDownAnalyzerFacadeForJSIR
 import org.jetbrains.kotlin.ir.backend.js.isBuiltIns
 import org.jetbrains.kotlin.ir.builders.TranslationPluginContext
 import org.jetbrains.kotlin.ir.declarations.IrFactory
@@ -80,7 +79,7 @@ private fun loadIr(
     irFactory: IrFactory,
     resolvedLibs: KotlinLibraryResolveResult,
 ): IrResult {
-    val builtIns = object : KotlinBuiltIns(LockBasedStorageManager("DartBuiltIns")) {}
+    val builtIns = DartKotlinBuiltIns()
 
     val resolvedModules = KlibMetadataFactories({ builtIns }, NullFlexibleTypeDeserializer)
         .DefaultResolvedDescriptorsFactory
@@ -103,27 +102,21 @@ private fun loadIr(
         builtIns.builtInsModule = foundBuiltInsModule!!
     }
 
-    // TODO: Replace with Dart specific analyzer
     val analyzer = AnalyzerWithCompilerReport(config).also {
         it.analyzeAndReport(files) {
-            TopDownAnalyzerFacadeForJSIR.analyzeFiles(
-                files = files,
-                project = env.project,
-                configuration = config,
-                moduleDescriptors = resolvedModules.resolvedDescriptors,
-                friendModuleDescriptors = emptyList(),
-                thisIsBuiltInsModule = compilingBuiltIns,
-                customBuiltInsModule = foundBuiltInsModule,
-                targetEnvironment = it.targetEnvironment
+            DartKotlinAnalyzer(env, config).analyze(
+                files,
+                modules = resolvedModules.resolvedDescriptors,
+                isBuiltInsModule = compilingBuiltIns,
+                builtInsModule = foundBuiltInsModule,
+                it.targetEnvironment
             )
         }
     }
 
     val analysisResult = analyzer.analysisResult
 
-    if (analyzer.hasErrors() || analysisResult.isError()) {
-        throw DotlinCompilerError()
-    }
+    analysisResult.throwIfError()
 
     val mainModule = analysisResult.moduleDescriptor.also {
         if (compilingBuiltIns) {
