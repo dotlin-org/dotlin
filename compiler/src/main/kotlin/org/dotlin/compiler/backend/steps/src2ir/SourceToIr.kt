@@ -22,6 +22,7 @@ package org.dotlin.compiler.backend.steps.src2ir
 import org.dotlin.compiler.backend.DartDescriptorBasedMangler
 import org.dotlin.compiler.backend.DartIrLinker
 import org.dotlin.compiler.backend.DartKotlinBuiltIns
+import org.dotlin.compiler.backend.DotlinCompilerError
 import org.dotlin.compiler.backend.steps.src2ir.analyze.DartKotlinAnalyzer
 import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDescriptor
 import org.jetbrains.kotlin.cli.common.messages.AnalyzerWithCompilerReport
@@ -116,7 +117,9 @@ private fun loadIr(
 
     val analysisResult = analyzer.analysisResult
 
-    analysisResult.throwIfError()
+    if (analyzer.hasErrors() || analysisResult.isError()) {
+        throw DotlinCompilerError()
+    }
 
     val mainModule = analysisResult.moduleDescriptor.also {
         if (compilingBuiltIns) {
