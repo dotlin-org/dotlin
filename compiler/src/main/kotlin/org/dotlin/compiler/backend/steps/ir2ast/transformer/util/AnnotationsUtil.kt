@@ -19,7 +19,10 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer.util
 
+import org.dotlin.compiler.backend.steps.falseIfNull
 import org.jetbrains.kotlin.ir.declarations.IrAnnotationContainer
+import org.jetbrains.kotlin.ir.declarations.IrDeclaration
+import org.jetbrains.kotlin.ir.declarations.IrOverridableDeclaration
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.util.getAnnotation
 import org.jetbrains.kotlin.ir.util.hasAnnotation
@@ -37,3 +40,14 @@ fun IrAnnotationContainer.getSingleAnnotationStringArgumentOf(name: String) = ge
     ?.value
 
 fun IrAnnotationContainer.hasAnnotation(name: String) = hasAnnotation(FqName(name))
+
+fun IrOverridableDeclaration<*>.hasOverriddenAnnotation(name: String): Boolean =
+    hasAnnotation(name) || overriddenSymbols.any {
+        val owner = it.owner
+
+        (owner as? IrDeclaration)?.hasAnnotation(name).falseIfNull() ||
+                (owner as? IrOverridableDeclaration<*>)?.hasOverriddenAnnotation(name).falseIfNull()
+    }
+
+fun IrDeclaration.hasDartGetterAnnotation() =
+    (this as? IrOverridableDeclaration<*>?)?.hasOverriddenAnnotation(DotlinAnnotations.dartGetter).falseIfNull()

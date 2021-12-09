@@ -33,6 +33,8 @@ annotation class DartName(val name: String)
  *
  * Can only be used on methods with no parameters and a return type that's not [Unit].
  *
+ * Applies to any overrides in subtypes as well.
+ *
  * **Note:** This annotation should not be used in general. This annotation exists purely for
  * standard library compilation.
  */
