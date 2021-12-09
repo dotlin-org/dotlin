@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
+import org.dotlin.compiler.backend.steps.ir2ast.DotlinIrBuiltIns
 import org.dotlin.compiler.backend.steps.ir2ast.ir.buildStatement
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.DefaultMapping
@@ -30,7 +31,6 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.AbstractJsDescriptorMangler
 import org.jetbrains.kotlin.ir.builders.IrSingleStatementBuilder
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
@@ -64,6 +64,8 @@ class DartLoweringContext(
     override val irFactory = IrFactoryImpl
     override val mapping = DefaultMapping()
     override val scriptMode = false
+
+    val dotlinBuiltIns = DotlinIrBuiltIns(irModuleFragment.descriptor.builtIns.builtInsModule, symbolTable)
 
     val dynamicType: IrDynamicType = IrDynamicTypeImpl(null, emptyList(), Variance.INVARIANT)
 

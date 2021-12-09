@@ -19,9 +19,10 @@
 package kotlin
 
 /**
- * Represents a value which is either `true` or `false`. On the JVM, non-nullable values of this type are
- * represented as values of the primitive type `boolean`.
+ * Represents a value which is either `true` or `false`. In Dart, values of this type are
+ * represented as values of type `bool`.
  */
+@DartName("bool")
 public class Boolean private constructor() : Comparable<Boolean> {
     /**
      * Returns the inverse of this boolean.

@@ -1,5 +1,6 @@
 /*
  * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2021 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +21,10 @@ package kotlin
 
 /**
  * The root of the Kotlin class hierarchy. Every Kotlin class has [Any] as a superclass.
+ *
+ * In Dart, values of this type are represented as values of type `Object`.
  */
+@DartName("Object")
 public open class Any {
     /**
      * Indicates whether some other object is "equal to" this one. Implementations must fulfil the following
