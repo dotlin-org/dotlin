@@ -32,6 +32,7 @@ import org.jetbrains.kotlin.name.Name
 class PrivateNamesLowering(private val context: DartLoweringContext) : IrDeclarationTransformer {
     override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrDeclarationWithName || declaration !is IrDeclarationWithVisibility) return noChange()
+        if (declaration is IrValueParameter) return noChange()
         // We want to handle constructor names, which are special by default.
         if (declaration.name.isSpecial && (declaration !is IrConstructor || !declaration.isPrivate)) return noChange()
 
@@ -53,15 +54,6 @@ class PrivateNamesLowering(private val context: DartLoweringContext) : IrDeclara
         // No change, we can leave.
         if (newName == declaration.name) return noChange()
 
-        val newDeclaration = when (declaration) {
-            is IrClass -> declaration.deepCopyWith { name = newName }
-            is IrConstructor -> declaration.deepCopyWith { name = newName }
-            is IrFunction -> declaration.deepCopyWith { name = newName }
-            is IrProperty -> declaration.deepCopyWith { name = newName }
-            is IrField -> declaration.deepCopyWith { name = newName }
-            else -> return noChange()
-        }
-
-        return just { replaceWith(newDeclaration) }
+        return just { replaceWith(declaration.deepCopyWith(name = newName)) }
     }
 }
