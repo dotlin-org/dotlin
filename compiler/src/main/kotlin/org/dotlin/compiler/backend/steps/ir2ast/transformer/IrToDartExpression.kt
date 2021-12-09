@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
+import org.dotlin.compiler.backend.steps.falseIfNull
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrBinaryInfixExpression
@@ -34,6 +35,7 @@ import org.dotlin.compiler.dart.ast.expression.invocation.DartMethodInvocation
 import org.dotlin.compiler.dart.ast.expression.literal.*
 import org.dotlin.compiler.dart.ast.type.DartNamedType
 import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
+import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrField
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.*
@@ -73,8 +75,6 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         val infixLeft by lazy { parenthesize(left) }
         val infixRight by lazy { parenthesize(right) }
 
-        val origin = irCallLike.origin
-
         fun methodInvocation(methodName: DartSimpleIdentifier): DartMethodInvocation {
             return DartMethodInvocation(
                 target = left,
@@ -83,7 +83,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
             )
         }
 
-        return when (origin) {
+        return when (val origin = irCallLike.origin) {
             IrStatementOrigin.PLUS -> {
                 val irLeftType = irLeft!!.type
                 val irRightType = irRight.type
@@ -136,46 +136,57 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                     right = actualRight,
                 )
             }
-            IrStatementOrigin.GET_PROPERTY -> {
-                val irSimpleFunction = irCallLike.symbol.owner as IrSimpleFunction
-                val propertyName = irSimpleFunction.correspondingPropertySymbol!!.owner.dartName
 
-                DartPropertyAccessExpression(infixLeft, propertyName)
-            }
             IrStatementOrigin.EQEQ ->
                 DartEqualityExpression(
                     left = parenthesize(irCallLike.getValueArgument(0)!!.accept(context)),
                     right = parenthesize(irCallLike.getValueArgument(1)!!.accept(context)),
                 )
             else -> {
-                val arguments = irCallLike.accept(IrToDartArgumentListTransformer, context)
+                val hasDartGetterAnnotation = irCallLike.symbol.owner.hasAnnotation(DotlinAnnotations.dartGetter)
 
-                when (irCallLike) {
-                    is IrConstructorCall, is IrEnumConstructorCall -> {
-                        val type = irCallLike.type.toDart(context) as DartNamedType
-                        val name = irCallLike.symbol.owner.dartNameOrNull
+                when {
+                    origin == IrStatementOrigin.GET_PROPERTY || origin == IrStatementOrigin.GET_LOCAL_PROPERTY
+                            || hasDartGetterAnnotation -> {
+                        val irSimpleFunction = irCallLike.symbol.owner as IrSimpleFunction
+                        val propertyName = when {
+                            hasDartGetterAnnotation -> irSimpleFunction.dartName
+                            else -> irSimpleFunction.correspondingPropertySymbol!!.owner.dartName
+                        }
 
-                        DartInstanceCreationExpression(
-                            type = type,
-                            constructorName = name,
-                            arguments = arguments,
-                            isConst = irCallLike.isDartConst()
-                        )
+                        DartPropertyAccessExpression(infixLeft, propertyName)
                     }
                     else -> {
-                        val functionName = irCallLike.symbol.owner.dartName
+                        val arguments = irCallLike.accept(IrToDartArgumentListTransformer, context)
 
-                        @Suppress("UnnecessaryVariable")
-                        when (val receiver = optionalLeft) {
-                            null -> DartFunctionExpressionInvocation(
-                                function = functionName,
-                                arguments = arguments
-                            )
-                            else -> DartMethodInvocation(
-                                target = receiver,
-                                methodName = functionName,
-                                arguments = arguments
-                            )
+                        when (irCallLike) {
+                            is IrConstructorCall, is IrEnumConstructorCall -> {
+                                val type = irCallLike.type.toDart(context) as DartNamedType
+                                val name = irCallLike.symbol.owner.dartNameOrNull
+
+                                DartInstanceCreationExpression(
+                                    type = type,
+                                    constructorName = name,
+                                    arguments = arguments,
+                                    isConst = irCallLike.isDartConst()
+                                )
+                            }
+                            else -> {
+                                val functionName = irCallLike.symbol.owner.dartName
+
+                                @Suppress("UnnecessaryVariable")
+                                when (val receiver = optionalLeft) {
+                                    null -> DartFunctionExpressionInvocation(
+                                        function = functionName,
+                                        arguments = arguments
+                                    )
+                                    else -> DartMethodInvocation(
+                                        target = receiver,
+                                        methodName = functionName,
+                                        arguments = arguments
+                                    )
+                                }
+                            }
                         }
                     }
                 }

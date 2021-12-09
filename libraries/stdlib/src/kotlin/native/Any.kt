@@ -52,6 +52,7 @@ public open class Any {
      * * If two objects are equal according to the `equals()` method, then calling the `hashCode` method on each of
      *   the two objects must produce the same integer result.
      */
+    @DartGetter()
     public open fun hashCode(): Int
 
     /**

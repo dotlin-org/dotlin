@@ -52,4 +52,35 @@ class Dotlin : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `@DartGetter`() = assertCompile {
+        kotlin(
+            """
+            class Hobbit {
+                @DartGetter
+                fun isProudfoot(): Boolean = true
+            }
+
+            fun main() {
+                Hobbit().isProudfoot()
+            }
+            """
+        )
+
+        dart(
+            """
+            class Hobbit {
+              Hobbit() : super();
+              bool get isProudfoot {
+                return true;
+              }
+            }
+
+            void main() {
+              Hobbit().isProudfoot;
+            }
+            """
+        )
+    }
 }

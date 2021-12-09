@@ -21,10 +21,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartNameOrNull
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.toDart
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.transformBy
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.*
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartClassMember
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartMethodDeclaration
@@ -54,7 +51,7 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
                     parameters = parameters,
                     body = irFunction.body.accept(context)
                 ),
-                isGetter = irFunction.isGetter,
+                isGetter = irFunction.isGetter || irFunction.hasAnnotation(DotlinAnnotations.dartGetter),
                 isSetter = irFunction.isSetter,
                 isOperator = irFunction.isOperator,
                 isStatic = irFunction.isStatic,
