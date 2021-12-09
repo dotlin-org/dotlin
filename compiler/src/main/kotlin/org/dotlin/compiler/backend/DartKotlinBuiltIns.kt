@@ -22,7 +22,8 @@ package org.dotlin.compiler.backend
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 
-class DartKotlinBuiltIns(createBuiltInsModule: Boolean = false) : KotlinBuiltIns(LockBasedStorageManager("DartKotlinBuiltIns")) {
+class DartKotlinBuiltIns(createBuiltInsModule: Boolean = false) :
+    KotlinBuiltIns(LockBasedStorageManager("DartKotlinBuiltIns")) {
     init {
         if (createBuiltInsModule) {
             createBuiltInsModule(false)

@@ -39,7 +39,7 @@ class NestedClassLowering(private val context: DartLoweringContext) : IrDeclarat
                 .filterIsInstance<IrClass>()
                 .toList()
                 .reversed()
-                .joinToString(separator = "$") { it.name.identifier}
+                .joinToString(separator = "$") { it.name.identifier }
                 .let { Name.identifier(it) }
         }
 

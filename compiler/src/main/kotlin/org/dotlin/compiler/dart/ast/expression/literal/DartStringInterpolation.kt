@@ -38,6 +38,7 @@ data class DartInterpolationExpression(val expression: DartExpression) : DartInt
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
         visitor.visitInterpolationExpression(this, context)
 }
+
 data class DartInterpolationString(val value: String) : DartInterpolationElement {
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
         visitor.visitInterpolationString(this, context)

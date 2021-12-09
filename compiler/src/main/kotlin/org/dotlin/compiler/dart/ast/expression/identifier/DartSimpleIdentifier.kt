@@ -53,8 +53,10 @@ value class DartSimpleIdentifier(override val value: String) : DartIdentifier {
 
     fun asPrivate(): DartSimpleIdentifier =
         DartSimpleIdentifier(baseValue, isPrivate = true, isGenerated = isGenerated)
+
     fun asGenerated(): DartSimpleIdentifier =
         DartSimpleIdentifier(baseValue, isPrivate = isPrivate, isGenerated = true)
+
     fun asGeneratedPrivate(): DartSimpleIdentifier =
         DartSimpleIdentifier(baseValue, isPrivate = true, isGenerated = true)
 

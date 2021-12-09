@@ -52,7 +52,7 @@ class IrToDartFunctionBodyTransformer(private val allowEmpty: Boolean) : IrDartA
     override fun visitSyntheticBody(body: IrSyntheticBody, data: DartTransformContext) = DartEmptyFunctionBody()
 }
 
-fun IrBody?.accept(context: DartTransformContext, allowEmpty: Boolean = false) = when(this) {
+fun IrBody?.accept(context: DartTransformContext, allowEmpty: Boolean = false) = when (this) {
     // TODO: isAsync, isGenerator
     null -> DartEmptyFunctionBody()
     else -> accept(IrToDartFunctionBodyTransformer(allowEmpty), context)

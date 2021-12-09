@@ -40,18 +40,19 @@ import org.jetbrains.kotlin.ir.util.*
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnitMember> {
-    override fun visitFunction(irFunction: IrFunction, context: DartTransformContext) = irFunction.transformBy(context) {
-        DartTopLevelFunctionDeclaration(
-            name = name!!,
-            returnType = returnType,
-            function = DartFunctionExpression(
-                parameters = parameters,
-                body = irFunction.body.accept(context)
-            ),
-            annotations = annotations,
-            documentationComment = documentationComment,
-        )
-    }
+    override fun visitFunction(irFunction: IrFunction, context: DartTransformContext) =
+        irFunction.transformBy(context) {
+            DartTopLevelFunctionDeclaration(
+                name = name!!,
+                returnType = returnType,
+                function = DartFunctionExpression(
+                    parameters = parameters,
+                    body = irFunction.body.accept(context)
+                ),
+                annotations = annotations,
+                documentationComment = documentationComment,
+            )
+        }
 
     override fun visitClass(irClass: IrClass, context: DartTransformContext): DartCompilationUnitMember {
         // Extensions are handled differently.
