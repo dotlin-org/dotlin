@@ -20,39 +20,23 @@
 package org.dotlin.compiler.backend.steps.ir2ast.transformer.util
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
+import org.dotlin.compiler.backend.steps.ir2ast.DotlinIrBuiltIns
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.dotlin.compiler.dart.ast.type.DartNamedType
 import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
 import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
 import org.dotlin.compiler.dart.ast.type.toNullable
+import org.jetbrains.kotlin.ir.declarations.IrAnnotationContainer
+import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationWithName
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationWithVisibility
+import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.types.*
+import org.jetbrains.kotlin.ir.util.getAnnotation
+import org.jetbrains.kotlin.name.FqName
 
-fun IrType.toDart(context: DartTransformContext, isReturnType: Boolean = false): DartTypeAnnotation {
-    if (isReturnType && isUnit()) {
-        return DartTypeAnnotation.VOID
-    }
-
-    // Convert built-ins to Dart equivalents.
-    when {
-        isBoolean() -> return DartTypeAnnotation.BOOL
-        isChar() || isString() -> return DartTypeAnnotation.STRING
-        isByte() || isShort() || isInt() || isLong() -> return DartTypeAnnotation.INT
-        isFloat() || isDouble() -> return DartTypeAnnotation.DOUBLE
-        isAny() -> return DartTypeAnnotation.OBJECT
-
-        // Nullables
-        isNullableBoolean() -> return DartTypeAnnotation.BOOL.toNullable()
-        isNullableChar() || isNullableString() -> return DartTypeAnnotation.STRING.toNullable()
-        isNullableByte() || isNullableShort() || isNullableInt() || isNullableLong() -> {
-            return DartTypeAnnotation.INT.toNullable()
-        }
-        isNullableFloat() || isNullableDouble() -> return DartTypeAnnotation.DOUBLE.toNullable()
-        isNullableAny() -> return DartTypeAnnotation.OBJECT.toNullable()
-    }
-
+fun IrType.toDart(context: DartTransformContext): DartTypeAnnotation {
     // TODO: Check for function type
 
     return when (this) {
@@ -67,15 +51,22 @@ fun IrType.toDart(context: DartTransformContext, isReturnType: Boolean = false):
     }
 }
 
+@Suppress("UNCHECKED_CAST")
+private fun IrAnnotationContainer.getAnnotationStringArgumentOf(name: String) = getAnnotation(FqName(name))
+    ?.getValueArgument(0)
+    ?.let { it as? IrConst<String> }
+    ?.value
+
 val IrDeclarationWithName.dartName: DartSimpleIdentifier
     get() = dartNameOrNull.let {
         require(it != null) { "Name (${name.asString()}) cannot be special" }
-
         it
     }
 
+
 val IrDeclarationWithName.dartNameOrNull: DartSimpleIdentifier?
-    get() = if (!name.isSpecial) DartSimpleIdentifier(name.identifier) else null
+    get() = getAnnotationStringArgumentOf("dotlin.DartName")?.let { DartSimpleIdentifier(it) }
+        ?: if (!name.isSpecial) DartSimpleIdentifier(name.identifier) else null
 
 val <D> D.dartName: DartSimpleIdentifier where D : IrDeclarationWithName, D : IrDeclarationWithVisibility
     @JvmName("dartNameWithVisibility")

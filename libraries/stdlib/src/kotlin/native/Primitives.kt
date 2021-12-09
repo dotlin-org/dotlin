@@ -26,8 +26,9 @@ package kotlin
 
 /**
  * Represents a 8-bit signed integer.
- * On the JVM, non-nullable values of this type are represented as values of the primitive type `byte`.
+ * In Dart, values of this type are represented as values of the primitive type `int`.
  */
+@DartName("int")
 public class Byte private constructor() : Number(), Comparable<Byte> {
     companion object {
         /**
@@ -274,8 +275,9 @@ public class Byte private constructor() : Number(), Comparable<Byte> {
 
 /**
  * Represents a 16-bit signed integer.
- * On the JVM, non-nullable values of this type are represented as values of the primitive type `short`.
+ * In Dart, values of this type are represented as values of the primitive type `int`.
  */
+@DartName("int")
 public class Short private constructor() : Number(), Comparable<Short> {
     companion object {
         /**
@@ -520,8 +522,9 @@ public class Short private constructor() : Number(), Comparable<Short> {
 
 /**
  * Represents a 32-bit signed integer.
- * On the JVM, non-nullable values of this type are represented as values of the primitive type `int`.
+ * In Dart, values of this type are represented as values of the primitive type `int`.
  */
+@DartName("int")
 public class Int private constructor() : Number(), Comparable<Int> {
     companion object {
         /**
@@ -801,8 +804,9 @@ public class Int private constructor() : Number(), Comparable<Int> {
 
 /**
  * Represents a 64-bit signed integer.
- * On the JVM, non-nullable values of this type are represented as values of the primitive type `long`.
+ * In Dart, values of this type are represented as values of the primitive type `long`.
  */
+@DartName("int")
 public class Long private constructor() : Number(), Comparable<Long> {
     companion object {
         /**
@@ -1086,8 +1090,9 @@ public class Long private constructor() : Number(), Comparable<Long> {
 
 /**
  * Represents a single-precision 32-bit IEEE 754 floating point number.
- * On the JVM, non-nullable values of this type are represented as values of the primitive type `float`.
+ * In Dart, values of this type are represented as values of the primitive type `double`.
  */
+@DartName("double")
 public class Float private constructor() : Number(), Comparable<Float> {
     companion object {
         /**
@@ -1337,8 +1342,9 @@ public class Float private constructor() : Number(), Comparable<Float> {
 
 /**
  * Represents a double-precision 64-bit IEEE 754 floating point number.
- * On the JVM, non-nullable values of this type are represented as values of the primitive type `double`.
+ * In Dart, values of this type are represented as values of the primitive type `double`.
  */
+@DartName("double")
 public class Double private constructor() : Number(), Comparable<Double> {
     companion object {
         /**

@@ -20,6 +20,7 @@ package dotlin
  * Specifies the name to use in Dart for the annotated element.
  */
 @Target(
+    AnnotationTarget.CLASS,
     AnnotationTarget.FUNCTION,
     AnnotationTarget.PROPERTY_GETTER,
     AnnotationTarget.PROPERTY_SETTER,
