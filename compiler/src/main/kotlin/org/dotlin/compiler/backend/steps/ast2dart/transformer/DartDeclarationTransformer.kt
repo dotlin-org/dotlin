@@ -43,11 +43,7 @@ object DartDeclarationTransformer : DartAstNodeTransformer {
         val abstract = if (classDeclaration.isAbstract) "abstract " else ""
         val name = classDeclaration.name.accept(context)
 
-        val members =
-            if (classDeclaration.members.isNotEmpty())
-                classDeclaration.members.accept(context).joinToString("", prefix = " {", postfix = "}")
-            else
-                " {}"
+        val typeParameters = classDeclaration.typeParameters.accept(context)
 
         val extends =
             if (classDeclaration.extendsClause != null)
@@ -61,7 +57,13 @@ object DartDeclarationTransformer : DartAstNodeTransformer {
             else
                 ""
 
-        return "${abstract}class $name$extends$implements$members"
+        val members =
+            if (classDeclaration.members.isNotEmpty())
+                classDeclaration.members.accept(context).joinToString("", prefix = " {", postfix = "}")
+            else
+                " {}"
+
+        return "${abstract}class $name$typeParameters$extends$implements$members"
     }
 
     override fun visitExtensionDeclaration(

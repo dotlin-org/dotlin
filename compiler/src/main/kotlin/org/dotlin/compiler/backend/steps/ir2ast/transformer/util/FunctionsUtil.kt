@@ -28,6 +28,7 @@ import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.dotlin.compiler.dart.ast.parameter.DartFormalParameterList
 import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
+import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameterList
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 
@@ -41,6 +42,7 @@ fun <N : DartAstNode> IrFunction.transformBy(
         DartFunctionDeclarationDefaults(
             name = simpleDartNameOrNull,
             returnType = returnType.toDart(context),
+            typeParameters = typeParameters.accept(context),
             parameters = valueParameters.accept(context),
             annotations = if (isOverride) listOf(DartAnnotation.OVERRIDE) else listOf(),
         )
@@ -51,6 +53,7 @@ data class DartFunctionDeclarationDefaults(
     val name: DartSimpleIdentifier?,
     val returnType: DartTypeAnnotation,
     val parameters: DartFormalParameterList,
+    val typeParameters: DartTypeParameterList,
     val annotations: List<DartAnnotation> = listOf(),
     val documentationComment: String? = null,
 )

@@ -23,10 +23,12 @@ import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartClassMember
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
+import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameterList
 
 data class DartClassDeclaration(
     val isAbstract: Boolean = false,
     override val name: DartSimpleIdentifier,
+    override val typeParameters: DartTypeParameterList = DartTypeParameterList(),
     val extendsClause: DartExtendsClause? = null,
     val implementsClause: DartImplementsClause? = null,
     // TODO: withClause, typeParameters

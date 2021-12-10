@@ -34,6 +34,7 @@ import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
 import org.dotlin.compiler.dart.ast.expression.DartFunctionExpression
 import org.dotlin.compiler.dart.ast.type.DartNamedType
+import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrBlockBody
@@ -52,6 +53,7 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
                 name!!,
                 returnType,
                 DartFunctionExpression(
+                    typeParameters = typeParameters,
                     parameters = parameters,
                     body = irFunction.body.accept(context)
                 ),
@@ -66,8 +68,6 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
 
     override fun visitConstructor(irConstructor: IrConstructor, context: DartTransformContext) =
         irConstructor.transformBy(context) {
-            val type = irConstructor.parentAsClass.defaultType.toDart(context) as DartNamedType
-
             val initializers = (irConstructor.body as? IrBlockBody)?.run {
                 // Constructor parameters with complex default values are initialized in the body. We move them to the
                 // Dart field initializer list, if possible.
@@ -106,7 +106,11 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
             }?.filterNotNull() ?: emptyList()
 
             DartConstructorDeclaration(
-                type,
+                returnType = irConstructor.parentAsClass.defaultType.toDart(context).let {
+                    it as DartNamedType
+                    // Type arguments are cleared, they're not allowed in constructors.
+                    it.copy(typeArguments = DartTypeArgumentList())
+                },
                 name = irConstructor.dartNameOrNull?.let {
                     // TODO: Do this for all names everywhere?
                     if (irConstructor.origin != IrDeclarationOrigin.DEFINED) it.asGenerated() else it

@@ -36,9 +36,10 @@ object DartExpressionTransformer : DartAstNodeTransformer {
         context: DartGenerationContext,
     ): String {
         val parameters = if (!context.isGetter) functionExpression.parameters.accept(context) else ""
+        val typeParameters = if (!context.isGetter) functionExpression.typeParameters.accept(context) else ""
         val body = functionExpression.body.accept(context)
 
-        return "$parameters$body"
+        return "$typeParameters$parameters$body"
     }
 
     override fun visitInvocationExpression(
