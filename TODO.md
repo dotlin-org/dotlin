@@ -136,8 +136,8 @@
   - [ ] Internal
 - [x] Operator overloading
 - [ ] Extensions
-    - [ ] Extension methods
-    - [ ] Extension properties
+    - [x] Extension methods
+    - [x] Extension properties
     - [ ] Companion object extensions
 - [ ] Generics
   - [ ] Variance (in, out)
