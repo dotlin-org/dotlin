@@ -37,7 +37,6 @@ class DartMethodDeclaration(
     val isStatic: Boolean = false,
     override val annotations: List<DartAnnotation> = listOf(),
     override val documentationComment: String? = null,
-    // TODO: typeParameters
 ) : DartClassMember, DartFunctionDeclaration, Cloneable {
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
         visitor.visitMethodDeclaration(this, context)

@@ -46,6 +46,7 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
                 name = name!!,
                 returnType = returnType,
                 function = DartFunctionExpression(
+                    typeParameters = typeParameters,
                     parameters = parameters,
                     body = irFunction.body.accept(context)
                 ),
@@ -69,6 +70,7 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
                 DartClassDeclaration(
                     name = name,
                     isAbstract = irClass.modality == Modality.ABSTRACT || irClass.isInterface,
+                    typeParameters = irClass.typeParameters.accept(context),
                     // If the class is a default value for a complex parameter, we want to implement
                     // it and not extend it, so we don't extend anything.
                     extendsClause = when {

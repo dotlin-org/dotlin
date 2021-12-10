@@ -2135,4 +2135,29 @@ class Class : BaseTest {
         )
     }
 
+    @Test
+    fun `class with type parameter`() = assertCompile {
+        kotlin("class Test<T>")
+
+        dart(
+            """
+            class Test<T> {
+              Test() : super();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `class with two type parameters`() = assertCompile {
+        kotlin("class Test<T0, T1>")
+
+        dart(
+            """
+            class Test<T0, T1> {
+              Test() : super();
+            }
+            """
+        )
+    }
 }

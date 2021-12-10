@@ -23,10 +23,11 @@ import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 import org.dotlin.compiler.dart.ast.declaration.function.body.DartEmptyFunctionBody
 import org.dotlin.compiler.dart.ast.declaration.function.body.DartFunctionBody
 import org.dotlin.compiler.dart.ast.parameter.DartFormalParameterList
+import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameterList
 
 data class DartFunctionExpression(
+    val typeParameters: DartTypeParameterList = DartTypeParameterList(),
     val parameters: DartFormalParameterList = DartFormalParameterList(),
-    // TODO: Type parameters
     val body: DartFunctionBody = DartEmptyFunctionBody(),
 ) : DartExpression {
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =

@@ -21,9 +21,9 @@ package org.dotlin.compiler.dart.ast.declaration.classormixin
 
 import org.dotlin.compiler.dart.ast.compilationunit.DartNamedCompilationUnitMember
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartClassMember
+import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameterList
 
 interface DartClassOrMixinDeclaration : DartNamedCompilationUnitMember {
-    // TODO: Type parameters
-
+    val typeParameters: DartTypeParameterList
     val members: List<DartClassMember>
 }

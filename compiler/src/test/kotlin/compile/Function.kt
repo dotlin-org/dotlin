@@ -294,4 +294,26 @@ class Function : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `function with type parameter`() = assertCompile {
+        kotlin("fun <T> test() {}")
+
+        dart(
+            """
+            void test<T>() {}
+            """
+        )
+    }
+
+    @Test
+    fun `function with two type parameters`() = assertCompile {
+        kotlin("fun <T0, T1> test() {}")
+
+        dart(
+            """
+            void test<T0, T1>() {}
+            """
+        )
+    }
 }

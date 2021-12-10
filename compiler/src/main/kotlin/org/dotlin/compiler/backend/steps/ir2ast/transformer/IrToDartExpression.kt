@@ -346,6 +346,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
     ): DartExpression =
         expression.function.transformBy(context) {
             DartFunctionExpression(
+                typeParameters = typeParameters,
                 parameters = parameters,
                 body = expression.function.body.accept(context)
             )
