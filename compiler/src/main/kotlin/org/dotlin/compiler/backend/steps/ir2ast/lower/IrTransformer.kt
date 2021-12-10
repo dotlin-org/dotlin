@@ -21,7 +21,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
-import org.dotlin.compiler.backend.steps.replace
+import org.dotlin.compiler.backend.util.replace
 import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
@@ -67,6 +67,12 @@ interface IrDeclarationTransformer : IrMultipleTransformer<IrDeclaration>, FileL
     override fun lower(irFile: IrFile) = irFile.transformDeclarations(::transform)
 
     override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration>
+}
+
+interface IrFileTransformer : FileLoweringPass {
+    override fun lower(irFile: IrFile) = transform(irFile)
+
+    fun transform(file: IrFile)
 }
 
 interface IrExpressionTransformer : IrSingleTransformer<IrExpression>, FileLoweringPass {

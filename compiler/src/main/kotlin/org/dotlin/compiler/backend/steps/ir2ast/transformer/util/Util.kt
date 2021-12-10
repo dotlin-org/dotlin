@@ -19,18 +19,17 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer.util
 
+import org.dotlin.compiler.backend.dartAnnotatedName
+import org.dotlin.compiler.backend.dartImportAliasPrefix
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrivate
 import org.dotlin.compiler.backend.steps.ir2ast.ir.owner
 import org.dotlin.compiler.backend.steps.ir2ast.ir.toDart
-import org.dotlin.compiler.backend.steps.util.DotlinAnnotations
-import org.dotlin.compiler.backend.steps.util.getSingleAnnotationStringArgumentOf
-import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
+import org.dotlin.compiler.dart.ast.expression.identifier.*
 import org.dotlin.compiler.dart.ast.type.DartNamedType
 import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
 import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationWithName
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationWithVisibility
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.types.IrDynamicType
 import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrType
@@ -51,23 +50,71 @@ fun IrType.toDart(context: DartTransformContext): DartTypeAnnotation {
     }
 }
 
-val IrDeclarationWithName.dartName: DartSimpleIdentifier
+val IrDeclarationWithName.dartName: DartIdentifier
     get() = dartNameOrNull.let {
         require(it != null) { "Name (${name.asString()}) cannot be special" }
         it
     }
 
-val IrDeclarationWithName.dartNameOrNull: DartSimpleIdentifier?
-    get() = getSingleAnnotationStringArgumentOf(DotlinAnnotations.dartName)?.let { DartSimpleIdentifier(it) }
-        ?: if (!name.isSpecial) DartSimpleIdentifier(name.identifier) else null
+val IrDeclarationWithName.dartNameOrNull: DartIdentifier?
+    get() {
+        val prefix = dartImportAliasPrefix?.toDartSimpleIdentifier()
 
-val <D> D.dartName: DartSimpleIdentifier where D : IrDeclarationWithName, D : IrDeclarationWithVisibility
+        val name = dartAnnotatedName?.toDartSimpleIdentifier()
+            ?: if (!name.isSpecial) name.identifier.toDartSimpleIdentifier() else null
+
+        return when {
+            prefix != null && name != null -> DartPrefixedIdentifier(prefix, name)
+            name != null -> name
+            else -> null
+        }
+    }
+
+val <D> D.dartName: DartIdentifier where D : IrDeclarationWithName, D : IrDeclarationWithVisibility
     @JvmName("dartNameWithVisibility")
-    get() = (this as IrDeclarationWithName).dartName.let { if (isPrivate) it.asPrivate() else it }
+    get() = (this as IrDeclarationWithName).dartName
+        .let { if (it.isSimple() && isPrivate) it.asPrivate() else it }
 
-val <D> D.dartNameOrNull: DartSimpleIdentifier? where D : IrDeclarationWithName, D : IrDeclarationWithVisibility
+val <D> D.dartNameOrNull: DartIdentifier? where D : IrDeclarationWithName, D : IrDeclarationWithVisibility
     @JvmName("dartNameOrNullWithVisibility")
-    get() = (this as IrDeclarationWithName).dartNameOrNull.let { if (isPrivate) it?.asPrivate() else it }
+    get() = (this as IrDeclarationWithName).dartNameOrNull
+        .let { if (it?.isSimple() == true && isPrivate) it.asPrivate() else it }
+
+val IrDeclarationWithName.dartNameAsSimple: DartSimpleIdentifier
+    get() = dartName as DartSimpleIdentifier
+
+val IrDeclarationWithName.dartNameAsSimpleOrNull: DartSimpleIdentifier?
+    get() = dartNameOrNull as DartSimpleIdentifier?
+
+/**
+ * The [dartName] for this declaration. If it's a [DartPrefixedIdentifier], the prefix is removed.
+ */
+val IrDeclarationWithName.simpleDartName: DartSimpleIdentifier
+    get() = when (val dartName = dartName) {
+        is DartSimpleIdentifier -> dartName
+        is DartPrefixedIdentifier -> dartName.identifier
+    }
+
+val IrDeclarationWithName.simpleDartNameOrNull: DartSimpleIdentifier?
+    get() = when (val dartName = dartNameOrNull) {
+        is DartSimpleIdentifier -> dartName
+        is DartPrefixedIdentifier -> dartName.identifier
+        else -> null
+    }
+
+// Some IR elements can be asserted that they always have simple identifiers.
+
+val IrValueDeclaration.dartName: DartSimpleIdentifier
+    get() = dartNameAsSimple
+
+val IrField.dartName: DartSimpleIdentifier
+    get() = dartNameAsSimple
+
+val IrConstructor.dartName: DartSimpleIdentifier
+    get() = dartNameAsSimple
+
+val IrConstructor.dartNameOrNull: DartSimpleIdentifier?
+    get() = dartNameAsSimpleOrNull
 
 fun <T> Iterable<T>.toPair(): Pair<T, T> {
     if (this.count() != 2) throw IllegalStateException("There must be exactly 2 elements to convert to a Pair")

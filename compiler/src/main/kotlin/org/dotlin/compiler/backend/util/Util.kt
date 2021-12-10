@@ -17,20 +17,11 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.dart.ast
+package org.dotlin.compiler.backend.util
 
-import org.dotlin.compiler.dart.ast.annotation.DartAnnotatedNode
-import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
+fun Boolean?.falseIfNull() = this ?: false
 
-interface DartDirective : DartAnnotatedNode {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) = visitor.visitDirective(this, context)
-
-    companion object {
-        operator fun invoke(): DartDirective = DefaultDartDirective()
-    }
+fun <T> MutableList<T>.replace(old: T, new: T) {
+    add(indexOf(old), new)
+    remove(old)
 }
-
-private data class DefaultDartDirective(
-    override val annotations: List<DartAnnotation> = listOf(),
-    override val documentationComment: String? = null
-) : DartDirective

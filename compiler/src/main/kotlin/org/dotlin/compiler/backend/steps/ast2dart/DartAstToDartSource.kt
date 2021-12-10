@@ -25,7 +25,9 @@ import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
 fun dartAstToDartSource(units: List<DartCompilationUnit>): String {
     val context = DartGenerationContext()
 
-    return units.joinToString(separator = "\n\n") {
-        it.accept(context)
-    }
+    // We compile to a single file (for now).
+    return DartCompilationUnit(
+        directives = units.map { it.directives }.flatten().toSet().toList(),
+        declarations = units.map { it.declarations }.flatten()
+    ).accept(context)
 }

@@ -17,23 +17,46 @@
 package dotlin
 
 /**
- * Specifies that the annotated method will be a getter in Dart.
- *
- * Can only be used on methods with no parameters and a return type that's not [Unit].
- *
- * Applies to any overrides in subtypes as well.
- *
- * **Note:** This annotation should not be used in general. This annotation exists purely for
- * standard library compilation.
- */
-@Target(AnnotationTarget.FUNCTION)
-internal annotation class DartGetter
-
-/**
- * Specifies that the annotated element is Dart built-in and should not be compiled.
- *
- * **Note:** This annotation should not be used in general. This annotation exists purely for
- * standard library compilation.
+ * Specifies that the annotated element should not be compiled as a declaration on its own, since a declaration
+ * already is already defined.
  */
 @Target(AnnotationTarget.CLASS)
-internal annotation class DartBuiltIn
+internal annotation class DartBuiltIn {
+    /**
+     * Specifies that the annotated method is a getter in Dart.
+     *
+     * Can only be used on methods with no parameters and a return type that's not [Unit].
+     *
+     * Applies to any overrides in subtypes as well.
+     */
+    @Target(AnnotationTarget.FUNCTION)
+    annotation class Getter
+
+    /**
+     * Specifies that whenever this declaration is referenced it should do so with a certain alias. This can be used
+     * to circumvent name conflicts with existing Dart names.
+     *
+     * @param library The library the declaration should be imported from.
+     * Should be a full import string, e.g. `dart:core`.
+     */
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.FUNCTION,
+    )
+    annotation class ImportAlias(val library: String)
+
+    /**
+     * Specifies that whenever this declaration is referenced a declaration from [library] should be hidden. This can
+     * be used to circumvent name conflicts with existing Dart names.
+     *
+     * Cannot be used together with [ImportAlias].
+     *
+     * @param library The library the declaration should be hidden from.
+     * Should be a full import string, e.g. `dart:core`.
+     */
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.FUNCTION,
+    )
+    annotation class HideImport(val library: String)
+}

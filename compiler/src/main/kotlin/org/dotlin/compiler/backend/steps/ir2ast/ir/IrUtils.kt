@@ -19,10 +19,10 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.ir
 
-import org.dotlin.compiler.backend.steps.falseIfNull
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrExpressionBodyWithOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.toDart
+import org.dotlin.compiler.backend.util.falseIfNull
 import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
 import org.jetbrains.kotlin.backend.common.ir.*
 import org.jetbrains.kotlin.backend.common.ir.isStatic
@@ -379,23 +379,6 @@ fun IrField.unsetInitializerOrigin() {
     if (initializer == null) return
 
     initializer = IrExpressionBodyImpl(initializer!!.expression)
-}
-
-/**
- * Returns the single element of this `Sequence`, null if it's empty and throws if there's more than one element.
- */
-fun <T> Sequence<T>.singleOrNullIfEmpty(lazyMessage: (() -> String)? = null): T? {
-    val iterator = iterator()
-
-    if (!iterator.hasNext()) return null
-
-    val single = iterator.next()
-
-    if (iterator.hasNext()) {
-        throw IllegalArgumentException(lazyMessage?.invoke() ?: "Sequence has more than one element.")
-    }
-
-    return single
 }
 
 val IrField.isOverride: Boolean

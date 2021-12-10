@@ -19,8 +19,87 @@
 
 package org.dotlin.compiler.dart.ast.expression.identifier
 
+import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 import org.dotlin.compiler.dart.ast.expression.DartExpression
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
-interface DartIdentifier : DartExpression {
+sealed interface DartIdentifier : DartExpression {
     val value: String
+
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
+        visitor.visitIdentifier(this, context)
+}
+
+@JvmInline
+value class DartSimpleIdentifier(override val value: String) : DartIdentifier {
+    constructor(value: String, isPrivate: Boolean, isGenerated: Boolean = false) :
+            this(
+                when {
+                    isPrivate -> when {
+                        isGenerated -> "_\$$value"
+                        else -> "_$value"
+                    }
+                    isGenerated -> "\$$value"
+                    else -> value
+                }
+            )
+
+    init {
+        require(value.isNotEmpty())
+    }
+
+    val isPrivate: Boolean
+        get() = value.startsWith("_")
+
+    val isGenerated: Boolean
+        get() = if (!isPrivate) value.startsWith("$") else value.startsWith("_$")
+
+    /**
+     * The [value] of this identifier without private (`_`) or generation (`$`) prefixes.
+     */
+    val baseValue: String
+        get() = value.removePrefix("_").removePrefix("$")
+
+    fun asPrivate(): DartSimpleIdentifier =
+        DartSimpleIdentifier(baseValue, isPrivate = true, isGenerated = isGenerated)
+
+    fun asGenerated(): DartSimpleIdentifier =
+        DartSimpleIdentifier(baseValue, isPrivate = isPrivate, isGenerated = true)
+
+    fun asGeneratedPrivate(): DartSimpleIdentifier =
+        DartSimpleIdentifier(baseValue, isPrivate = true, isGenerated = true)
+
+    override fun toString() = value
+}
+
+fun String.toDartSimpleIdentifier(): DartSimpleIdentifier = DartSimpleIdentifier(this)
+
+data class DartPrefixedIdentifier(
+    val prefix: DartSimpleIdentifier,
+    val identifier: DartSimpleIdentifier
+) : DartIdentifier {
+
+    override val value = "${prefix}.${identifier}"
+
+    override fun toString() = value
+}
+
+
+@OptIn(ExperimentalContracts::class)
+fun DartIdentifier.isSimple(): Boolean {
+    contract {
+        returns(true) implies (this@isSimple is DartSimpleIdentifier)
+    }
+
+    return this is DartSimpleIdentifier
+}
+
+@OptIn(ExperimentalContracts::class)
+fun DartIdentifier.isPrefixed(): Boolean {
+    contract {
+        returns(true) implies (this@isPrefixed is DartPrefixedIdentifier)
+    }
+
+    return this is DartPrefixedIdentifier
 }

@@ -19,10 +19,10 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer.util
 
-import org.dotlin.compiler.backend.steps.falseIfNull
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isOverride
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.accept
+import org.dotlin.compiler.backend.util.falseIfNull
 import org.dotlin.compiler.dart.ast.DartAstNode
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
@@ -39,7 +39,7 @@ fun <N : DartAstNode> IrFunction.transformBy(
 
     return block(
         DartFunctionDeclarationDefaults(
-            name = dartNameOrNull,
+            name = simpleDartNameOrNull,
             returnType = returnType.toDart(context),
             parameters = valueParameters.accept(context),
             annotations = if (isOverride) listOf(DartAnnotation.OVERRIDE) else listOf(),

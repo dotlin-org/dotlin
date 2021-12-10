@@ -19,9 +19,9 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
+import org.dotlin.compiler.backend.DotlinAnnotations
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.dotlin.compiler.backend.steps.util.DotlinAnnotations
-import org.dotlin.compiler.backend.steps.util.hasAnnotation
+import org.dotlin.compiler.backend.util.hasAnnotation
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 

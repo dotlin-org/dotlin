@@ -19,63 +19,102 @@
 
 import org.dotlin.compiler.KotlinToDartCompiler
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import java.io.File
 import java.nio.file.Path
-import kotlin.io.path.Path
-import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.createTempFile
-import kotlin.io.path.writeText
+import kotlin.io.path.*
 import kotlin.test.assertEquals
 
-abstract class CompilerAssertion {
-    protected lateinit var kotlin: String
+abstract class CompilerAssertion<I, O> {
+    protected open lateinit var kotlin: String
 
-    fun kotlin(@Language("kotlin") kotlin: String) {
+    open fun kotlin(@Language("kotlin") kotlin: String) {
         this.kotlin = kotlin.trimIndent()
     }
+
+    abstract val input: I
+    abstract val output: O
 }
 
-class AssertCompile : CompilerAssertion() {
-    private lateinit var dart: String
+abstract class AssertCompile<I, O> : CompilerAssertion<I, O>() {
+    protected lateinit var dart: String
 
     fun dart(@Language("dart") dart: String) {
         this.dart = dart.trimIndent()
     }
 
-    val result
-        get() = kotlin to dart
+
+    class Simple : AssertCompile<String, String>() {
+        override val input: String
+            get() = kotlin
+
+        override val output: String
+            get() = dart
+    }
 }
 
-class AssertCompileThrows : CompilerAssertion() {
-    val result
+class AssertCompileFiles : AssertCompile<List<String>, String>() {
+    private val kotlinSources = mutableListOf<String>()
+
+    override fun kotlin(@Language("kotlin") kotlin: String) {
+        kotlinSources += kotlin
+    }
+
+    override val input = kotlinSources
+
+    override val output: String
+        get() = dart
+}
+
+class AssertCompileThrows : CompilerAssertion<String, Nothing?>() {
+    override val input
         get() = kotlin
+
+    override val output: Nothing? = null
 }
 
-inline fun assertCompile(block: AssertCompile.() -> Unit) {
-    val args = AssertCompile()
+inline fun assertCompile(block: AssertCompile.Simple.() -> Unit) {
+    val args = AssertCompile.Simple()
     block(args)
-
-    val (kotlin, dart) = args.result
 
     val compiledDart = assertDoesNotThrow {
         KotlinToDartCompiler.compile(
-            kotlin,
+            args.input,
             dependencies = setOf(stdlibKlib),
             format = true
         )
     }
 
-    assertEquals(dart, compiledDart)
+    assertEquals(args.output, compiledDart)
+}
+
+inline fun assertCompileFiles(block: AssertCompileFiles.() -> Unit) {
+    val args = AssertCompileFiles()
+    block(args)
+
+    val tempDir = createTempDirectory()
+
+    args.input.forEachIndexed { index, source ->
+        tempDir.resolve("$index.kt").also { it.writeText(source) }
+    }
+
+    val compiledDart = assertDoesNotThrow {
+        KotlinToDartCompiler.compile(
+            setOf(tempDir),
+            dependencies = setOf(stdlibKlib),
+            format = true
+        )
+    }
+
+    assertEquals(args.output, compiledDart)
 }
 
 inline fun <reified E : Throwable> assertCompileThrows(block: AssertCompileThrows.() -> Unit) {
     val args = AssertCompileThrows()
     block(args)
 
-    val kotlin = args.result
+    val kotlin = args.input
 
     assertThrows<E> {
         KotlinToDartCompiler.compile(kotlin)
@@ -83,37 +122,33 @@ inline fun <reified E : Throwable> assertCompileThrows(block: AssertCompileThrow
 }
 
 
-class AssertCompileLibrary : CompilerAssertion() {
-    var path: Path? = null
-
+abstract class AssertCompileLibrary<I, O> : CompilerAssertion<I, O>() {
     var dependencies = setOf(stdlibKlib)
+}
 
-    val source: String
-        get() = kotlin
+class AssertCompileLibraryFromPath : AssertCompileLibrary<Path, Nothing?>() {
+    lateinit var path: Path
+
+    override val input: Path
+        get() = path
+
+    override val output = null
 }
 
 @OptIn(ExperimentalPathApi::class)
-inline fun assertCanCompileLib(block: AssertCompileLibrary.() -> Unit) {
-    val args = AssertCompileLibrary()
+inline fun assertCanCompileLib(block: AssertCompileLibraryFromPath.() -> Unit) {
+    val args = AssertCompileLibraryFromPath()
     block(args)
 
     val output = File("build/output.klib")
 
     assertDoesNotThrow {
-        when (val path = args.path) {
-            null -> KotlinToDartCompiler.compile(
-                args.source,
-                outputFile = output,
-                dependencies = args.dependencies,
-                klib = true
-            )
-            else -> KotlinToDartCompiler.compile(
-                sourceRoots = setOf(path),
-                outputFile = output,
-                dependencies = args.dependencies,
-                klib = true
-            )
-        }
+        KotlinToDartCompiler.compile(
+            sourceRoots = setOf(args.input),
+            outputFile = output,
+            dependencies = args.dependencies,
+            klib = true
+        )
     }
 }
 

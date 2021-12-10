@@ -23,7 +23,7 @@ package kotlin
  *
  * In Dart, values of this type are represented as values of the primitive type `int`.
  */
-@DartBuiltIn()
+@DartBuiltIn
 @DartName("int")
 public class Char private constructor() : Comparable<Char> {
     /**
