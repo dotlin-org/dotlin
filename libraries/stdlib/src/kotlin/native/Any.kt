@@ -24,7 +24,7 @@ package kotlin
  *
  * In Dart, values of this type are represented as values of type `Object`.
  */
-@DartBuiltIn()
+@DartBuiltIn
 @DartName("Object")
 public open class Any {
     /**
@@ -53,7 +53,7 @@ public open class Any {
      * * If two objects are equal according to the `equals()` method, then calling the `hashCode` method on each of
      *   the two objects must produce the same integer result.
      */
-    @DartGetter()
+    @DartBuiltIn.Getter
     public open fun hashCode(): Int
 
     /**

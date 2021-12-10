@@ -21,6 +21,7 @@ package compile.builtins
 
 import BaseTest
 import assertCompile
+import assertCompileFiles
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
@@ -53,13 +54,38 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartGetter`() = assertCompile {
+    fun `@DartBuiltIn`() = assertCompile {
+        kotlin(
+            """
+            @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
+            @DartBuiltIn
+            class Test
+
+            fun main() {
+                Test()
+            }
+            """
+        )
+
+        dart(
+            """
+            void main() {
+              Test();
+            }
+            """
+        )
+    }
+
+
+    @Test
+    fun `@DartBuiltInGetter`() = assertCompile {
         kotlin(
             """
             @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
             class Hobbit {
-                @DartGetter
+                @DartBuiltIn.Getter
                 fun isProudfoot(): Boolean = true
             }
 
@@ -86,13 +112,13 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartGetter override`() = assertCompile {
+    fun `@DartBuiltInGetter override`() = assertCompile {
         kotlin(
             """
             @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
             open class Hobbit {
-                @DartGetter
+                @DartBuiltIn.Getter
                 open fun isProudfoot(): Boolean = false
             }
 
@@ -131,24 +157,120 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartBuiltIn`() = assertCompile {
+    fun `@DartBuiltInImportAlias`() = assertCompile {
         kotlin(
             """
             @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
             @DartBuiltIn
-            class Test
+            @DartBuiltIn.ImportAlias("dart:core")
+            class List
 
             fun main() {
-                Test()
+                List()
             }
             """
         )
 
         dart(
             """
+            import 'dart:core' hide List;
+            import 'dart:core' as core;
+
             void main() {
-              Test();
+              core.List();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartBuiltInImportAlias separate input files`() = assertCompileFiles {
+        kotlin(
+            """
+            @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
+            package test
+
+            @DartBuiltIn
+            @DartBuiltIn.ImportAlias("dart:core")
+            class List
+            """
+        )
+
+        kotlin(
+            """
+            @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
+            package test
+
+            fun main() {
+                List()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'dart:core' hide List;
+            import 'dart:core' as core;
+
+            void main() {
+              core.List();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartBuiltInImportAlias type reference only`() = assertCompile {
+        kotlin(
+            """
+            @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
+            @DartBuiltIn
+            @DartBuiltIn.ImportAlias("dart:core")
+            class List
+
+            fun test(list: List) {}
+            """
+        )
+
+        dart(
+            """
+            import 'dart:core' hide List;
+            import 'dart:core' as core;
+
+            void test(core.List list) {}
+            """
+        )
+    }
+
+    @Test
+    fun `@DartBuiltInHideImport`() = assertCompile {
+        kotlin(
+            """
+            @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
+            @DartBuiltIn.HideImport("dart:core")
+            class Enum
+
+            fun main() {
+                Enum()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'dart:core' hide Enum;
+
+            class Enum {
+              Enum() : super();
+            }
+
+            void main() {
+              Enum();
             }
             """
         )

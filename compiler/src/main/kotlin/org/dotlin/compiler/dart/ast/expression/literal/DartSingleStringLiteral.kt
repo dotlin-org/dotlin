@@ -19,7 +19,7 @@
 
 package org.dotlin.compiler.dart.ast.expression.literal
 
-interface DartSingleStringLiteral : DartLiteral {
+interface DartSingleStringLiteral : DartStringLiteral {
     val isRaw: Boolean
     val isMultiline: Boolean
     val isSingleQuoted: Boolean

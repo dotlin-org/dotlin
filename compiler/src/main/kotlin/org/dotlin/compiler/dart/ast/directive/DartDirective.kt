@@ -17,11 +17,8 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.backend.steps
+package org.dotlin.compiler.dart.ast.directive
 
-fun Boolean?.falseIfNull() = this ?: false
+import org.dotlin.compiler.dart.ast.annotation.DartAnnotatedNode
 
-fun <T> MutableList<T>.replace(old: T, new: T) {
-    add(indexOf(old), new)
-    remove(old)
-}
+interface DartDirective : DartAnnotatedNode

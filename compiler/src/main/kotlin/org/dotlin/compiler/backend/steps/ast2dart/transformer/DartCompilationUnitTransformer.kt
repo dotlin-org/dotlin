@@ -21,11 +21,41 @@ package org.dotlin.compiler.backend.steps.ast2dart.transformer
 
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
+import org.dotlin.compiler.dart.ast.directive.DartCombinator
+import org.dotlin.compiler.dart.ast.directive.DartDirective
+import org.dotlin.compiler.dart.ast.directive.DartImportDirective
 
 object DartCompilationUnitTransformer : DartAstNodeTransformer {
     override fun visitCompilationUnit(unit: DartCompilationUnit, context: DartGenerationContext): String {
-        return unit.declarations.joinToString(separator = "\n") { it.accept(context) }
+        val directives = unit.directives.joinToString("\n") { it.accept(context) }
+        val declarations = unit.declarations.joinToString(separator = "\n") { it.accept(context) }
+
+        return "$directives\n$declarations"
+    }
+
+    override fun visitImportDirective(directive: DartImportDirective, context: DartGenerationContext): String {
+        val annotations = directive.annotations.accept(context)
+        val import = "import"
+        val library = directive.name.accept(context)
+        val alias = directive.alias?.accept(context)?.let { " as $it" } ?: ""
+        val combinators = directive.combinators.let { combinators ->
+            when {
+                combinators.isEmpty() -> ""
+                else -> combinators.joinToString(" ", prefix = " ") { it.accept(context) }
+            }
+        }
+
+        return "$annotations $import $library$alias$combinators;"
+    }
+
+    override fun visitCombinator(combinator: DartCombinator, context: DartGenerationContext): String {
+        val keyword = combinator.keyword
+        val names = combinator.names.joinToString(", ") { it.accept(context) }
+
+        return "$keyword $names"
     }
 }
 
 fun DartCompilationUnit.accept(context: DartGenerationContext) = accept(DartCompilationUnitTransformer, context)
+fun DartDirective.accept(context: DartGenerationContext) = accept(DartCompilationUnitTransformer, context)
+fun DartCombinator.accept(context: DartGenerationContext) = accept(DartCompilationUnitTransformer, context)

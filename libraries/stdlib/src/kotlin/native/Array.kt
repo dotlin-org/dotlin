@@ -25,7 +25,8 @@ package kotlin
  * See [Kotlin language documentation](https://kotlinlang.org/docs/reference/basic-types.html#arrays)
  * for more information on arrays.
  */
-@DartBuiltIn()
+@DartBuiltIn
+@DartBuiltIn.ImportAlias("dart:core")
 @DartName("List")
 public class Array<T> {
     /**

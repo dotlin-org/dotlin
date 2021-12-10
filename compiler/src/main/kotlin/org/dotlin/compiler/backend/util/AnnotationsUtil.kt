@@ -17,9 +17,8 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.backend.steps.util
+package org.dotlin.compiler.backend.util
 
-import org.dotlin.compiler.backend.steps.falseIfNull
 import org.jetbrains.kotlin.ir.declarations.IrAnnotationContainer
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrOverridableDeclaration
@@ -28,17 +27,13 @@ import org.jetbrains.kotlin.ir.util.getAnnotation
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.name.FqName
 
-object DotlinAnnotations {
-    const val dartName = "dotlin.DartName"
-    const val dartGetter = "dotlin.DartGetter"
-    const val dartBuiltIn = "dotlin.DartBuiltIn"
-}
-
 @Suppress("UNCHECKED_CAST")
 fun IrAnnotationContainer.getSingleAnnotationStringArgumentOf(name: String) = getAnnotation(FqName(name))
     ?.getValueArgument(0)
     ?.let { it as? IrConst<String> }
     ?.value
+
+fun IrAnnotationContainer.getAnnotation(name: String) = getAnnotation(FqName(name))
 
 fun IrAnnotationContainer.hasAnnotation(name: String) = hasAnnotation(FqName(name))
 
@@ -49,6 +44,3 @@ fun IrOverridableDeclaration<*>.hasOverriddenAnnotation(name: String): Boolean =
         (owner as? IrDeclaration)?.hasAnnotation(name).falseIfNull() ||
                 (owner as? IrOverridableDeclaration<*>)?.hasOverriddenAnnotation(name).falseIfNull()
     }
-
-fun IrDeclaration.hasDartGetterAnnotation() =
-    (this as? IrOverridableDeclaration<*>?)?.hasOverriddenAnnotation(DotlinAnnotations.dartGetter).falseIfNull()

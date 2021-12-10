@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
+import org.dotlin.compiler.backend.hasDartGetterAnnotation
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrBinaryInfixExpression
@@ -26,7 +27,6 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrConjunctionExpressi
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrDisjunctionExpression
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrNullAwareExpression
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.*
-import org.dotlin.compiler.backend.steps.util.hasDartGetterAnnotation
 import org.dotlin.compiler.dart.ast.collection.DartCollectionElementList
 import org.dotlin.compiler.dart.ast.expression.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
@@ -90,11 +90,11 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                 when {
                     // Built-in: String + Any? (or null) will use the Dart extension.
                     irLeftType.isString() && !irRightType.isString() -> {
-                        methodInvocation(irCallLike.symbol.owner.dartName)
+                        methodInvocation(irCallLike.symbol.owner.dartNameAsSimple)
                     }
                     // Built-in: Char + Int will use the Dart extension.
                     irLeftType.isChar() && irRightType.isInt() -> {
-                        methodInvocation(irCallLike.symbol.owner.dartName)
+                        methodInvocation(irCallLike.symbol.owner.dartNameAsSimple)
                     }
                     else -> DartPlusExpression(infixLeft, infixRight)
                 }
@@ -102,7 +102,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
             IrStatementOrigin.MINUS -> when {
                 // Built-in: String - int will use the Dart extension.
                 irLeft!!.type.isChar() && irRight.type.isInt() -> {
-                    methodInvocation(irCallLike.symbol.owner.dartName)
+                    methodInvocation(irCallLike.symbol.owner.dartNameAsSimple)
                 }
                 else -> DartMinusExpression(infixLeft, infixRight)
             }
@@ -149,8 +149,8 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                             || hasDartGetterAnnotation -> {
                         val irSimpleFunction = irCallLike.symbol.owner as IrSimpleFunction
                         val propertyName = when {
-                            hasDartGetterAnnotation -> irSimpleFunction.dartName
-                            else -> irSimpleFunction.correspondingPropertySymbol!!.owner.dartName
+                            hasDartGetterAnnotation -> irSimpleFunction.dartNameAsSimple
+                            else -> irSimpleFunction.correspondingPropertySymbol!!.owner.dartNameAsSimple
                         }
 
                         DartPropertyAccessExpression(infixLeft, propertyName)
@@ -161,7 +161,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                         when (irCallLike) {
                             is IrConstructorCall, is IrEnumConstructorCall -> {
                                 val type = irCallLike.type.toDart(context) as DartNamedType
-                                val name = irCallLike.symbol.owner.dartNameOrNull
+                                val name = irCallLike.symbol.owner.simpleDartNameOrNull
 
                                 DartInstanceCreationExpression(
                                     type = type,
@@ -181,7 +181,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                                     )
                                     else -> DartMethodInvocation(
                                         target = receiver,
-                                        methodName = functionName,
+                                        methodName = functionName as DartSimpleIdentifier,
                                         arguments = arguments
                                     )
                                 }
@@ -336,7 +336,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
 
     private val IrField.relevantDartName: DartSimpleIdentifier
         get() = when {
-            !isExplicitBackingField -> correspondingProperty?.dartName ?: dartName
+            !isExplicitBackingField -> correspondingProperty?.simpleDartName ?: dartName
             else -> dartName
         }
 

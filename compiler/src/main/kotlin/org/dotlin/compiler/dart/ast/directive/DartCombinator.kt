@@ -17,16 +17,27 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.dart.ast.compilationunit
+package org.dotlin.compiler.dart.ast.directive
 
 import org.dotlin.compiler.dart.ast.DartAstNode
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
-import org.dotlin.compiler.dart.ast.directive.DartDirective
+import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 
-data class DartCompilationUnit(
-    val directives: List<DartDirective> = listOf(),
-    val declarations: List<DartCompilationUnitMember> = listOf()
-) : DartAstNode {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitCompilationUnit(this, context)
+sealed interface DartCombinator : DartAstNode {
+    val keyword: String
+    val names: List<DartSimpleIdentifier>
+
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) = visitor.visitCombinator(this, context)
+}
+
+data class DartHideCombinator(
+    override val names: List<DartSimpleIdentifier>
+) : DartCombinator {
+    override val keyword = "hide"
+}
+
+data class DartShowCombinator(
+    override val names: List<DartSimpleIdentifier>
+) : DartCombinator {
+    override val keyword = "hide"
 }

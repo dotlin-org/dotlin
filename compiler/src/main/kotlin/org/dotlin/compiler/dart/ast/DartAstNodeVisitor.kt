@@ -37,8 +37,10 @@ import org.dotlin.compiler.dart.ast.declaration.function.body.DartEmptyFunctionB
 import org.dotlin.compiler.dart.ast.declaration.function.body.DartExpressionFunctionBody
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
+import org.dotlin.compiler.dart.ast.directive.DartCombinator
+import org.dotlin.compiler.dart.ast.directive.DartImportDirective
 import org.dotlin.compiler.dart.ast.expression.*
-import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
+import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.dotlin.compiler.dart.ast.expression.invocation.DartInvocationExpression
 import org.dotlin.compiler.dart.ast.expression.literal.*
 import org.dotlin.compiler.dart.ast.parameter.DartDefaultFormalParameter
@@ -87,12 +89,13 @@ interface DartAstNodeVisitor<R, C> {
         throwUnsupported()
 
     // Directives
-    fun visitDirective(directive: DartDirective, context: C): R = throwUnsupported()
+    fun visitImportDirective(directive: DartImportDirective, context: C): R = throwUnsupported()
+    fun visitCombinator(combinator: DartCombinator, context: C): R = throwUnsupported()
 
     // Expressions
     fun visitArgumentList(arguments: DartArgumentList, context: C): R = throwUnsupported()
     fun visitFunctionExpression(functionExpression: DartFunctionExpression, context: C): R = throwUnsupported()
-    fun visitSimpleIdentifier(identifier: DartSimpleIdentifier, context: C): R = throwUnsupported()
+    fun visitIdentifier(identifier: DartIdentifier, context: C): R = throwUnsupported()
     fun visitInvocationExpression(invocation: DartInvocationExpression, context: C): R = throwUnsupported()
 
     fun visitAssignmentExpression(assignment: DartAssignmentExpression, context: C): R = throwUnsupported()

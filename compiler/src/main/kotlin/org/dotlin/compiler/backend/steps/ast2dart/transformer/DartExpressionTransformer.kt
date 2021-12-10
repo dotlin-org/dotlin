@@ -22,7 +22,7 @@ package org.dotlin.compiler.backend.steps.ast2dart.transformer
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
 import org.dotlin.compiler.dart.ast.expression.*
 import org.dotlin.compiler.dart.ast.expression.DartAssignmentOperator.*
-import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
+import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.dotlin.compiler.dart.ast.expression.invocation.DartInvocationExpression
 import org.dotlin.compiler.dart.ast.expression.literal.*
 
@@ -196,7 +196,7 @@ object DartExpressionTransformer : DartAstNodeTransformer {
         return "$const$typeArguments$elements"
     }
 
-    override fun visitSimpleIdentifier(identifier: DartSimpleIdentifier, context: DartGenerationContext) =
+    override fun visitIdentifier(identifier: DartIdentifier, context: DartGenerationContext) =
         identifier.value
 
     private fun DartSingleStringLiteral.transformBy(
