@@ -275,4 +275,86 @@ class Dotlin : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `@DartBuiltInHideImport twice`() = assertCompile {
+        kotlin(
+            """
+            @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
+            @DartBuiltIn.HideImport("dart:core")
+            class Enum
+
+            @DartBuiltIn.HideImport("dart:core")
+            class List
+
+            fun main() {
+                Enum()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'dart:core' hide Enum, List;
+
+            class Enum {
+              Enum() : super();
+            }
+
+            class List {
+              List() : super();
+            }
+
+            void main() {
+              Enum();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartBuiltInHideImport twice, multiple files`() = assertCompileFiles {
+        kotlin(
+            """
+            @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
+            package test
+
+            @DartBuiltIn.HideImport("dart:core")
+            class Something
+
+            @DartBuiltIn.HideImport("dart:core")
+            class SomethingElse
+            """
+        )
+
+        kotlin(
+            """
+            package test
+
+            fun main() {
+                Something()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'dart:core' hide Something, SomethingElse;
+
+            class Something {
+              Something() : super();
+            }
+
+            class SomethingElse {
+              SomethingElse() : super();
+            }
+
+            void main() {
+              Something();
+            }
+            """
+        )
+    }
 }
