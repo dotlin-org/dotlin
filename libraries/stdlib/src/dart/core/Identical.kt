@@ -19,4 +19,4 @@ package dart.core
 /**
  * Check whether two references are to the same object.
  */
-fun identical(a: Any?, b: Any?): Boolean = false
+external fun identical(a: Any?, b: Any?): Boolean
