@@ -20,6 +20,7 @@
 package org.dotlin.compiler.backend.steps.ast2dart
 
 import org.dotlin.compiler.backend.steps.ast2dart.transformer.accept
+import org.dotlin.compiler.backend.util.optimizeImports
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
 
 fun dartAstToDartSource(units: List<DartCompilationUnit>): String {
@@ -27,7 +28,7 @@ fun dartAstToDartSource(units: List<DartCompilationUnit>): String {
 
     // We compile to a single file (for now).
     return DartCompilationUnit(
-        directives = units.map { it.directives }.flatten().toSet().toList(),
+        directives = units.map { it.directives }.flatten().optimizeImports(),
         declarations = units.map { it.declarations }.flatten()
     ).accept(context)
 }

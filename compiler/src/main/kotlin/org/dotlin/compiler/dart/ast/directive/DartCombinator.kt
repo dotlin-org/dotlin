@@ -28,16 +28,32 @@ sealed interface DartCombinator : DartAstNode {
     val names: List<DartSimpleIdentifier>
 
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) = visitor.visitCombinator(this, context)
+
+    companion object {
+        fun fromKeyword(keyword: String, names: List<DartSimpleIdentifier>) = when (keyword) {
+            DartHideCombinator.KEYWORD -> DartHideCombinator(names)
+            DartShowCombinator.KEYWORD -> DartShowCombinator(names)
+            else -> throw UnsupportedOperationException("Not a valid keyword: $keyword")
+        }
+    }
 }
 
 data class DartHideCombinator(
     override val names: List<DartSimpleIdentifier>
 ) : DartCombinator {
-    override val keyword = "hide"
+    override val keyword = KEYWORD
+
+    companion object {
+        const val KEYWORD = "hide"
+    }
 }
 
 data class DartShowCombinator(
     override val names: List<DartSimpleIdentifier>
 ) : DartCombinator {
-    override val keyword = "hide"
+    override val keyword = KEYWORD
+
+    companion object {
+        const val KEYWORD = "show"
+    }
 }
