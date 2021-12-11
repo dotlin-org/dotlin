@@ -54,6 +54,56 @@ class Dotlin : BaseTest {
     }
 
     @Test
+    fun `@DartConst constructor`() = assertCompile {
+        kotlin(
+            """
+            class Test @DartConst constructor()
+
+            fun main() {
+                Test()
+            }
+            """
+        )
+
+        dart(
+            """
+            class Test {
+              const Test() : super();
+            }
+            
+            void main() {
+              Test();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartConst constructor call`() = assertCompile {
+        kotlin(
+            """
+            class Test @DartConst constructor()
+
+            fun main() {
+                @DartConst Test()
+            }
+            """
+        )
+
+        dart(
+            """
+            class Test {
+              const Test() : super();
+            }
+
+            void main() {
+              const Test();
+            }
+            """
+        )
+    }
+
+    @Test
     fun `@DartBuiltIn`() = assertCompile {
         kotlin(
             """

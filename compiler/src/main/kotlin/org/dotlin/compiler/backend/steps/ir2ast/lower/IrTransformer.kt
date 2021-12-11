@@ -78,26 +78,33 @@ interface IrFileTransformer : FileLoweringPass {
 interface IrExpressionTransformer : IrSingleTransformer<IrExpression>, FileLoweringPass {
     override fun lower(irFile: IrFile) {
         irFile.transformChildren(
-            object : IrElementTransformer<IrDeclarationParent> {
+            object : IrElementTransformer<IrDeclaration?> {
                 override fun visitDeclaration(
                     declaration: IrDeclarationBase,
-                    parent: IrDeclarationParent
+                    parent: IrDeclaration?
                 ): IrStatement {
                     val newParent = if (declaration is IrDeclarationParent) declaration else parent
                     return super.visitDeclaration(declaration, newParent)
                 }
 
-                override fun visitExpression(expression: IrExpression, parent: IrDeclarationParent): IrExpression {
+                override fun visitExpression(expression: IrExpression, parent: IrDeclaration?): IrExpression {
+                    if (parent == null || parent !is IrDeclarationParent) {
+                        throw IllegalStateException("Expected parent but was $parent")
+                    }
+
                     expression.transformChildren(this, parent)
                     return expression.transformBy { transform(it, parent) }
                 }
             },
-            irFile
+            null
         )
     }
 
     override fun transform(expression: IrExpression): Transformation<IrExpression>? = noChange()
-    fun transform(expression: IrExpression, containerParent: IrDeclarationParent): Transformation<IrExpression>? =
+    fun <D> transform(
+        expression: IrExpression,
+        container: D
+    ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent =
         transform(expression)
 }
 

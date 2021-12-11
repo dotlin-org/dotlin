@@ -22,6 +22,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.declarations.buildFun
+import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
 import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -35,10 +36,10 @@ import org.jetbrains.kotlin.name.Name
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 class WhensWithSubjectExpressionsLowering(private val context: DartLoweringContext) : IrExpressionTransformer {
-    override fun transform(
+    override fun <D> transform(
         expression: IrExpression,
-        containerParent: IrDeclarationParent
-    ): Transformation<IrExpression>? {
+        container: D
+    ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
         if (expression !is IrBlock || expression.origin != IrStatementOrigin.WHEN) return noChange()
 
         val whenExpression = expression.statements.last() as IrWhen
@@ -47,7 +48,7 @@ class WhensWithSubjectExpressionsLowering(private val context: DartLoweringConte
             name = Name.special("<anonymous>")
             returnType = whenExpression.type
         }.apply {
-            parent = containerParent
+            parent = container
 
             body = IrBlockBodyImpl(
                 UNDEFINED_OFFSET,

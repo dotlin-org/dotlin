@@ -19,4 +19,14 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast
 
-class DartTransformContext
+import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrAnnotatedExpression
+import org.jetbrains.kotlin.ir.expressions.IrExpression
+
+data class DartTransformContext(val annotatedExpressions: Map<IrExpression, IrAnnotatedExpression> = mapOf()) {
+    fun <T> withAnnotatedExpression(from: IrAnnotatedExpression, block: (DartTransformContext) -> T): T {
+        val newContext = copy(
+            annotatedExpressions = annotatedExpressions + mapOf(from.expression to from)
+        )
+        return block(newContext)
+    }
+}

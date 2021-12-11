@@ -19,10 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.ir
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrConjunctionExpression
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrDisjunctionExpression
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrExpressionBodyWithOrigin
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrNullAwareExpression
+import org.dotlin.compiler.backend.steps.ir2ast.ir.element.*
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
@@ -33,6 +30,7 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 interface IrCustomElementHelper {
     fun visitExpression(expression: IrExpression): IrExpression? {
         return when (expression) {
+            is IrAnnotatedExpression -> visitAnnotatedExpression(expression)
             is IrNullAwareExpression -> visitNullAwareExpression(expression)
             is IrConjunctionExpression -> visitConjunctionExpression(expression)
             is IrDisjunctionExpression -> visitDisjunctionExpression(expression)
@@ -41,6 +39,7 @@ interface IrCustomElementHelper {
 
     }
 
+    fun visitAnnotatedExpression(expression: IrAnnotatedExpression): IrAnnotatedExpression
     fun visitNullAwareExpression(expression: IrNullAwareExpression): IrNullAwareExpression
     fun visitConjunctionExpression(expression: IrConjunctionExpression): IrConjunctionExpression
     fun visitDisjunctionExpression(expression: IrDisjunctionExpression): IrDisjunctionExpression
@@ -80,6 +79,7 @@ abstract class IrCustomElementTransformerVoid : IrElementTransformerVoid(), IrCu
         superVisitBody = { super<IrElementTransformerVoid>.visitBody(it) }
     )
 
+    override fun visitAnnotatedExpression(expression: IrAnnotatedExpression) = expression
     override fun visitNullAwareExpression(expression: IrNullAwareExpression) = expression
     override fun visitConjunctionExpression(expression: IrConjunctionExpression) = expression
     override fun visitDisjunctionExpression(expression: IrDisjunctionExpression) = expression

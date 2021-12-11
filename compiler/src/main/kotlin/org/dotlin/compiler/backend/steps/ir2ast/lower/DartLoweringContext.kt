@@ -50,12 +50,14 @@ import org.jetbrains.kotlin.ir.types.IrTypeSystemContextImpl
 import org.jetbrains.kotlin.ir.types.impl.IrDynamicTypeImpl
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.types.Variance
 
 class DartLoweringContext(
     override val configuration: CompilerConfiguration,
-    private val symbolTable: SymbolTable,
-    irModuleFragment: IrModuleFragment
+    val symbolTable: SymbolTable,
+    val bindingContext: BindingContext,
+    val irModuleFragment: IrModuleFragment
 ) : CommonBackendContext {
     override val builtIns = irModuleFragment.descriptor.builtIns
     override var inVerbosePhase = false
