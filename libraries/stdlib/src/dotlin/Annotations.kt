@@ -26,4 +26,12 @@ package dotlin
     AnnotationTarget.PROPERTY_SETTER,
     AnnotationTarget.FILE
 )
+@Retention(AnnotationRetention.SOURCE)
 annotation class DartName(val name: String)
+
+/**
+ * Specifies that the constructor or constructor call should be `const`.
+ */
+@Target(AnnotationTarget.CONSTRUCTOR, AnnotationTarget.EXPRESSION)
+@Retention(AnnotationRetention.SOURCE)
+annotation class DartConst()

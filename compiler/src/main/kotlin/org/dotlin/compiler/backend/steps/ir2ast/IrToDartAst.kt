@@ -29,7 +29,7 @@ fun irToDartAst(
     configuration: CompilerConfiguration,
     ir: IrResult
 ): List<DartCompilationUnit> {
-    ir.module.lower(configuration, ir.symbolTable)
+    ir.module.lower(configuration, ir.symbolTable, ir.bindingContext)
 
     val context = DartTransformContext()
     val units = mutableListOf<DartCompilationUnit>()

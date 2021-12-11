@@ -21,6 +21,7 @@ package dotlin
  * already is already defined.
  */
 @Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.SOURCE)
 internal annotation class DartBuiltIn {
     /**
      * Specifies that the annotated method is a getter in Dart.
@@ -30,6 +31,7 @@ internal annotation class DartBuiltIn {
      * Applies to any overrides in subtypes as well.
      */
     @Target(AnnotationTarget.FUNCTION)
+    @Retention(AnnotationRetention.SOURCE)
     annotation class Getter
 
     /**
@@ -43,6 +45,7 @@ internal annotation class DartBuiltIn {
         AnnotationTarget.CLASS,
         AnnotationTarget.FUNCTION,
     )
+    @Retention(AnnotationRetention.SOURCE)
     annotation class ImportAlias(val library: String)
 
     /**
@@ -58,5 +61,6 @@ internal annotation class DartBuiltIn {
         AnnotationTarget.CLASS,
         AnnotationTarget.FUNCTION,
     )
+    @Retention(AnnotationRetention.SOURCE)
     annotation class HideImport(val library: String)
 }

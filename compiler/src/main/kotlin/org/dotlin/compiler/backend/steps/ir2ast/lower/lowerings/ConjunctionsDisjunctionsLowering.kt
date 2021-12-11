@@ -22,6 +22,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrConjunctionExpression
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrDisjunctionExpression
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
+import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
@@ -29,10 +30,10 @@ import org.jetbrains.kotlin.ir.expressions.IrWhen
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UnnecessaryVariable")
 class ConjunctionsDisjunctionsLowering(private val context: DartLoweringContext) : IrExpressionTransformer {
-    override fun transform(
+    override fun <D> transform(
         expression: IrExpression,
-        containerParent: IrDeclarationParent
-    ): Transformation<IrExpression>? {
+        container: D
+    ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
         if (expression !is IrWhen) return noChange()
 
         val irWhen = expression

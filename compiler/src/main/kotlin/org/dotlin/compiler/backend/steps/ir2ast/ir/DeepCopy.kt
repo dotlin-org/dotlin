@@ -19,10 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.ir
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrConjunctionExpression
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrDisjunctionExpression
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrExpressionBodyWithOrigin
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrNullAwareExpression
+import org.dotlin.compiler.backend.steps.ir2ast.ir.element.*
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.builders.declarations.*
@@ -319,6 +316,12 @@ class DeepCopier(
         helperVisitBody = { super<IrCustomElementHelper>.visitBody(body) },
         superVisitBody = { super<DeepCopyIrTreeWithSymbols>.visitBody(body) }
     )
+
+    override fun visitAnnotatedExpression(expression: IrAnnotatedExpression): IrAnnotatedExpression =
+        IrAnnotatedExpression(
+            expression.expression.transform(),
+            expression.annotations.transform()
+        ).copyAttributes(expression)
 
     override fun visitNullAwareExpression(expression: IrNullAwareExpression): IrNullAwareExpression =
         IrNullAwareExpression(expression.expression.transform())

@@ -25,3 +25,9 @@ fun <T> MutableList<T>.replace(old: T, new: T) {
     add(indexOf(old), new)
     remove(old)
 }
+
+fun <T> Iterable<T>.toPair(): Pair<T, T> {
+    if (this.count() != 2) throw IllegalStateException("There must be exactly 2 elements to convert to a Pair")
+
+    return first() to last()
+}

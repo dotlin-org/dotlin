@@ -22,11 +22,9 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer
 import org.dotlin.compiler.backend.hasDartGetterAnnotation
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrBinaryInfixExpression
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrConjunctionExpression
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrDisjunctionExpression
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrNullAwareExpression
+import org.dotlin.compiler.backend.steps.ir2ast.ir.element.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.*
+import org.dotlin.compiler.backend.util.toPair
 import org.dotlin.compiler.dart.ast.collection.DartCollectionElementList
 import org.dotlin.compiler.dart.ast.expression.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
@@ -47,6 +45,7 @@ import org.jetbrains.kotlin.ir.types.isString
 object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
     override fun visitExpression(expression: IrExpression, context: DartTransformContext): DartExpression {
         return when (expression) {
+            is IrAnnotatedExpression -> visitAnnotatedExpression(expression, context)
             is IrNullAwareExpression -> visitNullAwareExpression(expression, context)
             is IrBinaryInfixExpression -> visitBinaryInfixExpression(expression, context)
             else -> super.visitExpression(expression, context)
@@ -167,7 +166,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                                     type = type,
                                     constructorName = name,
                                     arguments = arguments,
-                                    isConst = irCallLike.isDartConst()
+                                    isConst = irCallLike.isDartConst(context)
                                 )
                             }
                             else -> {
@@ -350,6 +349,16 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                 parameters = parameters,
                 body = expression.function.body.accept(context)
             )
+        }
+
+    private fun visitAnnotatedExpression(
+        irAnnotated: IrAnnotatedExpression,
+        context: DartTransformContext
+    ): DartExpression =
+        // Dart doesn't support annotated expressions, so the annotations are not outputted. But they are passed
+        // down so annotations can still be checked in child expressions.
+        context.withAnnotatedExpression(from = irAnnotated) {
+            irAnnotated.expression.accept(it)
         }
 
     private fun visitNullAwareExpression(

@@ -24,10 +24,12 @@ import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.StringL
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.SymbolTable
+import org.jetbrains.kotlin.resolve.BindingContext
 
 private val lowerings = listOf(
     ::DartBuiltInImportsLowering,
     ::DartBuiltInLowering,
+    ::AnnotatedExpressionsLowering,
     ::ObjectLowering,
     ::NestedClassLowering,
     ::EnumLowering,
@@ -56,8 +58,17 @@ private val lowerings = listOf(
     ::PrivateNamesLowering,
 )
 
-fun IrModuleFragment.lower(configuration: CompilerConfiguration, symbolTable: SymbolTable) {
-    val context = DartLoweringContext(configuration, irModuleFragment = this, symbolTable = symbolTable)
+fun IrModuleFragment.lower(
+    configuration: CompilerConfiguration,
+    symbolTable: SymbolTable,
+    bindingContext: BindingContext
+) {
+    val context = DartLoweringContext(
+        configuration,
+        irModuleFragment = this,
+        symbolTable = symbolTable,
+        bindingContext = bindingContext
+    )
 
     lowerings.forEach { lowering ->
         files.forEach { lowering(context).lower(it) }

@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.ir.declarations.IrOverridableDeclaration
 
 object DotlinAnnotations {
     const val dartName = "dotlin.DartName"
+    const val dartConst = "dotlin.DartConst"
 
     const val dartBuiltIn = "dotlin.DartBuiltIn"
     const val dartBuiltInGetter = "dotlin.DartBuiltIn.Getter"

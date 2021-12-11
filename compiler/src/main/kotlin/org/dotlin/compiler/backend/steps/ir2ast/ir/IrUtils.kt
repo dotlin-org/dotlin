@@ -433,20 +433,6 @@ fun IrFunction.isEqualsOverriddenFromAny() =
                 ?.defaultType
                 ?.isAny() ?: false
 
-fun IrElement.isDartConst(): Boolean = when (this) {
-    // The constructor of _$DefaultMarker is always const.
-    is IrConstructor -> when {
-        // Enums always get const constructors.
-        parentAsClass.isEnumClass -> true
-        else -> origin == IrDartDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE
-    }
-    is IrConstructorCall -> symbol.owner.isDartConst()
-    // Enum fields are always const.
-    is IrField -> origin == IrDeclarationOrigin.FIELD_FOR_ENUM_ENTRY
-    is IrConst<*> -> true
-    else -> false
-}
-
 val IrFunctionAccessExpression.valueArguments: List<IrExpression>
     get() = (0 until valueArgumentsCount).map { getValueArgument(it)!! }
 
