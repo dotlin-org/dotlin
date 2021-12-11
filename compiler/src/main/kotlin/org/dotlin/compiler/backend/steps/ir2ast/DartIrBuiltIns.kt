@@ -20,35 +20,36 @@
 package org.dotlin.compiler.backend.steps.ir2ast
 
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
+import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 
-class DotlinIrBuiltIns(
+class DartIrBuiltIns(
     private val builtInsModule: ModuleDescriptor,
     private val symbolTable: SymbolTable
 ) {
-    private inline fun <reified S : IrSymbol> symbolAt(fqName: String): S {
-        val (packageName, memberName) = fqName.split(".").run {
-            filter { it[0].isLowerCase() }.joinToString(".") to filter { it[0].isUpperCase() }.joinToString(".")
-        }
-
+    private inline fun <reified S : IrSymbol> symbolAt(packageName: String, memberName: String): S {
         val descriptor = builtInsModule.getPackage(FqName(packageName))
             .memberScope
             .getContributedDescriptors {
                 it == Name.identifier(memberName)
-            }.firstOrNull() ?: error("Classifier not found: $fqName")
+            }.firstOrNull() ?: error("Classifier not found: $packageName.$memberName")
 
         return symbolTable.let {
             when (S::class) {
                 IrClassSymbol::class -> it.referenceClass(descriptor as ClassDescriptor) as S
+                IrSimpleFunctionSymbol::class -> it.referenceSimpleFunction(descriptor as FunctionDescriptor) as S
                 else -> error("Unsupported symbol type: ${S::class.simpleName}")
             }
+        }.also {
+            require(it.isBound) { "Built-in symbol is not bound: $it" }
         }
     }
 
-    val dartName = symbolAt<IrClassSymbol>("dotlin.DartName")
+    val identical = symbolAt<IrSimpleFunctionSymbol>("dart.core", "identical")
 }

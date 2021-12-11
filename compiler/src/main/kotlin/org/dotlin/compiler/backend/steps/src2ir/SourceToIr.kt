@@ -24,6 +24,7 @@ import org.dotlin.compiler.backend.DartIrLinker
 import org.dotlin.compiler.backend.DartKotlinBuiltIns
 import org.dotlin.compiler.backend.DotlinCompilerError
 import org.dotlin.compiler.backend.steps.src2ir.analyze.DartKotlinAnalyzer
+import org.jetbrains.kotlin.backend.common.serialization.DeserializationStrategy
 import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDescriptor
 import org.jetbrains.kotlin.cli.common.messages.AnalyzerWithCompilerReport
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
@@ -155,7 +156,13 @@ private fun loadIr(
 
     if (!compilingBuiltIns) {
         resolvedLibs.getFullList().find { it.isBuiltIns }?.let {
-            irLinker.deserializeIrModuleHeader(mainModule.builtIns.builtInsModule, it)
+            irLinker.deserializeIrModuleHeader(
+                moduleDescriptor = mainModule.builtIns.builtInsModule,
+                kotlinLibrary = it,
+                // TODO: Optimize?
+                // For built-ins, we want everything.
+                deserializationStrategy = DeserializationStrategy.ALL
+            )
         }
     }
 

@@ -529,4 +529,29 @@ class Expression : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `===`() = assertCompile {
+        kotlin(
+            """
+            class Test
+
+            fun main() {
+               Test() === Test()
+            }
+            """
+        )
+
+        dart(
+            """
+            class Test {
+              Test() : super();
+            }
+
+            void main() {
+              identical(Test(), Test());
+            }
+            """
+        )
+    }
 }

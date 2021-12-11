@@ -33,7 +33,12 @@ object DartPlatformAnalyzerServices : PlatformDependentAnalyzerServices() {
         storageManager: StorageManager,
         result: MutableList<ImportPath>
     ) {
-        result.add(ImportPath.fromString("dotlin.*"))
+        result.addAll(
+            listOf(
+                ImportPath.fromString("dotlin.*"),
+                ImportPath.fromString("dart.core.*")
+            )
+        )
     }
 
     override val platformConfigurator: PlatformConfigurator = JsPlatformConfigurator // TODO: JS reference
