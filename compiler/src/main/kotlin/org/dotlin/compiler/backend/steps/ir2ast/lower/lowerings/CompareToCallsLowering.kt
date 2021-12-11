@@ -25,7 +25,7 @@ import org.jetbrains.kotlin.ir.IrBuiltIns
 import org.jetbrains.kotlin.ir.expressions.*
 
 /**
- * Simplifies `x.compareTo(y) >= 0` to `x.compareTo(y)` which eventually gets simplified to `x >= y`
+ * Simplifies `x.compareTo(y) >= 0` to `x.compareTo(y)` which eventually gets simplified to `x >= y`.
  */
 class CompareToCallsLowering(private val context: DartLoweringContext) : IrExpressionTransformer {
     override fun transform(expression: IrExpression): Transformation<IrExpression>? {

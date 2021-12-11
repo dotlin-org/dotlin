@@ -29,6 +29,7 @@ import org.jetbrains.kotlin.resolve.BindingContext
 private val lowerings = listOf(
     ::DartBuiltInImportsLowering,
     ::DartBuiltInLowering,
+    ::IdentityChecksLowering,
     ::AnnotatedExpressionsLowering,
     ::ObjectLowering,
     ::NestedClassLowering,

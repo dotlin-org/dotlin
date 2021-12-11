@@ -19,7 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
-import org.dotlin.compiler.backend.steps.ir2ast.DotlinIrBuiltIns
+import org.dotlin.compiler.backend.steps.ir2ast.DartIrBuiltIns
 import org.dotlin.compiler.backend.steps.ir2ast.ir.buildStatement
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.DefaultMapping
@@ -67,7 +67,7 @@ class DartLoweringContext(
     override val mapping = DefaultMapping()
     override val scriptMode = false
 
-    val dotlinBuiltIns = DotlinIrBuiltIns(irModuleFragment.descriptor.builtIns.builtInsModule, symbolTable)
+    val dartBuiltIns = DartIrBuiltIns(irModuleFragment.descriptor.builtIns.builtInsModule, symbolTable)
 
     val dynamicType: IrDynamicType = IrDynamicTypeImpl(null, emptyList(), Variance.INVARIANT)
 

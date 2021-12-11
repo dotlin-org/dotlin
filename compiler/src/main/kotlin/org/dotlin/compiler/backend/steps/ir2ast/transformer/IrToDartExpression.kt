@@ -134,7 +134,6 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                     right = actualRight,
                 )
             }
-
             IrStatementOrigin.EQEQ ->
                 DartEqualityExpression(
                     left = parenthesize(irCallLike.getValueArgument(0)!!.accept(context)),
