@@ -45,7 +45,7 @@ object DartCompilationUnitTransformer : DartAstNodeTransformer {
             }
         }
 
-        return "$annotations $import $library$alias$combinators;"
+        return "$annotations$import $library$alias$combinators;"
     }
 
     override fun visitCombinator(combinator: DartCombinator, context: DartGenerationContext): String {
