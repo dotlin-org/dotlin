@@ -52,5 +52,7 @@ fun DartLabel.accept(context: DartGenerationContext) = accept(DartMiscTransforme
 fun DartExtendsClause.accept(context: DartGenerationContext) = accept(DartMiscTransformer, context)
 fun DartImplementsClause.accept(context: DartGenerationContext) = accept(DartMiscTransformer, context)
 fun DartAnnotation.accept(context: DartGenerationContext) = accept(DartMiscTransformer, context)
-fun Collection<DartAnnotation>.accept(context: DartGenerationContext) =
-    joinToString(separator = "", postfix = " ") { it.accept(context) }
+fun Collection<DartAnnotation>.accept(context: DartGenerationContext) = when {
+    isEmpty() -> ""
+    else ->  joinToString(separator = "", postfix = " ") { it.accept(context) }
+}
