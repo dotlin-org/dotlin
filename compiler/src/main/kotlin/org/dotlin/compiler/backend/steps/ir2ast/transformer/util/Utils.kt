@@ -51,7 +51,7 @@ fun IrType.accept(context: DartTransformContext): DartTypeAnnotation {
     return when (this) {
         is IrSimpleType -> DartNamedType(
             name = owner.dartName,
-            isNullable = isNullable(),
+            isNullable = hasQuestionMark,
             // TODO isDeferred
             typeArguments = DartTypeArgumentList(arguments.map { it.accept(context) }.toMutableList()),
         )

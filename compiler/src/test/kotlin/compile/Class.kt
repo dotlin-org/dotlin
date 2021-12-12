@@ -2172,6 +2172,47 @@ class Class : BaseTest {
     }
 
     @Test
+    fun `class with type parameter with method`() = assertCompile {
+        kotlin(
+            """
+            class Test<T> {
+                fun method(other: T) {}
+            }
+            """
+        )
+
+        dart(
+            """
+            class Test<T> {
+              Test() : super();
+              void method(T other) {}
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `class with type parameter with method with nullable value parameter with type parameter type`() =
+        assertCompile {
+            kotlin(
+                """
+                class Test<T> {
+                    fun method(other: T?) {}
+                }
+                """
+            )
+
+            dart(
+                """
+                class Test<T> {
+                  Test() : super();
+                  void method(T? other) {}
+                }
+                """
+            )
+        }
+
+    @Test
     fun `class with two type parameters`() = assertCompile {
         kotlin("class Test<T0, T1>")
 
@@ -2696,7 +2737,7 @@ class Class : BaseTest {
 
             class Builder<T> {
               Builder() : super();
-              void startBuild(T? item) {
+              void startBuild(T item) {
                 (item as Identifiable?)?.identify();
                 (item as Buildable?)?.build();
                 this._identifyAndExec(item as Identifiable?);
@@ -2772,7 +2813,7 @@ class Class : BaseTest {
 
                 class Builder<T extends Marker?> {
                   Builder() : super();
-                  void startBuild(T? item) {
+                  void startBuild(T item) {
                     (item as Identifiable?)?.identify();
                     (item as Buildable?)?.build();
                     this._identifyAndExec(item as Identifiable?);
