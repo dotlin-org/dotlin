@@ -19,82 +19,16 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer.util
 
-import org.dotlin.compiler.backend.DotlinAnnotations
 import org.dotlin.compiler.backend.dartAnnotatedName
 import org.dotlin.compiler.backend.dartImportAliasPrefix
-import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
-import org.dotlin.compiler.backend.steps.ir2ast.ir.accept
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrAnnotatedExpression
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrivate
-import org.dotlin.compiler.backend.steps.ir2ast.ir.owner
-import org.dotlin.compiler.backend.util.hasAnnotation
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartPrefixedIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.toDartSimpleIdentifier
-import org.dotlin.compiler.dart.ast.type.DartNamedType
-import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
-import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
 import org.jetbrains.kotlin.backend.common.lower.parents
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.expressions.IrConst
-import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
-import org.jetbrains.kotlin.ir.expressions.IrEnumConstructorCall
-import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.types.IrDynamicType
-import org.jetbrains.kotlin.ir.types.IrSimpleType
-import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.util.isEnumClass
-import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
-
-fun IrType.accept(context: DartTransformContext): DartTypeAnnotation {
-    // TODO: Check for function type
-
-    return when (this) {
-        is IrSimpleType -> DartNamedType(
-            name = owner.dartName,
-            isNullable = hasQuestionMark,
-            // TODO isDeferred
-            typeArguments = DartTypeArgumentList(arguments.map { it.accept(context) }.toMutableList()),
-        )
-        is IrDynamicType -> DartTypeAnnotation.DYNAMIC
-        else -> throw UnsupportedOperationException()
-    }
-}
-
-fun IrDeclaration.isDartConst(): Boolean = when (this) {
-    is IrConstructor -> when {
-        // Enums always get const constructors.
-        parentAsClass.isEnumClass -> true
-        // The constructor of _$DefaultMarker is always const.
-        origin == IrDartDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE -> true
-        else -> hasAnnotation(DotlinAnnotations.dartConst)
-    }
-    // Enum fields are always const.
-    is IrField -> origin == IrDeclarationOrigin.FIELD_FOR_ENUM_ENTRY
-    else -> false
-}
-
-fun IrExpression.isDartConst(context: DartTransformContext): Boolean = when (this) {
-    // Enums are always constructed as const.
-    is IrEnumConstructorCall -> true
-    is IrConst<*> -> true
-    is IrAnnotatedExpression -> hasAnnotation(DotlinAnnotations.dartConst)
-    is IrConstructorCall -> when (symbol.owner.origin) {
-        // The constructor of _$DefaultMarker should always be invoked with const.
-        IrDartDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE -> true
-        else -> context.annotatedExpressions[this]?.hasAnnotation(DotlinAnnotations.dartConst) ?: false
-    }
-    else -> false
-}
-
-val IrDeclarationWithName.dartName: DartIdentifier
-    get() = dartNameOrNull.let {
-        require(it != null) { "Name (${name.asString()}) cannot be special" }
-        it
-    }
 
 private fun IrDeclarationWithName.getDartNameOrNull(allowNested: Boolean): DartIdentifier? {
     val aliasPrefix = dartImportAliasPrefix?.toDartSimpleIdentifier()
@@ -135,6 +69,12 @@ private fun IrDeclarationWithName.getDartNameOrNull(allowNested: Boolean): DartI
         else -> null
     }
 }
+
+val IrDeclarationWithName.dartName: DartIdentifier
+    get() = dartNameOrNull.let {
+        require(it != null) { "Name (${name.asString()}) cannot be special" }
+        it
+    }
 
 val IrDeclarationWithName.dartNameOrNull: DartIdentifier?
     get() = getDartNameOrNull(allowNested = true)
