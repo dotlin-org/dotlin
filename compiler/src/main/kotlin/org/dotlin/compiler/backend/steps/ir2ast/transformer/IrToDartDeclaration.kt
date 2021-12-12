@@ -158,6 +158,7 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
         return DartExtensionDeclaration(
             name = irClass.simpleDartName,
             extendedType = type,
+            typeParameters = irClass.typeParameters.accept(context),
             members = irClass.declarations.mapNotNull { it.acceptAsClassMember(context) }
         )
     }
