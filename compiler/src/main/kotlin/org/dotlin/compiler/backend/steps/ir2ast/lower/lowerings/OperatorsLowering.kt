@@ -21,6 +21,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
+import org.jetbrains.kotlin.backend.common.ir.isMethodOfAny
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -186,7 +187,7 @@ class OperatorsLowering(private val context: DartLoweringContext) : IrDeclaratio
                 isOperator = false
             }.apply {
                 // The equals method itself is not an override in Dart, only the actual '==' operator method is.
-                if (irFunction.isEqualsOverriddenFromAny()) {
+                if (irIdentifier == "equals" && irFunction.isMethodOfAny()) {
                     overriddenSymbols = emptyList()
                 }
             }
