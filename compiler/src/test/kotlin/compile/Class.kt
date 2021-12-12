@@ -1728,6 +1728,37 @@ class Class : BaseTest {
         }
 
         @Test
+        fun `class with overridden equals operator while implementing interface`() = assertCompile {
+            kotlin(
+                """
+                interface Marker
+
+                class Test : Marker {
+                    override fun equals(other: Any?): Boolean {
+                        return false
+                    }
+                }
+                """
+            )
+
+            dart(
+                """
+                abstract class Marker {}
+
+                class Test implements Marker {
+                  Test() : super();
+                  bool equals(Object? other) {
+                    return false;
+                  }
+
+                  @override
+                  bool operator ==(Object? other) => this.equals(other);
+                }
+                """
+            )
+        }
+
+        @Test
         fun `class with compareTo operator`() = assertCompile {
             kotlin(
                 """
