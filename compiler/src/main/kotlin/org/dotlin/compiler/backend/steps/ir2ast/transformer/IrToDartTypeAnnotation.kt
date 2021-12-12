@@ -20,15 +20,12 @@
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
-import org.dotlin.compiler.backend.steps.ir2ast.ir.accept
 import org.dotlin.compiler.backend.steps.ir2ast.ir.owner
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
 import org.dotlin.compiler.dart.ast.type.DartNamedType
 import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
 import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
-import org.jetbrains.kotlin.ir.types.IrDynamicType
-import org.jetbrains.kotlin.ir.types.IrSimpleType
-import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.*
 
 fun IrType.accept(context: DartTransformContext): DartTypeAnnotation {
     // TODO: Check for function type
@@ -43,3 +40,7 @@ fun IrType.accept(context: DartTransformContext): DartTypeAnnotation {
         else -> throw UnsupportedOperationException()
     }
 }
+
+// If typeOrNull returns null, it's a star projection, which corresponds best to dynamic in Dart.
+fun IrTypeArgument.accept(context: DartTransformContext): DartTypeAnnotation =
+    typeOrNull?.accept(context) ?: DartTypeAnnotation.DYNAMIC

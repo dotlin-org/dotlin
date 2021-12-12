@@ -21,7 +21,6 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.accept
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.simpleDartName
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.transformBy
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnitMember
