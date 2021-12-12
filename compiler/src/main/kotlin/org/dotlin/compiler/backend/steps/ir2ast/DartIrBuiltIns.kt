@@ -52,4 +52,10 @@ class DartIrBuiltIns(
     }
 
     val identical = symbolAt<IrSimpleFunctionSymbol>("dart.core", "identical")
+
+    val dotlin = Dotlin(this)
+
+    class Dotlin(builtIns: DartIrBuiltIns) {
+        val dart = builtIns.symbolAt<IrSimpleFunctionSymbol>("dotlin", "dart")
+    }
 }

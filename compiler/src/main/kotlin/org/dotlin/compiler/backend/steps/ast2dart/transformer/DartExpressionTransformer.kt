@@ -200,6 +200,8 @@ object DartExpressionTransformer : DartAstNodeTransformer {
     override fun visitIdentifier(identifier: DartIdentifier, context: DartGenerationContext) =
         identifier.value
 
+    override fun visitCode(code: DartCode, context: DartGenerationContext) = code.value
+
     private fun DartSingleStringLiteral.transformBy(
         block: DartSingleStringLiteralDefaults.() -> String
     ) = DartSingleStringLiteralDefaults(

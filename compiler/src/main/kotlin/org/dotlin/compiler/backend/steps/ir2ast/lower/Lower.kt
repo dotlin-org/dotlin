@@ -57,6 +57,7 @@ private val lowerings = listOf(
     ::InitBlocksLowering,
     ::MultipleTypeParametersLowering,
     ::DefaultConstructorsLowering,
+    ::DartCodeLowering
 )
 
 fun IrModuleFragment.lower(

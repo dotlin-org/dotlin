@@ -317,6 +317,12 @@ class DeepCopier(
         superVisitBody = { super<DeepCopyIrTreeWithSymbols>.visitBody(body) }
     )
 
+    override fun visitDartCodeExpression(expression: IrDartCodeExpression): IrDartCodeExpression =
+        IrDartCodeExpression(
+            expression.code,
+            expression.type.remapType()
+        ).copyAttributes(expression)
+
     override fun visitAnnotatedExpression(expression: IrAnnotatedExpression): IrAnnotatedExpression =
         IrAnnotatedExpression(
             expression.expression.transform(),

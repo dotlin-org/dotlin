@@ -45,6 +45,7 @@ import org.jetbrains.kotlin.ir.types.isString
 object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
     override fun visitExpression(expression: IrExpression, context: DartTransformContext): DartExpression {
         return when (expression) {
+            is IrDartCodeExpression -> visitCode(expression, context)
             is IrAnnotatedExpression -> visitAnnotatedExpression(expression, context)
             is IrNullAwareExpression -> visitNullAwareExpression(expression, context)
             is IrBinaryInfixExpression -> visitBinaryInfixExpression(expression, context)
@@ -386,6 +387,11 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
             is IrDisjunctionExpression -> DartDisjunctionExpression(left, right)
         }
     }
+
+    private fun visitCode(
+        irCode: IrDartCodeExpression,
+        context: DartTransformContext
+    ): DartExpression = DartCode(irCode.code)
 
     private fun DartExpression.possiblyParenthesize(): DartExpression = when (this) {
         is DartConditionalExpression, is DartAsExpression -> parenthesize()
