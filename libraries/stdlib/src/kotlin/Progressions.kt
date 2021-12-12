@@ -1,5 +1,6 @@
 /*
  * Copyright 2010-2021 JetBrains s.r.o.
+ * Copyright 2021 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +22,7 @@ import kotlin.internal.getProgressionLastElement
 /**
  * A progression of values of type `Char`.
  */
-public open class CharProgression
+open class CharProgression
     internal constructor
     (
             start: Char,
@@ -36,17 +37,17 @@ public open class CharProgression
     /**
      * The first element in the progression.
      */
-    public val first: Char = start
+    val first: Char = start
 
     /**
      * The last element in the progression.
      */
-    public val last: Char = getProgressionLastElement(start.code, endInclusive.code, step).toChar()
+    val last: Char = getProgressionLastElement(start.code, endInclusive.code, step).toChar()
 
     /**
      * The step of the progression.
      */
-    public val step: Int = step
+    val step: Int = step
 
     override fun iterator(): CharIterator = CharProgressionIterator(first, last, step)
 
@@ -56,7 +57,7 @@ public open class CharProgression
      * Progression with a positive step is empty if its first element is greater than the last element.
      * Progression with a negative step is empty if its first element is less than the last element.
      */
-    public open fun isEmpty(): Boolean = if (step > 0) first > last else first < last
+    open fun isEmpty(): Boolean = if (step > 0) first > last else first < last
 
     override fun equals(other: Any?): Boolean =
         other is CharProgression && (isEmpty() && other.isEmpty() ||
@@ -76,14 +77,14 @@ public open class CharProgression
          *
          * [step] must be greater than `Int.MIN_VALUE` and not equal to zero.
          */
-        public fun fromClosedRange(rangeStart: Char, rangeEnd: Char, step: Int): CharProgression = CharProgression(rangeStart, rangeEnd, step)
+        fun fromClosedRange(rangeStart: Char, rangeEnd: Char, step: Int): CharProgression = CharProgression(rangeStart, rangeEnd, step)
     }
 }
 
 /**
  * A progression of values of type `Int`.
  */
-public open class IntProgression
+open class IntProgression
     internal constructor
     (
             start: Int,
@@ -98,17 +99,17 @@ public open class IntProgression
     /**
      * The first element in the progression.
      */
-    public val first: Int = start
+    val first: Int = start
 
     /**
      * The last element in the progression.
      */
-    public val last: Int = getProgressionLastElement(start, endInclusive, step)
+    val last: Int = getProgressionLastElement(start, endInclusive, step)
 
     /**
      * The step of the progression.
      */
-    public val step: Int = step
+    val step: Int = step
 
     override fun iterator(): IntIterator = IntProgressionIterator(first, last, step)
 
@@ -118,7 +119,7 @@ public open class IntProgression
      * Progression with a positive step is empty if its first element is greater than the last element.
      * Progression with a negative step is empty if its first element is less than the last element.
      */
-    public open fun isEmpty(): Boolean = if (step > 0) first > last else first < last
+    open fun isEmpty(): Boolean = if (step > 0) first > last else first < last
 
     override fun equals(other: Any?): Boolean =
         other is IntProgression && (isEmpty() && other.isEmpty() ||
@@ -138,14 +139,14 @@ public open class IntProgression
          *
          * [step] must be greater than `Int.MIN_VALUE` and not equal to zero.
          */
-        public fun fromClosedRange(rangeStart: Int, rangeEnd: Int, step: Int): IntProgression = IntProgression(rangeStart, rangeEnd, step)
+        fun fromClosedRange(rangeStart: Int, rangeEnd: Int, step: Int): IntProgression = IntProgression(rangeStart, rangeEnd, step)
     }
 }
 
 /**
  * A progression of values of type `Long`.
  */
-public open class LongProgression
+open class LongProgression
     internal constructor
     (
             start: Long,
@@ -160,17 +161,17 @@ public open class LongProgression
     /**
      * The first element in the progression.
      */
-    public val first: Long = start
+    val first: Long = start
 
     /**
      * The last element in the progression.
      */
-    public val last: Long = getProgressionLastElement(start, endInclusive, step)
+    val last: Long = getProgressionLastElement(start, endInclusive, step)
 
     /**
      * The step of the progression.
      */
-    public val step: Long = step
+    val step: Long = step
 
     override fun iterator(): LongIterator = LongProgressionIterator(first, last, step)
 
@@ -180,7 +181,7 @@ public open class LongProgression
      * Progression with a positive step is empty if its first element is greater than the last element.
      * Progression with a negative step is empty if its first element is less than the last element.
      */
-    public open fun isEmpty(): Boolean = if (step > 0) first > last else first < last
+    open fun isEmpty(): Boolean = if (step > 0) first > last else first < last
 
     override fun equals(other: Any?): Boolean =
         other is LongProgression && (isEmpty() && other.isEmpty() ||
@@ -200,7 +201,7 @@ public open class LongProgression
          *
          * [step] must be greater than `Long.MIN_VALUE` and not equal to zero.
          */
-        public fun fromClosedRange(rangeStart: Long, rangeEnd: Long, step: Long): LongProgression = LongProgression(rangeStart, rangeEnd, step)
+        fun fromClosedRange(rangeStart: Long, rangeEnd: Long, step: Long): LongProgression = LongProgression(rangeStart, rangeEnd, step)
     }
 }
 

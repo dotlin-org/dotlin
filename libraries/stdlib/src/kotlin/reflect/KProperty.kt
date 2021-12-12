@@ -1,5 +1,6 @@
 /*
  * Copyright 2010-2018 JetBrains s.r.o.
+ * Copyright 2021 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +27,12 @@ package kotlin.reflect
  *
  * @param V the type of the property value.
  */
-public interface KProperty<out V> : KCallable<V> {
-}
+interface KProperty<out V> : KCallable<V>
 
 /**
  * Represents a property declared as a `var`.
  */
-public interface KMutableProperty<V> : KProperty<V> {
-}
+interface KMutableProperty<V> : KProperty<V>
 
 
 /**
@@ -41,23 +40,23 @@ public interface KMutableProperty<V> : KProperty<V> {
  * Such property is either originally declared in a receiverless context such as a package,
  * or has the receiver bound to it.
  */
-public interface KProperty0<out V> : KProperty<V>, () -> V {
+interface KProperty0<out V> : KProperty<V>, () -> V {
     /**
      * Returns the current value of the property.
      */
-    public fun get(): V
+    fun get(): V
 }
 
 /**
  * Represents a `var`-property without any kind of receiver.
  */
-public interface KMutableProperty0<V> : KProperty0<V>, KMutableProperty<V> {
+interface KMutableProperty0<V> : KProperty0<V>, KMutableProperty<V> {
     /**
      * Modifies the value of the property.
      *
      * @param value the new value to be assigned to this property.
      */
-    public fun set(value: V)
+    fun set(value: V)
 }
 
 
@@ -67,7 +66,7 @@ public interface KMutableProperty0<V> : KProperty0<V>, KMutableProperty<V> {
  * @param T the type of the receiver which should be used to obtain the value of the property.
  * @param V the type of the property value.
  */
-public interface KProperty1<T, out V> : KProperty<V>, (T) -> V {
+interface KProperty1<T, out V> : KProperty<V>, (T) -> V {
     /**
      * Returns the current value of the property.
      *
@@ -75,13 +74,13 @@ public interface KProperty1<T, out V> : KProperty<V>, (T) -> V {
      *                 For example, it should be a class instance if this is a member property of that class,
      *                 or an extension receiver if this is a top level extension property.
      */
-    public fun get(receiver: T): V
+    fun get(receiver: T): V
 }
 
 /**
  * Represents a `var`-property, operations on which take one receiver as a parameter.
  */
-public interface KMutableProperty1<T, V> : KProperty1<T, V>, KMutableProperty<V> {
+interface KMutableProperty1<T, V> : KProperty1<T, V>, KMutableProperty<V> {
     /**
      * Modifies the value of the property.
      *
@@ -90,7 +89,7 @@ public interface KMutableProperty1<T, V> : KProperty1<T, V>, KMutableProperty<V>
      *                 or an extension receiver if this is a top level extension property.
      * @param value the new value to be assigned to this property.
      */
-    public fun set(receiver: T, value: V)
+    fun set(receiver: T, value: V)
 }
 
 
@@ -104,7 +103,7 @@ public interface KMutableProperty1<T, V> : KProperty1<T, V>, KMutableProperty<V>
  *        the type of the extension receiver.
  * @param V the type of the property value.
  */
-public interface KProperty2<D, E, out V> : KProperty<V>, (D, E) -> V {
+interface KProperty2<D, E, out V> : KProperty<V>, (D, E) -> V {
     /**
      * Returns the current value of the property. In case of the extension property in a class,
      * the instance of the class should be passed first and the instance of the extension receiver second.
@@ -112,13 +111,13 @@ public interface KProperty2<D, E, out V> : KProperty<V>, (D, E) -> V {
      * @param receiver1 the instance of the first receiver.
      * @param receiver2 the instance of the second receiver.
      */
-    public fun get(receiver1: D, receiver2: E): V
+    fun get(receiver1: D, receiver2: E): V
 }
 
 /**
  * Represents a `var`-property, operations on which take two receivers as parameters.
  */
-public interface KMutableProperty2<D, E, V> : KProperty2<D, E, V>, KMutableProperty<V> {
+interface KMutableProperty2<D, E, V> : KProperty2<D, E, V>, KMutableProperty<V> {
     /**
      * Modifies the value of the property.
      *
@@ -126,5 +125,5 @@ public interface KMutableProperty2<D, E, V> : KProperty2<D, E, V>, KMutablePrope
      * @param receiver2 the instance of the second receiver.
      * @param value the new value to be assigned to this property.
      */
-    public fun set(receiver1: D, receiver2: E, value: V)
+    fun set(receiver1: D, receiver2: E, value: V)
 }

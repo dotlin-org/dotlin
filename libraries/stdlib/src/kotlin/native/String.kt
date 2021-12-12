@@ -1,5 +1,6 @@
 /*
  * Copyright 2010-2016 JetBrains s.r.o.
+ * Copyright 2021 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,15 +24,15 @@ package kotlin
  * implemented as instances of this class.
  */
 @DartBuiltIn
-public class String : Comparable<String>, CharSequence {
+class String : Comparable<String>, CharSequence {
     companion object {}
     
     /**
      * Returns a string obtained by concatenating this string with the string representation of the given [other] object.
      */
-    public operator fun plus(other: Any?): String
+    operator fun plus(other: Any?): String
 
-    public override val length: Int
+    override val length: Int
 
     /**
      * Returns the character of this string at the specified [index].
@@ -39,9 +40,9 @@ public class String : Comparable<String>, CharSequence {
      * If the [index] is out of bounds of this string, throws an [IndexOutOfBoundsException] except in Kotlin/JS
      * where the behavior is unspecified.
      */
-    public override fun get(index: Int): Char
+    override fun get(index: Int): Char
 
-    public override fun subSequence(startIndex: Int, endIndex: Int): CharSequence
+    override fun subSequence(startIndex: Int, endIndex: Int): CharSequence
 
-    public override fun compareTo(other: String): Int
+    override fun compareTo(other: String): Int
 }

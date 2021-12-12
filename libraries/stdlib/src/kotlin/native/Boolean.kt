@@ -1,5 +1,6 @@
 /*
  * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2021 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,30 +25,30 @@ package kotlin
  */
 @DartBuiltIn
 @DartName("bool")
-public class Boolean private constructor() : Comparable<Boolean> {
+class Boolean private constructor() : Comparable<Boolean> {
     /**
      * Returns the inverse of this boolean.
      */
-    public operator fun not(): Boolean
+    operator fun not(): Boolean
 
     /**
      * Performs a logical `and` operation between this Boolean and the [other] one. Unlike the `&&` operator,
      * this function does not perform short-circuit evaluation. Both `this` and [other] will always be evaluated.
      */
-    public infix fun and(other: Boolean): Boolean
+    infix fun and(other: Boolean): Boolean
 
     /**
      * Performs a logical `or` operation between this Boolean and the [other] one. Unlike the `||` operator,
      * this function does not perform short-circuit evaluation. Both `this` and [other] will always be evaluated.
      */
-    public infix fun or(other: Boolean): Boolean
+    infix fun or(other: Boolean): Boolean
 
     /**
      * Performs a logical `xor` operation between this Boolean and the [other] one.
      */
-    public infix fun xor(other: Boolean): Boolean
+    infix fun xor(other: Boolean): Boolean
 
-    public override fun compareTo(other: Boolean): Int
+    override fun compareTo(other: Boolean): Int
 
     @SinceKotlin("1.3")
     companion object {}

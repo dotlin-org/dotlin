@@ -1,6 +1,18 @@
 /*
  * Copyright 2010-2021 JetBrains s.r.o. and Kotlin Programming Language contributors.
- * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
+ * Copyright 2021 Wilko Manger
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package kotlin.ranges
@@ -8,7 +20,7 @@ package kotlin.ranges
 /**
  * A range of values of type `Char`.
  */
-public class CharRange(start: Char, endInclusive: Char) : CharProgression(start, endInclusive, 1), ClosedRange<Char> {
+class CharRange(start: Char, endInclusive: Char) : CharProgression(start, endInclusive, 1), ClosedRange<Char> {
     override val start: Char get() = first
     override val endInclusive: Char get() = last
 
@@ -32,14 +44,14 @@ public class CharRange(start: Char, endInclusive: Char) : CharProgression(start,
 
     companion object {
         /** An empty range of values of type Char. */
-        public val EMPTY: CharRange = CharRange(1.toChar(), 0.toChar())
+        val EMPTY: CharRange = CharRange(1.toChar(), 0.toChar())
     }
 }
 
 /**
  * A range of values of type `Int`.
  */
-public class IntRange(start: Int, endInclusive: Int) : IntProgression(start, endInclusive, 1), ClosedRange<Int> {
+class IntRange(start: Int, endInclusive: Int) : IntProgression(start, endInclusive, 1), ClosedRange<Int> {
     override val start: Int get() = first
     override val endInclusive: Int get() = last
 
@@ -63,14 +75,14 @@ public class IntRange(start: Int, endInclusive: Int) : IntProgression(start, end
 
     companion object {
         /** An empty range of values of type Int. */
-        public val EMPTY: IntRange = IntRange(1, 0)
+        val EMPTY: IntRange = IntRange(1, 0)
     }
 }
 
 /**
  * A range of values of type `Long`.
  */
-public class LongRange(start: Long, endInclusive: Long) : LongProgression(start, endInclusive, 1), ClosedRange<Long> {
+class LongRange(start: Long, endInclusive: Long) : LongProgression(start, endInclusive, 1), ClosedRange<Long> {
     override val start: Long get() = first
     override val endInclusive: Long get() = last
 
@@ -94,7 +106,7 @@ public class LongRange(start: Long, endInclusive: Long) : LongProgression(start,
 
     companion object {
         /** An empty range of values of type Long. */
-        public val EMPTY: LongRange = LongRange(1, 0)
+        val EMPTY: LongRange = LongRange(1, 0)
     }
 }
 

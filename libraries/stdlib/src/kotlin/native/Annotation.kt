@@ -1,5 +1,6 @@
 /*
  * Copyright 2010-2018 JetBrains s.r.o.
+ * Copyright 2021 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,4 +22,4 @@ package kotlin
  * See [Kotlin language documentation](https://kotlinlang.org/docs/reference/annotations.html) for more information
  * on annotations.
  */
-public interface Annotation
+interface Annotation

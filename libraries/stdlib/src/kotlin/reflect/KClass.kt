@@ -1,5 +1,6 @@
 /*
  * Copyright 2010-2020 JetBrains s.r.o.
+ * Copyright 2021 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,23 +25,22 @@ package kotlin.reflect
  *
  * @param T the type of the class.
  */
-public interface KClass<T : Any> : KClassifier {
+interface KClass<T : Any> : KClassifier {
     /**
      * The simple name of the class as it was declared in the source code,
      * or `null` if the class has no name (if, for example, it is a class of an anonymous object).
      */
-    public val simpleName: String?
+    val simpleName: String?
 
     /**
      * The fully qualified dot-separated name of the class,
      * or `null` if the class is local or a class of an anonymous object.
      */
-    public val qualifiedName: String?
+    val qualifiedName: String?
 
     /**
      * Returns `true` if [value] is an instance of this class on a given platform.
      */
     @SinceKotlin("1.1")
-    public fun isInstance(value: Any?): Boolean
-
+    fun isInstance(value: Any?): Boolean
 }

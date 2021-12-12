@@ -1,5 +1,6 @@
 /*
  * Copyright 2010-2019 JetBrains s.r.o.
+ * Copyright 2021 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,4 +24,4 @@ package kotlin.reflect
  * @see [KTypeParameter]
  */
 @SinceKotlin("1.1")
-public interface KClassifier
+interface KClassifier

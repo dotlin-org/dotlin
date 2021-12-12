@@ -1,5 +1,6 @@
 /*
  * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2021 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,4 +22,4 @@ package kotlin
  *
  * @param R return type of the function.
  */
-public interface Function<out R>
+interface Function<out R>

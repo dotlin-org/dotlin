@@ -1,5 +1,6 @@
 /*
  * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2021 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +20,11 @@ package kotlin
 /**
  * Classes which inherit from this interface have a defined total ordering between their instances.
  */
-public interface Comparable<in T> {
+interface Comparable<in T> {
     /**
      * Compares this object with the specified object for order. Returns zero if this object is equal
      * to the specified [other] object, a negative number if it's less than [other], or a positive number
      * if it's greater than [other].
      */
-    public operator fun compareTo(other: T): Int
+    operator fun compareTo(other: T): Int
 }
