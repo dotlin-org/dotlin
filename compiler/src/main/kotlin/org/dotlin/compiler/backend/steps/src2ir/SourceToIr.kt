@@ -41,7 +41,6 @@ import org.jetbrains.kotlin.ir.declarations.impl.IrFactoryImpl
 import org.jetbrains.kotlin.ir.util.IrMessageLogger
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.konan.util.KlibMetadataFactories
-import org.jetbrains.kotlin.library.metadata.NullFlexibleTypeDeserializer
 import org.jetbrains.kotlin.library.resolver.KotlinLibraryResolveResult
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtFile
@@ -83,7 +82,7 @@ private fun loadIr(
 ): IrResult {
     val builtIns = DartKotlinBuiltIns()
 
-    val resolvedModules = KlibMetadataFactories({ builtIns }, NullFlexibleTypeDeserializer)
+    val resolvedModules = KlibMetadataFactories({ builtIns }, DynamicTypeDeserializer)
         .DefaultResolvedDescriptorsFactory
         .createResolved(
             resolvedLibs,
