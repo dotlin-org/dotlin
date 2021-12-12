@@ -303,7 +303,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
             SAFE_CAST -> TODO()
             INSTANCEOF, NOT_INSTANCEOF -> DartIsExpression(expression, type, isNegated = operator == NOT_INSTANCEOF)
             SAM_CONVERSION -> TODO()
-            IMPLICIT_DYNAMIC_CAST -> TODO()
+            IMPLICIT_DYNAMIC_CAST -> expression
             REINTERPRET_CAST -> TODO()
         }
     }
