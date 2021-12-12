@@ -24,9 +24,12 @@ package kotlin
  * @param cause the cause of this throwable.
  */
 open class Throwable(open val message: String?, open val cause: Throwable?) {
+    @DartName("message")
     constructor(message: String?) : this(message, null)
 
+    @DartName("cause")
     constructor(cause: Throwable?) : this(cause?.toString(), cause)
 
+    @DartName("empty")
     constructor() : this(null, null)
 }
