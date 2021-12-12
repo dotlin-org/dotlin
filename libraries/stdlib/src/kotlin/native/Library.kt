@@ -46,12 +46,12 @@ inline fun <reified @PureReifiable T> arrayOfNulls(size: Int): Array<T?>
 /**
  * Returns an array containing the specified elements.
  */
-inline fun <reified @PureReifiable T> arrayOf(vararg elements: T): Array<T>
+inline fun <reified @PureReifiable T> arrayOf(vararg elements: T): Array<T> = dart("<T>[...elements]")
 
 /**
  * Returns an empty array of the specified type [T].
  */
-inline fun <reified @PureReifiable T> emptyArray(): Array<T>
+inline fun <reified @PureReifiable T> emptyArray(): Array<T> = dart("<T>[]")
 
 /**
  * Returns an array containing the specified [Double] numbers.
