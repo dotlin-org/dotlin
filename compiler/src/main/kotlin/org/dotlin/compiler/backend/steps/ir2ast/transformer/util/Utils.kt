@@ -29,10 +29,14 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrAnnotatedExpression
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrivate
 import org.dotlin.compiler.backend.steps.ir2ast.ir.owner
 import org.dotlin.compiler.backend.util.hasAnnotation
-import org.dotlin.compiler.dart.ast.expression.identifier.*
+import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
+import org.dotlin.compiler.dart.ast.expression.identifier.DartPrefixedIdentifier
+import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
+import org.dotlin.compiler.dart.ast.expression.identifier.toDartSimpleIdentifier
 import org.dotlin.compiler.dart.ast.type.DartNamedType
 import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
 import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
+import org.jetbrains.kotlin.backend.common.lower.parents
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
@@ -41,9 +45,9 @@ import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.types.IrDynamicType
 import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.isNullable
 import org.jetbrains.kotlin.ir.util.isEnumClass
 import org.jetbrains.kotlin.ir.util.parentAsClass
+import org.jetbrains.kotlin.ir.util.parentClassOrNull
 
 fun IrType.accept(context: DartTransformContext): DartTypeAnnotation {
     // TODO: Check for function type
@@ -92,29 +96,48 @@ val IrDeclarationWithName.dartName: DartIdentifier
         it
     }
 
-val IrDeclarationWithName.dartNameOrNull: DartIdentifier?
-    get() {
-        val prefix = dartImportAliasPrefix?.toDartSimpleIdentifier()
+private fun IrDeclarationWithName.getDartNameOrNull(allowNested: Boolean): DartIdentifier? {
+    val aliasPrefix = dartImportAliasPrefix?.toDartSimpleIdentifier()
 
-        val name = dartAnnotatedName?.toDartSimpleIdentifier()
-            ?: if (!name.isSpecial) name.identifier.toDartSimpleIdentifier() else null
-
-        return when {
-            prefix != null && name != null -> DartPrefixedIdentifier(prefix, name)
-            name != null -> name
+    var name = dartAnnotatedName?.toDartSimpleIdentifier()
+        ?: when {
+            !name.isSpecial -> name.identifier.toDartSimpleIdentifier()
+            // If a constructor is private with no name, we set the name to "_".
+            this is IrConstructor && isPrivate -> DartSimpleIdentifier("_")
             else -> null
+        }
+
+    // Nested classes, interfaces, etc.
+    if (allowNested && this is IrClass && parentClassOrNull != null) {
+        name = parents
+            .filterIsInstance<IrClass>()
+            .toList()
+            .reversed()
+            .map { it.getDartNameOrNull(allowNested = false)!! }
+            .plus(name)
+            .joinToString(separator = "$")
+            .toDartSimpleIdentifier()
+    }
+
+    if (this is IrDeclarationWithVisibility) {
+        name = when {
+            // Start name with underscore if the declaration is private and name didn't already start with one.
+            isPrivate && name?.isPrivate == false -> name.asPrivate()
+            // If a name starts with an underscore but is not for a private declaration, remove the underscore(s).
+            !isPrivate && name?.isPrivate == true -> name.value.replace(Regex("^_+"), "").toDartSimpleIdentifier()
+            else -> name
         }
     }
 
-val <D> D.dartName: DartIdentifier where D : IrDeclarationWithName, D : IrDeclarationWithVisibility
-    @JvmName("dartNameWithVisibility")
-    get() = (this as IrDeclarationWithName).dartName
-        .let { if (it.isSimple() && isPrivate) it.asPrivate() else it }
+    return when {
+        aliasPrefix != null && name != null -> DartPrefixedIdentifier(aliasPrefix, name)
+        name != null -> name
+        else -> null
+    }
+}
 
-val <D> D.dartNameOrNull: DartIdentifier? where D : IrDeclarationWithName, D : IrDeclarationWithVisibility
-    @JvmName("dartNameOrNullWithVisibility")
-    get() = (this as IrDeclarationWithName).dartNameOrNull
-        .let { if (it?.isSimple() == true && isPrivate) it.asPrivate() else it }
+val IrDeclarationWithName.dartNameOrNull: DartIdentifier?
+    get() = getDartNameOrNull(allowNested = true)
 
 val IrDeclarationWithName.dartNameAsSimple: DartSimpleIdentifier
     get() = dartName as DartSimpleIdentifier
