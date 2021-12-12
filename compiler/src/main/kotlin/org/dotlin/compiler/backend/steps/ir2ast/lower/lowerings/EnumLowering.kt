@@ -20,16 +20,16 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
+import org.dotlin.compiler.backend.steps.ir2ast.ir.irCall
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.dotlin.compiler.backend.util.replace
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
+import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.builders.declarations.buildField
 import org.jetbrains.kotlin.ir.builders.declarations.buildValueParameter
-import org.jetbrains.kotlin.ir.builders.irCallConstructor
-import org.jetbrains.kotlin.ir.builders.irDelegatingConstructorCall
-import org.jetbrains.kotlin.ir.builders.irGet
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.expressions.impl.IrBlockBodyImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.interpreter.toIrConst
 import org.jetbrains.kotlin.ir.types.classOrNull
@@ -49,9 +49,6 @@ class EnumLowering(private val context: DartLoweringContext) : IrDeclarationTran
         val enumSuperType = enum.superTypes.first()
 
         val enumConstructor = enum.primaryConstructor!!
-
-        // TODO: Manual remap
-        //enum.file.remap(entriesToFields)
 
         // Clean up constructor.
         enumConstructor.apply {
@@ -160,6 +157,35 @@ class EnumLowering(private val context: DartLoweringContext) : IrDeclarationTran
 
                 replace(old, new)
             }
+
+            methodWithName("values").let { old ->
+                val new = old.deepCopyWith {
+                    isFakeOverride = false
+                }.apply {
+                    body = IrBlockBodyImpl(
+                        UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+                        statements = listOf(
+                            context.buildStatement(symbol) {
+                                irReturn(
+                                    irVararg(
+                                        enum.defaultType,
+                                        entriesToFields.values.map {
+                                            irGetField(
+                                                receiver = null,
+                                                field = it,
+                                            )
+                                        }
+                                    )
+                                )
+                            }
+                        )
+                    )
+                }
+
+                replace(old, new)
+            }
+
+            removeIf { it.origin == IrDeclarationOrigin.ENUM_CLASS_SPECIAL_MEMBER }
         }
 
         return noChange()
