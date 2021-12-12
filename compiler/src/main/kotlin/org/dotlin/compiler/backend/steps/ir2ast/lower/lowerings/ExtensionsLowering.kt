@@ -22,13 +22,17 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.owner
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
+import org.jetbrains.kotlin.backend.common.ir.copyToWithoutSuperTypes
+import org.jetbrains.kotlin.backend.common.ir.copyTypeParameters
+import org.jetbrains.kotlin.backend.common.ir.copyTypeParametersFrom
 import org.jetbrains.kotlin.backend.common.ir.createParameterDeclarations
+import org.jetbrains.kotlin.backend.jvm.codegen.anyTypeArgument
 import org.jetbrains.kotlin.ir.builders.declarations.buildClass
-import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrFunction
-import org.jetbrains.kotlin.ir.declarations.IrProperty
+import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.defaultType
+import org.jetbrains.kotlin.ir.types.typeOrNull
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.isGetter
 import org.jetbrains.kotlin.ir.util.isSetter
@@ -47,11 +51,30 @@ class ExtensionsLowering(private val context: DartLoweringContext) : IrDeclarati
             else -> return noChange()
         } ?: return noChange()
 
+        var receiverTypeParameters = listOf<IrTypeParameter>()
+        val extensionReceiverType = extensionReceiver.type
+
+        // Any type parameters used to declare the receiver type go to the top of the Dart extension declaration, and
+        // are removed from the function type parameters.
+        if (declaration is IrFunction && extensionReceiverType is IrSimpleType) {
+            receiverTypeParameters = declaration.typeParameters
+                .filter {
+                    extensionReceiverType.arguments.any { arg ->
+                        (arg.typeOrNull as? IrSimpleType)?.classifier == it.symbol
+                    }
+                }
+
+            declaration.typeParameters -= receiverTypeParameters
+        }
+
+
         val extensionContainer = extensionContainers.getOrPut(extensionReceiver.type) {
             context.irFactory.buildClass {
                 origin = IrDartDeclarationOrigin.EXTENSION
                 name = Name.identifier("$${extensionReceiver.type.owner.name.identifier}Ext")
             }.apply {
+                copyTypeParameters(receiverTypeParameters)
+
                 declaration.file.let {
                     parent = it
                     it.declarations.add(this)

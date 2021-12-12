@@ -100,4 +100,46 @@ class Extension : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `extension on type with type parameter`() = assertCompile {
+        kotlin(
+            """
+            class Test<T>
+
+            fun <T> Test<T>.doIt() {}
+            """
+        )
+
+        dart(
+            """
+            class Test<T> {}
+
+            extension $TestExt<T> on Test<T> {
+              void doIt() {}
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `extension with type parameter on type with type parameter`() = assertCompile {
+        kotlin(
+            """
+            class Test<T>
+
+            fun <A, B> Test<A>.doIt() {}
+            """
+        )
+
+        dart(
+            """
+            class Test<T> {}
+
+            extension $TestExt<A> on Test<A> {
+              void doIt<B>() {}
+            }
+            """
+        )
+    }
 }
