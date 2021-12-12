@@ -42,9 +42,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            class Test {
-              Test() : super();
-            }
+            class Test {}
             
             extension $TestExt on Test {
               void doIt() {}
@@ -65,9 +63,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            class Test {
-              Test() : super();
-            }
+            class Test {}
             
             extension $TestExt on Test {
               int get number {
@@ -92,9 +88,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            class Test {
-              Test() : super();
-            }
+            class Test {}
 
             extension $TestExt on Test {
               int get number {

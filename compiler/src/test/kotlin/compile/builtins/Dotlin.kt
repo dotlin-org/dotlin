@@ -42,9 +42,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            class Dar {
-              Dar() : super();
-            }
+            class Dar {}
             
             void main() {
               Dar();
@@ -148,7 +146,6 @@ class Dotlin : BaseTest {
         dart(
             """
             class Hobbit {
-              Hobbit() : super();
               bool get isProudfoot {
                 return true;
               }
@@ -185,14 +182,12 @@ class Dotlin : BaseTest {
         dart(
             """
             class Hobbit {
-              Hobbit() : super();
               bool get isProudfoot {
                 return false;
               }
             }
 
             class Proudfoot extends Hobbit {
-              Proudfoot() : super();
               @override
               bool get isProudfoot {
                 return true;
@@ -315,9 +310,7 @@ class Dotlin : BaseTest {
             """
             import 'dart:core' hide Enum;
 
-            class Enum {
-              Enum() : super();
-            }
+            class Enum {}
 
             void main() {
               Enum();
@@ -348,13 +341,9 @@ class Dotlin : BaseTest {
             """
             import 'dart:core' hide Enum, List;
 
-            class Enum {
-              Enum() : super();
-            }
+            class Enum {}
 
-            class List {
-              List() : super();
-            }
+            class List {}
 
             void main() {
               Enum();
@@ -393,13 +382,9 @@ class Dotlin : BaseTest {
             """
             import 'dart:core' hide Something, SomethingElse;
 
-            class Something {
-              Something() : super();
-            }
+            class Something {}
 
-            class SomethingElse {
-              SomethingElse() : super();
-            }
+            class SomethingElse {}
 
             void main() {
               Something();
