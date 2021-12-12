@@ -640,7 +640,7 @@ class Function : BaseTest {
               void enjoy();
             }
 
-            void test<T>(T? book) {
+            void test<T>(T book) {
               (book as Novel?)?.enjoy();
               (book as Memoir?)?.intrigue();
               lookUp(book as Memoir?);
@@ -688,7 +688,7 @@ class Function : BaseTest {
                   void enjoy();
                 }
 
-                void test<T extends Book?>(T? book) {
+                void test<T extends Book?>(T book) {
                   (book as Novel?)?.enjoy();
                   (book as Memoir?)?.intrigue();
                   lookUp(book as Memoir?);
