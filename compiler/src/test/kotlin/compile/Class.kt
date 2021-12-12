@@ -939,6 +939,29 @@ class Class : BaseTest {
         }
 
         @Test
+        fun `interface implements interface with method`() = assertCompile {
+            kotlin(
+                """
+                interface Marker {
+                    fun doSomething()
+                }
+
+                interface Marked : Marker
+                """
+            )
+
+            dart(
+                """
+                abstract class Marker {
+                  void doSomething();
+                }
+
+                abstract class Marked implements Marker {}
+                """
+            )
+        }
+
+        @Test
         fun `class implements interface with method`() = assertCompile {
             kotlin(
                 """

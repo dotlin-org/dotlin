@@ -98,10 +98,15 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
                         },
                     members = irClass.declarations
                         .asSequence()
-                        // We handle fake overrides only from interfaces
+                        // We handle fake overrides only from interfaces and if this itself is not an interface.
                         .filter {
                             if (!it.isFakeOverride) {
                                 return@filter true
+                            }
+
+                            // We don't want any fake overrides if we are ourselves an interface.
+                            if (irClass.isInterface) {
+                                return@filter false
                             }
 
                             fun isFakeOverrideOfInterface(overridable: IrOverridableDeclaration<*>): Boolean {
