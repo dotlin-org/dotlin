@@ -19,22 +19,24 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.ir.element
 
-import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementTransformerVoid
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 
 class IrNullAwareExpression(
     val expression: IrExpression,
-) : IrExpression() {
+) : IrCustomExpression() {
     override var type: IrType = expression.type
-
-    override val startOffset = UNDEFINED_OFFSET
-    override val endOffset = UNDEFINED_OFFSET
-
-    override fun <R, D> accept(visitor: IrElementVisitor<R, D>, data: D) = visitor.visitExpression(this, data)
 
     override fun <D> acceptChildren(visitor: IrElementVisitor<Unit, D>, data: D) {
         expression.accept(visitor, data)
     }
+
+    override fun <D> transformChildren(transformer: IrElementTransformer<D>, data: D) {
+        expression.transform(transformer, data)
+    }
+
+    override fun transform(transformer: IrCustomElementTransformerVoid) = transformer.visitNullAwareExpression(this)
 }

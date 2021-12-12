@@ -20,23 +20,23 @@
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
-import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
-import org.dotlin.compiler.backend.steps.ir2ast.ir.isInitializedInBody
-import org.dotlin.compiler.backend.steps.ir2ast.ir.isToBeInitializedInFieldInitializerList
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.accept
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.simpleDartName
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.toDart
-import org.dotlin.compiler.dart.ast.parameter.*
 import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameter
 import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameterList
-import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
-import org.jetbrains.kotlin.ir.declarations.IrValueParameter
+import org.jetbrains.kotlin.ir.types.isNullableAny
 
 fun IrTypeParameter.accept(context: DartTransformContext): DartTypeParameter =
     DartTypeParameter(
-        name = simpleDartName
+        name = simpleDartName,
+        bound = superTypes.single().let {
+            // We don't care if the super type is Any?, that's the default.
+            when {
+                !it.isNullableAny() -> it.accept(context)
+                else -> null
+            }
+        }
     )
 
 fun List<IrTypeParameter>.accept(context: DartTransformContext) = DartTypeParameterList(map { it.accept(context) })

@@ -20,25 +20,30 @@
 package org.dotlin.compiler.backend.steps.ir2ast.ir.element
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementTransformerVoid
-import org.jetbrains.kotlin.ir.declarations.impl.IrFactoryImpl
+import org.jetbrains.kotlin.ir.IrElement
+import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrExpressionBody
-import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 
-class IrExpressionBodyWithOrigin(
-    override var expression: IrExpression,
-    val origin: IrStatementOrigin
-) : IrExpressionBody(), IrCustomElement {
-    override val factory = IrFactoryImpl
+interface IrCustomElement : IrElement {
+    override val startOffset
+        get() = UNDEFINED_OFFSET
+    override val endOffset
+        get() = UNDEFINED_OFFSET
 
-    override fun <R, D> accept(visitor: IrElementVisitor<R, D>, data: D): R =
-        super<IrExpressionBody>.accept(visitor, data)
+    override fun <R, D> accept(visitor: IrElementVisitor<R, D>, data: D) = visitor.visitElement(this, data)
 
-    override fun <D> transform(transformer: IrElementTransformer<D>, data: D) =
-        super<IrExpressionBody>.transform(transformer, data)
+    override fun <D> transform(transformer: IrElementTransformer<D>, data: D) = when (transformer) {
+        is IrCustomElementTransformerVoid -> transform(transformer)
+        else -> transformer.visitElement(this, data)
+    }
 
-    override fun transform(transformer: IrCustomElementTransformerVoid) =
-        transformer.visitExpressionBodyWithOrigin(this)
+    fun transform(transformer: IrCustomElementTransformerVoid): IrElement
+}
+
+abstract class IrCustomExpression : IrExpression(), IrCustomElement {
+    override fun <R, D> accept(visitor: IrElementVisitor<R, D>, data: D) = visitor.visitExpression(this, data)
+
+    override fun <D> transform(transformer: IrElementTransformer<D>, data: D) = transformer.visitExpression(this, data)
 }

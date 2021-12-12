@@ -2160,4 +2160,530 @@ class Class : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `class with type parameter bound`() = assertCompile {
+        kotlin("class Test<T : Int>")
+
+        dart(
+            """
+            class Test<T extends int> {
+              Test() : super();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `class with multiple type parameter bounds`() = assertCompile {
+        kotlin(
+            """
+            interface Buildable {
+                fun build()
+            }
+
+            interface Identifiable {
+                fun identify()
+            }
+
+            class Builder<T> where T : Buildable, T : Identifiable {
+                fun startBuild(item: T) {
+                    item.identify()
+                    item.build()
+
+                    identifyAndExec(item)
+                }
+
+                private fun identifyAndExec(id: Identifiable) {}
+            }
+
+            class SomeItem : Buildable, Identifiable {
+                override fun build() { }
+
+                override fun identify() {}
+            }
+
+            fun main() {
+                Builder<SomeItem>().startBuild(SomeItem())
+            }
+            """
+        )
+
+        dart(
+            """
+            abstract class Buildable {
+              void build();
+            }
+
+            abstract class Identifiable {
+              void identify();
+            }
+
+            class Builder<T extends Object> {
+              Builder() : super();
+              void startBuild(T item) {
+                (item as Identifiable).identify();
+                (item as Buildable).build();
+                this._identifyAndExec(item as Identifiable);
+              }
+
+              void _identifyAndExec(Identifiable id) {}
+            }
+
+            class SomeItem implements Buildable, Identifiable {
+              SomeItem() : super();
+              @override
+              void build() {}
+              @override
+              void identify() {}
+            }
+
+            void main() {
+              Builder<SomeItem>().startBuild(SomeItem());
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `class with multiple type parameter bounds with common supertype`() = assertCompile {
+        kotlin(
+            """
+            interface Marker
+
+            interface Buildable : Marker {
+                fun build()
+            }
+
+            interface Identifiable : Marker {
+                fun identify()
+            }
+
+            class Builder<T> where T : Buildable, T : Identifiable {
+                fun startBuild(item: T) {
+                    item.identify()
+                    item.build()
+
+                    identifyAndExec(item)
+                }
+
+                private fun identifyAndExec(id: Identifiable) {}
+            }
+
+            class SomeItem : Buildable, Identifiable {
+                override fun build() { }
+
+                override fun identify() {}
+            }
+
+            fun main() {
+                Builder<SomeItem>().startBuild(SomeItem())
+            }
+            """
+        )
+
+        dart(
+            """
+            abstract class Marker {}
+
+            abstract class Buildable implements Marker {
+              void build();
+            }
+
+            abstract class Identifiable implements Marker {
+              void identify();
+            }
+
+            class Builder<T extends Marker> {
+              Builder() : super();
+              void startBuild(T item) {
+                (item as Identifiable).identify();
+                (item as Buildable).build();
+                this._identifyAndExec(item as Identifiable);
+              }
+
+              void _identifyAndExec(Identifiable id) {}
+            }
+
+            class SomeItem implements Buildable, Identifiable {
+              SomeItem() : super();
+              @override
+              void build() {}
+              @override
+              void identify() {}
+            }
+
+            void main() {
+              Builder<SomeItem>().startBuild(SomeItem());
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `class with multiple type parameter bounds one which is nullable`() = assertCompile {
+        kotlin(
+            """
+            interface Buildable {
+                fun build()
+            }
+
+            interface Identifiable {
+                fun identify()
+            }
+
+            class Builder<T> where T : Buildable?, T : Identifiable {
+                fun startBuild(item: T) {
+                    item.identify()
+                    item.build()
+
+                    identifyAndExec(item)
+                }
+
+                private fun identifyAndExec(id: Identifiable) {}
+            }
+
+            class SomeItem : Buildable, Identifiable {
+                override fun build() { }
+
+                override fun identify() {}
+            }
+
+            fun main() {
+                Builder<SomeItem>().startBuild(SomeItem())
+            }
+            """
+        )
+
+        dart(
+            """
+            abstract class Buildable {
+              void build();
+            }
+
+            abstract class Identifiable {
+              void identify();
+            }
+
+            class Builder<T extends Object> {
+              Builder() : super();
+              void startBuild(T item) {
+                (item as Identifiable).identify();
+                (item as Buildable).build();
+                this._identifyAndExec(item as Identifiable);
+              }
+
+              void _identifyAndExec(Identifiable id) {}
+            }
+
+            class SomeItem implements Buildable, Identifiable {
+              SomeItem() : super();
+              @override
+              void build() {}
+              @override
+              void identify() {}
+            }
+
+            void main() {
+              Builder<SomeItem>().startBuild(SomeItem());
+            }
+            """
+        )
+    }
+
+    // Technically this doesn't make much sense, but good to translate it as-is, since the Kotlin compiler doesn't
+    // give a warning.
+    @Test
+    fun `class with multiple type parameter bounds one which is nullable and a null safe operator is used on`() =
+        assertCompile {
+            kotlin(
+                """
+                interface Buildable {
+                    fun build()
+                }
+
+                interface Identifiable {
+                    fun identify()
+                }
+
+                class Builder<T> where T : Buildable?, T : Identifiable {
+                    fun startBuild(item: T) {
+                        item.identify()
+                        item?.build()
+
+                        identifyAndExec(item)
+                    }
+
+                    private fun identifyAndExec(id: Identifiable) {}
+                }
+
+                class SomeItem : Buildable, Identifiable {
+                    override fun build() { }
+
+                    override fun identify() {}
+                }
+
+                fun main() {
+                    Builder<SomeItem>().startBuild(SomeItem())
+                }
+                """
+            )
+
+            dart(
+                """
+                abstract class Buildable {
+                  void build();
+                }
+
+                abstract class Identifiable {
+                  void identify();
+                }
+
+                class Builder<T extends Object> {
+                  Builder() : super();
+                  void startBuild(T item) {
+                    (item as Identifiable).identify();
+                    (item as Buildable?)?.build();
+                    this._identifyAndExec(item as Identifiable);
+                  }
+
+                  void _identifyAndExec(Identifiable id) {}
+                }
+
+                class SomeItem implements Buildable, Identifiable {
+                  SomeItem() : super();
+                  @override
+                  void build() {}
+                  @override
+                  void identify() {}
+                }
+
+                void main() {
+                  Builder<SomeItem>().startBuild(SomeItem());
+                }
+                """
+            )
+        }
+
+    @Test
+    fun `class with multiple type parameter bounds with common super type one which is nullable`() = assertCompile {
+        kotlin(
+            """
+            interface Marker
+
+            interface Buildable : Marker {
+                fun build()
+            }
+
+            interface Identifiable : Marker {
+                fun identify()
+            }
+
+            class Builder<T> where T : Buildable?, T : Identifiable {
+                fun startBuild(item: T) {
+                    item.identify()
+                    item.build()
+
+                    identifyAndExec(item)
+                }
+
+                private fun identifyAndExec(id: Identifiable) {}
+            }
+
+            class SomeItem : Buildable, Identifiable {
+                override fun build() { }
+
+                override fun identify() {}
+            }
+
+            fun main() {
+                Builder<SomeItem>().startBuild(SomeItem())
+            }
+            """
+        )
+
+        dart(
+            """
+            abstract class Marker {}
+
+            abstract class Buildable implements Marker {
+              void build();
+            }
+
+            abstract class Identifiable implements Marker {
+              void identify();
+            }
+
+            class Builder<T extends Marker> {
+              Builder() : super();
+              void startBuild(T item) {
+                (item as Identifiable).identify();
+                (item as Buildable).build();
+                this._identifyAndExec(item as Identifiable);
+              }
+
+              void _identifyAndExec(Identifiable id) {}
+            }
+
+            class SomeItem implements Buildable, Identifiable {
+              SomeItem() : super();
+              @override
+              void build() {}
+              @override
+              void identify() {}
+            }
+
+            void main() {
+              Builder<SomeItem>().startBuild(SomeItem());
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `class with multiple type parameter bounds both of which are nullable`() = assertCompile {
+        kotlin(
+            """
+            interface Buildable {
+                fun build()
+            }
+
+            interface Identifiable {
+                fun identify()
+            }
+
+            class Builder<T> where T : Buildable?, T : Identifiable? {
+                fun startBuild(item: T) {
+                    item?.identify()
+                    item?.build()
+
+                    identifyAndExec(item)
+                }
+
+                private fun identifyAndExec(id: Identifiable?) {}
+            }
+
+            class SomeItem : Buildable, Identifiable {
+                override fun build() { }
+
+                override fun identify() {}
+            }
+
+            fun main() {
+                Builder<SomeItem?>().startBuild(SomeItem())
+            }
+            """
+        )
+
+        dart(
+            """
+            abstract class Buildable {
+              void build();
+            }
+
+            abstract class Identifiable {
+              void identify();
+            }
+
+            class Builder<T> {
+              Builder() : super();
+              void startBuild(T? item) {
+                (item as Identifiable?)?.identify();
+                (item as Buildable?)?.build();
+                this._identifyAndExec(item as Identifiable?);
+              }
+
+              void _identifyAndExec(Identifiable? id) {}
+            }
+
+            class SomeItem implements Buildable, Identifiable {
+              SomeItem() : super();
+              @override
+              void build() {}
+              @override
+              void identify() {}
+            }
+
+            void main() {
+              Builder<SomeItem?>().startBuild(SomeItem());
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `class with multiple type parameter bounds with common super type both of which are nullable`() =
+        assertCompile {
+            kotlin(
+                """
+                interface Marker
+
+                interface Buildable : Marker {
+                    fun build()
+                }
+
+                interface Identifiable : Marker {
+                    fun identify()
+                }
+
+                class Builder<T> where T : Buildable?, T : Identifiable? {
+                    fun startBuild(item: T) {
+                        item?.identify()
+                        item?.build()
+
+                        identifyAndExec(item)
+                    }
+
+                    private fun identifyAndExec(id: Identifiable?) {}
+                }
+
+                class SomeItem : Buildable, Identifiable {
+                    override fun build() { }
+
+                    override fun identify() {}
+                }
+
+                fun main() {
+                    Builder<SomeItem>().startBuild(SomeItem())
+                }
+                """
+            )
+
+            dart(
+                """
+                abstract class Marker {}
+
+                abstract class Buildable implements Marker {
+                  void build();
+                }
+
+                abstract class Identifiable implements Marker {
+                  void identify();
+                }
+
+                class Builder<T extends Marker?> {
+                  Builder() : super();
+                  void startBuild(T? item) {
+                    (item as Identifiable?)?.identify();
+                    (item as Buildable?)?.build();
+                    this._identifyAndExec(item as Identifiable?);
+                  }
+
+                  void _identifyAndExec(Identifiable? id) {}
+                }
+
+                class SomeItem implements Buildable, Identifiable {
+                  SomeItem() : super();
+                  @override
+                  void build() {}
+                  @override
+                  void identify() {}
+                }
+
+                void main() {
+                  Builder<SomeItem>().startBuild(SomeItem());
+                }
+                """
+            )
+        }
 }

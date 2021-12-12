@@ -20,8 +20,8 @@
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.accept
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.toDart
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
 import org.dotlin.compiler.dart.ast.statement.*
@@ -64,7 +64,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement> {
                     name = it.dartName,
                     expression = it.initializer?.accept(context)
                 ),
-                type = irVariable.type.toDart(context),
+                type = irVariable.type.accept(context),
                 isConst = it.isConst,
                 isFinal = !it.isVar,
                 isLate = false

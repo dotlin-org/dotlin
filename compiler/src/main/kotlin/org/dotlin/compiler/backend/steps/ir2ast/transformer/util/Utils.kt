@@ -24,10 +24,10 @@ import org.dotlin.compiler.backend.dartAnnotatedName
 import org.dotlin.compiler.backend.dartImportAliasPrefix
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
+import org.dotlin.compiler.backend.steps.ir2ast.ir.accept
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrAnnotatedExpression
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrivate
 import org.dotlin.compiler.backend.steps.ir2ast.ir.owner
-import org.dotlin.compiler.backend.steps.ir2ast.ir.toDart
 import org.dotlin.compiler.backend.util.hasAnnotation
 import org.dotlin.compiler.dart.ast.expression.identifier.*
 import org.dotlin.compiler.dart.ast.type.DartNamedType
@@ -45,7 +45,7 @@ import org.jetbrains.kotlin.ir.types.isNullable
 import org.jetbrains.kotlin.ir.util.isEnumClass
 import org.jetbrains.kotlin.ir.util.parentAsClass
 
-fun IrType.toDart(context: DartTransformContext): DartTypeAnnotation {
+fun IrType.accept(context: DartTransformContext): DartTypeAnnotation {
     // TODO: Check for function type
 
     return when (this) {
@@ -53,7 +53,7 @@ fun IrType.toDart(context: DartTransformContext): DartTypeAnnotation {
             name = owner.dartName,
             isNullable = isNullable(),
             // TODO isDeferred
-            typeArguments = DartTypeArgumentList(arguments.map { it.toDart(context) }.toMutableList()),
+            typeArguments = DartTypeArgumentList(arguments.map { it.accept(context) }.toMutableList()),
         )
         is IrDynamicType -> DartTypeAnnotation.DYNAMIC
         else -> throw UnsupportedOperationException()
