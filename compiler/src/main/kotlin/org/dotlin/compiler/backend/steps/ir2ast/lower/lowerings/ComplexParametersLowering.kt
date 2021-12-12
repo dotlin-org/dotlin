@@ -247,10 +247,12 @@ class ComplexParametersLowering(private val context: DartLoweringContext) : IrDe
 
             addValueParameter {
                 name = Name.identifier("invocation")
+                // TODO: Reference type via DartBuiltIns
                 this.type = context.irFactory.buildClass {
                     name = Name.identifier("Invocation")
                     origin = irClass.origin
                 }.apply {
+                    parent = file
                     createParameterDeclarations()
                 }.defaultType
             }

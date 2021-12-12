@@ -19,31 +19,17 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.deepCopyWith
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.jetbrains.kotlin.backend.common.ir.addChild
-import org.jetbrains.kotlin.backend.common.lower.parentsWithSelf
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.util.file
-import org.jetbrains.kotlin.name.Name
 
 class NestedClassLowering(private val context: DartLoweringContext) : IrDeclarationTransformer {
     override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrClass || declaration.parent !is IrClass || declaration.isInner) return noChange()
 
-        val parent = declaration.parent as IrClass
-
-        val renamedClass = declaration.deepCopyWith {
-            name = declaration.parentsWithSelf
-                .filterIsInstance<IrClass>()
-                .toList()
-                .reversed()
-                .joinToString(separator = "$") { it.name.identifier }
-                .let { Name.identifier(it) }
-        }
-
-        parent.file.addChild(renamedClass)
+        // We don't use addChild on purpose: We want to keep parent information.
+        declaration.file.declarations.add(declaration)
 
         return just { remove() }
     }
