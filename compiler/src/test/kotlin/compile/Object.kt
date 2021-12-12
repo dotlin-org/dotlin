@@ -89,7 +89,6 @@ class Object : BaseTest {
         dart(
             """ 
             class Test {
-              Test() : super();
               static final $TestCompanion $companion = $TestCompanion.$instance;
             }
             

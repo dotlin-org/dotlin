@@ -40,9 +40,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            class Test {
-              Test() : super();
-            }
+            class Test {}
             
             void main() {
               Test();
@@ -93,7 +91,6 @@ class Expression : BaseTest {
         dart(
             """
             class Test {
-              Test() : super();
               void doIt() {}
             }
             
@@ -295,7 +292,6 @@ class Expression : BaseTest {
         dart(
             """
             class Gondor {
-              Gondor() : super();
               void callForAid() {}
             }
             
@@ -327,15 +323,12 @@ class Expression : BaseTest {
         dart(
             """
             class Gondor {
-              Gondor() : super();
               Answer? callForAid() {
                 return Answer();
               }
             }
             
-            class Answer {
-              Answer() : super();
-            }
+            class Answer {}
             
             void main() {
               final Gondor? gondor = null;
@@ -544,9 +537,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            class Test {
-              Test() : super();
-            }
+            class Test {}
 
             void main() {
               identical(Test(), Test());

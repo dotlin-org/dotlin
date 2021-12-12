@@ -31,9 +31,7 @@ class Class : BaseTest {
 
         dart(
             """
-            class Test {
-              Test() : super();
-            }
+            class Test {}
             """
         )
     }
@@ -44,9 +42,7 @@ class Class : BaseTest {
 
         dart(
             """
-            class _Test {
-              _Test() : super();
-            }
+            class _Test {}
             """
         )
     }
@@ -66,7 +62,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   final int property = 96;
                 }
                 """
@@ -90,7 +85,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   final int property = 96;
                 }
 
@@ -118,7 +112,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   int property = 96;
                 }
 
@@ -225,7 +218,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   final int property1 = 19;
                   final int property2 = 96;
                 }
@@ -345,7 +337,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   int get property {
                     return 343;
                   }
@@ -375,7 +366,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   void sideEffect(int x) {}
                   int get property {
                     return 343;
@@ -412,7 +402,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   void sideEffect(int x) {}
                   int _${'$'}property = 0;
                   int get property {
@@ -558,7 +547,6 @@ class Class : BaseTest {
                 }
                 
                 class Test {
-                  Test() : super();
                   final int x = returnsInt();
                 }
                 """
@@ -608,13 +596,9 @@ class Class : BaseTest {
 
             dart(
                 """
-                class A {
-                  A() : super();
-                }
+                class A {}
                 
-                class B extends A {
-                  B() : super();
-                }
+                class B extends A {}
                 """
             )
         }
@@ -739,9 +723,7 @@ class Class : BaseTest {
 
                 dart(
                     """
-                    class Vector {
-                      Vector() : super();
-                    }
+                    class Vector {}
                     
                     Vector returnsVector() {
                       return Vector();
@@ -780,9 +762,7 @@ class Class : BaseTest {
 
                 dart(
                     """
-                    class Vector {
-                      Vector() : super();
-                    }
+                    class Vector {}
                     
                     Vector returnsVector() {
                       return Vector();
@@ -824,12 +804,10 @@ class Class : BaseTest {
             dart(
                 """
                 class A {
-                  A() : super();
                   final int property = 0;
                 }
                 
                 class B extends A {
-                  B() : super();
                   @override
                   final int property = 1;
                 }
@@ -851,7 +829,6 @@ class Class : BaseTest {
             dart(
                 """
                 class A {
-                  A() : super();
                   final int property = 0;
                 }
                 
@@ -907,9 +884,7 @@ class Class : BaseTest {
                 """
                 abstract class Marker {}
     
-                class Test implements Marker {
-                  Test() : super();
-                }
+                class Test implements Marker {}
                 """
             )
         }
@@ -931,9 +906,7 @@ class Class : BaseTest {
                 
                 abstract class Marker2 {}
     
-                class Test implements Marker, Marker2 {
-                  Test() : super();
-                }
+                class Test implements Marker, Marker2 {}
                 """
             )
         }
@@ -986,7 +959,6 @@ class Class : BaseTest {
                 }
                 
                 class TestImpl implements Test {
-                  TestImpl() : super();
                   @override
                   void method(
                     int x, {
@@ -1034,7 +1006,6 @@ class Class : BaseTest {
                 }
                 
                 class TestImpl implements Test {
-                  TestImpl() : super();
                   @override
                   void method(
                     int x, {
@@ -1081,7 +1052,6 @@ class Class : BaseTest {
                 }
                 
                 class TestImpl implements Test {
-                  TestImpl() : super();
                   @override
                   int method(
                     int x, {
@@ -1133,7 +1103,6 @@ class Class : BaseTest {
                     }
                     
                     class TestImpl implements Test {
-                      TestImpl() : super();
                       @override
                       int method(
                         int x, {
@@ -1175,7 +1144,6 @@ class Class : BaseTest {
                 }
     
                 class TestImpl implements Test {
-                  TestImpl() : super();
                   @override
                   final int property = 343;
                 }
@@ -1207,7 +1175,6 @@ class Class : BaseTest {
                 }
     
                 class TestImpl implements Test {
-                  TestImpl() : super();
                   @override
                   int get property {
                     return 343;
@@ -1252,7 +1219,6 @@ class Class : BaseTest {
                 }
     
                 class TestImpl implements Test {
-                  TestImpl() : super();
                   @override
                   int get property {
                     return 343;
@@ -1281,7 +1247,6 @@ class Class : BaseTest {
         dart(
             """
             class Test {
-              Test() : super();
               void doIt() {}
             }
             """
@@ -1514,7 +1479,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   Test rangeTo(Test other) {
                     return Test();
                   }
@@ -1563,7 +1527,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   int get(int index) {
                     return index;
                   }
@@ -1589,7 +1552,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   int get(
                     int index,
                     int index2,
@@ -1614,7 +1576,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   void set(
                     int index,
                     bool value,
@@ -1642,7 +1603,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   void set(
                     int index,
                     int index2,
@@ -1666,7 +1626,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   void call() {}
                 }
                 """
@@ -1688,7 +1647,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   int call(
                     int a, {
                     int b = 0,
@@ -1715,7 +1673,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   bool equals(Object? other) {
                     return false;
                   }
@@ -1746,7 +1703,6 @@ class Class : BaseTest {
                 abstract class Marker {}
 
                 class Test implements Marker {
-                  Test() : super();
                   bool equals(Object? other) {
                     return false;
                   }
@@ -1773,7 +1729,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   int compareTo(Test other) {
                     return 1;
                   }
@@ -1806,7 +1761,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   int compareTo(Test other) {
                     return 1;
                   }
@@ -1843,7 +1797,6 @@ class Class : BaseTest {
             dart(
                 """
                 abstract class A {
-                  A() : super();
                   int compareTo(A other);
                   bool operator <(A other) => this.compareTo(other) < 0;
                   bool operator >(A other) => this.compareTo(other) > 0;
@@ -1852,7 +1805,6 @@ class Class : BaseTest {
                 }
 
                 class B extends A {
-                  B() : super();
                   @override
                   int compareTo(A other) {
                     return 1;
@@ -1877,7 +1829,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   Test inc(Test other) {
                     return Test();
                   }
@@ -1901,7 +1852,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   Test dec(Test other) {
                     return Test();
                   }
@@ -1925,7 +1875,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   Test unaryPlus() {
                     return Test();
                   }
@@ -1949,7 +1898,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   Test unaryMinus() {
                     return Test();
                   }
@@ -1973,7 +1921,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test {
-                  Test() : super();
                   Test not() {
                     return Test();
                   }
@@ -2112,13 +2059,9 @@ class Class : BaseTest {
 
         dart(
             """
-            class Tree {
-              Tree() : super();
-            }
+            class Tree {}
 
-            class Tree${'$'}Branch {
-              Tree${'$'}Branch() : super();
-            }
+            class Tree${'$'}Branch {}
             """
         )
     }
@@ -2137,17 +2080,11 @@ class Class : BaseTest {
 
         dart(
             """
-            class Tree {
-              Tree() : super();
-            }
+            class Tree {}
 
-            class Tree${'$'}Branch${'$'}Leaf {
-              Tree${'$'}Branch${'$'}Leaf() : super();
-            }
+            class Tree${'$'}Branch${'$'}Leaf {}
 
-            class Tree${'$'}Branch {
-              Tree${'$'}Branch() : super();
-            }
+            class Tree${'$'}Branch {}
             """
         )
     }
@@ -2170,21 +2107,15 @@ class Class : BaseTest {
 
         dart(
             """
-            class Tree {
-              Tree() : super();
-            }
+            class Tree {}
 
             void main() {
               Tree${'$'}Branch${'$'}Leaf();
             }
 
-            class Tree${'$'}Branch${'$'}Leaf {
-              Tree${'$'}Branch${'$'}Leaf() : super();
-            }
+            class Tree${'$'}Branch${'$'}Leaf {}
 
-            class Tree${'$'}Branch {
-              Tree${'$'}Branch() : super();
-            }
+            class Tree${'$'}Branch {}
             """
         )
     }
@@ -2195,9 +2126,7 @@ class Class : BaseTest {
 
         dart(
             """
-            class Test<T> {
-              Test() : super();
-            }
+            class Test<T> {}
             """
         )
     }
@@ -2215,7 +2144,6 @@ class Class : BaseTest {
         dart(
             """
             class Test<T> {
-              Test() : super();
               void method(T other) {}
             }
             """
@@ -2236,7 +2164,6 @@ class Class : BaseTest {
             dart(
                 """
                 class Test<T> {
-                  Test() : super();
                   void method(T? other) {}
                 }
                 """
@@ -2249,9 +2176,7 @@ class Class : BaseTest {
 
         dart(
             """
-            class Test<T0, T1> {
-              Test() : super();
-            }
+            class Test<T0, T1> {}
             """
         )
     }
@@ -2262,9 +2187,7 @@ class Class : BaseTest {
 
         dart(
             """
-            class Test<T extends int> {
-              Test() : super();
-            }
+            class Test<T extends int> {}
             """
         )
     }
@@ -2315,7 +2238,6 @@ class Class : BaseTest {
             }
 
             class Builder<T extends Object> {
-              Builder() : super();
               void startBuild(T item) {
                 (item as Identifiable).identify();
                 (item as Buildable).build();
@@ -2326,7 +2248,6 @@ class Class : BaseTest {
             }
 
             class SomeItem implements Buildable, Identifiable {
-              SomeItem() : super();
               @override
               void build() {}
               @override
@@ -2390,7 +2311,6 @@ class Class : BaseTest {
             }
 
             class Builder<T extends Marker> {
-              Builder() : super();
               void startBuild(T item) {
                 (item as Identifiable).identify();
                 (item as Buildable).build();
@@ -2401,7 +2321,6 @@ class Class : BaseTest {
             }
 
             class SomeItem implements Buildable, Identifiable {
-              SomeItem() : super();
               @override
               void build() {}
               @override
@@ -2473,7 +2392,6 @@ class Class : BaseTest {
                 }
 
                 class Builder<T extends Marker> {
-                  Builder() : super();
                   void startBuild(T item) {
                     (item as Marker).mark();
                     (item as Identifiable).identify();
@@ -2485,7 +2403,6 @@ class Class : BaseTest {
                 }
 
                 class SomeItem implements Buildable, Identifiable {
-                  SomeItem() : super();
                   @override
                   void mark() {}
                   @override
@@ -2547,7 +2464,6 @@ class Class : BaseTest {
             }
 
             class Builder<T extends Object> {
-              Builder() : super();
               void startBuild(T item) {
                 (item as Identifiable).identify();
                 (item as Buildable).build();
@@ -2558,7 +2474,6 @@ class Class : BaseTest {
             }
 
             class SomeItem implements Buildable, Identifiable {
-              SomeItem() : super();
               @override
               void build() {}
               @override
@@ -2621,7 +2536,6 @@ class Class : BaseTest {
                 }
 
                 class Builder<T extends Object> {
-                  Builder() : super();
                   void startBuild(T item) {
                     (item as Identifiable).identify();
                     (item as Buildable?)?.build();
@@ -2632,7 +2546,6 @@ class Class : BaseTest {
                 }
 
                 class SomeItem implements Buildable, Identifiable {
-                  SomeItem() : super();
                   @override
                   void build() {}
                   @override
@@ -2696,7 +2609,6 @@ class Class : BaseTest {
             }
 
             class Builder<T extends Marker> {
-              Builder() : super();
               void startBuild(T item) {
                 (item as Identifiable).identify();
                 (item as Buildable).build();
@@ -2707,7 +2619,6 @@ class Class : BaseTest {
             }
 
             class SomeItem implements Buildable, Identifiable {
-              SomeItem() : super();
               @override
               void build() {}
               @override
@@ -2767,7 +2678,6 @@ class Class : BaseTest {
             }
 
             class Builder<T> {
-              Builder() : super();
               void startBuild(T item) {
                 (item as Identifiable?)?.identify();
                 (item as Buildable?)?.build();
@@ -2778,7 +2688,6 @@ class Class : BaseTest {
             }
 
             class SomeItem implements Buildable, Identifiable {
-              SomeItem() : super();
               @override
               void build() {}
               @override
@@ -2843,7 +2752,6 @@ class Class : BaseTest {
                 }
 
                 class Builder<T extends Marker?> {
-                  Builder() : super();
                   void startBuild(T item) {
                     (item as Identifiable?)?.identify();
                     (item as Buildable?)?.build();
@@ -2854,7 +2762,6 @@ class Class : BaseTest {
                 }
 
                 class SomeItem implements Buildable, Identifiable {
-                  SomeItem() : super();
                   @override
                   void build() {}
                   @override
