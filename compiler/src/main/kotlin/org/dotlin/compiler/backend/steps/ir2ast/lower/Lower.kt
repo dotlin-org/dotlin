@@ -42,7 +42,6 @@ private val lowerings = listOf(
     ::OverriddenParametersLowering,
     ::DefaultInterfaceImplementationsLowering,
     ::OperatorsLowering,
-    ::ConstructorNamesLowering,
     ::ExtensionsLowering,
     ::SortStatementsLowering,
     ::ConstructorPassingComplexParamToSuperLowering,
