@@ -47,8 +47,8 @@
   - [ ] Interfaces
     - [x] Regular interfaces
     - [ ] SAM interfaces
-  - [ ] Objects
-    - [ ] Companion objects
+  - [x] Objects
+    - [x] Companion objects
   - [ ] Class members
     - [x] Constructors
       - [x] Primary constructors
@@ -71,7 +71,7 @@
   - [ ] Non-local returns
 - [ ] Expressions
   - [x] Literals
-    - [ ] Int literals
+    - [x] Int literals
       - [x] Decimal literals
       - [x] Hexadecimal literals
     - [x] Float literals
@@ -80,7 +80,7 @@
     - [ ] String literals
       - [x] Single string literal
       - [ ] Multiline string literal
-      - [ ] String interpolations
+      - [x] String interpolations
   - [ ] Try catch expressions
   - [x] Conditional expressions
   - [x] When expressions
@@ -141,9 +141,9 @@
     - [ ] Companion object extensions
 - [ ] Generics
   - [ ] Variance (in, out)
-  - [ ] Constraints
-    - [ ] One upper bound
-    - [ ] Multiple upper bounds
+  - [x] Constraints
+    - [x] One upper bound
+    - [x] Multiple upper bounds
 - [ ] Exceptions
 - [ ] Nothing type
 - [ ] Function overloading
