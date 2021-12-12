@@ -22,41 +22,40 @@ package kotlin
  */
 @DartBuiltIn
 @DartName("num")
-public abstract class Number {
+abstract class Number {
     /**
      * Returns the value of this number as a [Double], which may involve rounding.
      */
-    public abstract fun toDouble(): Double
+    abstract fun toDouble(): Double
 
     /**
      * Returns the value of this number as a [Float], which may involve rounding.
      */
-    public abstract fun toFloat(): Float
+    abstract fun toFloat(): Float
 
     /**
      * Returns the value of this number as a [Long], which may involve rounding or truncation.
      */
-    public abstract fun toLong(): Long
+    abstract fun toLong(): Long
 
     /**
      * Returns the value of this number as an [Int], which may involve rounding or truncation.
      */
-    public abstract fun toInt(): Int
+    abstract fun toInt(): Int
 
     /**
      * Returns the [Char] with the numeric value equal to this number, truncated to 16 bits if appropriate.
      */
-//    @Deprecated("Direct conversion to Char is deprecated. Use toInt().toChar() or Char constructor instead.", ReplaceWith("this.toInt().toChar()"))
-    public abstract fun toChar(): Char
+    abstract fun toChar(): Char
 
     /**
      * Returns the value of this number as a [Short], which may involve rounding or truncation.
      */
-    public abstract fun toShort(): Short
+    abstract fun toShort(): Short
 
     /**
      * Returns the value of this number as a [Byte], which may involve rounding or truncation.
      */
-    public abstract fun toByte(): Byte
+    abstract fun toByte(): Byte
 }
 

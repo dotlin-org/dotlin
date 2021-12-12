@@ -1,5 +1,6 @@
 /*
  * Copyright 2010-2018 JetBrains s.r.o.
+ * Copyright 2021 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,4 +20,4 @@ package kotlin.reflect
 /**
  * Represents a function with introspection capabilities.
  */
-public interface KFunction<out R> : KCallable<R>, Function<R>
+interface KFunction<out R> : KCallable<R>, Function<R>

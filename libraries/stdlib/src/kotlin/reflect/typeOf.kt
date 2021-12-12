@@ -1,5 +1,6 @@
 /*
  * Copyright 2010-2019 JetBrains s.r.o.
+ * Copyright 2021 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,5 +21,5 @@ package kotlin.reflect
  * Returns a runtime representation of the given reified type [T] as an instance of [KType].
  */
 @SinceKotlin("1.6")
-public inline fun <reified T> typeOf(): KType =
+inline fun <reified T> typeOf(): KType =
     throw UnsupportedOperationException("This function is implemented as an intrinsic on all supported platforms.")

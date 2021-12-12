@@ -1,5 +1,6 @@
 /*
  * Copyright 2010-2020 JetBrains s.r.o.
+ * Copyright 2021 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,15 +27,15 @@ package kotlin.reflect
  * for more information.
  */
 @SinceKotlin("1.1")
-public data class KTypeProjection constructor(
+data class KTypeProjection constructor(
     /**
      * The use-site variance specified in the projection, or `null` if this is a star projection.
      */
-    public val variance: KVariance?,
+    val variance: KVariance?,
     /**
      * The type specified in the projection, or `null` if this is a star projection.
      */
-    public val type: KType?
+    val type: KType?
 ) {
 
     init {
@@ -53,7 +54,7 @@ public data class KTypeProjection constructor(
         KVariance.OUT -> "out $type"
     }
 
-    public companion object {
+    companion object {
         // provided for compiler access
         // TODO: Remove?
         @PublishedApi
@@ -65,28 +66,28 @@ public data class KTypeProjection constructor(
          * See the [Kotlin language documentation](https://kotlinlang.org/docs/reference/generics.html#star-projections)
          * for more information.
          */
-        public val STAR: KTypeProjection get() = star
+        val STAR: KTypeProjection get() = star
 
         /**
          * Creates an invariant projection of a given type. Invariant projection is just the type itself,
          * without any use-site variance modifiers applied to it.
          * For example, in the type `Set<String>`, `String` is an invariant projection of the type represented by the class `String`.
          */
-        public fun invariant(type: KType): KTypeProjection =
+        fun invariant(type: KType): KTypeProjection =
             KTypeProjection(KVariance.INVARIANT, type)
 
         /**
          * Creates a contravariant projection of a given type, denoted by the `in` modifier applied to a type.
          * For example, in the type `MutableList<in Number>`, `in Number` is a contravariant projection of the type of class `Number`.
          */
-        public fun contravariant(type: KType): KTypeProjection =
+        fun contravariant(type: KType): KTypeProjection =
             KTypeProjection(KVariance.IN, type)
 
         /**
          * Creates a covariant projection of a given type, denoted by the `out` modifier applied to a type.
          * For example, in the type `Array<out Number>`, `out Number` is a covariant projection of the type of class `Number`.
          */
-        public fun covariant(type: KType): KTypeProjection =
+        fun covariant(type: KType): KTypeProjection =
             KTypeProjection(KVariance.OUT, type)
     }
 }

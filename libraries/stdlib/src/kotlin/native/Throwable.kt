@@ -1,5 +1,6 @@
 /*
  * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2021 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +15,6 @@
  * limitations under the License.
  */
 
-@file:Suppress("NON_ABSTRACT_FUNCTION_WITH_NO_BODY", "MUST_BE_INITIALIZED_OR_BE_ABSTRACT", "UNUSED_PARAMETER")
-
 package kotlin
 
 /**
@@ -24,7 +23,7 @@ package kotlin
  * @param message the detail message string.
  * @param cause the cause of this throwable.
  */
-public open class Throwable(open val message: String?, open val cause: Throwable?) {
+open class Throwable(open val message: String?, open val cause: Throwable?) {
     constructor(message: String?) : this(message, null)
 
     constructor(cause: Throwable?) : this(cause?.toString(), cause)

@@ -26,7 +26,7 @@ package kotlin
  */
 @DartBuiltIn
 @DartName("Object")
-public open class Any {
+open class Any {
     /**
      * Indicates whether some other object is "equal to" this one. Implementations must fulfil the following
      * requirements:
@@ -43,7 +43,7 @@ public open class Any {
      *
      * Read more about [equality](https://kotlinlang.org/docs/reference/equality.html) in Kotlin.
      */
-    public open operator fun equals(other: Any?): Boolean
+    open operator fun equals(other: Any?): Boolean
 
     /**
      * Returns a hash code value for the object. The general contract of `hashCode` is:
@@ -54,10 +54,10 @@ public open class Any {
      *   the two objects must produce the same integer result.
      */
     @DartBuiltIn.Getter
-    public open fun hashCode(): Int
+    open fun hashCode(): Int
 
     /**
      * Returns a string representation of the object.
      */
-    public open fun toString(): String
+    open fun toString(): String
 }

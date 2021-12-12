@@ -1,5 +1,6 @@
 /*
  * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2021 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +22,7 @@ import kotlin.annotation.AnnotationTarget.*
 /**
  * Contains the list of code elements which are the possible annotation targets
  */
-public enum class AnnotationTarget {
+enum class AnnotationTarget {
     /** Class, interface or object, annotation class is also included */
     CLASS,
     /** Annotation class only */
@@ -60,7 +61,7 @@ public enum class AnnotationTarget {
  *
  * Determines how an annotation is stored in binary output.
  */
-public enum class AnnotationRetention {
+enum class AnnotationRetention {
     /** Annotation isn't stored in binary output */
     SOURCE,
     /** Annotation is stored in binary output, but invisible for reflection */
@@ -79,7 +80,7 @@ public enum class AnnotationRetention {
  */
 @Target(AnnotationTarget.ANNOTATION_CLASS)
 @MustBeDocumented
-public annotation class Target(vararg val allowedTargets: AnnotationTarget)
+annotation class Target(vararg val allowedTargets: AnnotationTarget)
 
 /**
  * This meta-annotation determines whether an annotation is stored in binary output and visible for reflection. By default, both are true.
@@ -87,17 +88,17 @@ public annotation class Target(vararg val allowedTargets: AnnotationTarget)
  * @property value necessary annotation retention (RUNTIME, BINARY or SOURCE)
  */
 @Target(AnnotationTarget.ANNOTATION_CLASS)
-public annotation class Retention(val value: AnnotationRetention = AnnotationRetention.RUNTIME)
+annotation class Retention(val value: AnnotationRetention = AnnotationRetention.RUNTIME)
 
 /**
  * This meta-annotation determines that an annotation is applicable twice or more on a single code element
  */
 @Target(AnnotationTarget.ANNOTATION_CLASS)
-public annotation class Repeatable
+annotation class Repeatable
 
 /**
- * This meta-annotation determines that an annotation is a part of public API and therefore should be included in the generated
+ * This meta-annotation determines that an annotation is a part of API and therefore should be included in the generated
  * documentation for the element to which the annotation is applied.
  */
 @Target(AnnotationTarget.ANNOTATION_CLASS)
-public annotation class MustBeDocumented
+annotation class MustBeDocumented

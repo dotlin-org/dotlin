@@ -1,5 +1,6 @@
 /*
  * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2021 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,4 +21,4 @@ package kotlin
  * Nothing has no instances. You can use Nothing to represent "a value that never exists": for example,
  * if a function has the return type of Nothing, it means that it never returns (always throws an exception).
  */
-public class Nothing private constructor()
+class Nothing private constructor()

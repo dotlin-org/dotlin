@@ -20,4 +20,4 @@ package kotlin
 /**
  * An exception is thrown to indicate that a method body remains to be implemented.
  */
-public class NotImplementedError(message: String = "An operation is not implemented.") : Error(message)
+class NotImplementedError(message: String = "An operation is not implemented.") : Error(message)

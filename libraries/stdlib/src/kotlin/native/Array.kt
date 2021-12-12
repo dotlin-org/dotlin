@@ -1,5 +1,6 @@
 /*
  * Copyright 2010-2019 JetBrains s.r.o.
+ * Copyright 2021 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +29,7 @@ package kotlin
 @DartBuiltIn
 @DartBuiltIn.ImportAlias("dart:core")
 @DartName("List")
-public class Array<T> {
+class Array<T> {
     /**
      * Creates a new array with the specified [size], where each element is calculated by calling the specified
      * [init] function.
@@ -36,7 +37,7 @@ public class Array<T> {
      * The function [init] is called for each array element sequentially starting from the first one.
      * It should return the value for an array element given its index.
      */
-    public constructor(size: Int, init: (Int) -> T)
+    constructor(size: Int, init: (Int) -> T)
 
     /**
      * Returns the array element at the specified [index]. This method can be called using the
@@ -48,7 +49,7 @@ public class Array<T> {
      * If the [index] is out of bounds of this array, throws an [IndexOutOfBoundsException] except in Kotlin/JS
      * where the behavior is unspecified.
      */
-    public operator fun get(index: Int): T
+    operator fun get(index: Int): T
 
     /**
      * Sets the array element at the specified [index] to the specified [value]. This method can
@@ -60,15 +61,15 @@ public class Array<T> {
      * If the [index] is out of bounds of this array, throws an [IndexOutOfBoundsException] except in Kotlin/JS
      * where the behavior is unspecified.
      */
-    public operator fun set(index: Int, value: T): Unit
+    operator fun set(index: Int, value: T): Unit
 
     /**
      * Returns the number of elements in the array.
      */
-    public val size: Int
+    val size: Int
 
     /**
      * Creates an [Iterator] for iterating over the elements of the array.
      */
-    public operator fun iterator(): Iterator<T>
+    operator fun iterator(): Iterator<T>
 }

@@ -1,5 +1,6 @@
 /*
  * Copyright 2010-2019 JetBrains s.r.o.
+ * Copyright 2021 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,21 +25,20 @@ package kotlin
  * information on enum classes.
  */
 @DartBuiltIn.HideImport("dart:core")
-public abstract class Enum<E : Enum<E>>(name: String, ordinal: Int): Comparable<E> {
-    companion object {}
-
+abstract class Enum<E : Enum<E>> @DartConst constructor(
     /**
      * Returns the name of this enum constant, exactly as declared in its enum declaration.
      */
-    public final val name: String
-
+    final val name: String,
     /**
      * Returns the ordinal of this enumeration constant (its position in its enum declaration, where the initial constant
      * is assigned an ordinal of zero).
      */
-    public final val ordinal: Int
+    final val ordinal: Int
+): Comparable<E> {
+    companion object {}
 
-    public override final fun compareTo(other: E): Int
+    override final fun compareTo(other: E) = ordinal.compareTo(other.ordinal)
 
     /**
      * Throws an exception since enum constants cannot be cloned.
@@ -46,19 +46,22 @@ public abstract class Enum<E : Enum<E>>(name: String, ordinal: Int): Comparable<
      */
     protected final fun clone(): Any
 
-    public override final fun equals(other: Any?): Boolean
-    public override final fun hashCode(): Int
-    public override fun toString(): String
+    override final fun equals(other: Any?) = this === other
+
+    override final fun hashCode(): Int
+    override fun toString() = name
 
     /**
      * Returns an array containing the constants of this enum type, in the order they're declared.
      * This method may be used to iterate over the constants.
      * @values
      */
+    open fun values(): Array<E>
 
     /**
      * Returns the enum constant of this type with the specified name. The string must match exactly an identifier used to declare an enum constant in this type. (Extraneous whitespace characters are not permitted.)
      * @throws IllegalArgumentException if this enum type has no constant with the specified name
      * @valueOf
      */
+    open fun valueOf(name: String): E
 }

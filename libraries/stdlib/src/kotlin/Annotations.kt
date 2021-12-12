@@ -1,5 +1,6 @@
 /*
  * Copyright 2010-2019 JetBrains s.r.o.
+ * Copyright 2021 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +43,7 @@ import kotlin.annotation.AnnotationTarget.*
  */
 @Target(CLASS, FUNCTION, PROPERTY, ANNOTATION_CLASS, CONSTRUCTOR, PROPERTY_SETTER, PROPERTY_GETTER, TYPEALIAS)
 @MustBeDocumented
-public annotation class Deprecated(
+annotation class Deprecated(
     val message: String,
     val replaceWith: ReplaceWith = ReplaceWith(""),
     val level: DeprecationLevel = DeprecationLevel.WARNING
@@ -63,7 +64,7 @@ public annotation class Deprecated(
 @Target(CLASS, FUNCTION, PROPERTY, ANNOTATION_CLASS, CONSTRUCTOR, PROPERTY_SETTER, PROPERTY_GETTER, TYPEALIAS)
 @MustBeDocumented
 @SinceKotlin("1.4")
-public annotation class DeprecatedSinceKotlin(
+annotation class DeprecatedSinceKotlin(
     val warningSince: String = "",
     val errorSince: String = "",
     val hiddenSince: String = ""
@@ -85,14 +86,14 @@ public annotation class DeprecatedSinceKotlin(
 @Target()
 @Retention(BINARY)
 @MustBeDocumented
-public annotation class ReplaceWith(val expression: String, vararg val imports: String)
+annotation class ReplaceWith(val expression: String, vararg val imports: String)
 
 /**
  * Possible levels of a deprecation. The level specifies how the deprecated element usages are reported in code.
  *
  * @see Deprecated
  */
-public enum class DeprecationLevel {
+enum class DeprecationLevel {
     /** Usage of the deprecated element will be reported as a warning. */
     WARNING,
     /** Usage of the deprecated element will be reported as an error. */
@@ -106,7 +107,7 @@ public enum class DeprecationLevel {
  */
 @Target(TYPE)
 @MustBeDocumented
-public annotation class ExtensionFunctionType
+annotation class ExtensionFunctionType
 
 /**
  * Annotates type arguments of functional type and holds corresponding parameter name specified by the user in type declaration (if any).
@@ -114,7 +115,7 @@ public annotation class ExtensionFunctionType
 @Target(TYPE)
 @MustBeDocumented
 @SinceKotlin("1.1")
-public annotation class ParameterName(val name: String)
+annotation class ParameterName(val name: String)
 
 /**
  * Suppresses the given compilation warnings in the annotated element.
@@ -123,7 +124,7 @@ public annotation class ParameterName(val name: String)
 @Target(CLASS, ANNOTATION_CLASS, TYPE_PARAMETER, PROPERTY, FIELD, LOCAL_VARIABLE, VALUE_PARAMETER,
         CONSTRUCTOR, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER, TYPE, EXPRESSION, FILE, TYPEALIAS)
 @Retention(SOURCE)
-public annotation class Suppress(vararg val names: String)
+annotation class Suppress(vararg val names: String)
 
 /**
  * Suppresses errors about variance conflict
@@ -131,7 +132,7 @@ public annotation class Suppress(vararg val names: String)
 @Target(TYPE)
 @Retention(SOURCE)
 @MustBeDocumented
-public annotation class UnsafeVariance
+annotation class UnsafeVariance
 
 /**
  * Specifies the first version of Kotlin where a declaration has appeared.
@@ -143,7 +144,7 @@ public annotation class UnsafeVariance
 @Target(CLASS, PROPERTY, FIELD, CONSTRUCTOR, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER, TYPEALIAS)
 @Retention(AnnotationRetention.BINARY)
 @MustBeDocumented
-public annotation class SinceKotlin(val version: String)
+annotation class SinceKotlin(val version: String)
 
 /**
  * When applied to annotation class X specifies that X defines a DSL language
@@ -163,22 +164,22 @@ public annotation class SinceKotlin(val version: String)
 @Retention(BINARY)
 @MustBeDocumented
 @SinceKotlin("1.1")
-public annotation class DslMarker
+annotation class DslMarker
 
 
 /**
- * When applied to a class or a member with internal visibility allows to use it from public inline functions and
+ * When applied to a class or a member with internal visibility allows to use it from inline functions and
  * makes it effectively public.
  *
- * Public inline functions cannot use non-public API, since if they are inlined, those non-public API references
+ * inline functions cannot use non-API, since if they are inlined, those non-API references
  * would violate access restrictions at a call site (https://kotlinlang.org/docs/reference/inline-functions.html#public-inline-restrictions).
  *
  * To overcome this restriction an `internal` declaration can be annotated with the `@PublishedApi` annotation:
- * - this allows to call that declaration from public inline functions;
+ * - this allows to call that declaration from inline functions;
  * - the declaration becomes effectively public, and this should be considered with respect to binary compatibility maintaining.
  */
 @Target(AnnotationTarget.CLASS, AnnotationTarget.CONSTRUCTOR, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.BINARY)
 @MustBeDocumented
 @SinceKotlin("1.1")
-public annotation class PublishedApi
+annotation class PublishedApi

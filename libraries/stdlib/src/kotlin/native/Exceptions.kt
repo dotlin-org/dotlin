@@ -26,47 +26,47 @@
 
 package kotlin
 
-public open class Error : Throwable {
+open class Error : Throwable {
     constructor()
     constructor(message: String?)
     constructor(message: String?, cause: Throwable?)
     constructor(cause: Throwable?)
 }
 
-public open class Exception : Throwable {
+open class Exception : Throwable {
     constructor()
     constructor(message: String?)
     constructor(message: String?, cause: Throwable?)
     constructor(cause: Throwable?)
 }
 
-public open class RuntimeException : Exception {
+open class RuntimeException : Exception {
     constructor()
     constructor(message: String?)
     constructor(message: String?, cause: Throwable?)
     constructor(cause: Throwable?)
 }
 
-public open class IllegalArgumentException : RuntimeException {
+open class IllegalArgumentException : RuntimeException {
     constructor()
     constructor(message: String?)
     constructor(message: String?, cause: Throwable?)
     constructor(cause: Throwable?)
 }
 
-public open class IllegalStateException : RuntimeException {
+open class IllegalStateException : RuntimeException {
     constructor()
     constructor(message: String?)
     constructor(message: String?, cause: Throwable?)
     constructor(cause: Throwable?)
 }
 
-public open class IndexOutOfBoundsException : RuntimeException {
+open class IndexOutOfBoundsException : RuntimeException {
     constructor()
     constructor(message: String?)
 }
 
-public open class ConcurrentModificationException : RuntimeException {
+open class ConcurrentModificationException : RuntimeException {
     constructor()
     constructor(message: String?)
     @Deprecated("The constructor is not supported on all platforms and will be removed from kotlin-stdlib-common soon.", level = DeprecationLevel.ERROR)
@@ -75,40 +75,40 @@ public open class ConcurrentModificationException : RuntimeException {
     constructor(cause: Throwable?)
 }
 
-public open class UnsupportedOperationException : RuntimeException {
+open class UnsupportedOperationException : RuntimeException {
     constructor()
     constructor(message: String?)
     constructor(message: String?, cause: Throwable?)
     constructor(cause: Throwable?)
 }
 
-public open class NumberFormatException : IllegalArgumentException {
+open class NumberFormatException : IllegalArgumentException {
     constructor()
     constructor(message: String?)
 }
 
-public open class NullPointerException : RuntimeException {
+open class NullPointerException : RuntimeException {
     constructor()
     constructor(message: String?)
 }
 
-public open class ClassCastException : RuntimeException {
+open class ClassCastException : RuntimeException {
     constructor()
     constructor(message: String?)
 }
 
-public open class AssertionError : Error {
+open class AssertionError : Error {
     constructor()
     constructor(message: Any?)
 }
 
-public open class NoSuchElementException : RuntimeException {
+open class NoSuchElementException : RuntimeException {
     constructor()
     constructor(message: String?)
 }
 
 @SinceKotlin("1.3")
-public open class ArithmeticException : RuntimeException {
+open class ArithmeticException : RuntimeException {
     constructor()
     constructor(message: String?)
 }
@@ -123,20 +123,20 @@ public open class ArithmeticException : RuntimeException {
  * - the detailed description of each throwable in the [Throwable.cause] chain.
  */
 @SinceKotlin("1.4")
-public fun Throwable.stackTraceToString(): String
+fun Throwable.stackTraceToString(): String
 
 /**
  * Prints the [detailed description][Throwable.stackTraceToString] of this throwable to the standard output or standard error output.
  */
 @SinceKotlin("1.4")
-public fun Throwable.printStackTrace(): Unit
+fun Throwable.printStackTrace(): Unit
 
 /**
  * When supported by the platform, adds the specified exception to the list of exceptions that were
  * suppressed in order to deliver this exception.
  */
 @SinceKotlin("1.4")
-public fun Throwable.addSuppressed(exception: Throwable)
+fun Throwable.addSuppressed(exception: Throwable)
 
 /**
  * Returns a list of all exceptions that were suppressed in order to deliver this exception.
@@ -147,5 +147,5 @@ public fun Throwable.addSuppressed(exception: Throwable)
  * - if this [Throwable] instance has disabled the suppression.
  */
 //@SinceKotlin("1.4")
-//public val Throwable.suppressedExceptions: List<Throwable>
+//val Throwable.suppressedExceptions: List<Throwable>
 // TODO
