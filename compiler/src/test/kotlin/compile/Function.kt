@@ -419,6 +419,60 @@ class Function : BaseTest {
     }
 
     @Test
+    fun `function with multiple type parameter bounds with common super type calling method from common super type`() =
+        assertCompile {
+            kotlin(
+                """
+                interface Book {
+                    fun read()
+                }
+
+                interface Memoir : Book {
+                    fun intrigue()
+                }
+
+                interface Novel : Book {
+                    fun enjoy()
+                }
+
+                fun <T> test(book: T) where T : Memoir, T : Novel {
+                    book.read()
+                    book.enjoy()
+                    book.intrigue()
+                    lookUp(book)
+                }
+
+                fun lookUp(memoir: Memoir) {}
+                """
+            )
+
+            dart(
+                """
+                abstract class Book {
+                  void read();
+                }
+
+                abstract class Memoir implements Book {
+                  void intrigue();
+                }
+
+                abstract class Novel implements Book {
+                  void enjoy();
+                }
+
+                void test<T extends Book>(T book) {
+                  (book as Book).read();
+                  (book as Novel).enjoy();
+                  (book as Memoir).intrigue();
+                  lookUp(book as Memoir);
+                }
+
+                void lookUp(Memoir memoir) {}
+                """
+            )
+        }
+
+    @Test
     fun `function with multiple type parameter bounds one of which is nullable`() = assertCompile {
         kotlin(
             """
