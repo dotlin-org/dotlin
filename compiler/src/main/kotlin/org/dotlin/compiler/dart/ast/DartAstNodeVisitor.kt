@@ -156,4 +156,6 @@ interface DartAstNodeVisitor<R, C> {
     fun visitExpressionFunctionBody(body: DartExpressionFunctionBody, context: C): R = throwUnsupported()
 
     fun visitLabel(label: DartLabel, context: C): R = throwUnsupported()
+
+    fun visitCode(code: DartCode, context: C): R = throwUnsupported()
 }

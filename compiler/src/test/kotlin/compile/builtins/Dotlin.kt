@@ -448,4 +448,23 @@ class Dotlin : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `dart()`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                val x = dart("[]")
+            }
+            """
+        )
+
+        dart(
+            """
+            void main() {
+              final dynamic x = [];
+            }
+            """
+        )
+    }
 }

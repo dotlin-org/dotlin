@@ -39,6 +39,7 @@ interface IrCustomElementHelper {
 
     }
 
+    fun visitDartCodeExpression(expression: IrDartCodeExpression): IrDartCodeExpression
     fun visitAnnotatedExpression(expression: IrAnnotatedExpression): IrAnnotatedExpression
     fun visitNullAwareExpression(expression: IrNullAwareExpression): IrNullAwareExpression
     fun visitConjunctionExpression(expression: IrConjunctionExpression): IrConjunctionExpression
@@ -78,6 +79,9 @@ abstract class IrCustomElementTransformerVoid : IrElementTransformerVoid(), IrCu
         helperVisitBody = { super<IrCustomElementHelper>.visitBody(it) },
         superVisitBody = { super<IrElementTransformerVoid>.visitBody(it) }
     )
+
+    override fun visitDartCodeExpression(expression: IrDartCodeExpression) =
+        expression.transformChildrenVoid().let { expression }
 
     override fun visitAnnotatedExpression(expression: IrAnnotatedExpression) =
         expression.transformChildrenVoid().let { expression }
