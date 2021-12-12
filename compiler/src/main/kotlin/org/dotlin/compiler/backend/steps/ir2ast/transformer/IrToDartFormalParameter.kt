@@ -24,7 +24,6 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isInitializedInBody
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isToBeInitializedInFieldInitializerList
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.accept
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
 import org.dotlin.compiler.dart.ast.parameter.*
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
