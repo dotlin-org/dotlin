@@ -2221,7 +2221,7 @@ class Class : BaseTest {
             }
 
             class SomeItem : Buildable, Identifiable {
-                override fun build() { }
+                override fun build() {}
 
                 override fun identify() {}
             }
@@ -2294,7 +2294,7 @@ class Class : BaseTest {
             }
 
             class SomeItem : Buildable, Identifiable {
-                override fun build() { }
+                override fun build() {}
 
                 override fun identify() {}
             }
@@ -2344,6 +2344,92 @@ class Class : BaseTest {
     }
 
     @Test
+    fun `class with multiple type parameter bounds with common supertype calling method from super type`() =
+        assertCompile {
+            kotlin(
+                """
+                interface Marker {
+                    fun mark()
+                }
+
+                interface Buildable : Marker {
+                    fun build()
+                }
+
+                interface Identifiable : Marker {
+                    fun identify()
+                }
+
+                class Builder<T> where T : Buildable, T : Identifiable {
+                    fun startBuild(item: T) {
+                        item.mark()
+                        item.identify()
+                        item.build()
+
+                        identifyAndExec(item)
+                    }
+
+                    private fun identifyAndExec(id: Identifiable) {}
+                }
+
+                class SomeItem : Buildable, Identifiable {
+                    override fun mark() {}
+
+                    override fun build() {}
+
+                    override fun identify() {}
+                }
+
+                fun main() {
+                    Builder<SomeItem>().startBuild(SomeItem())
+                }
+                """
+            )
+
+            dart(
+                """
+                abstract class Marker {
+                  void mark();
+                }
+
+                abstract class Buildable implements Marker {
+                  void build();
+                }
+
+                abstract class Identifiable implements Marker {
+                  void identify();
+                }
+
+                class Builder<T extends Marker> {
+                  Builder() : super();
+                  void startBuild(T item) {
+                    (item as Marker).mark();
+                    (item as Identifiable).identify();
+                    (item as Buildable).build();
+                    this._identifyAndExec(item as Identifiable);
+                  }
+
+                  void _identifyAndExec(Identifiable id) {}
+                }
+
+                class SomeItem implements Buildable, Identifiable {
+                  SomeItem() : super();
+                  @override
+                  void mark() {}
+                  @override
+                  void build() {}
+                  @override
+                  void identify() {}
+                }
+
+                void main() {
+                  Builder<SomeItem>().startBuild(SomeItem());
+                }
+                """
+            )
+    }
+
+    @Test
     fun `class with multiple type parameter bounds one which is nullable`() = assertCompile {
         kotlin(
             """
@@ -2367,7 +2453,7 @@ class Class : BaseTest {
             }
 
             class SomeItem : Buildable, Identifiable {
-                override fun build() { }
+                override fun build() {}
 
                 override fun identify() {}
             }
@@ -2441,7 +2527,7 @@ class Class : BaseTest {
                 }
 
                 class SomeItem : Buildable, Identifiable {
-                    override fun build() { }
+                    override fun build() {}
 
                     override fun identify() {}
                 }
@@ -2514,7 +2600,7 @@ class Class : BaseTest {
             }
 
             class SomeItem : Buildable, Identifiable {
-                override fun build() { }
+                override fun build() {}
 
                 override fun identify() {}
             }
@@ -2587,7 +2673,7 @@ class Class : BaseTest {
             }
 
             class SomeItem : Buildable, Identifiable {
-                override fun build() { }
+                override fun build() {}
 
                 override fun identify() {}
             }
@@ -2661,7 +2747,7 @@ class Class : BaseTest {
                 }
 
                 class SomeItem : Buildable, Identifiable {
-                    override fun build() { }
+                    override fun build() {}
 
                     override fun identify() {}
                 }

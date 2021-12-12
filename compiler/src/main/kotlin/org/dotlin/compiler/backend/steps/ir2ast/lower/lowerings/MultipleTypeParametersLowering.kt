@@ -23,10 +23,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementTransformerVoi
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrNullAwareExpression
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrFunction
-import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
-import org.jetbrains.kotlin.ir.declarations.IrTypeParametersContainer
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrTypeOperatorCallImpl
 import org.jetbrains.kotlin.ir.types.IrType
@@ -34,6 +31,7 @@ import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.types.isNullable
 import org.jetbrains.kotlin.ir.types.makeNullable
 import org.jetbrains.kotlin.ir.util.defaultType
+import org.jetbrains.kotlin.ir.util.isFakeOverride
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.ir.util.superTypes
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
@@ -72,12 +70,23 @@ class MultipleTypeParametersLowering(private val context: DartLoweringContext) :
         // Add explicit casts of relevant types.
         declaration.transformChildrenVoid(
             object : IrCustomElementTransformerVoid() {
+                fun IrDeclaration.firstNonFakeOverrideOrSelf(): IrDeclaration {
+                    if (!isFakeOverride) return this
+                    if (this !is IrOverridableDeclaration<*>) return this
+
+                    return (overriddenSymbols.firstOrNull()?.owner as? IrDeclaration)
+                        ?.firstNonFakeOverrideOrSelf() ?: this
+                }
+
                 fun IrExpression?.possiblyCastReceiver(
                     of: IrDeclarationReference,
                     isInNullAware: Boolean,
                     set: (IrTypeOperatorCall) -> Unit
                 ) = this?.possiblyCast(
-                    castType = (of.symbol.owner as IrDeclaration).parentClassOrNull?.defaultType,
+                    castType = (of.symbol.owner as IrDeclaration)
+                        .firstNonFakeOverrideOrSelf()
+                        .parentClassOrNull
+                        ?.defaultType,
                     isInNullAware,
                     set,
                 )
