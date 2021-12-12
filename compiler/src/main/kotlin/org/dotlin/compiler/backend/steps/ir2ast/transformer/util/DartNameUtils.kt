@@ -36,8 +36,23 @@ private fun IrDeclarationWithName.getDartNameOrNull(allowNested: Boolean): DartI
     var name = dartAnnotatedName?.toDartSimpleIdentifier()
         ?: when {
             !name.isSpecial -> name.identifier.toDartSimpleIdentifier()
-            // If a constructor is private with no name, we set the name to "_".
-            this is IrConstructor && isPrivate -> DartSimpleIdentifier("_")
+            this is IrConstructor -> {
+                val constructors = parentClassOrNull?.declarations?.filterIsInstance<IrConstructor>() ?: emptyList()
+
+                when {
+                    constructors.size <= 1 -> when {
+                        // If a constructor is private with no name, we set the name to "_".
+                        isPrivate -> DartSimpleIdentifier("_")
+                        else -> null
+                    }
+                    // If have multiple constructors (and this is not the primary constructor, which by
+                    // default has no name), they're numbered in the order of appearance,
+                    // e.g. `MyClass.$constructor$0`.
+                    !isPrimary -> DartSimpleIdentifier("\$constructor$${constructors.indexOf(this)}")
+                    else -> null
+                }
+            }
+
             else -> null
         }
 

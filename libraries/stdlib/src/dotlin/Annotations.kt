@@ -21,6 +21,7 @@ package dotlin
  */
 @Target(
     AnnotationTarget.CLASS,
+    AnnotationTarget.CONSTRUCTOR,
     AnnotationTarget.FUNCTION,
     AnnotationTarget.PROPERTY_GETTER,
     AnnotationTarget.PROPERTY_SETTER,

@@ -52,6 +52,62 @@ class Dotlin : BaseTest {
     }
 
     @Test
+    fun `@DartName on primary constructor`() = assertCompile {
+        kotlin(
+            """
+            class Human @DartName("withName") constructor(val name: String)
+
+            fun main() {
+                Human("Faramir")
+            }
+            """
+        )
+
+        dart(
+            """
+            class Human {
+              Human.withName(this.name) : super();
+              final String name;
+            }
+
+            void main() {
+              Human.withName('Faramir');
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartName on secondary constructor`() = assertCompile {
+        kotlin(
+            """
+            class Human(val name: String) {
+                @DartName("nameless")
+                constructor() : this("")
+            }
+
+            fun main() {
+                Human()
+            }
+            """
+        )
+
+        dart(
+            """
+            class Human {
+              Human(this.name) : super();
+              final String name;
+              Human.nameless() : this('');
+            }
+
+            void main() {
+              Human.nameless();
+            }
+            """
+        )
+    }
+
+    @Test
     fun `@DartConst constructor`() = assertCompile {
         kotlin(
             """
