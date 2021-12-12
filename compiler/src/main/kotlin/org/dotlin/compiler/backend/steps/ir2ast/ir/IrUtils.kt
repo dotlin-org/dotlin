@@ -21,7 +21,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.ir
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrExpressionBodyWithOrigin
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.toDart
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.accept
 import org.dotlin.compiler.backend.util.falseIfNull
 import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
 import org.jetbrains.kotlin.backend.common.ir.*
@@ -199,8 +199,8 @@ val IrValueParameter.correspondingProperty: IrProperty?
     }
 
 // If typeOrNull returns null, it's a star projection, which corresponds best to dynamic in Dart.
-fun IrTypeArgument.toDart(context: DartTransformContext): DartTypeAnnotation =
-    typeOrNull?.toDart(context) ?: DartTypeAnnotation.DYNAMIC
+fun IrTypeArgument.accept(context: DartTransformContext): DartTypeAnnotation =
+    typeOrNull?.accept(context) ?: DartTypeAnnotation.DYNAMIC
 
 fun todo(element: IrElement): Nothing = TODO("${element::class.java.simpleName} is not supported")
 

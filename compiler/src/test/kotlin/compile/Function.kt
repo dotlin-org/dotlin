@@ -316,4 +316,332 @@ class Function : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `function with type parameter bound`() = assertCompile {
+        kotlin("fun <T : Int> test() {}")
+
+        dart(
+            """
+            void test<T extends int>() {}
+            """
+        )
+    }
+
+    @Test
+    fun `function with multiple type parameter bounds`() = assertCompile {
+        kotlin(
+            """
+            interface Memoir {
+                fun intrigue()
+            }
+
+            interface Novel {
+                fun enjoy()
+            }
+
+            fun <T> test(book: T) where T : Memoir, T : Novel {
+                book.enjoy()
+                book.intrigue()
+                lookUp(book)
+            }
+
+            fun lookUp(memoir: Memoir) {}
+            """
+        )
+
+        dart(
+            """
+            abstract class Memoir {
+              void intrigue();
+            }
+
+            abstract class Novel {
+              void enjoy();
+            }
+
+            void test<T extends Object>(T book) {
+              (book as Novel).enjoy();
+              (book as Memoir).intrigue();
+              lookUp(book as Memoir);
+            }
+
+            void lookUp(Memoir memoir) {}
+            """
+        )
+    }
+
+    @Test
+    fun `function with multiple type parameter bounds with common super type`() = assertCompile {
+        kotlin(
+            """
+            interface Book
+
+            interface Memoir : Book {
+                fun intrigue()
+            }
+
+            interface Novel : Book {
+                fun enjoy()
+            }
+
+            fun <T> test(book: T) where T : Memoir, T : Novel {
+                book.enjoy()
+                book.intrigue()
+                lookUp(book)
+            }
+
+            fun lookUp(memoir: Memoir) {}
+            """
+        )
+
+        dart(
+            """
+            abstract class Book {}
+
+            abstract class Memoir implements Book {
+              void intrigue();
+            }
+
+            abstract class Novel implements Book {
+              void enjoy();
+            }
+
+            void test<T extends Book>(T book) {
+              (book as Novel).enjoy();
+              (book as Memoir).intrigue();
+              lookUp(book as Memoir);
+            }
+
+            void lookUp(Memoir memoir) {}
+            """
+        )
+    }
+
+    @Test
+    fun `function with multiple type parameter bounds one of which is nullable`() = assertCompile {
+        kotlin(
+            """
+            interface Memoir {
+                fun intrigue()
+            }
+
+            interface Novel {
+                fun enjoy()
+            }
+
+            fun <T> test(book: T) where T : Memoir?, T : Novel {
+                book.enjoy()
+                book.intrigue()
+                lookUp(book)
+            }
+
+            fun lookUp(memoir: Memoir) {}
+            """
+        )
+
+        dart(
+            """
+            abstract class Memoir {
+              void intrigue();
+            }
+
+            abstract class Novel {
+              void enjoy();
+            }
+
+            void test<T extends Object>(T book) {
+              (book as Novel).enjoy();
+              (book as Memoir).intrigue();
+              lookUp(book as Memoir);
+            }
+
+            void lookUp(Memoir memoir) {}
+            """
+        )
+    }
+
+    // Technically this doesn't make much sense, but good to translate it as-is, since the Kotlin compiler doesn't
+    // give a warning.
+    @Test
+    fun `function with multiple type parameter bounds one of which is nullable and a null safe operator is used on`() =
+        assertCompile {
+            kotlin(
+                """
+                interface Memoir {
+                    fun intrigue()
+                }
+
+                interface Novel {
+                    fun enjoy()
+                }
+
+                fun <T> test(book: T) where T : Memoir?, T : Novel {
+                    book.enjoy()
+                    book?.intrigue()
+                    lookUp(book)
+                }
+
+                fun lookUp(memoir: Memoir) {}
+                """
+            )
+
+            dart(
+                """
+                abstract class Memoir {
+                  void intrigue();
+                }
+
+                abstract class Novel {
+                  void enjoy();
+                }
+
+                void test<T extends Object>(T book) {
+                  (book as Novel).enjoy();
+                  (book as Memoir?)?.intrigue();
+                  lookUp(book as Memoir);
+                }
+
+                void lookUp(Memoir memoir) {}
+                """
+            )
+        }
+
+    @Test
+    fun `function with multiple type parameter bounds with common super type one which is nullable`() = assertCompile {
+        kotlin(
+            """
+            interface Book
+
+            interface Memoir : Book {
+                fun intrigue()
+            }
+
+            interface Novel : Book {
+                fun enjoy()
+            }
+
+            fun <T> test(book: T) where T : Memoir?, T : Novel {
+                book.enjoy()
+                book.intrigue()
+                lookUp(book)
+            }
+
+            fun lookUp(memoir: Memoir) {}
+            """
+        )
+
+        dart(
+            """
+            abstract class Book {}
+
+            abstract class Memoir implements Book {
+              void intrigue();
+            }
+
+            abstract class Novel implements Book {
+              void enjoy();
+            }
+
+            void test<T extends Book>(T book) {
+              (book as Novel).enjoy();
+              (book as Memoir).intrigue();
+              lookUp(book as Memoir);
+            }
+
+            void lookUp(Memoir memoir) {}
+            """
+        )
+    }
+
+    @Test
+    fun `function with multiple type parameter bounds both of which are nullable`() = assertCompile {
+        kotlin(
+            """
+            interface Memoir {
+                fun intrigue()
+            }
+
+            interface Novel {
+                fun enjoy()
+            }
+
+            fun <T> test(book: T) where T : Memoir?, T : Novel? {
+                book?.enjoy()
+                book?.intrigue()
+                lookUp(book)
+            }
+
+            fun lookUp(memoir: Memoir?) {}
+            """
+        )
+
+        dart(
+            """
+            abstract class Memoir {
+              void intrigue();
+            }
+
+            abstract class Novel {
+              void enjoy();
+            }
+
+            void test<T>(T? book) {
+              (book as Novel?)?.enjoy();
+              (book as Memoir?)?.intrigue();
+              lookUp(book as Memoir?);
+            }
+
+            void lookUp(Memoir? memoir) {}
+            """
+        )
+    }
+
+    @Test
+    fun `function with multiple type parameter bounds with common super type both of which are nullable`() =
+        assertCompile {
+            kotlin(
+                """
+                interface Book
+
+                interface Memoir : Book {
+                    fun intrigue()
+                }
+
+                interface Novel : Book {
+                    fun enjoy()
+                }
+
+                fun <T> test(book: T) where T : Memoir?, T : Novel? {
+                    book?.enjoy()
+                    book?.intrigue()
+                    lookUp(book)
+                }
+
+                fun lookUp(memoir: Memoir?) {}
+                """
+            )
+
+            dart(
+                """
+                abstract class Book {}
+
+                abstract class Memoir implements Book {
+                  void intrigue();
+                }
+
+                abstract class Novel implements Book {
+                  void enjoy();
+                }
+
+                void test<T extends Book?>(T? book) {
+                  (book as Novel?)?.enjoy();
+                  (book as Memoir?)?.intrigue();
+                  lookUp(book as Memoir?);
+                }
+
+                void lookUp(Memoir? memoir) {}
+                """
+            )
+        }
 }

@@ -103,7 +103,7 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
             }?.filterNotNull() ?: emptyList()
 
             DartConstructorDeclaration(
-                returnType = irConstructor.parentAsClass.defaultType.toDart(context).let {
+                returnType = irConstructor.parentAsClass.defaultType.accept(context).let {
                     it as DartNamedType
                     // Type arguments are cleared, they're not allowed in constructors.
                     it.copy(typeArguments = DartTypeArgumentList())
@@ -126,7 +126,7 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
 
     override fun visitField(irField: IrField, context: DartTransformContext): DartClassMember {
         val fieldName = irField.dartName
-        val fieldType = irField.type.toDart(context)
+        val fieldType = irField.type.accept(context)
 
         val irProperty = irField.correspondingProperty
 

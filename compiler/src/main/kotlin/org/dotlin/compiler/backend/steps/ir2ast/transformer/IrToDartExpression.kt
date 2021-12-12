@@ -65,13 +65,8 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         val left by lazy { optionalLeft!! }
         val right by lazy { irRight.accept(context) }
 
-        fun parenthesize(exp: DartExpression) = when (exp) {
-            is DartConditionalExpression, is DartAsExpression -> exp.parenthesize()
-            else -> exp
-        }
-
-        val infixLeft by lazy { parenthesize(left) }
-        val infixRight by lazy { parenthesize(right) }
+        val infixLeft by lazy { left.possiblyParenthesize() }
+        val infixRight by lazy { right.possiblyParenthesize() }
 
         fun methodInvocation(methodName: DartSimpleIdentifier): DartMethodInvocation {
             return DartMethodInvocation(
@@ -119,7 +114,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                 val (actualLeft, actualRight) = if (irCallLike.valueArgumentsCount == 1) {
                     infixLeft to infixRight
                 } else {
-                    irCallLike.valueArguments.map { parenthesize(it.accept(context)) }.toPair()
+                    irCallLike.valueArguments.map { it.accept(context).possiblyParenthesize() }.toPair()
                 }
 
                 return DartComparisonExpression(
@@ -136,8 +131,8 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
             }
             IrStatementOrigin.EQEQ ->
                 DartEqualityExpression(
-                    left = parenthesize(irCallLike.getValueArgument(0)!!.accept(context)),
-                    right = parenthesize(irCallLike.getValueArgument(1)!!.accept(context)),
+                    left = irCallLike.getValueArgument(0)!!.accept(context).possiblyParenthesize(),
+                    right = irCallLike.getValueArgument(1)!!.accept(context).possiblyParenthesize(),
                 )
             else -> {
                 val hasDartGetterAnnotation = irCallLike.symbol.owner.hasDartGetterAnnotation()
@@ -158,7 +153,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
 
                         when (irCallLike) {
                             is IrConstructorCall, is IrEnumConstructorCall -> {
-                                val type = irCallLike.type.toDart(context) as DartNamedType
+                                val type = irCallLike.type.accept(context) as DartNamedType
                                 val name = irCallLike.symbol.owner.simpleDartNameOrNull
 
                                 DartInstanceCreationExpression(
@@ -178,7 +173,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                                         arguments = arguments
                                     )
                                     else -> DartMethodInvocation(
-                                        target = receiver,
+                                        target = receiver.possiblyParenthesize(),
                                         methodName = functionName as DartSimpleIdentifier,
                                         arguments = arguments
                                     )
@@ -259,7 +254,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         }
 
         return DartPropertyAccessExpression(
-            target = receiver,
+            target = receiver.possiblyParenthesize(),
             propertyName = name,
         )
     }
@@ -280,7 +275,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
 
         val assignee = if (receiver != null)
             DartPropertyAccessExpression(
-                target = receiver,
+                target = receiver.possiblyParenthesize(),
                 propertyName = name,
             )
         else
@@ -297,7 +292,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         context: DartTransformContext
     ): DartExpression {
         val expression = irTypeOperatorCall.argument.accept(context)
-        val type = irTypeOperatorCall.typeOperand.toDart(context)
+        val type = irTypeOperatorCall.typeOperand.accept(context)
 
         return when (val operator = irTypeOperatorCall.operator) {
             CAST, IMPLICIT_CAST -> DartAsExpression(expression, type)
@@ -328,7 +323,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                     }
                 }
             ),
-            typeArguments = DartTypeArgumentList(irVararg.varargElementType.toDart(context))
+            typeArguments = DartTypeArgumentList(irVararg.varargElementType.accept(context))
         )
     }
 
@@ -390,6 +385,11 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
             is IrConjunctionExpression -> DartConjunctionExpression(left, right)
             is IrDisjunctionExpression -> DartDisjunctionExpression(left, right)
         }
+    }
+
+    private fun DartExpression.possiblyParenthesize(): DartExpression = when (this) {
+        is DartConditionalExpression, is DartAsExpression -> parenthesize()
+        else -> this
     }
 }
 

@@ -21,8 +21,8 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.accept
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.simpleDartName
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.toDart
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.transformBy
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnitMember
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartClassDeclaration
@@ -76,7 +76,7 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
                     extendsClause = when {
                         !isDefaultValueClass -> irClass.superTypes
                             .firstOrNull { it.getClass()?.isClass ?: false && !it.isAny() }
-                            ?.toDart(context)
+                            ?.accept(context)
                             ?.let { DartExtendsClause(it as DartNamedType) }
                         else -> null
                     },
@@ -89,7 +89,7 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
                                 else -> it
                             }
                         }
-                        .map { it.toDart(context) as DartNamedType }
+                        .map { it.accept(context) as DartNamedType }
                         .let {
                             when {
                                 it.isNotEmpty() -> DartImplementsClause(it)
@@ -149,7 +149,7 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
                     else -> null
                 }
             }.first()
-            .toDart(context)
+            .accept(context)
 
         return DartExtensionDeclaration(
             name = irClass.simpleDartName,

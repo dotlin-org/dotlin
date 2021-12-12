@@ -41,7 +41,7 @@ fun <N : DartAstNode> IrFunction.transformBy(
     return block(
         DartFunctionDeclarationDefaults(
             name = simpleDartNameOrNull,
-            returnType = returnType.toDart(context),
+            returnType = returnType.accept(context),
             typeParameters = typeParameters.accept(context),
             parameters = valueParameters.accept(context),
             annotations = if (isOverride) listOf(DartAnnotation.OVERRIDE) else listOf(),

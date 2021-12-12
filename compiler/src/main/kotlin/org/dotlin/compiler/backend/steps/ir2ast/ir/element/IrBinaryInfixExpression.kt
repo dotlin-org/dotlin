@@ -19,23 +19,24 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.ir.element
 
-import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementTransformerVoid
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 
-sealed class IrBinaryInfixExpression(override var type: IrType) : IrExpression() {
+sealed class IrBinaryInfixExpression(override var type: IrType) : IrCustomExpression() {
     abstract val left: IrExpression
     abstract val right: IrExpression
-
-    override val endOffset = UNDEFINED_OFFSET
-    override val startOffset = UNDEFINED_OFFSET
-
-    override fun <R, D> accept(visitor: IrElementVisitor<R, D>, data: D) = visitor.visitExpression(this, data)
 
     override fun <D> acceptChildren(visitor: IrElementVisitor<Unit, D>, data: D) {
         left.accept(visitor, data)
         right.accept(visitor, data)
+    }
+
+    override fun <D> transformChildren(transformer: IrElementTransformer<D>, data: D) {
+        left.transform(transformer, data)
+        right.transform(transformer, data)
     }
 }
 
@@ -43,10 +44,14 @@ class IrConjunctionExpression(
     override val left: IrExpression,
     override val right: IrExpression,
     override var type: IrType,
-) : IrBinaryInfixExpression(type)
+) : IrBinaryInfixExpression(type) {
+    override fun transform(transformer: IrCustomElementTransformerVoid) = transformer.visitConjunctionExpression(this)
+}
 
 class IrDisjunctionExpression(
     override val left: IrExpression,
     override val right: IrExpression,
     override var type: IrType,
-) : IrBinaryInfixExpression(type)
+) : IrBinaryInfixExpression(type) {
+    override fun transform(transformer: IrCustomElementTransformerVoid) = transformer.visitDisjunctionExpression(this)
+}

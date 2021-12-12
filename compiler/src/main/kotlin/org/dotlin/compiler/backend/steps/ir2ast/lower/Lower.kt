@@ -56,6 +56,7 @@ private val lowerings = listOf(
     ::UnitReturnsLowering,
     ::SafeCallsLowering,
     ::InitBlocksLowering,
+    ::MultipleTypeParametersLowering,
     ::PrivateNamesLowering,
 )
 

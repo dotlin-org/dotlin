@@ -79,10 +79,18 @@ abstract class IrCustomElementTransformerVoid : IrElementTransformerVoid(), IrCu
         superVisitBody = { super<IrElementTransformerVoid>.visitBody(it) }
     )
 
-    override fun visitAnnotatedExpression(expression: IrAnnotatedExpression) = expression
-    override fun visitNullAwareExpression(expression: IrNullAwareExpression) = expression
-    override fun visitConjunctionExpression(expression: IrConjunctionExpression) = expression
-    override fun visitDisjunctionExpression(expression: IrDisjunctionExpression) = expression
+    override fun visitAnnotatedExpression(expression: IrAnnotatedExpression) =
+        expression.transformChildrenVoid().let { expression }
+
+    override fun visitNullAwareExpression(expression: IrNullAwareExpression) =
+        expression.transformChildrenVoid().let { expression }
+
+    override fun visitConjunctionExpression(expression: IrConjunctionExpression) =
+        expression.transformChildrenVoid().let { expression }
+
+    override fun visitDisjunctionExpression(expression: IrDisjunctionExpression) =
+        expression.transformChildrenVoid().let { expression }
+
     override fun visitExpressionBodyWithOrigin(body: IrExpressionBodyWithOrigin): IrExpressionBodyWithOrigin {
         body.transformChildrenVoid()
         return body
