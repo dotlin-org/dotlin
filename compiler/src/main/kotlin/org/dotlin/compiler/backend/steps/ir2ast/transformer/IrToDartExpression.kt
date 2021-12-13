@@ -243,16 +243,9 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         return irGetValue.symbol.owner.dartName
     }
 
-    override fun visitGetEnumValue(irGetEnumValue: IrGetEnumValue, data: DartTransformContext) =
-        irGetEnumValue.symbol.owner.dartName
-
     override fun visitGetField(irGetField: IrGetField, context: DartTransformContext): DartExpression {
-        val receiver = irGetField.receiver?.accept(context)
+        val receiver = irGetField.receiver?.accept(context) ?: irGetField.type.owner.dartName
         val name = irGetField.symbol.owner.relevantDartName
-
-        if (receiver == null) {
-            return name
-        }
 
         return DartPropertyAccessExpression(
             target = receiver.possiblyParenthesize(),
