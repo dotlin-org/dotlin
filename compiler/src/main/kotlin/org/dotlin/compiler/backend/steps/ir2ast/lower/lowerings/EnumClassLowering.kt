@@ -37,7 +37,7 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.Name
 
 @Suppress("UnnecessaryVariable")
-class EnumLowering(private val context: DartLoweringContext) : IrDeclarationTransformer {
+class EnumClassLowering(private val context: DartLoweringContext) : IrDeclarationTransformer {
     override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrClass || !declaration.isEnumClass) return noChange()
 
