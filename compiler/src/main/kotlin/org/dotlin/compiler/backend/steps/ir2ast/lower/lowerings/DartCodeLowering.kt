@@ -36,7 +36,10 @@ class DartCodeLowering(private val context: DartLoweringContext) : IrExpressionT
         val code = (expression.valueArguments[0] as IrConst<*>).value as String
 
         return replaceWith(
-            IrDartCodeExpression(code, type = context.dynamicType)
+            IrDartCodeExpression(
+                code.trimIndent(),
+                type = context.dynamicType
+            )
         )
     }
 }

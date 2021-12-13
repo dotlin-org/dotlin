@@ -467,4 +467,34 @@ class Dotlin : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `dart() as body`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                dart(
+                    ${"\"\"\""}
+                    final x = [0, 1, 2];
+                    for (int n in x) {
+                      print(n);
+                    }
+                    ${"\"\"\""}
+                )
+            }
+            """
+        )
+
+        dart(
+            """
+            void main() {
+              final x = [0, 1, 2];
+              for (int n in x) {
+                print(n);
+              }
+              ;
+            }
+            """
+        )
+    }
 }
