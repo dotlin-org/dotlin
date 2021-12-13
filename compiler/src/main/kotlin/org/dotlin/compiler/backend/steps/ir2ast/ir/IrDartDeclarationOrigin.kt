@@ -67,5 +67,12 @@ sealed class IrDartDeclarationOrigin(private val name: String) : IrDeclarationOr
      */
     object FACTORY_REDIRECT_ACTUAL_PARAM : IrDartDeclarationOrigin("FACTORY_REDIRECT_ACTUAL_PARAM")
 
+    /**
+     * Used by the `Comparable` lowerings. A temporary `compareTo` extension to `kotlin.Comparable` is added so that
+     * the [OperatorsLowering] generates the correct Dart operators. Then this `compareTo` extension is removed again,
+     * since `compareTo` is already defined in Dart's `Comparable`.
+     */
+    object COMPARABLE_TEMPORARY_COMPARE_TO : IrDartDeclarationOrigin("COMPARABLE_TEMPORARY_COMPARE_TO")
+
     override fun toString() = name
 }

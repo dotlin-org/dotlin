@@ -76,6 +76,7 @@ class OperatorsLowering(private val context: DartLoweringContext) : IrDeclaratio
                         name = Name.identifier(operatorIdentifier)
                         isOperator = true
                         returnType = context.irBuiltIns.booleanType
+                        origin = operatorOrigin
                     }.apply {
                         val intClassifier = context.irBuiltIns.intType.classifierOrFail
                         val (operatorStatementOrigin, operatorSymbol) = context.irBuiltIns.run {
