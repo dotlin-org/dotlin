@@ -32,6 +32,7 @@ import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrEnumConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.util.isAnnotationClass
 import org.jetbrains.kotlin.ir.util.isEnumClass
 import org.jetbrains.kotlin.ir.util.parentAsClass
 
@@ -39,6 +40,8 @@ fun IrDeclaration.isDartConst(): Boolean = when (this) {
     is IrConstructor -> when {
         // Enums always get const constructors.
         parentAsClass.isEnumClass -> true
+        // Annotations always get const constructors.
+        parentAsClass.isAnnotationClass -> true
         // The constructor of _$DefaultMarker is always const.
         origin == IrDartDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE -> true
         else -> hasAnnotation(DotlinAnnotations.dartConst)
