@@ -22,24 +22,22 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.owner
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.jetbrains.kotlin.backend.common.ir.copyToWithoutSuperTypes
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartNameAsSimple
 import org.jetbrains.kotlin.backend.common.ir.copyTypeParameters
-import org.jetbrains.kotlin.backend.common.ir.copyTypeParametersFrom
 import org.jetbrains.kotlin.backend.common.ir.createParameterDeclarations
-import org.jetbrains.kotlin.backend.jvm.codegen.anyTypeArgument
 import org.jetbrains.kotlin.ir.builders.declarations.buildClass
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.types.IrSimpleType
-import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.defaultType
-import org.jetbrains.kotlin.ir.types.typeOrNull
+import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.isGetter
 import org.jetbrains.kotlin.ir.util.isSetter
+import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.renderer.render
 
 class ExtensionsLowering(private val context: DartLoweringContext) : IrDeclarationTransformer {
-    private val extensionContainers = mutableMapOf<IrType, IrClass>()
+    private val extensionContainers = mutableMapOf<String, IrClass>()
 
     override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         val extensionReceiver = when (declaration) {
@@ -67,11 +65,15 @@ class ExtensionsLowering(private val context: DartLoweringContext) : IrDeclarati
             declaration.typeParameters -= receiverTypeParameters
         }
 
+        val extensionContainerName = extensionReceiver.type.getExtensionContainerName(
+            currentFile = declaration.file,
+            hasExtensionTypeArguments = receiverTypeParameters.isNotEmpty()
+        )
 
-        val extensionContainer = extensionContainers.getOrPut(extensionReceiver.type) {
+        val extensionContainer = extensionContainers.getOrPut(extensionContainerName) {
             context.irFactory.buildClass {
                 origin = IrDartDeclarationOrigin.EXTENSION
-                name = Name.identifier("$${extensionReceiver.type.owner.name.identifier}Ext")
+                name = Name.identifier(extensionContainerName)
             }.apply {
                 copyTypeParameters(receiverTypeParameters)
 
@@ -87,4 +89,27 @@ class ExtensionsLowering(private val context: DartLoweringContext) : IrDeclarati
 
         return just { remove() }
     }
+
+    private fun IrType.getExtensionContainerName(currentFile: IrFile, hasExtensionTypeArguments: Boolean): String {
+        val owner = classOrNull!!.owner
+        val prefix = '$'
+        val packagePrefix = when {
+            owner.file != currentFile -> owner.file.fqName.pathSegments()
+                .map { it.identifier }
+                .joinToString { it.titlecase() }
+            else -> ""
+        }
+        val className = owner.dartNameAsSimple
+        val typeArguments = when {
+            !hasExtensionTypeArguments && this is IrSimpleType -> arguments
+                .mapNotNull { it.typeOrNull?.classOrNull?.owner?.dartNameAsSimple?.value }
+                .joinToString { it.titlecase() }
+            else -> ""
+        }
+        val suffix = "Extensions"
+
+        return "$prefix$packagePrefix$className$typeArguments$suffix"
+    }
+
+    private fun String.titlecase() = this[0].uppercaseChar() + drop(1)
 }
