@@ -27,9 +27,6 @@ import org.junit.jupiter.api.Test
 @DisplayName("Compile: Extension")
 class Extension : BaseTest {
 
-    @Suppress("PropertyName")
-    val TestExt = "\$TestExt"
-
     @Test
     fun extension() = assertCompile {
         kotlin(
@@ -43,8 +40,8 @@ class Extension : BaseTest {
         dart(
             """
             class Test {}
-            
-            extension $TestExt on Test {
+
+            extension ${'$'}TestExtensions on Test {
               void doIt() {}
             }
             """
@@ -64,8 +61,8 @@ class Extension : BaseTest {
         dart(
             """
             class Test {}
-            
-            extension $TestExt on Test {
+
+            extension ${'$'}TestExtensions on Test {
               int get number {
                 return 3;
               }
@@ -90,7 +87,7 @@ class Extension : BaseTest {
             """
             class Test {}
 
-            extension $TestExt on Test {
+            extension ${'$'}TestExtensions on Test {
               int get number {
                 return 3;
               }
@@ -115,8 +112,59 @@ class Extension : BaseTest {
             """
             class Test<T> {}
 
-            extension $TestExt<T> on Test<T> {
+            extension ${'$'}TestExtensions<T> on Test<T> {
               void doIt() {}
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `two extensions on type with type parameter`() = assertCompile {
+        kotlin(
+            """
+            class Test<T>
+
+            fun <T> Test<T>.doIt() {}
+
+            fun <T> Test<T>.doItAgain() {}
+            """
+        )
+
+        dart(
+            """
+            class Test<T> {}
+
+            extension ${'$'}TestExtensions<T> on Test<T> {
+              void doIt() {}
+              void doItAgain() {}
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `two extensions on type with type parameter with different type arguments`() = assertCompile {
+        kotlin(
+            """
+            class Test<T>
+
+            fun <T> Test<T>.doIt() {}
+
+            fun Test<Int>.doItAgain() {}
+            """
+        )
+
+        dart(
+            """
+            class Test<T> {}
+
+            extension ${'$'}TestExtensions<T> on Test<T> {
+              void doIt() {}
+            }
+
+            extension ${'$'}TestIntExtensions on Test<int> {
+              void doItAgain() {}
             }
             """
         )
@@ -136,8 +184,25 @@ class Extension : BaseTest {
             """
             class Test<T> {}
 
-            extension $TestExt<A> on Test<A> {
+            extension ${'$'}TestExtensions<A> on Test<A> {
               void doIt<B>() {}
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `extension on type from other file`() = assertCompile {
+        kotlin(
+            """
+            fun String.titlecase() {}
+            """
+        )
+
+        dart(
+            """
+            extension ${'$'}KotlinStringExtensions on String {
+              void titlecase() {}
             }
             """
         )
