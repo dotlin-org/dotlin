@@ -21,6 +21,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower
 
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.Comparable
+import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.EnumLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.StringLowering
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
@@ -31,11 +32,12 @@ private val lowerings = listOf(
     Comparable::PreOperatorsLowering,
     ::DartBuiltInImportsLowering,
     ::DartBuiltInLowering,
+    ::EnumLowering,
     ::IdentityChecksLowering,
     ::AnnotatedExpressionsLowering,
     ::ObjectLowering,
     ::NestedClassLowering,
-    ::EnumLowering,
+    ::EnumClassLowering,
     ::StringLowering,
     ::ConjunctionsDisjunctionsLowering,
     ::ComplexParametersLowering,
