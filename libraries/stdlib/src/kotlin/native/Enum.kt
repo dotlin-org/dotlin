@@ -50,18 +50,4 @@ abstract class Enum<E : Enum<E>> @DartConst constructor(
 
     override final fun hashCode(): Int
     override fun toString() = name
-
-    /**
-     * Returns an array containing the constants of this enum type, in the order they're declared.
-     * This method may be used to iterate over the constants.
-     * @values
-     */
-    open fun values(): Array<E>
-
-    /**
-     * Returns the enum constant of this type with the specified name. The string must match exactly an identifier used to declare an enum constant in this type. (Extraneous whitespace characters are not permitted.)
-     * @throws IllegalArgumentException if this enum type has no constant with the specified name
-     * @valueOf
-     */
-    open fun valueOf(name: String): E
 }

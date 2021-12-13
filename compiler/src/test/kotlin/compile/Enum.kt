@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
-@Disabled
 @DisplayName("Compile: Enum")
 class Enum : BaseTest {
     @Test
@@ -41,13 +40,23 @@ class Enum : BaseTest {
 
         dart(
             """
-            class Test extends ${'$'}Enum {
-              const Test._(this.ordinal) : super();
-              
-              final int ordinal;
-              
-              static const ALPHA = Test._(0);
-              static const BETA = Test._(1);
+            import 'dart:core' hide Enum, List;
+            import 'dart:core' as core;
+
+            class Test extends Enum<Test> {
+              const Test._(
+                String name,
+                int ordinal,
+              ) : super(name, ordinal);
+              static const Test ALPHA = Test._('ALPHA', 0);
+              static const Test BETA = Test._('BETA', 1);
+              static core.List<Test> values() {
+                return <Test>[Test.ALPHA, Test.BETA];
+              }
+
+              static Test valueOf(String value) {
+                return values().firstWhere((v) => v.name == value);
+              }
             }
             """
         )
@@ -66,13 +75,25 @@ class Enum : BaseTest {
 
         dart(
             """
-            class Test extends ${'$'}Enum {
-              const Test._(this.ordinal) : super();
-              
-              final int ordinal;
-              
-              static const ALPHA = Test._(0);
-              static const BETA = Test._(1);
+            import 'dart:core' hide Enum, List;
+            import 'dart:core' as core;
+
+            class Test extends Enum<Test> {
+              const Test._(
+                String name,
+                int ordinal,
+                this.lowercase,
+              ) : super(name, ordinal);
+              final String lowercase;
+              static const Test ALPHA = Test._('ALPHA', 0, 'α');
+              static const Test BETA = Test._('BETA', 1, 'β');
+              static core.List<Test> values() {
+                return <Test>[Test.ALPHA, Test.BETA];
+              }
+
+              static Test valueOf(String value) {
+                return values().firstWhere((v) => v.name == value);
+              }
             }
             """
         )
@@ -91,13 +112,70 @@ class Enum : BaseTest {
 
         dart(
             """
-            class Test extends ${'$'}Enum {
-              const Test._(this.ordinal) : super();
-              
-              final int ordinal;
-              
-              static const ALPHA = Test._(0);
-              static const BETA = Test._(1);
+            import 'dart:core' hide Enum, List;
+            import 'dart:core' as core;
+
+            class Test extends Enum<Test> {
+              const Test._(
+                String name,
+                int ordinal,
+                this.lowercase,
+                this.uppercase,
+              ) : super(name, ordinal);
+              final String lowercase;
+              final String uppercase;
+              static const Test ALPHA = Test._('ALPHA', 0, 'α', 'Α');
+              static const Test BETA = Test._('BETA', 1, 'β', 'Β');
+              static core.List<Test> values() {
+                return <Test>[Test.ALPHA, Test.BETA];
+              }
+
+              static Test valueOf(String value) {
+                return values().firstWhere((v) => v.name == value);
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `get enum value`() = assertCompile {
+        kotlin(
+            """
+            enum class Test {
+                ALPHA,
+                BETA,
+            }
+
+            fun main() {
+                Test.ALPHA
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'dart:core' hide Enum, List;
+            import 'dart:core' as core;
+
+            class Test extends Enum<Test> {
+              const Test._(
+                String name,
+                int ordinal,
+              ) : super(name, ordinal);
+              static const Test ALPHA = Test._('ALPHA', 0);
+              static const Test BETA = Test._('BETA', 1);
+              static core.List<Test> values() {
+                return <Test>[Test.ALPHA, Test.BETA];
+              }
+
+              static Test valueOf(String value) {
+                return values().firstWhere((v) => v.name == value);
+              }
+            }
+
+            void main() {
+              Test.ALPHA;
             }
             """
         )

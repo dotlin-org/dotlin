@@ -20,7 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
-import org.dotlin.compiler.backend.steps.ir2ast.ir.irCall
+import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrDartCodeExpression
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.dotlin.compiler.backend.util.replace
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -35,6 +35,25 @@ import org.jetbrains.kotlin.ir.interpreter.toIrConst
 import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.Name
+
+// TODO: Use
+private object Documentation {
+    const val VALUES = """
+    /**
+     * Returns an array containing the constants of this enum type, in the order they're declared.
+     * This method may be used to iterate over the constants.
+     * @values
+     */
+    """
+
+    const val VALUE_OF = """
+    /**
+     * Returns the enum constant of this type with the specified name. The string must match exactly an identifier used to declare an enum constant in this type. (Extraneous whitespace characters are not permitted.)
+     * @throws IllegalArgumentException if this enum type has no constant with the specified name
+     * @valueOf
+     */
+    """
+}
 
 @Suppress("UnnecessaryVariable")
 class EnumClassLowering(private val context: DartLoweringContext) : IrDeclarationTransformer {
@@ -145,9 +164,6 @@ class EnumClassLowering(private val context: DartLoweringContext) : IrDeclaratio
                 }
             }
 
-
-        // TODO: Body of valueOf & values
-
         // compareTo will be defined in Enum<T> itself, mark as fake override.
         enum.declarations.apply {
             methodWithName("compareTo").let { old ->
@@ -158,34 +174,41 @@ class EnumClassLowering(private val context: DartLoweringContext) : IrDeclaratio
                 replace(old, new)
             }
 
-            methodWithName("values").let { old ->
-                val new = old.deepCopyWith {
-                    isFakeOverride = false
-                }.apply {
-                    body = IrBlockBodyImpl(
-                        UNDEFINED_OFFSET, UNDEFINED_OFFSET,
-                        statements = listOf(
-                            context.buildStatement(symbol) {
-                                irReturn(
-                                    irVararg(
-                                        enum.defaultType,
-                                        entriesToFields.values.map {
-                                            irGetField(
-                                                receiver = null,
-                                                field = it,
-                                            )
-                                        }
-                                    )
+            methodWithName("values").apply {
+                body = IrBlockBodyImpl(
+                    UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+                    statements = listOf(
+                        context.buildStatement(symbol) {
+                            irReturn(
+                                irVararg(
+                                    enum.defaultType,
+                                    entriesToFields.values.map {
+                                        irGetField(
+                                            receiver = null,
+                                            field = it,
+                                        )
+                                    }
                                 )
-                            }
-                        )
+                            )
+                        }
                     )
-                }
-
-                replace(old, new)
+                )
             }
 
-            removeIf { it.origin == IrDeclarationOrigin.ENUM_CLASS_SPECIAL_MEMBER }
+            methodWithName("valueOf").apply {
+                body = IrBlockBodyImpl(
+                    UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+                    statements = listOf(
+                        IrDartCodeExpression(
+                            code =
+                            """
+                            return values().firstWhere((v) => v.name == value)
+                            """.trimIndent(),
+                            type = context.dynamicType
+                        )
+                    )
+                )
+            }
         }
 
         return noChange()
