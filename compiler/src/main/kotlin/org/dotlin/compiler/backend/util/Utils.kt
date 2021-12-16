@@ -31,3 +31,5 @@ fun <T> Iterable<T>.toPair(): Pair<T, T> {
 
     return first() to last()
 }
+
+fun String.sentenceCase() = this[0].uppercaseChar() + drop(1)
