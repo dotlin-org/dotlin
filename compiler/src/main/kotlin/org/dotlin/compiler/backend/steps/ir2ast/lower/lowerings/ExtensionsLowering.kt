@@ -20,21 +20,21 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
-import org.dotlin.compiler.backend.steps.ir2ast.ir.owner
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartNameAsSimple
+import org.dotlin.compiler.backend.util.sentenceCase
 import org.jetbrains.kotlin.backend.common.ir.copyTypeParameters
 import org.jetbrains.kotlin.backend.common.ir.createParameterDeclarations
 import org.jetbrains.kotlin.ir.builders.declarations.buildClass
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.types.*
+import org.jetbrains.kotlin.ir.types.IrSimpleType
+import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.classOrNull
+import org.jetbrains.kotlin.ir.types.typeOrNull
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.isGetter
 import org.jetbrains.kotlin.ir.util.isSetter
-import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.renderer.render
 
 class ExtensionsLowering(private val context: DartLoweringContext) : IrDeclarationTransformer {
     private val extensionContainers = mutableMapOf<String, IrClass>()
@@ -96,20 +96,18 @@ class ExtensionsLowering(private val context: DartLoweringContext) : IrDeclarati
         val packagePrefix = when {
             owner.file != currentFile -> owner.file.fqName.pathSegments()
                 .map { it.identifier }
-                .joinToString { it.titlecase() }
+                .joinToString { it.sentenceCase() }
             else -> ""
         }
         val className = owner.dartNameAsSimple
         val typeArguments = when {
             !hasExtensionTypeArguments && this is IrSimpleType -> arguments
                 .mapNotNull { it.typeOrNull?.classOrNull?.owner?.dartNameAsSimple?.value }
-                .joinToString { it.titlecase() }
+                .joinToString { it.sentenceCase() }
             else -> ""
         }
         val suffix = "Extensions"
 
         return "$prefix$packagePrefix$className$typeArguments$suffix"
     }
-
-    private fun String.titlecase() = this[0].uppercaseChar() + drop(1)
 }

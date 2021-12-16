@@ -24,6 +24,7 @@ import DefaultValue
 import assertCompile
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 @DisplayName("Compile: Function")
@@ -698,4 +699,422 @@ class Function : BaseTest {
                 """
             )
         }
+
+    @Nested
+    inner class Overloading : BaseTest {
+        @Test
+        fun `function with overload`() = assertCompile {
+            kotlin(
+                """
+                fun giveCookie() {}
+
+                fun giveCookie(message: String) {}
+                """
+            )
+
+            dart(
+                """
+                void giveCookie() {}
+                void giveCookieWithMessage(String message) {}
+                """
+            )
+        }
+
+        @Test
+        fun `function with overload with @DartName`() = assertCompile {
+            kotlin(
+                """
+                fun giveCookie() {}
+
+                @DartName("giveCookieWhileSaying")
+                fun giveCookie(message: String) {}
+                """
+            )
+
+            dart(
+                """
+                void giveCookie() {}
+                void giveCookieWhileSaying(String message) {}
+                """
+            )
+        }
+
+        @Test
+        fun `function with two overloads`() = assertCompile {
+            kotlin(
+                """
+                fun giveCookie() {}
+
+                fun giveCookie(message: String) {}
+
+                fun giveCookie(message: String, wrapping: String) {}
+                """
+            )
+
+            dart(
+                """
+                void giveCookie() {}
+                void giveCookieWithMessage(String message) {}
+                void giveCookieWithMessageAndWrapping(
+                  String message,
+                  String wrapping,
+                ) {}
+                """
+            )
+        }
+
+        @Test
+        fun `function with three overloads`() = assertCompile {
+            kotlin(
+                """
+                fun giveCookie() {}
+
+                fun giveCookie(message: String) {}
+
+                fun giveCookie(message: String, wrapping: String) {}
+
+                fun giveCookie(message: String, wrapping: String, extra: String) {}
+                """
+            )
+
+            dart(
+                """
+                void giveCookie() {}
+                void giveCookieWithMessage(String message) {}
+                void giveCookieWithMessageAndWrapping(
+                  String message,
+                  String wrapping,
+                ) {}
+                void giveCookieWithMessageWrappingAndExtra(
+                  String message,
+                  String wrapping,
+                  String extra,
+                ) {}
+                """
+            )
+        }
+
+        @Test
+        fun `function with overload that already has parameters`() = assertCompile {
+            kotlin(
+                """
+                fun sayHello(greeting: String) {}
+
+                fun sayHello(greeting: String, friendly: Boolean) {}
+                """
+            )
+
+            dart(
+                """
+                void sayHello(String greeting) {}
+                void sayHelloWithFriendly(
+                  String greeting,
+                  bool friendly,
+                ) {}
+                """
+            )
+        }
+
+
+        @Test
+        fun `function with overload that have same amount of parameters`() = assertCompile {
+            kotlin(
+                """
+                fun compare(a: Int, b: Int) {}
+                fun compare(that: String, other: String) {}
+                """
+            )
+
+            dart(
+                """
+                void compare(
+                  int a,
+                  int b,
+                ) {}
+                void compareWithThatAndOther(
+                  String that,
+                  String other,
+                ) {}
+                """
+            )
+        }
+
+        @Test
+        fun `function with overload that have same amount of parameters and same names`() = assertCompile {
+            kotlin(
+                """
+                fun compare(a: Int, b: Int) {}
+                fun compare(a: String, b: String) {}
+                fun compare(a: Float, b: Float) {}
+                """
+            )
+
+            dart(
+                """
+                void compare(
+                  int a,
+                  int b,
+                ) {}
+                void compareString(
+                  String a,
+                  String b,
+                ) {}
+                void compareFloat(
+                  double a,
+                  double b,
+                ) {}
+                """
+            )
+        }
+
+        @Test
+        fun `function with overload that have same amount of parameters, same names and same Dart types`() =
+            assertCompile {
+                kotlin(
+                    """
+                    fun compare(that: Int, other: Int) {}
+                    fun compare(that: Float, other: Float) {}
+                    fun compare(that: Double, other: Double) {}
+                    """
+                )
+
+                dart(
+                    """
+                    void compare(
+                      int that,
+                      int other,
+                    ) {}
+                    void compareFloat(
+                      double that,
+                      double other,
+                    ) {}
+                    void compareDouble(
+                      double that,
+                      double other,
+                    ) {}
+                    """
+                )
+        }
+
+        @Test
+        fun `function with overload that have same amount of parameters, but not the same names but same Dart types`() =
+            assertCompile {
+                kotlin(
+                    """
+                    fun compare(a: Int, b: Int) {}
+                    fun compare(that: Float, other: Float) {}
+                    fun compare(that: Double, other: Double) {}
+                    """
+                )
+
+                dart(
+                    """
+                    void compare(
+                      int a,
+                      int b,
+                    ) {}
+                    void compareWithThatAndOther(
+                      double that,
+                      double other,
+                    ) {}
+                    void compareWithThatAndOtherDouble(
+                      double that,
+                      double other,
+                    ) {}
+                    """
+                )
+            }
+
+        @Test
+        fun `function with overload that are equivalent in Dart but not in Kotlin`() = assertCompile {
+            kotlin(
+                """
+                fun compare(a: Int, b: Int) {}
+
+                fun compare(a: Long, b: Long) {}
+                """
+            )
+
+            dart(
+                """
+                void compare(
+                  int a,
+                  int b,
+                ) {}
+                void compareLong(
+                  int a,
+                  int b,
+                ) {}
+                """
+            )
+        }
+
+        @Test
+        fun `function with three overloads, two of which have similar parameters`() = assertCompile {
+            kotlin(
+                """
+                fun giveCookie() {}
+
+                fun giveCookie(message: String) {}
+
+                fun giveCookie(message: String, wrapping: String) {}
+
+                fun giveCookie(message: String, wrapping: Long) {}
+                """
+            )
+
+            dart(
+                """
+                void giveCookie() {}
+                void giveCookieWithMessage(String message) {}
+                void giveCookieWithMessageAndWrapping(
+                  String message,
+                  String wrapping,
+                ) {}
+                void giveCookieWithMessageAndWrappingLong(
+                  String message,
+                  int wrapping,
+                ) {}
+                """
+            )
+        }
+
+        @Test
+        fun `function with overload that has the same parameters but one is generic`() = assertCompile {
+            kotlin(
+                """
+                fun <T> compare(a: Int, b: Int) {}
+                fun compare(a: Int, b: Int) {}
+                """
+            )
+
+            dart(
+                """
+                void compareWithGenericT<T>(
+                  int a,
+                  int b,
+                ) {}
+                void compare(
+                  int a,
+                  int b,
+                ) {}
+                """
+            )
+        }
+
+        @Test
+        fun `function with overload that has the same parameters are generic and have same type parameter name`() =
+            assertCompile {
+                kotlin(
+                    """
+                    fun <T> compare(a: Int, b: Int) {}
+                    fun <T : String> compare(a: T, b: T) {}
+                    """
+                )
+
+                dart(
+                    """
+                    void compare<T>(
+                      int a,
+                      int b,
+                    ) {}
+                    void compareWithGenericTMustBeString<T extends String>(
+                      T a,
+                      T b,
+                    ) {}
+                    """
+                )
+            }
+
+        @Disabled // TODO: Analysis error
+        @Test
+        fun `function with overload that has the same parameters are generic and have same type parameter name but multiple bounds`() =
+            assertCompile {
+                kotlin(
+                    """
+                    interface Marker1
+                    interface Marker2
+
+                    fun <T> compare(a: Int, b: Int) {}
+                    fun <T> compare(a: T, b: T) where T : Marker1, T : Marker2 {}
+                    """
+                )
+            }
+
+        @Test
+        fun `function with overload that has the same parameters and both are generic`() = assertCompile {
+            kotlin(
+                """
+                fun <T> compare(a: T, b: Int) {}
+                fun <T, A : Int> compare(a: A, b: Int) {}
+                """
+            )
+
+            dart(
+                """
+                void compare<T>(
+                  T a,
+                  int b,
+                ) {}
+                void compareWithGenericA<T, A extends int>(
+                  A a,
+                  int b,
+                ) {}
+                """
+            )
+        }
+
+        @Test
+        fun `function with two overloads that have the same parameters and are generic`() = assertCompile {
+            kotlin(
+                """
+                fun <T, A> compare(a: T, b: Int) {}
+                fun <T, A : Int> compare(a: A, b: Int) {}
+                fun <T, A : Long> compare(a: A, b: Int) {}
+                """
+            )
+
+            dart(
+                """
+                void compare<T, A>(
+                  T a,
+                  int b,
+                ) {}
+                void compareWithGenericAMustBeInt<T, A extends int>(
+                  A a,
+                  int b,
+                ) {}
+                void compareWithGenericAMustBeLong<T, A extends int>(
+                  A a,
+                  int b,
+                ) {}
+                """
+            )
+        }
+
+        // TODO (possibly): Not ideal, but correct with the current logic.
+        @Test
+        fun `function with overload that has the same parameters are generic but has more type parameters`() =
+            assertCompile {
+                kotlin(
+                    """
+                    fun <T> compare(a: Int, b: Int) {}
+                    fun <T, I, J, K> compare(a: T, b: Int) {}
+                    """
+                )
+
+                dart(
+                    """
+                    void compare<T>(
+                      int a,
+                      int b,
+                    ) {}
+                    void compareWithA<T, I, J, K>(
+                      T a,
+                      int b,
+                    ) {}
+                    """
+                )
+            }
+    }
 }

@@ -22,39 +22,120 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer.util
 import org.dotlin.compiler.backend.dartAnnotatedName
 import org.dotlin.compiler.backend.dartImportAliasPrefix
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrivate
+import org.dotlin.compiler.backend.util.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartPrefixedIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.toDartSimpleIdentifier
 import org.jetbrains.kotlin.backend.common.lower.parents
 import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 
 private fun IrDeclarationWithName.getDartNameOrNull(allowNested: Boolean): DartIdentifier? {
     val aliasPrefix = dartImportAliasPrefix?.toDartSimpleIdentifier()
 
-    var name = dartAnnotatedName?.toDartSimpleIdentifier()
-        ?: when {
-            !name.isSpecial -> name.identifier.toDartSimpleIdentifier()
-            this is IrConstructor -> {
-                val constructors = parentClassOrNull?.declarations?.filterIsInstance<IrConstructor>() ?: emptyList()
+    val annotatedName = dartAnnotatedName?.toDartSimpleIdentifier()
 
-                when {
-                    constructors.size <= 1 -> when {
-                        // If a constructor is private with no name, we set the name to "_".
-                        isPrivate -> DartSimpleIdentifier("_")
-                        else -> null
-                    }
-                    // If have multiple constructors (and this is not the primary constructor, which by
-                    // default has no name), they're numbered in the order of appearance,
-                    // e.g. `MyClass.$constructor$0`.
-                    !isPrimary -> DartSimpleIdentifier("\$constructor$${constructors.indexOf(this)}")
+    var name = annotatedName ?: when {
+        !name.isSpecial -> name.identifier.toDartSimpleIdentifier()
+        this is IrConstructor -> {
+            val constructors = parentClassOrNull?.declarations?.filterIsInstance<IrConstructor>() ?: emptyList()
+
+            when {
+                constructors.size <= 1 -> when {
+                    // If a constructor is private with no name, we set the name to "_".
+                    isPrivate -> DartSimpleIdentifier("_")
                     else -> null
                 }
+                // If have multiple constructors (and this is not the primary constructor, which by
+                // default has no name), they're numbered in the order of appearance,
+                // e.g. `MyClass.$constructor$0`.
+                !isPrimary -> DartSimpleIdentifier("\$constructor$${constructors.indexOf(this)}")
+                else -> null
             }
-
-            else -> null
         }
+        else -> null
+    }
+
+    // Handle function overloads.
+    if (name != null && annotatedName == null && this is IrSimpleFunction && isOverload && !isRootOverload) {
+        val baseOverload = baseOverload
+        val uniqueParameters = when {
+            rootOverload != baseOverload -> uniqueValueParametersComparedTo(rootOverload)
+            else -> emptyList()
+        }
+        val uniqueTypeParameters = uniqueTypeParametersComparedTo(rootOverload)
+
+        var uniqueValueTypeSuffix = ""
+        var needsTypeParamBoundInfo = false
+
+        fun IrType?.displayName() = this?.classOrNull?.owner?.name?.toString() ?: ""
+
+        if (this != baseOverload) {
+            needsTypeParamBoundInfo = true
+
+            // Find the first unique type and use that as a suffix.
+            val ourValueTypes = valueParameters.map { it.type }.toSet()
+            val overloadValueTypes = overloads
+                .map { it.valueParameters.map { param -> param.type } }
+                .flatten()
+                .toSet()
+
+            uniqueValueTypeSuffix =
+                ourValueTypes.subtract(overloadValueTypes).firstOrNull().displayName()
+        }
+
+        fun List<*>.isLastPart(index: Int) = index == size - 1 && size != 1
+
+        val uniqueParametersPart = when {
+            uniqueParameters.isNotEmpty() -> "With" + uniqueParameters
+                .mapIndexed { index, parameter ->
+                    val part = parameter.name.toString().sentenceCase()
+
+                    when {
+                        uniqueParameters.isLastPart(index) -> "And$part"
+                        else -> part
+                    }
+                }
+                .joinToString(separator = "")
+            else -> ""
+        }
+
+        val uniqueTypeParametersPart = when {
+            uniqueParameters.isEmpty() && uniqueTypeParameters.isNotEmpty() -> "WithGeneric" + uniqueTypeParameters
+                .mapIndexed { index, parameter ->
+                    val namePart = parameter.name.toString().sentenceCase()
+                    val boundPart by lazy {
+                        parameter.superTypes.mapIndexed { index, superType ->
+                            val superTypePart = superType.displayName()
+
+                            when {
+                                parameter.superTypes.isLastPart(index) -> "And$superTypePart"
+                                else -> superTypePart
+                            }
+                        }.joinToString(separator = "")
+                    }
+
+                    val part = namePart + when {
+                        needsTypeParamBoundInfo && boundPart.isNotEmpty() -> "MustBe$boundPart"
+                        else -> ""
+                    }
+
+                    when {
+                        uniqueTypeParameters.isLastPart(index) -> "And$part"
+                        else -> part
+                    }
+                }
+                .joinToString(separator = "")
+            else -> ""
+        }
+
+        name = DartSimpleIdentifier(
+            name.value + uniqueParametersPart + uniqueTypeParametersPart + uniqueValueTypeSuffix
+        )
+    }
 
     // Nested classes, interfaces, etc.
     if (allowNested && this is IrClass && parentClassOrNull != null) {
