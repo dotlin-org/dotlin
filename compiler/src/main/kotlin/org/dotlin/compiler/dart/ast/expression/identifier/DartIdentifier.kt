@@ -27,8 +27,10 @@ import kotlin.contracts.contract
 sealed interface DartIdentifier : DartExpression {
     val value: String
 
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitIdentifier(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitIdentifier(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {}
 }
 
 @JvmInline

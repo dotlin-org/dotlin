@@ -27,6 +27,8 @@ value class DartIntegerLiteral(val value: Int) : DartLiteral {
     constructor(value: Short) : this(value.toInt())
     constructor(value: Long) : this(value.toInt())
 
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) =
-        visitor.visitIntegerLiteral(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
+        visitor.visitIntegerLiteral(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {}
 }

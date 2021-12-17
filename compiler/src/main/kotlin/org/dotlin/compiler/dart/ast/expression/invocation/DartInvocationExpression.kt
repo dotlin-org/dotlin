@@ -29,6 +29,12 @@ interface DartInvocationExpression : DartExpression {
     val arguments: DartArgumentList
     val typeArguments: DartTypeArgumentList
 
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitInvocationExpression(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitInvocationExpression(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        function.accept(visitor, data)
+        arguments.accept(visitor, data)
+        typeArguments.accept(visitor, data)
+    }
 }

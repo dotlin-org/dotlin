@@ -32,6 +32,11 @@ data class DartFieldFormalParameter(
     override val isFinal: Boolean = false,
     val type: DartTypeAnnotation,
 ) : DartNormalFormalParameter {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitFieldFormalParameter(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitFieldFormalParameter(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        identifier?.accept(visitor, data)
+        type.accept(visitor, data)
+    }
 }

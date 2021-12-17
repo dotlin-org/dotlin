@@ -20,6 +20,7 @@
 package org.dotlin.compiler.dart.ast.declaration.classormixin
 
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
+import org.dotlin.compiler.dart.ast.accept
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartClassMember
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
@@ -36,6 +37,15 @@ data class DartClassDeclaration(
     override val annotations: List<DartAnnotation> = listOf(),
     override val documentationComment: String? = null,
 ) : DartClassOrMixinDeclaration {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitClassDeclaration(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitClassDeclaration(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        name.accept(visitor, data)
+        typeParameters.accept(visitor, data)
+        extendsClause?.accept(visitor, data)
+        implementsClause?.accept(visitor, data)
+        members.accept(visitor, data)
+        annotations.accept(visitor, data)
+    }
 }

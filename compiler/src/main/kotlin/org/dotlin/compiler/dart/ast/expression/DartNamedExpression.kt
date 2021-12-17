@@ -26,6 +26,11 @@ data class DartNamedExpression(
     val label: DartLabel,
     val expression: DartExpression,
 ) : DartExpression {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitNamedExpression(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitNamedExpression(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        label.accept(visitor, data)
+        expression.accept(visitor, data)
+    }
 }

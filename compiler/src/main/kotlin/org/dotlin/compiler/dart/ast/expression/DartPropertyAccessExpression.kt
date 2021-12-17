@@ -27,8 +27,13 @@ data class DartPropertyAccessExpression(
     val propertyName: DartSimpleIdentifier,
     override val isNullAware: Boolean = false,
 ) : DartPossiblyNullAwareExpression {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitPropertyAccess(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitPropertyAccess(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        target.accept(visitor, data)
+        propertyName.accept(visitor, data)
+    }
 
     override fun asNullAware(): DartPropertyAccessExpression = copy(isNullAware = true)
 }

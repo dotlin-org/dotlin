@@ -20,6 +20,7 @@
 package org.dotlin.compiler.dart.ast.declaration.variable
 
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
+import org.dotlin.compiler.dart.ast.accept
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotatedNode
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
@@ -44,6 +45,12 @@ data class DartVariableDeclarationList(
     ) : this(variables.toList(), isConst, isFinal, isLate, type, annotations, documentationComment)
 
 
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) =
-        visitor.visitVariableDeclarationList(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
+        visitor.visitVariableDeclarationList(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        variables.accept(visitor, data)
+        type?.accept(visitor, data)
+        annotations.accept(visitor, data)
+    }
 }

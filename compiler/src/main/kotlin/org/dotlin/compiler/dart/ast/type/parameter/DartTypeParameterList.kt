@@ -21,12 +21,17 @@ package org.dotlin.compiler.dart.ast.type.parameter
 
 import org.dotlin.compiler.dart.ast.DartAstNode
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
+import org.dotlin.compiler.dart.ast.accept
 
 class DartTypeParameterList(
     private val parameters: List<DartTypeParameter> = mutableListOf(),
 ) : DartAstNode, List<DartTypeParameter> by parameters {
     constructor(vararg parameters: DartTypeParameter) : this(parameters.toList())
 
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) =
-        visitor.visitTypeParameterList(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
+        visitor.visitTypeParameterList(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        parameters.accept(visitor, data)
+    }
 }

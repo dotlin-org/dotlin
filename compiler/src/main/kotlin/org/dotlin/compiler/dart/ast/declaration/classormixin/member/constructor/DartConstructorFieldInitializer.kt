@@ -27,6 +27,11 @@ data class DartConstructorFieldInitializer(
     val fieldName: DartSimpleIdentifier,
     val expression: DartExpression,
 ) : DartConstructorInitializer {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitConstructorFieldInitializer(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitConstructorFieldInitializer(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        fieldName.accept(visitor, data)
+        expression.accept(visitor, data)
+    }
 }

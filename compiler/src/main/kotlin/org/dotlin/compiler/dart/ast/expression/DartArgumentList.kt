@@ -21,12 +21,17 @@ package org.dotlin.compiler.dart.ast.expression
 
 import org.dotlin.compiler.dart.ast.DartAstNode
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
+import org.dotlin.compiler.dart.ast.accept
 
 data class DartArgumentList(
     private val arguments: List<DartExpression> = listOf(),
 ) : DartAstNode, List<DartExpression> by arguments {
     constructor(vararg arguments: DartExpression) : this(arguments.toList())
 
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) =
-        visitor.visitArgumentList(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
+        visitor.visitArgumentList(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        arguments.accept(visitor, data)
+    }
 }

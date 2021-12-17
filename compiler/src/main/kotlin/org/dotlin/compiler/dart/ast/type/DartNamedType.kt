@@ -28,7 +28,12 @@ data class DartNamedType(
     override val isNullable: Boolean = false,
     val isDeferred: Boolean = false,
 ) : DartTypeAnnotation {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R = visitor.visitNamedType(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R = visitor.visitNamedType(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        name.accept(visitor, data)
+        typeArguments.accept(visitor, data)
+    }
 }
 
 fun DartNamedType.toNullable() = copy(isNullable = true)

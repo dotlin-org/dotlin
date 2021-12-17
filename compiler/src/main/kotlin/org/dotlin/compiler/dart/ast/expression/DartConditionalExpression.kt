@@ -26,6 +26,12 @@ data class DartConditionalExpression(
     val thenExpression: DartExpression,
     val elseExpression: DartExpression
 ) : DartExpression {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) =
-        visitor.visitConditionalExpression(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
+        visitor.visitConditionalExpression(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        condition.accept(visitor, data)
+        thenExpression.accept(visitor, data)
+        elseExpression.accept(visitor, data)
+    }
 }

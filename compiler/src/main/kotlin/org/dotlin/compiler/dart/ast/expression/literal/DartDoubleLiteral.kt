@@ -25,6 +25,8 @@ import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 value class DartDoubleLiteral(val value: Double) : DartLiteral {
     constructor(value: Float) : this(value.toDouble())
 
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) =
-        visitor.visitDoubleLiteral(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
+        visitor.visitDoubleLiteral(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {}
 }

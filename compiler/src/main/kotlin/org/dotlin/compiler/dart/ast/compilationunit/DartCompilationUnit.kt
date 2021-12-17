@@ -21,12 +21,18 @@ package org.dotlin.compiler.dart.ast.compilationunit
 
 import org.dotlin.compiler.dart.ast.DartAstNode
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
+import org.dotlin.compiler.dart.ast.accept
 import org.dotlin.compiler.dart.ast.directive.DartDirective
 
 data class DartCompilationUnit(
     val directives: List<DartDirective> = listOf(),
     val declarations: List<DartCompilationUnitMember> = listOf()
 ) : DartAstNode {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitCompilationUnit(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitCompilationUnit(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        directives.accept(visitor, data)
+        declarations.accept(visitor, data)
+    }
 }

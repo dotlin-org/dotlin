@@ -27,8 +27,13 @@ data class DartAssignmentExpression(
     val operator: DartAssignmentOperator = DartAssignmentOperator.ASSIGN,
     val right: DartExpression,
 ) : DartExpression {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) =
-        visitor.visitAssignmentExpression(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
+        visitor.visitAssignmentExpression(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        left.accept(visitor, data)
+        right.accept(visitor, data)
+    }
 }
 
 enum class DartAssignmentOperator {

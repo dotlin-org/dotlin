@@ -21,12 +21,13 @@ package org.dotlin.compiler.dart.ast.parameter
 
 import org.dotlin.compiler.dart.ast.DartAstNode
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
+import org.dotlin.compiler.dart.ast.accept
 
 /**
  * Parameters are sorted based on whether they're [DartDefaultFormalParameter] or not.
  */
 class DartFormalParameterList private constructor(
-    parameters: List<DartFormalParameter> = listOf(),
+    private val parameters: List<DartFormalParameter> = listOf(),
 ) : DartAstNode, List<DartFormalParameter> by parameters {
 
     companion object {
@@ -35,6 +36,10 @@ class DartFormalParameterList private constructor(
             DartFormalParameterList(parameters.sortedBy { it.isDefault() })
     }
 
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) =
-        visitor.visitFormalParameterList(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
+        visitor.visitFormalParameterList(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        parameters.accept(visitor, data)
+    }
 }

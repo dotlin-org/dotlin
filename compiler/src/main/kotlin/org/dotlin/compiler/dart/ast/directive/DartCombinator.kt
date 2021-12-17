@@ -21,13 +21,18 @@ package org.dotlin.compiler.dart.ast.directive
 
 import org.dotlin.compiler.dart.ast.DartAstNode
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
+import org.dotlin.compiler.dart.ast.accept
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 
 sealed interface DartCombinator : DartAstNode {
     val keyword: String
     val names: List<DartSimpleIdentifier>
 
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) = visitor.visitCombinator(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) = visitor.visitCombinator(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        names.accept(visitor, data)
+    }
 
     companion object {
         fun fromKeyword(keyword: String, names: List<DartSimpleIdentifier>) = when (keyword) {

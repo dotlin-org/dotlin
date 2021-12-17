@@ -27,6 +27,12 @@ data class DartIfStatement(
     val thenStatement: DartStatement,
     val elseStatement: DartStatement? = null
 ) : DartStatement {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitIfStatement(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitIfStatement(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        condition.accept(visitor, data)
+        thenStatement.accept(visitor, data)
+        elseStatement?.accept(visitor, data)
+    }
 }

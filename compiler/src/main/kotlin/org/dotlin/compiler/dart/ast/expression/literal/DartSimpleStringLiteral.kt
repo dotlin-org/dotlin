@@ -27,6 +27,8 @@ data class DartSimpleStringLiteral(
     override val isMultiline: Boolean = false,
     override val isSingleQuoted: Boolean = true,
 ) : DartSingleStringLiteral {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitSimpleStringLiteral(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitSimpleStringLiteral(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {}
 }

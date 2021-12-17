@@ -22,6 +22,8 @@ package org.dotlin.compiler.dart.ast.expression.literal
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 
 object DartNullLiteral : DartLiteral {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitNullLiteral(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitNullLiteral(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {}
 }

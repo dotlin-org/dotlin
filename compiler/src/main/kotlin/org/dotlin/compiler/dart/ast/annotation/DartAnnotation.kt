@@ -36,7 +36,14 @@ data class DartAnnotation(
     val arguments: DartArgumentList? = null,
     val typeArguments: DartArgumentList? = null,
 ) : DartAstNode {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) = visitor.visitAnnotation(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) = visitor.visitAnnotation(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        name.accept(visitor, data)
+        constructorName?.accept(visitor, data)
+        arguments?.acceptChildren(visitor, data)
+        typeArguments?.acceptChildren(visitor, data)
+    }
 
     companion object {
         val OVERRIDE = DartAnnotation("override".toDartSimpleIdentifier())

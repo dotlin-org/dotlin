@@ -28,6 +28,11 @@ data class DartListLiteral(
     override val isConst: Boolean = false,
     override val typeArguments: DartTypeArgumentList
 ) : DartTypedLiteral {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) =
-        visitor.visitListLiteral(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
+        visitor.visitListLiteral(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        elements.accept(visitor, data)
+        typeArguments.accept(visitor, data)
+    }
 }

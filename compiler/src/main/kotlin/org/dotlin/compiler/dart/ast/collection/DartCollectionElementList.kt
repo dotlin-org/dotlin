@@ -21,10 +21,15 @@ package org.dotlin.compiler.dart.ast.collection
 
 import org.dotlin.compiler.dart.ast.DartAstNode
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
+import org.dotlin.compiler.dart.ast.accept
 
 data class DartCollectionElementList(
     private val elements: List<DartCollectionElement> = listOf(),
 ) : DartAstNode, List<DartCollectionElement> by elements {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) =
-        visitor.visitCollectionElementList(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
+        visitor.visitCollectionElementList(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        elements.accept(visitor, data)
+    }
 }

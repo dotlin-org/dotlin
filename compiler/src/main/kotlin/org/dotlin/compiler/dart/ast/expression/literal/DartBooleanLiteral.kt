@@ -28,6 +28,8 @@ value class DartBooleanLiteral(val value: Boolean) : DartLiteral {
         val FALSE = DartBooleanLiteral(false)
     }
 
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) =
-        visitor.visitBooleanLiteral(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
+        visitor.visitBooleanLiteral(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {}
 }

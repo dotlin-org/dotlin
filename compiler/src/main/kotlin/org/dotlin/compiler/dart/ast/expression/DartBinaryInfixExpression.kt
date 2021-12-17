@@ -26,8 +26,13 @@ sealed interface DartBinaryInfixExpression : DartExpression {
     val operator: DartBinaryInfixOperator
     val right: DartExpression
 
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) =
-        visitor.visitBinaryInfixExpression(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
+        visitor.visitBinaryInfixExpression(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        left.accept(visitor, data)
+        right.accept(visitor, data)
+    }
 }
 
 @JvmInline

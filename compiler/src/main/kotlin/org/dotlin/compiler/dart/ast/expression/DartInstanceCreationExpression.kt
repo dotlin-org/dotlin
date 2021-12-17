@@ -29,6 +29,12 @@ data class DartInstanceCreationExpression(
     val constructorName: DartSimpleIdentifier? = null,
     val arguments: DartArgumentList = DartArgumentList(),
 ) : DartExpression {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitInstanceCreationExpression(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitInstanceCreationExpression(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        type.accept(visitor, data)
+        constructorName?.accept(visitor, data)
+        arguments.accept(visitor, data)
+    }
 }

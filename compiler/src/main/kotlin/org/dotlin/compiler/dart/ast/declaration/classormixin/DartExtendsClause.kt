@@ -26,6 +26,10 @@ import org.dotlin.compiler.dart.ast.type.DartNamedType
 data class DartExtendsClause(
     val type: DartNamedType,
 ) : DartAstNode {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitExtendsClause(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitExtendsClause(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        type.accept(visitor, data)
+    }
 }

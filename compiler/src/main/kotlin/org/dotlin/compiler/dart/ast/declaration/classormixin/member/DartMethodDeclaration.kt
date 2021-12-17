@@ -20,6 +20,7 @@
 package org.dotlin.compiler.dart.ast.declaration.classormixin.member
 
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
+import org.dotlin.compiler.dart.ast.accept
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.declaration.function.DartFunctionDeclaration
 import org.dotlin.compiler.dart.ast.expression.DartFunctionExpression
@@ -38,6 +39,13 @@ class DartMethodDeclaration(
     override val annotations: List<DartAnnotation> = listOf(),
     override val documentationComment: String? = null,
 ) : DartClassMember, DartFunctionDeclaration, Cloneable {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitMethodDeclaration(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitMethodDeclaration(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        name.accept(visitor, data)
+        returnType.accept(visitor, data)
+        function.accept(visitor, data)
+        annotations.accept(visitor, data)
+    }
 }

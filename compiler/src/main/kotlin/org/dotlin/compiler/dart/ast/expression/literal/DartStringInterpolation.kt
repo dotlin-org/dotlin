@@ -21,6 +21,7 @@ package org.dotlin.compiler.dart.ast.expression.literal
 
 import org.dotlin.compiler.dart.ast.DartAstNode
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
+import org.dotlin.compiler.dart.ast.accept
 import org.dotlin.compiler.dart.ast.expression.DartExpression
 
 data class DartStringInterpolation(
@@ -29,17 +30,26 @@ data class DartStringInterpolation(
     override val isMultiline: Boolean = false,
     override val isSingleQuoted: Boolean = true,
 ) : DartSingleStringLiteral {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitStringInterpolation(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitStringInterpolation(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        elements.accept(visitor, data)
+    }
 }
 
 interface DartInterpolationElement : DartAstNode
+
 data class DartInterpolationExpression(val expression: DartExpression) : DartInterpolationElement {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitInterpolationExpression(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitInterpolationExpression(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {}
 }
 
 data class DartInterpolationString(val value: String) : DartInterpolationElement {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitInterpolationString(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitInterpolationString(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {}
 }

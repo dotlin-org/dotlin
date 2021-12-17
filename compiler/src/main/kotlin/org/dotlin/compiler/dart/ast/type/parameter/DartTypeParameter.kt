@@ -28,6 +28,11 @@ data class DartTypeParameter(
     val name: DartSimpleIdentifier,
     val bound: DartTypeAnnotation? = null
 ) : DartAstNode {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) =
-        visitor.visitTypeParameter(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
+        visitor.visitTypeParameter(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        name.accept(visitor, data)
+        bound?.accept(visitor, data)
+    }
 }

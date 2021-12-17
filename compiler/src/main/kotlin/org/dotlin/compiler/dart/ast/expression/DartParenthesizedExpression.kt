@@ -24,8 +24,12 @@ import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 data class DartParenthesizedExpression(
     val expression: DartExpression,
 ) : DartExpression {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitParenthesizedExpression(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitParenthesizedExpression(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        expression.accept(visitor, data)
+    }
 }
 
 fun DartExpression.parenthesize() = DartParenthesizedExpression(this)
