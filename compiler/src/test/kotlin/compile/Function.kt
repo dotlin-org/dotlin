@@ -32,27 +32,51 @@ class Function : BaseTest {
     @Test
     fun function() = assertCompile {
         kotlin("fun test() {}")
-        dart("void test() {}")
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void test() {}
+            """
+        )
     }
 
     @Test
     fun `private function`() = assertCompile {
         kotlin("private fun test() {}")
-        dart("void _test() {}")
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void _test() {}
+            """
+        )
     }
 
     @Test
     fun `function with single parameter`() = assertCompile {
         kotlin("fun test(arg: String) {}")
 
-        dart("void test(String arg) {}")
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void test(String arg) {}
+            """
+        )
     }
 
     @Test
     fun `function with single parameter with default value`() = assertCompile {
         kotlin("""fun test(arg: String = "test") {}""")
 
-        dart("void test({String arg = 'test'}) {}")
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void test({String arg = 'test'}) {}
+            """
+        )
     }
 
     @Test
@@ -69,6 +93,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             String returnsString() {
               return 'test';
             }
@@ -84,7 +110,13 @@ class Function : BaseTest {
     fun `function with single nullable parameter with default value`() = assertCompile {
         kotlin("fun test(arg: String? = null) {}")
 
-        dart("void test({String? arg = null}) {}")
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void test({String? arg = null}) {}
+            """
+        )
     }
 
     @Test
@@ -101,6 +133,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             String returnsString() {
               return 'test';
             }
@@ -109,8 +143,10 @@ class Function : BaseTest {
               arg = arg == const _$DefaultValue() ? returnsString() : arg as String?;
             }
             
+            @sealed
             class _$DefaultValue {
               const _$DefaultValue();
+              @nonVirtual
               dynamic noSuchMethod(Invocation invocation) {}
             }
             """
@@ -123,6 +159,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void test(
               String arg1,
               int arg2,
@@ -137,6 +175,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void test({
               String arg1 = 'test',
               int arg2 = 96,
@@ -159,6 +199,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             String returnsString() {
               return 'test';
             }
@@ -180,6 +222,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void test({
               String? arg1 = null,
               String? arg2 = null,
@@ -202,6 +246,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             String returnsString() {
               return 'test';
             }
@@ -214,8 +260,10 @@ class Function : BaseTest {
               arg2 = arg2 == const _$DefaultValue() ? returnsString() : arg2 as String?;
             }
             
+            @sealed
             class _$DefaultValue {
               const _$DefaultValue();
+              @nonVirtual
               dynamic noSuchMethod(Invocation invocation) {}
             }
             """
@@ -228,6 +276,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void test({
               int arg1 = 1,
               int? arg2 = null,
@@ -243,7 +293,13 @@ class Function : BaseTest {
     fun `function with vararg parameter`() = assertCompile {
         kotlin("fun test(vararg args: String) {}")
 
-        dart("void test(List<String> args) {}")
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void test(List<String> args) {}
+            """
+        )
     }
 
     @Disabled
@@ -261,6 +317,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void test(List<String> args) {}
             
             void main() {
@@ -285,6 +343,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void test(
               List<String> args,
               int x,
@@ -302,6 +362,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void test<T>() {}
             """
         )
@@ -313,6 +375,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void test<T0, T1>() {}
             """
         )
@@ -324,6 +388,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void test<T extends int>() {}
             """
         )
@@ -353,6 +419,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             abstract class Memoir {
               void intrigue();
             }
@@ -398,6 +466,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             abstract class Book {}
 
             abstract class Memoir implements Book {
@@ -449,6 +519,8 @@ class Function : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 abstract class Book {
                   void read();
                 }
@@ -497,6 +569,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             abstract class Memoir {
               void intrigue();
             }
@@ -543,6 +617,8 @@ class Function : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 abstract class Memoir {
                   void intrigue();
                 }
@@ -588,6 +664,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             abstract class Book {}
 
             abstract class Memoir implements Book {
@@ -633,6 +711,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             abstract class Memoir {
               void intrigue();
             }
@@ -679,6 +759,8 @@ class Function : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 abstract class Book {}
 
                 abstract class Memoir implements Book {
@@ -714,6 +796,8 @@ class Function : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 void giveCookie() {}
                 void giveCookieWithMessage(String message) {}
                 """
@@ -733,6 +817,8 @@ class Function : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 void giveCookie() {}
                 void giveCookieWhileSaying(String message) {}
                 """
@@ -753,6 +839,8 @@ class Function : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 void giveCookie() {}
                 void giveCookieWithMessage(String message) {}
                 void giveCookieWithMessageAndWrapping(
@@ -779,6 +867,8 @@ class Function : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 void giveCookie() {}
                 void giveCookieWithMessage(String message) {}
                 void giveCookieWithMessageAndWrapping(
@@ -806,6 +896,8 @@ class Function : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 void sayHello(String greeting) {}
                 void sayHelloWithFriendly(
                   String greeting,
@@ -827,6 +919,8 @@ class Function : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 void compare(
                   int a,
                   int b,
@@ -851,6 +945,8 @@ class Function : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 void compare(
                   int a,
                   int b,
@@ -880,6 +976,8 @@ class Function : BaseTest {
 
                 dart(
                     """
+                    import 'package:meta/meta.dart';
+
                     void compare(
                       int that,
                       int other,
@@ -909,6 +1007,8 @@ class Function : BaseTest {
 
                 dart(
                     """
+                    import 'package:meta/meta.dart';
+
                     void compare(
                       int a,
                       int b,
@@ -937,6 +1037,8 @@ class Function : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 void compare(
                   int a,
                   int b,
@@ -965,6 +1067,8 @@ class Function : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 void giveCookie() {}
                 void giveCookieWithMessage(String message) {}
                 void giveCookieWithMessageAndWrapping(
@@ -990,6 +1094,8 @@ class Function : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 void compareWithGenericT<T>(
                   int a,
                   int b,
@@ -1014,6 +1120,8 @@ class Function : BaseTest {
 
                 dart(
                     """
+                    import 'package:meta/meta.dart';
+
                     void compare<T>(
                       int a,
                       int b,
@@ -1052,6 +1160,8 @@ class Function : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 void compare<T>(
                   T a,
                   int b,
@@ -1076,6 +1186,8 @@ class Function : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 void compare<T, A>(
                   T a,
                   int b,
@@ -1105,6 +1217,8 @@ class Function : BaseTest {
 
                 dart(
                     """
+                    import 'package:meta/meta.dart';
+
                     void compare<T>(
                       int a,
                       int b,

@@ -38,6 +38,9 @@ class Object : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test {
               Test._() : super();
               static final Test $instance = Test._();
@@ -60,8 +63,12 @@ class Object : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test {
               Test._() : super();
+              @nonVirtual
               int compute() {
                 return 343;
               }
@@ -87,11 +94,15 @@ class Object : BaseTest {
         val companion = "\$companion"
 
         dart(
-            """ 
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test {
               static final $TestCompanion $companion = $TestCompanion.$instance;
             }
             
+            @sealed
             class $TestCompanion {
               $TestCompanion._() : super();
               static final $TestCompanion $instance = $TestCompanion._();

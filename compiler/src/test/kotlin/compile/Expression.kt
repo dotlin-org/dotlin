@@ -40,6 +40,9 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test {}
             
             void main() {
@@ -63,8 +66,12 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test {
               Test._() : super();
+              @nonVirtual
               void main() {
                 Test._();
               }
@@ -90,7 +97,11 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test {
+              @nonVirtual
               void doIt() {}
             }
             
@@ -113,6 +124,8 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void main() {
               final int x = 0 == 1 ? 0 : 1;
             }
@@ -140,6 +153,8 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             int test() {
               return 3;
             }
@@ -174,6 +189,8 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             int test() {
               return 3;
             }
@@ -209,6 +226,8 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             int test(int x) {
               return x;
             }
@@ -242,6 +261,8 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void main() {
               final int x = () {
                 return 68;
@@ -265,6 +286,8 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void main() {
               final int x = (int y) {
                 return 68 * y;
@@ -291,7 +314,11 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Gondor {
+              @nonVirtual
               void callForAid() {}
             }
             
@@ -322,12 +349,17 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Gondor {
+              @nonVirtual
               Answer? callForAid() {
                 return Answer();
               }
             }
             
+            @sealed
             class Answer {}
             
             void main() {
@@ -351,6 +383,8 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void main() {
               final String amount = 'Three';
               '${'$'}{amount} were given to the Elves, immortal, wisest and fairest of all beings.';
@@ -372,6 +406,8 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void main() {
               final bool areDwarves = true;
               '${'$'}{areDwarves ? 'Seven' : 'Three'} to the Dwarf-Lords, great miners and craftsmen of ...';
@@ -392,6 +428,8 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void main() {
               true && 2 == 0;
             }
@@ -411,6 +449,8 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void main() {
               true || 2 == 0;
             }
@@ -430,6 +470,8 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void main() {
               3 == 0 && 2 == 0 && 1 == 0;
             }
@@ -449,6 +491,8 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void main() {
               3 == 0 || 2 == 0 || 1 == 0;
             }
@@ -471,8 +515,12 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Hobbit {
               Hobbit(this.name) : super();
+              @nonVirtual
               final String name;
             }
 
@@ -497,6 +545,8 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void main() {
               9 is int;
             }
@@ -516,6 +566,8 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void main() {
               9 is! int;
             }
@@ -537,6 +589,9 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test {}
 
             void main() {

@@ -39,6 +39,9 @@ class Extension : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test {}
 
             extension ${'$'}TestExtensions on Test {
@@ -60,6 +63,9 @@ class Extension : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test {}
 
             extension ${'$'}TestExtensions on Test {
@@ -85,6 +91,9 @@ class Extension : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test {}
 
             extension ${'$'}TestExtensions on Test {
@@ -110,6 +119,9 @@ class Extension : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test<T> {}
 
             extension ${'$'}TestExtensions<T> on Test<T> {
@@ -133,6 +145,9 @@ class Extension : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test<T> {}
 
             extension ${'$'}TestExtensions<T> on Test<T> {
@@ -157,6 +172,9 @@ class Extension : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test<T> {}
 
             extension ${'$'}TestExtensions<T> on Test<T> {
@@ -182,6 +200,9 @@ class Extension : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test<T> {}
 
             extension ${'$'}TestExtensions<A> on Test<A> {
@@ -201,6 +222,8 @@ class Extension : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             extension ${'$'}KotlinStringExtensions on String {
               void titlecase() {}
             }

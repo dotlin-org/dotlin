@@ -32,14 +32,16 @@ object DartDeclarationTransformer : DartAstNodeTransformer {
         functionDeclaration: DartTopLevelFunctionDeclaration,
         context: DartGenerationContext,
     ): String {
+        val annotations = functionDeclaration.annotations.accept(context)
         val name = functionDeclaration.name.accept(context)
         val returnType = functionDeclaration.returnType.accept(context)
         val function = functionDeclaration.function.accept(context)
 
-        return "$returnType $name$function"
+        return "$annotations$returnType $name$function"
     }
 
     override fun visitClassDeclaration(classDeclaration: DartClassDeclaration, context: DartGenerationContext): String {
+        val annotations = classDeclaration.annotations.accept(context)
         val abstract = if (classDeclaration.isAbstract) "abstract " else ""
         val name = classDeclaration.name.accept(context)
 
@@ -63,30 +65,32 @@ object DartDeclarationTransformer : DartAstNodeTransformer {
             else
                 " {}"
 
-        return "${abstract}class $name$typeParameters$extends$implements$members"
+        return "$annotations${abstract}class $name$typeParameters$extends$implements$members"
     }
 
     override fun visitExtensionDeclaration(
         extensionDeclaration: DartExtensionDeclaration,
         context: DartGenerationContext
     ) = extensionDeclaration.let {
+        val annotations = it.annotations.accept(context)
         val name = if (it.name != null) it.name.accept(context) else ""
         val typeParameters = it.typeParameters.accept(context)
         val type = it.extendedType.accept(context)
 
         val members = it.members.accept(context).joinToString("", prefix = "{", postfix = "}")
 
-        "extension $name$typeParameters on $type$members"
+        "${annotations}extension $name$typeParameters on $type$members"
     }
 
     override fun visitVariableDeclaration(
         variableDeclaration: DartVariableDeclaration,
         context: DartGenerationContext,
     ) = variableDeclaration.let {
+        val annotations = it.annotations.accept(context)
         val name = it.name.accept(context)
         val expression = if (it.expression != null) " = " + it.expression.accept(context) else ""
 
-        "$name$expression"
+        "$annotations$name$expression"
     }
 
     override fun visitVariableDeclarationList(

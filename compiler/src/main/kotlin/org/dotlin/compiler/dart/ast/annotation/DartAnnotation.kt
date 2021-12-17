@@ -21,6 +21,10 @@ package org.dotlin.compiler.dart.ast.annotation
 
 import org.dotlin.compiler.dart.ast.DartAstNode
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
+import org.dotlin.compiler.dart.ast.annotation.DartAnnotation.Companion.INTERNAL
+import org.dotlin.compiler.dart.ast.annotation.DartAnnotation.Companion.NON_VIRTUAL
+import org.dotlin.compiler.dart.ast.annotation.DartAnnotation.Companion.PROTECTED
+import org.dotlin.compiler.dart.ast.annotation.DartAnnotation.Companion.SEALED
 import org.dotlin.compiler.dart.ast.expression.DartArgumentList
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
@@ -37,5 +41,13 @@ data class DartAnnotation(
     companion object {
         val OVERRIDE = DartAnnotation("override".toDartSimpleIdentifier())
         val DEPRECATED = DartAnnotation("deprecated".toDartSimpleIdentifier())
+
+        // package:meta annotations
+        val INTERNAL = DartAnnotation("internal".toDartSimpleIdentifier())
+        val PROTECTED = DartAnnotation("protected".toDartSimpleIdentifier())
+        val NON_VIRTUAL = DartAnnotation("nonVirtual".toDartSimpleIdentifier())
+        val SEALED = DartAnnotation("sealed".toDartSimpleIdentifier())
     }
 }
+
+fun DartAnnotation.isFromMetaPackage() = listOf(INTERNAL, PROTECTED, NON_VIRTUAL, SEALED).any { this == it }
