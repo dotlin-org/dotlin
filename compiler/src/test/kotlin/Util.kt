@@ -44,7 +44,6 @@ abstract class AssertCompile<I, O> : CompilerAssertion<I, O>() {
         this.dart = dart.trimIndent()
     }
 
-
     class Simple : AssertCompile<String, String>() {
         override val input: String
             get() = kotlin

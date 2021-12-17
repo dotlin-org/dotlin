@@ -21,6 +21,8 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
+import org.dotlin.compiler.backend.steps.ir2ast.ir.isDartExtension
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartAnnotations
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.simpleDartName
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.transformBy
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnitMember
@@ -56,7 +58,7 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
 
     override fun visitClass(irClass: IrClass, context: DartTransformContext): DartCompilationUnitMember {
         // Extensions are handled differently.
-        if (irClass.origin == IrDartDeclarationOrigin.EXTENSION) {
+        if (irClass.isDartExtension) {
             return visitExtension(irClass, context)
         }
 
@@ -135,7 +137,8 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
                             return@filter isFakeOverrideOfInterface(overridable)
                         }
                         .mapNotNull { it.accept(IrToDartClassMemberTransformer, context) }
-                        .toList()
+                        .toList(),
+                    annotations = irClass.dartAnnotations
                 )
             }
             ClassKind.ENUM_ENTRY -> throw UnsupportedOperationException(
@@ -159,7 +162,8 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
             name = irClass.simpleDartName,
             extendedType = type,
             typeParameters = irClass.typeParameters.accept(context),
-            members = irClass.declarations.mapNotNull { it.acceptAsClassMember(context) }
+            members = irClass.declarations.mapNotNull { it.acceptAsClassMember(context) },
+            annotations = irClass.dartAnnotations
         )
     }
 

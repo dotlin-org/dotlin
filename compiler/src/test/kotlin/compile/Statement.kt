@@ -42,6 +42,8 @@ class Statement : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void main() {
               if (0 == 1) {
                 main();
@@ -69,6 +71,8 @@ class Statement : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void main() {
               if (1 + 1 == 3) {
                 main();
@@ -95,6 +99,8 @@ class Statement : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void main() {
               if (1 + 1 == 3) {
                 main();
@@ -122,6 +128,8 @@ class Statement : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void main(int x) {
               if (1 + 1 == 3) {
                 main(2);
@@ -152,6 +160,8 @@ class Statement : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             int test(int y) {
               return y * 3;
             }

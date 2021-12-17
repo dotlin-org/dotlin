@@ -42,7 +42,9 @@ class Enum : BaseTest {
             """
             import 'dart:core' hide Enum, List;
             import 'dart:core' as core;
+            import 'package:meta/meta.dart';
 
+            @sealed
             class Test extends Enum<Test> {
               const Test._(
                 String name,
@@ -77,13 +79,16 @@ class Enum : BaseTest {
             """
             import 'dart:core' hide Enum, List;
             import 'dart:core' as core;
+            import 'package:meta/meta.dart';
 
+            @sealed
             class Test extends Enum<Test> {
               const Test._(
                 String name,
                 int ordinal,
                 this.lowercase,
               ) : super(name, ordinal);
+              @nonVirtual
               final String lowercase;
               static const Test ALPHA = Test._('ALPHA', 0, 'α');
               static const Test BETA = Test._('BETA', 1, 'β');
@@ -114,7 +119,9 @@ class Enum : BaseTest {
             """
             import 'dart:core' hide Enum, List;
             import 'dart:core' as core;
+            import 'package:meta/meta.dart';
 
+            @sealed
             class Test extends Enum<Test> {
               const Test._(
                 String name,
@@ -122,7 +129,9 @@ class Enum : BaseTest {
                 this.lowercase,
                 this.uppercase,
               ) : super(name, ordinal);
+              @nonVirtual
               final String lowercase;
+              @nonVirtual
               final String uppercase;
               static const Test ALPHA = Test._('ALPHA', 0, 'α', 'Α');
               static const Test BETA = Test._('BETA', 1, 'β', 'Β');
@@ -157,7 +166,9 @@ class Enum : BaseTest {
             """
             import 'dart:core' hide Enum, List;
             import 'dart:core' as core;
+            import 'package:meta/meta.dart';
 
+            @sealed
             class Test extends Enum<Test> {
               const Test._(
                 String name,

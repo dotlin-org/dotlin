@@ -62,27 +62,28 @@ object DartClassMemberTransformer : DartAstNodeTransformer {
     override fun visitConstructorDeclaration(
         constructorDeclaration: DartConstructorDeclaration,
         context: DartGenerationContext,
-    ): String {
+    ) = constructorDeclaration.let {
+        val annotations = it.annotations.accept(context)
         val keyword = when {
-            constructorDeclaration.isConst -> "const "
-            constructorDeclaration.isFactory -> "factory "
+            it.isConst -> "const "
+            it.isFactory -> "factory "
             else -> ""
         }
 
-        val type = constructorDeclaration.returnType.accept(context)
-        val name = constructorDeclaration.name?.accept(context)
+        val type = it.returnType.accept(context)
+        val name = it.name?.accept(context)
         val constructorName = if (name != null) "$type.$name" else type
 
-        val parameters = constructorDeclaration.function.parameters.accept(context)
-        val body = constructorDeclaration.function.body.accept(context)
+        val parameters = it.function.parameters.accept(context)
+        val body = it.function.body.accept(context)
 
-        val initializers =
-            if (constructorDeclaration.initializers.isNotEmpty())
-                " : " + constructorDeclaration.initializers.joinToString { it.accept(context) }
-            else
-                ""
+        val initializers = when {
+            it.initializers.isNotEmpty() -> " : " + it.initializers.joinToString { init -> init.accept(context) }
+            else -> ""
+        }
 
-        return "$keyword $constructorName$parameters$initializers$body"
+        "$annotations$keyword $constructorName$parameters$initializers$body"
+
     }
 
     override fun visitFieldDeclaration(fieldDeclaration: DartFieldDeclaration, context: DartGenerationContext) =

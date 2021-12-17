@@ -23,7 +23,6 @@ import org.dotlin.compiler.backend.hasDartGetterAnnotation
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.*
-import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartClassMember
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartMethodDeclaration
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.*
@@ -161,7 +160,7 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
             ),
             isStatic = irField.isStatic,
             isAbstract = isAbstract,
-            annotations = if (irField.isOverride) listOf(DartAnnotation.OVERRIDE) else emptyList()
+            annotations = irField.dartAnnotations
         )
     }
 }

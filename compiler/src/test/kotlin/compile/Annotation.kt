@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
-@DisplayName("Compile: Enum")
+@DisplayName("Compile: Annotation")
 class Annotation : BaseTest {
     @Test
     fun `annotation`() = assertCompile {
@@ -36,7 +36,10 @@ class Annotation : BaseTest {
         )
 
         dart(
-            """ 
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test implements Annotation {
               const Test();
             }

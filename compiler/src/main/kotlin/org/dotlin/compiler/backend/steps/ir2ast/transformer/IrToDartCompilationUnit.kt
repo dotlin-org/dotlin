@@ -22,7 +22,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer
 import org.dotlin.compiler.backend.DotlinAnnotations
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
-import org.dotlin.compiler.backend.util.optimizeImports
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.optimizeImports
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
 import org.dotlin.compiler.dart.ast.directive.DartHideCombinator
 import org.dotlin.compiler.dart.ast.directive.DartImportDirective
@@ -76,6 +76,12 @@ object IrToDartCompilationUnitTransformer : IrDartAstTransformer<DartCompilation
                 )
             }
             .flatten()
+            // Always import the meta package for extra annotations.
+            .plus(
+                DartImportDirective(
+                    name = DartSimpleStringLiteral("package:meta/meta.dart")
+                )
+            )
             .optimizeImports()
     )
 

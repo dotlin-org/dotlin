@@ -42,6 +42,9 @@ class Dotlin : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Dar {}
             
             void main() {
@@ -65,8 +68,12 @@ class Dotlin : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Human {
               Human.withName(this.name) : super();
+              @nonVirtual
               final String name;
             }
 
@@ -94,8 +101,12 @@ class Dotlin : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Human {
               Human(this.name) : super();
+              @nonVirtual
               final String name;
               Human.nameless() : this('');
             }
@@ -121,6 +132,9 @@ class Dotlin : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test {
               const Test() : super();
             }
@@ -146,6 +160,9 @@ class Dotlin : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test {
               const Test() : super();
             }
@@ -174,6 +191,8 @@ class Dotlin : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void main() {
               Test();
             }
@@ -201,7 +220,11 @@ class Dotlin : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Hobbit {
+              @nonVirtual
               bool get isProudfoot {
                 return true;
               }
@@ -237,12 +260,15 @@ class Dotlin : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             class Hobbit {
               bool get isProudfoot {
                 return false;
               }
             }
 
+            @sealed
             class Proudfoot extends Hobbit {
               @override
               bool get isProudfoot {
@@ -277,6 +303,7 @@ class Dotlin : BaseTest {
             """
             import 'dart:core' hide List;
             import 'dart:core' as core;
+            import 'package:meta/meta.dart';
 
             void main() {
               core.List();
@@ -315,6 +342,7 @@ class Dotlin : BaseTest {
             """
             import 'dart:core' hide List;
             import 'dart:core' as core;
+            import 'package:meta/meta.dart';
 
             void main() {
               core.List();
@@ -341,6 +369,7 @@ class Dotlin : BaseTest {
             """
             import 'dart:core' hide List;
             import 'dart:core' as core;
+            import 'package:meta/meta.dart';
 
             void test(core.List list) {}
             """
@@ -365,7 +394,9 @@ class Dotlin : BaseTest {
         dart(
             """
             import 'dart:core' hide Enum;
+            import 'package:meta/meta.dart';
 
+            @sealed
             class Enum {}
 
             void main() {
@@ -396,9 +427,12 @@ class Dotlin : BaseTest {
         dart(
             """
             import 'dart:core' hide Enum, List;
+            import 'package:meta/meta.dart';
 
+            @sealed
             class Enum {}
 
+            @sealed
             class List {}
 
             void main() {
@@ -437,9 +471,12 @@ class Dotlin : BaseTest {
         dart(
             """
             import 'dart:core' hide Something, SomethingElse;
+            import 'package:meta/meta.dart';
 
+            @sealed
             class Something {}
 
+            @sealed
             class SomethingElse {}
 
             void main() {
@@ -461,6 +498,8 @@ class Dotlin : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void main() {
               final dynamic x = [];
             }
@@ -487,6 +526,8 @@ class Dotlin : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             void main() {
               final x = [0, 1, 2];
               for (int n in x) {

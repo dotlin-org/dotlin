@@ -31,6 +31,9 @@ class Class : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test {}
             """
         )
@@ -42,7 +45,25 @@ class Class : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class _Test {}
+            """
+        )
+    }
+
+    @Test
+    fun `internal class`() = assertCompile {
+        kotlin("internal class Test")
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @internal
+            @sealed
+            class Test {}
             """
         )
     }
@@ -61,7 +82,11 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
+                  @nonVirtual
                   final int property = 96;
                 }
                 """
@@ -84,7 +109,11 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
+                  @nonVirtual
                   final int property = 96;
                 }
 
@@ -111,7 +140,11 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
+                  @nonVirtual
                   int property = 96;
                 }
 
@@ -132,8 +165,12 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
                   Test({this.property = 96}) : super();
+                  @nonVirtual
                   final int property;
                 }
                 """
@@ -154,14 +191,18 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 int returnsInt() {
                   return 343;
                 }
                 
+                @sealed
                 class Test {
                   Test({int? property = null})
                       : property = property == null ? returnsInt() : property,
                         super();
+                  @nonVirtual
                   final int property;
                 }
                 """
@@ -183,21 +224,27 @@ class Class : BaseTest {
 
                 dart(
                     """
+                    import 'package:meta/meta.dart';
+
                     int returnsInt() {
                       return 343;
                     }
                     
+                    @sealed
                     class Test {
                       Test({dynamic property = const _$DefaultValue()})
                           : property = property == const _$DefaultValue()
                                 ? returnsInt()
                                 : property as int?,
                             super();
+                      @nonVirtual
                       final int? property;
                     }
                     
+                    @sealed
                     class _$DefaultValue {
                       const _$DefaultValue();
+                      @nonVirtual
                       dynamic noSuchMethod(Invocation invocation) {}
                     }
                     """
@@ -217,8 +264,13 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
+                  @nonVirtual
                   final int property1 = 19;
+                  @nonVirtual
                   final int property2 = 96;
                 }
                 """
@@ -231,16 +283,21 @@ class Class : BaseTest {
                 """
                 class Test(val property1: Int = 19, val property2: Int = 96)
                 """
-                )
+            )
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
                   Test({
                     this.property1 = 19,
                     this.property2 = 96,
                   }) : super();
+                  @nonVirtual
                   final int property1;
+                  @nonVirtual
                   final int property2;
                 }
                 """
@@ -261,10 +318,13 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 int returnsInt() {
                   return 343;
                 }
                 
+                @sealed
                 class Test {
                   Test({
                     int? property1 = null,
@@ -272,7 +332,9 @@ class Class : BaseTest {
                   })  : property1 = property1 == null ? returnsInt() : property1,
                         property2 = property2 == null ? returnsInt() : property2,
                         super();
+                  @nonVirtual
                   final int property1;
+                  @nonVirtual
                   final int property2;
                 }
                 """
@@ -294,10 +356,13 @@ class Class : BaseTest {
 
                 dart(
                     """
+                    import 'package:meta/meta.dart';
+
                     int returnsInt() {
                       return 343;
                     }
                     
+                    @sealed
                     class Test {
                       Test({
                         dynamic property1 = const _$DefaultValue(),
@@ -309,12 +374,16 @@ class Class : BaseTest {
                                 ? returnsInt()
                                 : property2 as int?,
                             super();
+                      @nonVirtual
                       final int? property1;
+                      @nonVirtual
                       final int? property2;
                     }
                     
+                    @sealed
                     class _$DefaultValue {
                       const _$DefaultValue();
+                      @nonVirtual
                       dynamic noSuchMethod(Invocation invocation) {}
                     }
                     """
@@ -336,7 +405,11 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
+                  @nonVirtual
                   int get property {
                     return 343;
                   }
@@ -365,12 +438,18 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
+                  @nonVirtual
                   void sideEffect(int x) {}
+                  @nonVirtual
                   int get property {
                     return 343;
                   }
     
+                  @nonVirtual
                   void set property(int value) {
                     this.sideEffect(value);
                   }
@@ -401,14 +480,21 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
+                  @nonVirtual
                   void sideEffect(int x) {}
+                  @nonVirtual
                   int _${'$'}property = 0;
+                  @nonVirtual
                   int get property {
                     this.sideEffect(this._${'$'}property);
                     return this._${'$'}property;
                   }
         
+                  @nonVirtual
                   void set property(int value) {
                     this.sideEffect(value);
                     this._${'$'}property = value;
@@ -430,10 +516,14 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
                   Test(int param) : super() {
                     this.property = param;
                   }
+                  @nonVirtual
                   late final int property;
                 }
                 """
@@ -453,6 +543,9 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
                   Test(
                     int x,
@@ -462,7 +555,9 @@ class Class : BaseTest {
                     this.sum = x + y + z;
                     this.sumTimesSum = this.sum * this.sum;
                   }
+                  @nonVirtual
                   late final int sum;
+                  @nonVirtual
                   late final int sumTimesSum;
                 }
                 """
@@ -482,6 +577,9 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
                   Test(
                     this.x,
@@ -491,10 +589,15 @@ class Class : BaseTest {
                     this.sum = this.x + this.y + this.z;
                     this.sumTimesSum = this.sum * this.sum;
                   }
+                  @nonVirtual
                   final int x;
+                  @nonVirtual
                   final int y;
+                  @nonVirtual
                   final int z;
+                  @nonVirtual
                   late final int sum;
+                  @nonVirtual
                   late final int sumTimesSum;
                 }
                 """
@@ -515,11 +618,16 @@ class Class : BaseTest {
 
                 dart(
                     """
+                    import 'package:meta/meta.dart';
+
+                    @sealed
                     class Test {
                       Test(int x) : super() {
                         this.xTimesX = this.x * x;
                       }
+                      @nonVirtual
                       final int x = 34;
+                      @nonVirtual
                       late final int xTimesX;
                     }
                     """
@@ -533,7 +641,7 @@ class Class : BaseTest {
                 fun returnsInt(): Int {
                     return 343
                 }
-    
+
                 class Test {
                     val x = returnsInt()
                 }
@@ -542,11 +650,15 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 int returnsInt() {
                   return 343;
                 }
                 
+                @sealed
                 class Test {
+                  @nonVirtual
                   final int x = returnsInt();
                 }
                 """
@@ -569,11 +681,16 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
                   Test() : super() {
                     this.x = this.returnsInt();
                   }
+                  @nonVirtual
                   late final int x;
+                  @nonVirtual
                   int returnsInt() {
                     return 343;
                   }
@@ -596,8 +713,11 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 class A {}
                 
+                @sealed
                 class B extends A {}
                 """
             )
@@ -614,10 +734,13 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 class A {
                   A(int x) : super();
                 }
                 
+                @sealed
                 class B extends A {
                   B() : super(3);
                 }
@@ -636,10 +759,13 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 class A {
                   A(int x) : super();
                 }
                 
+                @sealed
                 class B extends A {
                   B(int y) : super(y);
                 }
@@ -659,10 +785,13 @@ class Class : BaseTest {
 
                 dart(
                     """
+                    import 'package:meta/meta.dart';
+
                     class A {
                       A(int x) : super();
                     }
                 
+                    @sealed
                     class B extends A {
                       B({int y = 0}) : super(y);
                     }
@@ -686,6 +815,8 @@ class Class : BaseTest {
 
                 dart(
                     """
+                    import 'package:meta/meta.dart';
+
                     int returnsInt() {
                       return 343;
                     }
@@ -694,6 +825,7 @@ class Class : BaseTest {
                       A(int x) : super();
                     }
                     
+                    @sealed
                     class B extends A {
                       B._${'$'}(int y) : super(y);
                       factory B({int? y = null}) {
@@ -723,6 +855,9 @@ class Class : BaseTest {
 
                 dart(
                     """
+                    import 'package:meta/meta.dart';
+
+                    @sealed
                     class Vector {}
                     
                     Vector returnsVector() {
@@ -733,6 +868,7 @@ class Class : BaseTest {
                       A(Vector x) : super();
                     }
                     
+                    @sealed
                     class B extends A {
                       B._${'$'}(Vector y) : super(y);
                       factory B({Vector? y = null}) {
@@ -762,6 +898,9 @@ class Class : BaseTest {
 
                 dart(
                     """
+                    import 'package:meta/meta.dart';
+
+                    @sealed
                     class Vector {}
                     
                     Vector returnsVector() {
@@ -772,6 +911,7 @@ class Class : BaseTest {
                       A(Vector? x) : super();
                     }
                     
+                    @sealed
                     class B extends A {
                       B._${'$'}(Vector? y) : super(y);
                       factory B({Vector? y = const _${'$'}DefaultVectorValue()}) {
@@ -780,8 +920,10 @@ class Class : BaseTest {
                       }
                     }
                     
+                    @sealed
                     class _${'$'}DefaultVectorValue implements Vector {
                       const _${'$'}DefaultVectorValue();
+                      @nonVirtual
                       dynamic noSuchMethod(Invocation invocation) {}
                     }
                     """
@@ -795,6 +937,7 @@ class Class : BaseTest {
                 open class A {
                     open val property: Int = 0
                 }
+
                 class B : A() {
                     override val property: Int = 1
                 }
@@ -803,10 +946,13 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 class A {
                   final int property = 0;
                 }
                 
+                @sealed
                 class B extends A {
                   @override
                   final int property = 1;
@@ -822,16 +968,20 @@ class Class : BaseTest {
                 open class A {
                     open val property: Int = 0
                 }
+
                 class B(override val property: Int) : A()
                 """
             )
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 class A {
                   final int property = 0;
                 }
                 
+                @sealed
                 class B extends A {
                   B(this.property) : super();
                   @override
@@ -853,11 +1003,14 @@ class Class : BaseTest {
 
                 dart(
                     """
+                    import 'package:meta/meta.dart';
+
                     class A {
                       A({this.property = 0}) : super();
                       final int property;
                     }
                     
+                    @sealed
                     class B extends A {
                       B(this.property) : super(property: property);
                       @override
@@ -882,8 +1035,11 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 abstract class Marker {}
     
+                @sealed
                 class Test implements Marker {}
                 """
             )
@@ -902,10 +1058,13 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 abstract class Marker {}
                 
                 abstract class Marker2 {}
     
+                @sealed
                 class Test implements Marker, Marker2 {}
                 """
             )
@@ -925,6 +1084,8 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 abstract class Marker {
                   void doSomething();
                 }
@@ -941,7 +1102,7 @@ class Class : BaseTest {
                 interface Test {
                     fun method(x: Int, y: Int = 0, z: Int? = null)
                 }
-    
+
                 class TestImpl : Test {
                     override fun method(x: Int, y: Int, z: Int?) {}
                 }
@@ -950,6 +1111,8 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 abstract class Test {
                   void method(
                     int x, {
@@ -958,6 +1121,7 @@ class Class : BaseTest {
                   });
                 }
                 
+                @sealed
                 class TestImpl implements Test {
                   @override
                   void method(
@@ -981,7 +1145,7 @@ class Class : BaseTest {
                 fun returnsInt(): Int {
                     return 343
                 }
-    
+
                 class TestImpl : Test {
                     override fun method(x: Int, y: Int, z: Int?) {}
                 }
@@ -990,6 +1154,8 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 abstract class Test {
                   void method(
                     int x, {
@@ -1005,6 +1171,7 @@ class Class : BaseTest {
                   return 343;
                 }
                 
+                @sealed
                 class TestImpl implements Test {
                   @override
                   void method(
@@ -1017,8 +1184,10 @@ class Class : BaseTest {
                   }
                 }
                 
+                @sealed
                 class _$DefaultValue {
                   const _$DefaultValue();
+                  @nonVirtual
                   dynamic noSuchMethod(Invocation invocation) {}
                 }
                 """
@@ -1041,6 +1210,8 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 abstract class Test {
                   int method(
                     int x, {
@@ -1051,6 +1222,7 @@ class Class : BaseTest {
                   }
                 }
                 
+                @sealed
                 class TestImpl implements Test {
                   @override
                   int method(
@@ -1086,6 +1258,8 @@ class Class : BaseTest {
 
                 dart(
                     """
+                    import 'package:meta/meta.dart';
+
                     abstract class Test {
                       int method(
                         int x, {
@@ -1102,6 +1276,7 @@ class Class : BaseTest {
                       return 343;
                     }
                     
+                    @sealed
                     class TestImpl implements Test {
                       @override
                       int method(
@@ -1115,8 +1290,10 @@ class Class : BaseTest {
                       }
                     }
                     
+                    @sealed
                     class _$DefaultValue {
                       const _$DefaultValue();
+                      @nonVirtual
                       dynamic noSuchMethod(Invocation invocation) {}
                     }
                     """
@@ -1130,7 +1307,7 @@ class Class : BaseTest {
                 interface Test {
                     val property: Int
                 }
-    
+
                 class TestImpl : Test {
                     override val property = 343
                 }
@@ -1139,10 +1316,13 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 abstract class Test {
                   abstract final int property;
                 }
     
+                @sealed
                 class TestImpl implements Test {
                   @override
                   final int property = 343;
@@ -1168,12 +1348,15 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 abstract class Test {
                   int get property {
                     return 343;
                   }
                 }
     
+                @sealed
                 class TestImpl implements Test {
                   @override
                   int get property {
@@ -1206,6 +1389,8 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 void sideEffect(int x) {}
     
                 abstract class Test {
@@ -1218,6 +1403,7 @@ class Class : BaseTest {
                   }
                 }
     
+                @sealed
                 class TestImpl implements Test {
                   @override
                   int get property {
@@ -1246,7 +1432,11 @@ class Class : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test {
+              @nonVirtual
               void doIt() {}
             }
             """
@@ -1291,6 +1481,8 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 abstract class Vector {
                   Vector(int? u) : super();
                   abstract final int x;
@@ -1298,6 +1490,7 @@ class Class : BaseTest {
                   abstract final int z;
                 }
                 
+                @sealed
                 class VectorImpl extends Vector {
                   VectorImpl._${'$'}(
                     this.y,
@@ -1334,9 +1527,13 @@ class Class : BaseTest {
                   final int y;
                   @override
                   final int z;
+                  @nonVirtual
                   late final int sum;
+                  @nonVirtual
                   late final int sumPower;
+                  @nonVirtual
                   late final int sumPowerTwo;
+                  @nonVirtual
                   int doSomething() {
                     return 3;
                   }
@@ -1346,8 +1543,10 @@ class Class : BaseTest {
                   return 343;
                 }
                 
+                @sealed
                 class _$DefaultValue {
                   const _$DefaultValue();
+                  @nonVirtual
                   dynamic noSuchMethod(Invocation invocation) {}
                 }
                 """
@@ -1370,13 +1569,19 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
                   Test({this.n = 0}) : super();
+                  @nonVirtual
                   final int n;
+                  @nonVirtual
                   Test plus(Test other) {
                     return Test(n: this.n + other.n);
                   }
 
+                  @nonVirtual
                   Test operator +(Test other) => this.plus(other);
                 }
                 """
@@ -1397,13 +1602,19 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
                   Test({this.n = 0}) : super();
+                  @nonVirtual
                   final int n;
+                  @nonVirtual
                   Test minus(Test other) {
                     return Test(n: this.n - other.n);
                   }
 
+                  @nonVirtual
                   Test operator -(Test other) => this.minus(other);
                 }
                 """
@@ -1424,13 +1635,19 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
                   Test({this.n = 0}) : super();
+                  @nonVirtual
                   final int n;
+                  @nonVirtual
                   Test times(Test other) {
                     return Test(n: this.n * other.n);
                   }
 
+                  @nonVirtual
                   Test operator *(Test other) => this.times(other);
                 }
                 """
@@ -1451,13 +1668,19 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
                   Test({this.n = 0.0}) : super();
+                  @nonVirtual
                   final double n;
+                  @nonVirtual
                   Test div(Test other) {
                     return Test(n: this.n / other.n);
                   }
 
+                  @nonVirtual
                   Test operator /(Test other) => this.div(other);
                 }
                 """
@@ -1478,7 +1701,11 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
+                  @nonVirtual
                   Test rangeTo(Test other) {
                     return Test();
                   }
@@ -1501,9 +1728,14 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
                   Test({this.n = 0}) : super();
+                  @nonVirtual
                   final int n;
+                  @nonVirtual
                   bool contains(Test other) {
                     return false;
                   }
@@ -1526,11 +1758,16 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
+                  @nonVirtual
                   int get(int index) {
                     return index;
                   }
 
+                  @nonVirtual
                   int operator [](int index) => this.get(index);
                 }
                 """
@@ -1551,7 +1788,11 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
+                  @nonVirtual
                   int get(
                     int index,
                     int index2,
@@ -1575,11 +1816,16 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
+                  @nonVirtual
                   void set(
                     int index,
                     bool value,
                   ) {}
+                  @nonVirtual
                   void operator []=(
                     int index,
                     bool value,
@@ -1602,7 +1848,11 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
+                  @nonVirtual
                   void set(
                     int index,
                     int index2,
@@ -1625,7 +1875,11 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
+                  @nonVirtual
                   void call() {}
                 }
                 """
@@ -1646,7 +1900,11 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
+                  @nonVirtual
                   int call(
                     int a, {
                     int b = 0,
@@ -1672,6 +1930,9 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
                   bool equals(Object? other) {
                     return false;
@@ -1700,8 +1961,11 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 abstract class Marker {}
 
+                @sealed
                 class Test implements Marker {
                   bool equals(Object? other) {
                     return false;
@@ -1728,14 +1992,22 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
+                  @nonVirtual
                   int compareTo(Test other) {
                     return 1;
                   }
 
+                  @nonVirtual
                   bool operator <(Test other) => this.compareTo(other) < 0;
+                  @nonVirtual
                   bool operator >(Test other) => this.compareTo(other) > 0;
+                  @nonVirtual
                   bool operator <=(Test other) => this.compareTo(other) <= 0;
+                  @nonVirtual
                   bool operator >=(Test other) => this.compareTo(other) >= 0;
                 }
                 """
@@ -1760,14 +2032,22 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
+                  @nonVirtual
                   int compareTo(Test other) {
                     return 1;
                   }
 
+                  @nonVirtual
                   bool operator <(Test other) => this.compareTo(other) < 0;
+                  @nonVirtual
                   bool operator >(Test other) => this.compareTo(other) > 0;
+                  @nonVirtual
                   bool operator <=(Test other) => this.compareTo(other) <= 0;
+                  @nonVirtual
                   bool operator >=(Test other) => this.compareTo(other) >= 0;
                 }
                 
@@ -1796,6 +2076,8 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 abstract class A {
                   int compareTo(A other);
                   bool operator <(A other) => this.compareTo(other) < 0;
@@ -1804,6 +2086,7 @@ class Class : BaseTest {
                   bool operator >=(A other) => this.compareTo(other) >= 0;
                 }
 
+                @sealed
                 class B extends A {
                   @override
                   int compareTo(A other) {
@@ -1828,7 +2111,11 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
+                  @nonVirtual
                   Test inc(Test other) {
                     return Test();
                   }
@@ -1851,7 +2138,11 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
+                  @nonVirtual
                   Test dec(Test other) {
                     return Test();
                   }
@@ -1874,7 +2165,11 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
+                  @nonVirtual
                   Test unaryPlus() {
                     return Test();
                   }
@@ -1897,7 +2192,11 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
+                  @nonVirtual
                   Test unaryMinus() {
                     return Test();
                   }
@@ -1920,7 +2219,11 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test {
+                  @nonVirtual
                   Test not() {
                     return Test();
                   }
@@ -1940,6 +2243,9 @@ class Class : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test {
               Test._() : super();
             }
@@ -1961,6 +2267,9 @@ class Class : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test {
               Test() : super() {
                 3 + 3;
@@ -1988,6 +2297,9 @@ class Class : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test {
               Test() : super() {
                 3 + 3;
@@ -2012,6 +2324,9 @@ class Class : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test {
               Test(int param) : super() {
                 param + 3;
@@ -2037,6 +2352,9 @@ class Class : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test {
               Test(int param) : super() {
                 param + 3;
@@ -2059,8 +2377,12 @@ class Class : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Tree {}
 
+            @sealed
             class Tree${'$'}Branch {}
             """
         )
@@ -2080,10 +2402,15 @@ class Class : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Tree {}
 
+            @sealed
             class Tree${'$'}Branch${'$'}Leaf {}
 
+            @sealed
             class Tree${'$'}Branch {}
             """
         )
@@ -2107,14 +2434,19 @@ class Class : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Tree {}
 
             void main() {
               Tree${'$'}Branch${'$'}Leaf();
             }
 
+            @sealed
             class Tree${'$'}Branch${'$'}Leaf {}
 
+            @sealed
             class Tree${'$'}Branch {}
             """
         )
@@ -2126,6 +2458,9 @@ class Class : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test<T> {}
             """
         )
@@ -2143,7 +2478,11 @@ class Class : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test<T> {
+              @nonVirtual
               void method(T other) {}
             }
             """
@@ -2163,7 +2502,11 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
+                @sealed
                 class Test<T> {
+                  @nonVirtual
                   void method(T? other) {}
                 }
                 """
@@ -2176,6 +2519,9 @@ class Class : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test<T0, T1> {}
             """
         )
@@ -2187,6 +2533,9 @@ class Class : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            @sealed
             class Test<T extends int> {}
             """
         )
@@ -2229,6 +2578,8 @@ class Class : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             abstract class Buildable {
               void build();
             }
@@ -2237,16 +2588,20 @@ class Class : BaseTest {
               void identify();
             }
 
+            @sealed
             class Builder<T extends Object> {
+              @nonVirtual
               void startBuild(T item) {
                 (item as Identifiable).identify();
                 (item as Buildable).build();
                 this._identifyAndExec(item as Identifiable);
               }
 
+              @nonVirtual
               void _identifyAndExec(Identifiable id) {}
             }
 
+            @sealed
             class SomeItem implements Buildable, Identifiable {
               @override
               void build() {}
@@ -2300,6 +2655,8 @@ class Class : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             abstract class Marker {}
 
             abstract class Buildable implements Marker {
@@ -2310,16 +2667,20 @@ class Class : BaseTest {
               void identify();
             }
 
+            @sealed
             class Builder<T extends Marker> {
+              @nonVirtual
               void startBuild(T item) {
                 (item as Identifiable).identify();
                 (item as Buildable).build();
                 this._identifyAndExec(item as Identifiable);
               }
 
+              @nonVirtual
               void _identifyAndExec(Identifiable id) {}
             }
 
+            @sealed
             class SomeItem implements Buildable, Identifiable {
               @override
               void build() {}
@@ -2379,6 +2740,8 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 abstract class Marker {
                   void mark();
                 }
@@ -2391,7 +2754,9 @@ class Class : BaseTest {
                   void identify();
                 }
 
+                @sealed
                 class Builder<T extends Marker> {
+                  @nonVirtual
                   void startBuild(T item) {
                     (item as Marker).mark();
                     (item as Identifiable).identify();
@@ -2399,9 +2764,11 @@ class Class : BaseTest {
                     this._identifyAndExec(item as Identifiable);
                   }
 
+                  @nonVirtual
                   void _identifyAndExec(Identifiable id) {}
                 }
 
+                @sealed
                 class SomeItem implements Buildable, Identifiable {
                   @override
                   void mark() {}
@@ -2455,6 +2822,8 @@ class Class : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             abstract class Buildable {
               void build();
             }
@@ -2463,16 +2832,20 @@ class Class : BaseTest {
               void identify();
             }
 
+            @sealed
             class Builder<T extends Object> {
+              @nonVirtual
               void startBuild(T item) {
                 (item as Identifiable).identify();
                 (item as Buildable).build();
                 this._identifyAndExec(item as Identifiable);
               }
 
+              @nonVirtual
               void _identifyAndExec(Identifiable id) {}
             }
 
+            @sealed
             class SomeItem implements Buildable, Identifiable {
               @override
               void build() {}
@@ -2527,6 +2900,8 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 abstract class Buildable {
                   void build();
                 }
@@ -2535,16 +2910,20 @@ class Class : BaseTest {
                   void identify();
                 }
 
+                @sealed
                 class Builder<T extends Object> {
+                  @nonVirtual
                   void startBuild(T item) {
                     (item as Identifiable).identify();
                     (item as Buildable?)?.build();
                     this._identifyAndExec(item as Identifiable);
                   }
 
+                  @nonVirtual
                   void _identifyAndExec(Identifiable id) {}
                 }
 
+                @sealed
                 class SomeItem implements Buildable, Identifiable {
                   @override
                   void build() {}
@@ -2598,6 +2977,8 @@ class Class : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             abstract class Marker {}
 
             abstract class Buildable implements Marker {
@@ -2608,16 +2989,20 @@ class Class : BaseTest {
               void identify();
             }
 
+            @sealed
             class Builder<T extends Marker> {
+              @nonVirtual
               void startBuild(T item) {
                 (item as Identifiable).identify();
                 (item as Buildable).build();
                 this._identifyAndExec(item as Identifiable);
               }
 
+              @nonVirtual
               void _identifyAndExec(Identifiable id) {}
             }
 
+            @sealed
             class SomeItem implements Buildable, Identifiable {
               @override
               void build() {}
@@ -2669,6 +3054,8 @@ class Class : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
             abstract class Buildable {
               void build();
             }
@@ -2677,16 +3064,20 @@ class Class : BaseTest {
               void identify();
             }
 
+            @sealed
             class Builder<T> {
+              @nonVirtual
               void startBuild(T item) {
                 (item as Identifiable?)?.identify();
                 (item as Buildable?)?.build();
                 this._identifyAndExec(item as Identifiable?);
               }
 
+              @nonVirtual
               void _identifyAndExec(Identifiable? id) {}
             }
 
+            @sealed
             class SomeItem implements Buildable, Identifiable {
               @override
               void build() {}
@@ -2741,6 +3132,8 @@ class Class : BaseTest {
 
             dart(
                 """
+                import 'package:meta/meta.dart';
+
                 abstract class Marker {}
 
                 abstract class Buildable implements Marker {
@@ -2751,16 +3144,20 @@ class Class : BaseTest {
                   void identify();
                 }
 
+                @sealed
                 class Builder<T extends Marker?> {
+                  @nonVirtual
                   void startBuild(T item) {
                     (item as Identifiable?)?.identify();
                     (item as Buildable?)?.build();
                     this._identifyAndExec(item as Identifiable?);
                   }
 
+                  @nonVirtual
                   void _identifyAndExec(Identifiable? id) {}
                 }
 
+                @sealed
                 class SomeItem implements Buildable, Identifiable {
                   @override
                   void build() {}

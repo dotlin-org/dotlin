@@ -17,7 +17,7 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.backend.util
+package org.dotlin.compiler.backend.steps.ir2ast.transformer.util
 
 import org.dotlin.compiler.dart.ast.directive.DartCombinator
 import org.dotlin.compiler.dart.ast.directive.DartDirective
