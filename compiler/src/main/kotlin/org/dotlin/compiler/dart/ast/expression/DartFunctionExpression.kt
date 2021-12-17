@@ -30,6 +30,12 @@ data class DartFunctionExpression(
     val parameters: DartFormalParameterList = DartFormalParameterList(),
     val body: DartFunctionBody = DartEmptyFunctionBody(),
 ) : DartExpression {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitFunctionExpression(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitFunctionExpression(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        typeParameters.accept(visitor, data)
+        parameters.accept(visitor, data)
+        body.accept(visitor, data)
+    }
 }

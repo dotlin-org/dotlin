@@ -27,6 +27,11 @@ data class DartIsExpression(
     val type: DartTypeAnnotation,
     val isNegated: Boolean = false
 ) : DartExpression {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) =
-        visitor.visitIsExpression(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
+        visitor.visitIsExpression(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        expression.accept(visitor, data)
+        type.accept(visitor, data)
+    }
 }

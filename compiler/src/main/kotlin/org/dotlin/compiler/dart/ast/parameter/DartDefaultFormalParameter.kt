@@ -30,8 +30,13 @@ data class DartDefaultFormalParameter(
     val defaultValue: DartExpression? = null,
     val isNamed: Boolean = false,
 ) : DartFormalParameter {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitDefaultFormalParameter(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitDefaultFormalParameter(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        parameter.accept(visitor, data)
+        defaultValue?.accept(visitor, data)
+    }
 }
 
 @OptIn(ExperimentalContracts::class)

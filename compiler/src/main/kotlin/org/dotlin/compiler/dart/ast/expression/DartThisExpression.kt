@@ -22,6 +22,8 @@ package org.dotlin.compiler.dart.ast.expression
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 
 object DartThisExpression : DartExpression {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) =
-        visitor.visitThisExpression(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
+        visitor.visitThisExpression(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {}
 }

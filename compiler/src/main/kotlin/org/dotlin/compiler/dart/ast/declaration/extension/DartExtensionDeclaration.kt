@@ -20,6 +20,7 @@
 package org.dotlin.compiler.dart.ast.declaration.extension
 
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
+import org.dotlin.compiler.dart.ast.accept
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnitMember
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartClassMember
@@ -35,6 +36,14 @@ class DartExtensionDeclaration(
     override val annotations: List<DartAnnotation> = emptyList(),
     override val documentationComment: String? = null,
 ) : DartCompilationUnitMember {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitExtensionDeclaration(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitExtensionDeclaration(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        name?.accept(visitor, data)
+        extendedType.accept(visitor, data)
+        members.accept(visitor, data)
+        typeParameters.accept(visitor, data)
+        annotations.accept(visitor, data)
+    }
 }

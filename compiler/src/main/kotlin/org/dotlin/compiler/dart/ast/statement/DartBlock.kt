@@ -20,12 +20,17 @@
 package org.dotlin.compiler.dart.ast.statement
 
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
+import org.dotlin.compiler.dart.ast.accept
 
 
 class DartBlock(
     val statements: List<DartStatement> = listOf()
 ) : DartStatement {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R = visitor.visitBlock(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R = visitor.visitBlock(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        statements.accept(visitor, data)
+    }
 }
 
 fun DartStatement.wrapInBlock(): DartBlock = DartBlock(statements = mutableListOf(this))

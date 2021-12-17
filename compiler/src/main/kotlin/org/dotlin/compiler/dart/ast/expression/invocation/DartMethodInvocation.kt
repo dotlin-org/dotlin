@@ -40,5 +40,4 @@ data class DartMethodInvocation(
     )
 
     override fun asNullAware(): DartMethodInvocation = copy(isNullAware = true)
-
 }

@@ -25,8 +25,12 @@ import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
 data class DartVariableDeclarationStatement(
     val variables: DartVariableDeclarationList,
 ) : DartStatement {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitVariableDeclarationStatement(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitVariableDeclarationStatement(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        variables.accept(visitor, data)
+    }
 }
 
 fun DartVariableDeclarationList.asStatement() = DartVariableDeclarationStatement(this)

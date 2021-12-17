@@ -23,5 +23,7 @@ import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 
 @JvmInline
 value class DartCode(val value: String) : DartExpression {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) = visitor.visitCode(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) = visitor.visitCode(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {}
 }

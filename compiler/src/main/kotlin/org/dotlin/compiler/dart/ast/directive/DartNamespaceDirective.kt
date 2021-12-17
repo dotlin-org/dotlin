@@ -20,6 +20,7 @@
 package org.dotlin.compiler.dart.ast.directive
 
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
+import org.dotlin.compiler.dart.ast.accept
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.dotlin.compiler.dart.ast.expression.literal.DartStringLiteral
@@ -35,6 +36,13 @@ data class DartImportDirective(
     override val combinators: List<DartCombinator> = emptyList(),
     override val documentationComment: String? = null,
 ) : DartNamespaceDirective {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) =
-        visitor.visitImportDirective(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
+        visitor.visitImportDirective(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        name.accept(visitor, data)
+        alias?.accept(visitor, data)
+        annotations.accept(visitor, data)
+        combinators.accept(visitor, data)
+    }
 }

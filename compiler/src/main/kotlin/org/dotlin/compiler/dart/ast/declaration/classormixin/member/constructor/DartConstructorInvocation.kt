@@ -28,8 +28,13 @@ interface DartConstructorInvocation : DartConstructorInitializer {
     val arguments: DartArgumentList
     val keyword: DartConstructorInvocationKeyword
 
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitConstructorInvocation(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitConstructorInvocation(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        name?.accept(visitor, data)
+        arguments.accept(visitor, data)
+    }
 }
 
 enum class DartConstructorInvocationKeyword(val value: String) {

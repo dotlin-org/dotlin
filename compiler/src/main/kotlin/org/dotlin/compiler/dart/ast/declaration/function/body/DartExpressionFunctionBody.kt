@@ -27,6 +27,10 @@ class DartExpressionFunctionBody(
     override val isAsync: Boolean = false,
     override val isGenerator: Boolean = false,
 ) : DartFunctionBody {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitExpressionFunctionBody(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitExpressionFunctionBody(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        expression.accept(visitor, data)
+    }
 }

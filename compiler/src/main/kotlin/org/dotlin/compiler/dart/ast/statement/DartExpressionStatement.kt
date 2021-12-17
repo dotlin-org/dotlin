@@ -25,8 +25,12 @@ import org.dotlin.compiler.dart.ast.expression.DartExpression
 data class DartExpressionStatement(
     val expression: DartExpression,
 ) : DartStatement {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitExpressionStatement(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitExpressionStatement(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        expression.accept(visitor, data)
+    }
 }
 
 fun DartExpression.asStatement(): DartExpressionStatement = DartExpressionStatement(this@asStatement)

@@ -25,6 +25,8 @@ data class DartEmptyFunctionBody(
     override val isAsync: Boolean = false,
     override val isGenerator: Boolean = false,
 ) : DartFunctionBody {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitEmptyFunctionBody(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitEmptyFunctionBody(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {}
 }

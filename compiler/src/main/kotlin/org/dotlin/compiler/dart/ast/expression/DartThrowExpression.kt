@@ -24,6 +24,10 @@ import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 data class DartThrowExpression(
     val expression: DartExpression,
 ) : DartExpression {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitThrowExpression(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitThrowExpression(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        expression.accept(visitor, data)
+    }
 }

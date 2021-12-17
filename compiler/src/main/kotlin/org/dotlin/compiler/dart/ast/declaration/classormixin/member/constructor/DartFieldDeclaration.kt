@@ -20,6 +20,7 @@
 package org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor
 
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
+import org.dotlin.compiler.dart.ast.accept
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartClassMember
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
@@ -32,6 +33,11 @@ data class DartFieldDeclaration(
     override val annotations: List<DartAnnotation> = listOf(),
     override val documentationComment: String? = null,
 ) : DartClassMember {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitFieldDeclaration(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitFieldDeclaration(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        fields.accept(visitor, data)
+        annotations.accept(visitor, data)
+    }
 }

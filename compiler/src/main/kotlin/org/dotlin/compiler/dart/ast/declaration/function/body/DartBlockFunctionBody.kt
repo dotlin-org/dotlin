@@ -27,6 +27,10 @@ class DartBlockFunctionBody(
     override val isAsync: Boolean = false,
     override val isGenerator: Boolean = false,
 ) : DartFunctionBody {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R =
-        visitor.visitBlockFunctionBody(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitBlockFunctionBody(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        block.accept(visitor, data)
+    }
 }
