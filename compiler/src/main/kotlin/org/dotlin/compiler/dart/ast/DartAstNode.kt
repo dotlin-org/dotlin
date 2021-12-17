@@ -20,8 +20,10 @@
 package org.dotlin.compiler.dart.ast
 
 interface DartAstNode {
-    fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C): R
+    fun <R, D> accept(visitor: DartAstNodeVisitor<R, D>, data: D): R
+
+    fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D)
 }
 
-fun <R, C, N : DartAstNode> Collection<N>.accept(visitor: DartAstNodeVisitor<R, C>, context: C) =
-    map { it.accept(visitor, context) }
+fun <R, C, N : DartAstNode> Collection<N>.accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
+    map { it.accept(visitor, data) }

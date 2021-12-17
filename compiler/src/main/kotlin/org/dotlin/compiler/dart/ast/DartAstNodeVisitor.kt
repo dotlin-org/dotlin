@@ -56,92 +56,125 @@ import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameterList
 interface DartAstNodeVisitor<R, C> {
     private fun throwUnsupported(): Nothing = throw UnsupportedOperationException()
 
-    fun visitCompilationUnit(unit: DartCompilationUnit, context: C): R = throwUnsupported()
+    fun visitAstNode(node: DartAstNode, context: C): R = throwUnsupported()
+
+    fun visitCompilationUnit(unit: DartCompilationUnit, context: C): R = visitAstNode(unit, context)
 
     // Annotation
-    fun visitAnnotation(annotation: DartAnnotation, context: C): R = throwUnsupported()
+    fun visitAnnotation(annotation: DartAnnotation, context: C): R = visitAstNode(annotation, context)
 
     // Declarations
     fun visitTopLevelFunctionDeclaration(functionDeclaration: DartTopLevelFunctionDeclaration, context: C): R =
-        throwUnsupported()
+        visitAstNode(functionDeclaration, context)
 
-    fun visitClassDeclaration(classDeclaration: DartClassDeclaration, context: C): R = throwUnsupported()
-    fun visitExtensionDeclaration(extensionDeclaration: DartExtensionDeclaration, context: C): R = throwUnsupported()
-    fun visitMethodDeclaration(methodDeclaration: DartMethodDeclaration, context: C): R = throwUnsupported()
+    fun visitClassDeclaration(classDeclaration: DartClassDeclaration, context: C): R =
+        visitAstNode(classDeclaration, context)
+
+    fun visitExtensionDeclaration(extensionDeclaration: DartExtensionDeclaration, context: C): R =
+        visitAstNode(extensionDeclaration, context)
+
+    fun visitMethodDeclaration(methodDeclaration: DartMethodDeclaration, context: C): R =
+        visitAstNode(methodDeclaration, context)
+
     fun visitConstructorDeclaration(constructorDeclaration: DartConstructorDeclaration, context: C): R =
-        throwUnsupported()
+        visitAstNode(constructorDeclaration, context)
 
     fun visitFieldDeclaration(fieldDeclaration: DartFieldDeclaration, context: C): R =
-        throwUnsupported()
+        visitAstNode(fieldDeclaration, context)
 
-    fun visitVariableDeclaration(variableDeclaration: DartVariableDeclaration, context: C): R = throwUnsupported()
-    fun visitVariableDeclarationList(variables: DartVariableDeclarationList, context: C): R = throwUnsupported()
+    fun visitVariableDeclaration(variableDeclaration: DartVariableDeclaration, context: C): R =
+        visitAstNode(variableDeclaration, context)
+
+    fun visitVariableDeclarationList(variables: DartVariableDeclarationList, context: C): R =
+        visitAstNode(variables, context)
 
     // Declarations: Clauses
-    fun visitExtendsClause(extendsClause: DartExtendsClause, context: C): R = throwUnsupported()
-    fun visitImplementsClause(implementsClause: DartImplementsClause, context: C): R = throwUnsupported()
+    fun visitExtendsClause(extendsClause: DartExtendsClause, context: C): R = visitAstNode(extendsClause, context)
+    fun visitImplementsClause(implementsClause: DartImplementsClause, context: C): R =
+        visitAstNode(implementsClause, context)
 
     // Constructor initializers
     fun visitConstructorInvocation(invocation: DartConstructorInvocation, context: C): R =
-        throwUnsupported()
+        visitAstNode(invocation, context)
 
     fun visitConstructorFieldInitializer(initializer: DartConstructorFieldInitializer, context: C): R =
-        throwUnsupported()
+        visitAstNode(initializer, context)
 
     // Directives
-    fun visitImportDirective(directive: DartImportDirective, context: C): R = throwUnsupported()
-    fun visitCombinator(combinator: DartCombinator, context: C): R = throwUnsupported()
+    fun visitImportDirective(directive: DartImportDirective, context: C): R = visitAstNode(directive, context)
+    fun visitCombinator(combinator: DartCombinator, context: C): R = visitAstNode(combinator, context)
 
     // Expressions
-    fun visitArgumentList(arguments: DartArgumentList, context: C): R = throwUnsupported()
-    fun visitFunctionExpression(functionExpression: DartFunctionExpression, context: C): R = throwUnsupported()
-    fun visitIdentifier(identifier: DartIdentifier, context: C): R = throwUnsupported()
-    fun visitInvocationExpression(invocation: DartInvocationExpression, context: C): R = throwUnsupported()
+    fun visitArgumentList(arguments: DartArgumentList, context: C): R = visitAstNode(arguments, context)
+    fun visitFunctionExpression(functionExpression: DartFunctionExpression, context: C): R =
+        visitAstNode(functionExpression, context)
 
-    fun visitAssignmentExpression(assignment: DartAssignmentExpression, context: C): R = throwUnsupported()
-    fun visitNamedExpression(namedExpression: DartNamedExpression, context: C): R = throwUnsupported()
+    fun visitIdentifier(identifier: DartIdentifier, context: C): R = visitAstNode(identifier, context)
+    fun visitInvocationExpression(invocation: DartInvocationExpression, context: C): R =
+        visitAstNode(invocation, context)
+
+    fun visitAssignmentExpression(assignment: DartAssignmentExpression, context: C): R =
+        visitAstNode(assignment, context)
+
+    fun visitNamedExpression(namedExpression: DartNamedExpression, context: C): R =
+        visitAstNode(namedExpression, context)
+
     fun visitParenthesizedExpression(parenthesizedExpression: DartParenthesizedExpression, context: C): R =
-        throwUnsupported()
+        visitAstNode(parenthesizedExpression, context)
 
     fun visitInstanceCreationExpression(instanceCreation: DartInstanceCreationExpression, context: C): R =
-        throwUnsupported()
+        visitAstNode(instanceCreation, context)
 
-    fun visitPropertyAccess(propertyAccess: DartPropertyAccessExpression, context: C): R = throwUnsupported()
-    fun visitConditionalExpression(conditional: DartConditionalExpression, context: C): R = throwUnsupported()
-    fun visitIsExpression(isExpression: DartIsExpression, context: C): R = throwUnsupported()
-    fun visitAsExpression(asExpression: DartAsExpression, context: C): R = throwUnsupported()
-    fun visitThisExpression(thisExpression: DartThisExpression, context: C): R = throwUnsupported()
-    fun visitBinaryInfixExpression(binaryInfix: DartBinaryInfixExpression, context: C): R = throwUnsupported()
-    fun visitThrowExpression(throwExpression: DartThrowExpression, context: C): R = throwUnsupported()
+    fun visitPropertyAccess(propertyAccess: DartPropertyAccessExpression, context: C): R =
+        visitAstNode(propertyAccess, context)
+
+    fun visitConditionalExpression(conditional: DartConditionalExpression, context: C): R =
+        visitAstNode(conditional, context)
+
+    fun visitIsExpression(isExpression: DartIsExpression, context: C): R = visitAstNode(isExpression, context)
+    fun visitAsExpression(asExpression: DartAsExpression, context: C): R = visitAstNode(asExpression, context)
+    fun visitThisExpression(thisExpression: DartThisExpression, context: C): R = visitAstNode(thisExpression, context)
+    fun visitBinaryInfixExpression(binaryInfix: DartBinaryInfixExpression, context: C): R =
+        visitAstNode(binaryInfix, context)
+
+    fun visitThrowExpression(throwExpression: DartThrowExpression, context: C): R =
+        visitAstNode(throwExpression, context)
 
     // Expressions: Literals
-    fun visitSimpleStringLiteral(literal: DartSimpleStringLiteral, context: C): R = throwUnsupported()
+    fun visitSimpleStringLiteral(literal: DartSimpleStringLiteral, context: C): R = visitAstNode(literal, context)
 
-    fun visitStringInterpolation(literal: DartStringInterpolation, context: C): R = throwUnsupported()
-    fun visitInterpolationString(element: DartInterpolationString, context: C): R = throwUnsupported()
-    fun visitInterpolationExpression(element: DartInterpolationExpression, context: C): R = throwUnsupported()
+    fun visitStringInterpolation(literal: DartStringInterpolation, context: C): R = visitAstNode(literal, context)
+    fun visitInterpolationString(interpolationString: DartInterpolationString, context: C): R =
+        visitAstNode(interpolationString, context)
 
-    fun visitNullLiteral(literal: DartNullLiteral, context: C): R = throwUnsupported()
-    fun visitBooleanLiteral(literal: DartBooleanLiteral, context: C): R = throwUnsupported()
-    fun visitIntegerLiteral(literal: DartIntegerLiteral, context: C): R = throwUnsupported()
-    fun visitDoubleLiteral(literal: DartDoubleLiteral, context: C): R = throwUnsupported()
-    fun visitListLiteral(literal: DartListLiteral, context: C): R = throwUnsupported()
-    fun visitCollectionElementList(collectionElementList: DartCollectionElementList, context: C): R = throwUnsupported()
+    fun visitInterpolationExpression(element: DartInterpolationExpression, context: C): R =
+        visitAstNode(element, context)
+
+    fun visitNullLiteral(literal: DartNullLiteral, context: C): R = visitAstNode(literal, context)
+    fun visitBooleanLiteral(literal: DartBooleanLiteral, context: C): R = visitAstNode(literal, context)
+    fun visitIntegerLiteral(literal: DartIntegerLiteral, context: C): R = visitAstNode(literal, context)
+    fun visitDoubleLiteral(literal: DartDoubleLiteral, context: C): R = visitAstNode(literal, context)
+    fun visitListLiteral(literal: DartListLiteral, context: C): R = visitAstNode(literal, context)
+    fun visitCollectionElementList(collectionElementList: DartCollectionElementList, context: C): R =
+        visitAstNode(collectionElementList, context)
 
     // Parameters
-    fun visitFormalParameterList(parameters: DartFormalParameterList, context: C): R = throwUnsupported()
-    fun visitSimpleFormalParameter(parameter: DartSimpleFormalParameter, context: C): R = throwUnsupported()
-    fun visitFieldFormalParameter(parameter: DartFieldFormalParameter, context: C): R = throwUnsupported()
-    fun visitDefaultFormalParameter(defaultParameter: DartDefaultFormalParameter, context: C): R = throwUnsupported()
+    fun visitFormalParameterList(parameters: DartFormalParameterList, context: C): R = visitAstNode(parameters, context)
+    fun visitSimpleFormalParameter(parameter: DartSimpleFormalParameter, context: C): R =
+        visitAstNode(parameter, context)
+
+    fun visitFieldFormalParameter(parameter: DartFieldFormalParameter, context: C): R = visitAstNode(parameter, context)
+    fun visitDefaultFormalParameter(defaultParameter: DartDefaultFormalParameter, context: C): R =
+        visitAstNode(defaultParameter, context)
 
     // Statements
-    fun visitBlock(block: DartBlock, context: C): R = throwUnsupported()
-    fun visitExpressionStatement(statement: DartExpressionStatement, context: C): R = throwUnsupported()
+    fun visitBlock(block: DartBlock, context: C): R = visitAstNode(block, context)
+    fun visitExpressionStatement(statement: DartExpressionStatement, context: C): R = visitAstNode(statement, context)
     fun visitVariableDeclarationStatement(statement: DartVariableDeclarationStatement, context: C): R =
-        throwUnsupported()
+        visitAstNode(statement, context)
 
-    fun visitReturnStatement(statement: DartReturnStatement, context: C): R = throwUnsupported()
-    fun visitIfStatement(statement: DartIfStatement, context: C): R = throwUnsupported()
+    fun visitReturnStatement(statement: DartReturnStatement, context: C): R = visitAstNode(statement, context)
+    fun visitIfStatement(statement: DartIfStatement, context: C): R = visitAstNode(statement, context)
 
     // Type
 
