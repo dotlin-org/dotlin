@@ -23,5 +23,7 @@ import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 
 @JvmInline
 value class DartLabel(val value: DartSimpleIdentifier) : DartAstNode {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, context: C) = visitor.visitLabel(this, context)
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) = visitor.visitLabel(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {}
 }
