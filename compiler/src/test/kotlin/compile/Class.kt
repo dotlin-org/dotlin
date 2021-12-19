@@ -653,7 +653,7 @@ class Class : BaseTest {
                     int y,
                     int z,
                   ) : super() {
-                    this.sum = x + y + z;
+                    this.sum = (x + y) + z;
                     this.sumTimesSum = this.sum * this.sum;
                   }
                   @nonVirtual
@@ -687,7 +687,7 @@ class Class : BaseTest {
                     this.y,
                     this.z,
                   ) : super() {
-                    this.sum = this.x + this.y + this.z;
+                    this.sum = (this.x + this.y) + this.z;
                     this.sumTimesSum = this.sum * this.sum;
                   }
                   @nonVirtual
@@ -1603,8 +1603,8 @@ class Class : BaseTest {
                     int v = 3,
                   }) : super(length) {
                     this.sum = complexValue(r);
-                    this.sumPower = this.sum * 2 * o;
-                    this.sumPowerTwo = this.x * this.sum * 2 + complexValue(r);
+                    this.sumPower = (this.sum * 2) * o;
+                    this.sumPowerTwo = ((this.x * this.sum) * 2) + complexValue(r);
                   }
                   factory VectorImpl({
                     int x = 0,

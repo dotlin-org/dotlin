@@ -37,9 +37,11 @@ import org.jetbrains.kotlin.ir.declarations.IrField
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.IrTypeOperator.*
+import org.jetbrains.kotlin.ir.types.isBoolean
 import org.jetbrains.kotlin.ir.types.isChar
 import org.jetbrains.kotlin.ir.types.isInt
 import org.jetbrains.kotlin.ir.types.isString
+import org.jetbrains.kotlin.ir.util.irCall
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
@@ -145,9 +147,14 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                     right = right,
                 )
             else -> {
+
+
                 val hasDartGetterAnnotation = irCallLike.symbol.owner.hasDartGetterAnnotation()
 
                 when {
+                    irCallLike.origin == IrStatementOrigin.EXCL && irLeft!!.type.isBoolean() -> {
+                        DartNegatedExpression(left.possiblyParenthesize())
+                    }
                     origin == IrStatementOrigin.GET_PROPERTY || origin == IrStatementOrigin.GET_LOCAL_PROPERTY
                             || hasDartGetterAnnotation -> {
                         val irSimpleFunction = irCallLike.symbol.owner as IrSimpleFunction
@@ -396,7 +403,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
     ): DartExpression = DartCode(irCode.code)
 
     private fun DartExpression.possiblyParenthesize(): DartExpression = when (this) {
-        is DartConditionalExpression, is DartAsExpression -> parenthesize()
+        is DartConditionalExpression, is DartAsExpression, is DartBinaryInfixExpression -> parenthesize()
         else -> this
     }
 }

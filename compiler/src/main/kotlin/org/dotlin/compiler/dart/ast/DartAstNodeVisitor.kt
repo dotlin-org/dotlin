@@ -122,6 +122,9 @@ interface DartAstNodeVisitor<R, C> {
     fun visitParenthesizedExpression(parenthesizedExpression: DartParenthesizedExpression, context: C): R =
         visitAstNode(parenthesizedExpression, context)
 
+    fun visitNegatedExpressionExpression(negatedExpression: DartNegatedExpression, context: C): R =
+        visitAstNode(negatedExpression, context)
+
     fun visitInstanceCreationExpression(instanceCreation: DartInstanceCreationExpression, context: C): R =
         visitAstNode(instanceCreation, context)
 
