@@ -132,11 +132,13 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
         val isFinal: Boolean
         val isConst: Boolean
         val isAbstract: Boolean
+        val isLate: Boolean
 
         irProperty.let {
             isFinal = it?.isVar != true
             isConst = irField.isDartConst() || it?.isConst == true
             isAbstract = it?.modality == Modality.ABSTRACT
+            isLate = it?.isLateinit == true
         }
 
         val initializer = when {
@@ -155,7 +157,7 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
                 ),
                 isFinal = isFinal,
                 isConst = isConst,
-                isLate = irField.isInitializedInBody,
+                isLate = isLate || irField.isInitializedInBody,
                 type = fieldType
             ),
             isStatic = irField.isStatic,

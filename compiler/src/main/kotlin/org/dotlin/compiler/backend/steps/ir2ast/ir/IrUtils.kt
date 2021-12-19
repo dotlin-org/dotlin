@@ -348,10 +348,16 @@ val IrFunction.isStatic: Boolean
     get() = isStatic && !(parent as IrClass).isDartExtension
 
 val IrFunction.isImplicitGetter: Boolean
-    get() = isGetter && origin == IrDeclarationOrigin.DEFAULT_PROPERTY_ACCESSOR
+    get() = isGetter && origin == IrDeclarationOrigin.DEFAULT_PROPERTY_ACCESSOR &&
+            hasSameVisibilityAsCorrespondingProperty
 
 val IrFunction.isImplicitSetter: Boolean
-    get() = isSetter && origin == IrDeclarationOrigin.DEFAULT_PROPERTY_ACCESSOR
+    get() = isSetter && origin == IrDeclarationOrigin.DEFAULT_PROPERTY_ACCESSOR &&
+            hasSameVisibilityAsCorrespondingProperty
+
+private val IrFunction.hasSameVisibilityAsCorrespondingProperty: Boolean
+    get() = (this as? IrSimpleFunction)?.correspondingProperty
+        .let { it?.visibility == null || it.visibility == visibility }
 
 val IrProperty.hasExplicitBackingField: Boolean
     get() = backingField?.isExplicitBackingField == true
@@ -381,8 +387,8 @@ val IrField.correspondingProperty: IrProperty?
     get() = correspondingPropertySymbol?.owner
 
 val IrField.isExplicitBackingField: Boolean
-    get() = !correspondingProperty?.hasImplicitGetter.falseIfNull() &&
-            !correspondingProperty?.hasImplicitSetter.falseIfNull() &&
+    get() = (correspondingProperty?.hasImplicitGetter != true ||
+            (correspondingProperty?.isVar == true && correspondingProperty?.hasImplicitSetter != true)) &&
             correspondingProperty?.backingField == this &&
             origin == IrDeclarationOrigin.PROPERTY_BACKING_FIELD
 
