@@ -19,26 +19,16 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.*
-import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.jetbrains.kotlin.backend.common.ir.addChild
-import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
+import org.dotlin.compiler.backend.steps.ir2ast.ir.methodWithName
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationTransformer
+import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
+import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
 import org.jetbrains.kotlin.builtins.StandardNames
-import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
-import org.jetbrains.kotlin.descriptors.Modality
-import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.builders.*
-import org.jetbrains.kotlin.ir.builders.declarations.buildFun
-import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.expressions.IrConstKind
-import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
-import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
+import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.types.getPublicSignature
-import org.jetbrains.kotlin.ir.types.isString
 import org.jetbrains.kotlin.ir.util.defaultType
-import org.jetbrains.kotlin.ir.util.file
-import org.jetbrains.kotlin.name.Name
 
 class EnumLowering(private val context: DartLoweringContext) : IrDeclarationTransformer {
     override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {

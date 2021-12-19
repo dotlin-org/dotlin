@@ -19,33 +19,33 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.*
+import org.dotlin.compiler.backend.steps.ir2ast.ir.deepCopyWith
+import org.dotlin.compiler.backend.steps.ir2ast.ir.propertyWithName
+import org.dotlin.compiler.backend.steps.ir2ast.ir.resolveOverride
+import org.dotlin.compiler.backend.steps.ir2ast.ir.type
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.jetbrains.kotlin.backend.common.ir.addChild
 import org.jetbrains.kotlin.backend.wasm.ir2wasm.allSuperInterfaces
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.builders.*
-import org.jetbrains.kotlin.ir.builders.declarations.*
+import org.jetbrains.kotlin.ir.builders.declarations.buildField
+import org.jetbrains.kotlin.ir.builders.irCall
+import org.jetbrains.kotlin.ir.builders.irGet
+import org.jetbrains.kotlin.ir.builders.irGetField
+import org.jetbrains.kotlin.ir.builders.irSetField
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrReturn
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
-import org.jetbrains.kotlin.ir.expressions.impl.IrBlockBodyImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrReturnImpl
-import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
-import org.jetbrains.kotlin.ir.types.*
-import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
-import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
+import org.jetbrains.kotlin.ir.types.getPublicSignature
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.isInterface
 import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.types.Variance
 
 class IteratorLowering(private val context: DartLoweringContext) : IrDeclarationTransformer {
     override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
@@ -71,7 +71,8 @@ class IteratorSubtypeBackingFieldsLowering(private val context: DartLoweringCont
     override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrClass ||
             declaration.isInterface ||
-            !declaration.allSuperInterfaces().any { it.isIterator() }) {
+            !declaration.allSuperInterfaces().any { it.isIterator() }
+        ) {
             return noChange()
         }
 
