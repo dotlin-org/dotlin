@@ -21,6 +21,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementTransformerVoid
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrNullAwareExpression
+import org.dotlin.compiler.backend.steps.ir2ast.ir.firstNonFakeOverrideOrSelf
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.*
@@ -70,14 +71,6 @@ class MultipleTypeParametersLowering(private val context: DartLoweringContext) :
         // Add explicit casts of relevant types.
         declaration.transformChildrenVoid(
             object : IrCustomElementTransformerVoid() {
-                fun IrDeclaration.firstNonFakeOverrideOrSelf(): IrDeclaration {
-                    if (!isFakeOverride) return this
-                    if (this !is IrOverridableDeclaration<*>) return this
-
-                    return (overriddenSymbols.firstOrNull()?.owner as? IrDeclaration)
-                        ?.firstNonFakeOverrideOrSelf() ?: this
-                }
-
                 fun IrExpression?.possiblyCastReceiver(
                     of: IrDeclarationReference,
                     isInNullAware: Boolean,
