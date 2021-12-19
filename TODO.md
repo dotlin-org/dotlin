@@ -21,7 +21,7 @@
   - [ ] Collections
   - [ ] Comparable
   - [ ] Enum
-  - [ ] Iterator
+  - [x] Iterator
   - [ ] Library
   - [ ] Nothing
   - [ ] Number

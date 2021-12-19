@@ -47,6 +47,8 @@ class ObjectLowering(private val context: DartLoweringContext) : IrDeclarationTr
 
             origin = IrDartDeclarationOrigin.OBJECT
         }.apply {
+            val newObj = this
+
             primaryConstructor!!.visibility = DescriptorVisibilities.PRIVATE
 
             addChild(
@@ -55,6 +57,8 @@ class ObjectLowering(private val context: DartLoweringContext) : IrDeclarationTr
                     type = defaultType
                     name = Name.identifier("\$instance")
                 }.apply {
+                    parent = newObj
+
                     initializer = IrExpressionBodyImpl(
                         context.buildStatement(symbol) {
                             IrConstructorCallImpl(
@@ -81,6 +85,8 @@ class ObjectLowering(private val context: DartLoweringContext) : IrDeclarationTr
                     type = obj.defaultType
                     name = Name.identifier("\$companion")
                 }.apply {
+                    parent = obj
+
                     initializer = IrExpressionBodyImpl(
                         context.createIrBuilder(symbol).buildStatement {
                             irGetField(

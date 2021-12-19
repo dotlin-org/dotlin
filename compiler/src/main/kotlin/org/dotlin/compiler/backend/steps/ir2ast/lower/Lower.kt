@@ -20,9 +20,8 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.*
+import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.Comparable
-import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.EnumLowering
-import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.StringLowering
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.SymbolTable
@@ -53,6 +52,9 @@ private val lowerings = listOf(
     ::ConstructorPassingComplexParamToSuperLowering,
     ::CompareToCallsLowering,
     ::RemoveInstanceInitializersLowering,
+    ::IteratorSubtypeBackingFieldsLowering,
+    ::IteratorSubtypeReturnsLowering,
+    ::IteratorLowering,
     ::PropertySimplifyingLowering,
     ::WhensWithSubjectStatementsLowering,
     ::WhensWithSubjectExpressionsLowering,
