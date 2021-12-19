@@ -20,9 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.jetbrains.kotlin.backend.jvm.ir.isInPublicInlineScope
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
-
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.expressions.IrDelegatingConstructorCall
@@ -42,7 +40,8 @@ class DefaultConstructorsLowering(private val context: DartLoweringContext) : Ir
             declaration.visibility != DescriptorVisibilities.PUBLIC ||
             declaration.annotations.isNotEmpty() ||
             declaration.valueParameters.isNotEmpty() ||
-            declaration.typeParameters.isNotEmpty()) {
+            declaration.typeParameters.isNotEmpty()
+        ) {
             return noChange()
         }
 

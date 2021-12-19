@@ -54,5 +54,5 @@ fun DartImplementsClause.accept(context: DartGenerationContext) = accept(DartMis
 fun DartAnnotation.accept(context: DartGenerationContext) = accept(DartMiscTransformer, context)
 fun Collection<DartAnnotation>.accept(context: DartGenerationContext) = when {
     isEmpty() -> ""
-    else ->  joinToString(separator = "", postfix = " ") { it.accept(context) }
+    else -> joinToString(separator = "", postfix = " ") { it.accept(context) }
 }

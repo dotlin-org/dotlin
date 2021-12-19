@@ -22,7 +22,8 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 import org.dotlin.compiler.backend.DotlinAnnotations
 import org.dotlin.compiler.backend.dartHideImportLibrary
 import org.dotlin.compiler.backend.dartImportAliasLibrary
-import org.dotlin.compiler.backend.steps.ir2ast.lower.*
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.lower.IrFileTransformer
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.simpleDartNameOrNull
 import org.dotlin.compiler.backend.util.getAnnotation
 import org.jetbrains.kotlin.ir.IrElement
@@ -30,7 +31,9 @@ import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationWithName
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrTypeParametersContainer
-import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
+import org.jetbrains.kotlin.ir.expressions.IrDeclarationReference
+import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.types.IrType
@@ -42,6 +45,9 @@ import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.ir.util.remapTypes
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
+import kotlin.collections.mutableMapOf
+import kotlin.collections.plus
+import kotlin.collections.set
 
 /**
  * A fake synthetic annotation is created to tell the IrToDartCompilationUnitTransformer to add the import directives

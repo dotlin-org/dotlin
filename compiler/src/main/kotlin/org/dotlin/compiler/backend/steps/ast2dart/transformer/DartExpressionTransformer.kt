@@ -170,7 +170,10 @@ object DartExpressionTransformer : DartAstNodeTransformer {
             "$rawToken$quoteToken$elements$quoteToken"
         }
 
-    override fun visitInterpolationString(interpolationString: DartInterpolationString, context: DartGenerationContext) =
+    override fun visitInterpolationString(
+        interpolationString: DartInterpolationString,
+        context: DartGenerationContext
+    ) =
         interpolationString.value
 
     override fun visitInterpolationExpression(
