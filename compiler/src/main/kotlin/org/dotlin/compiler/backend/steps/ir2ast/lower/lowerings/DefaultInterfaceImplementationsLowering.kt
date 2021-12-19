@@ -19,19 +19,21 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
+import org.dotlin.compiler.backend.steps.ir2ast.ir.deepCopyWith
+import org.dotlin.compiler.backend.steps.ir2ast.ir.firstNonFakeOverrideOrNull
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationTransformer
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
 import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
+import org.dotlin.compiler.backend.util.replace
 import org.jetbrains.kotlin.backend.common.ir.moveBodyTo
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
-import org.jetbrains.kotlin.ir.types.classifierOrNull
 import org.jetbrains.kotlin.ir.util.isFakeOverride
 import org.jetbrains.kotlin.ir.util.isInterface
-import org.jetbrains.kotlin.ir.util.parentClassOrNull
+import org.jetbrains.kotlin.ir.util.parentAsClass
 
 /**
  * Since Dart requires you to implement _all_ members if you `implement` a class,
@@ -44,36 +46,36 @@ class DefaultInterfaceImplementationsLowering(private val context: DartLoweringC
 
         val irClass = declaration
 
-        // TODO: Support multiple interfaces
-        val superClass = irClass.superTypes.firstOrNull()?.classifierOrNull?.owner as? IrClass ?: return noChange()
-        if (!superClass.isInterface) return noChange()
-
         irClass.declarations
             .filter { it.isFakeOverride }
             .apply {
-                fun applyBodyOfSuperTo(function: IrSimpleFunction) {
-                    val superFunction = function.overriddenSymbols
-                        .firstOrNull { it.owner.parentClassOrNull == superClass }
-                        ?.owner
+                fun makeNonFakeOverride(function: IrSimpleFunction): IrSimpleFunction? {
+                    val superFunction = function.firstNonFakeOverrideOrNull()
 
-                    function.body = superFunction?.moveBodyTo(function)
+                    if (superFunction?.parentAsClass?.isInterface != true) return null
+
+                    return function.deepCopyWith { isFakeOverride = false }.apply {
+                        body = superFunction.moveBodyTo(this)
+                    }
                 }
 
                 // Handle function overrides.
                 filterIsInstance<IrSimpleFunction>()
-                    .forEach(::applyBodyOfSuperTo)
+                    .forEach {
+                        val new = makeNonFakeOverride(it) ?: return@forEach
+                        irClass.declarations.replace(it, new)
+                    }
 
                 // Handle getter & setter overrides.
                 filterIsInstance<IrProperty>()
                     .forEach { property ->
                         property.apply {
-                            getter?.let { applyBodyOfSuperTo(it) }
-                            setter?.let { applyBodyOfSuperTo(it) }
+                            getter?.let { getter = makeNonFakeOverride(it) }
+                            setter?.let { setter = makeNonFakeOverride(it) }
                         }
                     }
             }
 
         return noChange()
     }
-
 }
