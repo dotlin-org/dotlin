@@ -160,9 +160,9 @@ class Expression : BaseTest {
             }
 
             void main() {
-              final int x = 1 + 1 == 3
+              final int x = (1 + 1) == 3
                   ? test()
-                  : 3 + 3 == 7
+                  : (3 + 3) == 7
                       ? test()
                       : test();
             }
@@ -196,9 +196,9 @@ class Expression : BaseTest {
             }
 
             void main() {
-              final int x = 1 + 1 == 3
+              final int x = (1 + 1) == 3
                   ? test()
-                  : 3 + 3 == 7
+                  : (3 + 3) == 7
                       ? test()
                       : test();
             }
@@ -596,6 +596,27 @@ class Expression : BaseTest {
 
             void main() {
               identical(Test(), Test());
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `Boolean !`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+               !(1 == 0)
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              !(1 == 0);
             }
             """
         )
