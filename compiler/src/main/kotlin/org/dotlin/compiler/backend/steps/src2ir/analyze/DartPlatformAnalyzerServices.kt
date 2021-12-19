@@ -36,7 +36,6 @@ object DartPlatformAnalyzerServices : PlatformDependentAnalyzerServices() {
         result.addAll(
             listOf(
                 ImportPath.fromString("dotlin.*"),
-                ImportPath.fromString("dart.core.*")
             )
         )
     }
