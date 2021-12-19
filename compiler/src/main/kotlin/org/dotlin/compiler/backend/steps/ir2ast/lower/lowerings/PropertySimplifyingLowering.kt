@@ -52,7 +52,7 @@ class PropertySimplifyingLowering(val context: DartLoweringContext) : IrDeclarat
             val irField = context.irFactory.buildField {
                 name = irProperty.name
                 type = irProperty.type
-                isFinal = irProperty.isVar
+                isFinal = !irProperty.isVar
             }.apply {
                 parent = irProperty.parent
                 correspondingPropertySymbol = irProperty.symbol
@@ -115,7 +115,7 @@ class PropertySimplifyingLowering(val context: DartLoweringContext) : IrDeclarat
             }
 
             val addGetter = when {
-                !hasImplicitGetter -> getter?.let {
+                !hasImplicitGetter || hasExplicitBackingField -> getter?.let {
                     val newGetter = it.deepCopyWith {
                         name = irProperty.name
                     }.apply {
@@ -130,14 +130,26 @@ class PropertySimplifyingLowering(val context: DartLoweringContext) : IrDeclarat
             }
 
             val addSetter = when {
-                !hasImplicitSetter -> setter?.let {
+                !hasImplicitSetter || hasExplicitBackingField -> setter?.let {
                     val newSetter = it.deepCopyWith {
                         name = irProperty.name
                     }.apply {
+                        irProperty.setter = this
+
                         correspondingPropertySymbol = irProperty.symbol
+
+                        valueParameters.single().let { param ->
+                            if (param.name.asString() == "<set-?>") {
+                                valueParameters = listOf(
+                                    param.deepCopyWith {
+                                        name = Name.identifier("\$value")
+                                    }
+                                )
+                            }
+                        }
                     }
 
-                    irProperty.setter = newSetter
+
 
                     add(newSetter)
                 }

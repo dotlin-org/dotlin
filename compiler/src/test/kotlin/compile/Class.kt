@@ -156,6 +156,107 @@ class Class : BaseTest {
         }
 
         @Test
+        fun `class with single property in body and calling custom setter`() = assertCompile {
+            kotlin(
+                """
+                class Test {
+                    fun sideEffect() {}
+
+                    var property: Int = 0
+                        set(value) {
+                            sideEffect()
+                        }
+                }
+
+                fun main() {
+                    Test().property = 123
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                @sealed
+                class Test {
+                  @nonVirtual
+                  void sideEffect() {}
+                  @nonVirtual
+                  int _${'$'}property = 0;
+                  @nonVirtual
+                  int get property {
+                    return this._${'$'}property;
+                  }
+
+                  @nonVirtual
+                  void set property(int value) {
+                    this.sideEffect();
+                  }
+                }
+
+                void main() {
+                  Test().property = 123;
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `class with single simple property in body and calling private setter`() = assertCompile {
+            kotlin(
+                """
+                class Test {
+                    fun sideEffect() {}
+
+                    var property: Int = 0
+                        private set
+
+                    fun doIt() {
+                        property = 3
+                    }
+                }
+
+                fun main() {
+                    Test().doIt()
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                @sealed
+                class Test {
+                  @nonVirtual
+                  void sideEffect() {}
+                  @nonVirtual
+                  int _${'$'}property = 0;
+                  @nonVirtual
+                  int get property {
+                    return this._${'$'}property;
+                  }
+
+                  @nonVirtual
+                  void set _property(int ${'$'}value) {
+                    this._${'$'}property = ${'$'}value;
+                  }
+
+                  @nonVirtual
+                  void doIt() {
+                    this.property = 3;
+                  }
+                }
+
+                void main() {
+                  Test().doIt();
+                }
+                """
+            )
+        }
+
+        @Test
         fun `class with single property in primary constructor`() = assertCompile {
             kotlin(
                 """

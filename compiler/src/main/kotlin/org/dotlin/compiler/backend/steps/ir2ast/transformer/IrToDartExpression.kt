@@ -135,6 +135,15 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                     left = irCallLike.getValueArgument(0)!!.accept(context).possiblyParenthesize(),
                     right = irCallLike.getValueArgument(1)!!.accept(context).possiblyParenthesize(),
                 )
+            IrStatementOrigin.EQ ->
+                DartAssignmentExpression(
+                    left = DartPropertyAccessExpression(
+                        target = infixLeft,
+                        propertyName = (irCallLike.symbol.owner as IrSimpleFunction)
+                            .correspondingProperty!!.dartNameAsSimple
+                    ),
+                    right = right,
+                )
             else -> {
                 val hasDartGetterAnnotation = irCallLike.symbol.owner.hasDartGetterAnnotation()
 
@@ -144,7 +153,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                         val irSimpleFunction = irCallLike.symbol.owner as IrSimpleFunction
                         val propertyName = when {
                             hasDartGetterAnnotation -> irSimpleFunction.dartNameAsSimple
-                            else -> irSimpleFunction.correspondingPropertySymbol!!.owner.dartNameAsSimple
+                            else -> irSimpleFunction.correspondingProperty!!.dartNameAsSimple
                         }
 
                         DartPropertyAccessExpression(infixLeft, propertyName)
