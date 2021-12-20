@@ -36,6 +36,7 @@ private val lowerings = listOf(
     ::AnnotatedExpressionsLowering,
     ::EnumClassLowering,
     ::GetEnumValueLowering,
+    ::DartConstExpressionsInConstConstructorsLowering,
     ::ConjunctionsDisjunctionsLowering,
     ::ComplexParametersLowering,
     ::PropertiesReferencingThisLowering,

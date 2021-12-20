@@ -22,6 +22,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartConst
 import org.jetbrains.kotlin.backend.common.ir.createParameterDeclarations
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
@@ -261,4 +262,9 @@ class ComplexParametersLowering(private val context: DartLoweringContext) : IrDe
             body = context.irFactory.createBlockBody(UNDEFINED_OFFSET, UNDEFINED_OFFSET)
         }
     }
+
+    /**
+     * Whether the [IrExpression] is 'complex' in terms of Dart final initializers.
+     */
+    private fun IrExpression?.isComplex() = this != null && !isDartConst()
 }
