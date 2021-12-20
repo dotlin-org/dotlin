@@ -46,7 +46,7 @@ class Dotlin : BaseTest {
 
             @sealed
             class Dar {}
-            
+
             void main() {
               Dar();
             }
@@ -119,6 +119,73 @@ class Dotlin : BaseTest {
     }
 
     @Test
+    fun `@DartName on simple property`() = assertCompile {
+        kotlin(
+            """
+            class Cool {
+                @DartName("CHILL")
+                val chill = 0
+            }
+
+            fun main() {
+                Cool().chill
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Cool {
+              @nonVirtual
+              final int CHILL = 0;
+            }
+
+            void main() {
+              Cool().CHILL;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartName on property with getter`() = assertCompile {
+        kotlin(
+            """
+            class Cool {
+                @DartName("CHILL")
+                val chill: Int
+                    get() = 0
+            }
+
+            fun main() {
+                Cool().chill
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Cool {
+              @nonVirtual
+              int get CHILL {
+                return 0;
+              }
+            }
+
+            void main() {
+              Cool().CHILL;
+            }
+            """
+        )
+    }
+
+    @Test
     fun `@DartConst constructor`() = assertCompile {
         kotlin(
             """
@@ -138,7 +205,7 @@ class Dotlin : BaseTest {
             class Test {
               const Test() : super();
             }
-            
+
             void main() {
               Test();
             }
