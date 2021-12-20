@@ -183,10 +183,10 @@ class Class : BaseTest {
                   @nonVirtual
                   void sideEffect() {}
                   @nonVirtual
-                  int _${'$'}property = 0;
+                  int _${'$'}propertyBackingField = 0;
                   @nonVirtual
                   int get property {
-                    return this._${'$'}property;
+                    return this._${'$'}propertyBackingField;
                   }
 
                   @nonVirtual
@@ -232,15 +232,15 @@ class Class : BaseTest {
                   @nonVirtual
                   void sideEffect() {}
                   @nonVirtual
-                  int _${'$'}property = 0;
+                  int _${'$'}propertyBackingField = 0;
                   @nonVirtual
                   int get property {
-                    return this._${'$'}property;
+                    return this._${'$'}propertyBackingField;
                   }
 
                   @nonVirtual
                   void set _property(int ${'$'}value) {
-                    this._${'$'}property = ${'$'}value;
+                    this._${'$'}propertyBackingField = ${'$'}value;
                   }
 
                   @nonVirtual
@@ -588,17 +588,17 @@ class Class : BaseTest {
                   @nonVirtual
                   void sideEffect(int x) {}
                   @nonVirtual
-                  int _${'$'}property = 0;
+                  int _${'$'}propertyBackingField = 0;
                   @nonVirtual
                   int get property {
-                    this.sideEffect(this._${'$'}property);
-                    return this._${'$'}property;
+                    this.sideEffect(this._${'$'}propertyBackingField);
+                    return this._${'$'}propertyBackingField;
                   }
         
                   @nonVirtual
                   void set property(int value) {
                     this.sideEffect(value);
-                    this._${'$'}property = value;
+                    this._${'$'}propertyBackingField = value;
                   }
                 }
                 """

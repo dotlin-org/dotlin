@@ -21,6 +21,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
+import org.dotlin.compiler.backend.util.isSimple
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.declarations.buildField
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
@@ -48,11 +49,14 @@ class PropertySimplifyingLowering(val context: DartLoweringContext) : IrDeclarat
 
         // If we have an implicit getter, and in the case of vars, also an implicit setter, we replace
         // the property with a field.
-        if (irProperty.hasImplicitGetter && (!irProperty.isVar || irProperty.hasImplicitSetter)) {
+        if (irProperty.isSimple) {
             val irField = context.irFactory.buildField {
                 name = irProperty.name
                 type = irProperty.type
                 isFinal = !irProperty.isVar
+                isStatic = irProperty.backingField?.isStatic == true ||
+                        (irProperty.getter?.dispatchReceiverParameter == null &&
+                                irProperty.setter?.dispatchReceiverParameter == null)
             }.apply {
                 parent = irProperty.parent
                 correspondingPropertySymbol = irProperty.symbol
@@ -99,18 +103,7 @@ class PropertySimplifyingLowering(val context: DartLoweringContext) : IrDeclarat
         return irProperty.run {
             val addBackingField = when {
                 // If a property has an explicit backing field, add it.
-                hasExplicitBackingField -> {
-                    val oldBackingField = backingField!!
-
-                    // We replace it with a properly named field first.
-                    val newBackingField = oldBackingField.deepCopyWith {
-                        name = Name.identifier("$" + oldBackingField.name.identifier)
-                    }
-
-                    backingField = newBackingField
-
-                    add(newBackingField)
-                }
+                hasExplicitBackingField -> add(backingField!!)
                 else -> null
             }
 
@@ -148,8 +141,6 @@ class PropertySimplifyingLowering(val context: DartLoweringContext) : IrDeclarat
                             }
                         }
                     }
-
-
 
                     add(newSetter)
                 }
