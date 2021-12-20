@@ -51,7 +51,7 @@ class ConstructorPassingComplexParamToSuperLowering(private val context: DartLow
             .singleOrNull()
 
         if (superCall == null ||
-            !superCall.valueArguments.any { arg -> originalComplexParams.any { arg.hasDirectReferenceTo(it) } }
+            !superCall.valueArguments.any { arg -> originalComplexParams.any { arg?.hasDirectReferenceTo(it) == true } }
         ) {
             // No complex params are passed to a super constructor, nothing to see here.
             return noChange()

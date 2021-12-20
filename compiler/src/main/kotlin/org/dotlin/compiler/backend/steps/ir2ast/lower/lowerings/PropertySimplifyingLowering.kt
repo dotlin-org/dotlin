@@ -87,7 +87,7 @@ class PropertySimplifyingLowering(val context: DartLoweringContext) : IrDeclarat
                                 UNDEFINED_OFFSET,
                                 irField.symbol,
                                 receiver = receiver,
-                                value = expression.valueArguments.single(),
+                                value = expression.valueArguments.single()!!,
                                 type = irField.type
                             )
                             else -> expression

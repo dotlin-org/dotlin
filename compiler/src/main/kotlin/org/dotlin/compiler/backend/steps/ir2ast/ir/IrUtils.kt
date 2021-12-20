@@ -432,8 +432,8 @@ fun IrFunction.isEqualsOverriddenFromAny() =
                 ?.defaultType
                 ?.isAny() ?: false
 
-val IrFunctionAccessExpression.valueArguments: List<IrExpression>
-    get() = (0 until valueArgumentsCount).map { getValueArgument(it)!! }
+val IrFunctionAccessExpression.valueArguments: List<IrExpression?>
+    get() = (0 until valueArgumentsCount).map { getValueArgument(it) }
 
 val IrFunctionAccessExpression.typeArguments: List<IrType>
     get() = (0 until typeArgumentsCount).map { getTypeArgument(it)!! }

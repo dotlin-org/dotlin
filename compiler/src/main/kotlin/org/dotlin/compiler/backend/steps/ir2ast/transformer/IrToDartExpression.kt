@@ -117,7 +117,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                 val (actualLeft, actualRight) = if (irCallLike.valueArgumentsCount == 1) {
                     infixLeft to infixRight
                 } else {
-                    irCallLike.valueArguments.map { it.accept(context).possiblyParenthesize() }.toPair()
+                    irCallLike.valueArguments.mapNotNull { it?.accept(context)?.possiblyParenthesize() }.toPair()
                 }
 
                 return DartComparisonExpression(
