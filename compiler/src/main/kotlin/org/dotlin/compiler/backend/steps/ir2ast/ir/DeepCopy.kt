@@ -34,6 +34,21 @@ import org.jetbrains.kotlin.name.Name
 /**
  * Deep-copies the given class and remaps all references to it (if [remapReferences] is true).
  */
+inline fun <reified T : IrDeclaration> T.deepCopy(
+    remapReferences: Boolean = true,
+): T = when (this) {
+    is IrClass -> deepCopyWith(remapReferences) {}
+    is IrConstructor -> deepCopyWith(remapReferences) {}
+    is IrFunction -> deepCopyWith(remapReferences) {}
+    is IrProperty -> deepCopyWith(remapReferences) {}
+    is IrField -> deepCopyWith(remapReferences) {}
+    is IrValueParameter -> deepCopyWith(remapReferences) {}
+    else -> throw UnsupportedOperationException("Cannot deep-copy ${T::class.simpleName}")
+}
+
+/**
+ * Deep-copies the given class and remaps all references to it (if [remapReferences] is true).
+ */
 inline fun <reified T : IrDeclarationWithName> T.deepCopyWith(
     remapReferences: Boolean = true,
     name: Name,

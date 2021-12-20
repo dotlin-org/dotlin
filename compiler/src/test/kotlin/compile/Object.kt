@@ -26,8 +26,6 @@ import org.junit.jupiter.api.Test
 
 @DisplayName("Compile: Object")
 class Object : BaseTest {
-    private val instance = "\$instance"
-
     @Test
     fun `object`() = assertCompile {
         kotlin(
@@ -43,7 +41,7 @@ class Object : BaseTest {
             @sealed
             class Test {
               Test._() : super();
-              static final Test $instance = Test._();
+              static final Test ${'$'}instance = Test._();
             }
             """
         )
@@ -54,7 +52,7 @@ class Object : BaseTest {
         kotlin(
             """
             object Test {
-                fun compute(): Int {
+                fun compute(x: Int, y: Float): Int {
                     return 343
                 }
             }
@@ -69,11 +67,19 @@ class Object : BaseTest {
             class Test {
               Test._() : super();
               @nonVirtual
-              int compute() {
+              int ${'$'}compute(
+                int x,
+                double y,
+              ) {
                 return 343;
               }
             
-              static final Test $instance = Test._();
+              static final Test ${'$'}instance = Test._();
+              static int compute(
+                int x,
+                double y,
+              ) =>
+                  Test.${'$'}instance.${'$'}compute(x, y);
             }
             """
         )
@@ -89,9 +95,35 @@ class Object : BaseTest {
             """
         )
 
-        @Suppress("LocalVariableName")
-        val TestCompanion = "\$TestCompanion"
-        val companion = "\$companion"
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {
+              static final ${'$'}TestCompanion ${'$'}companion = ${'$'}TestCompanion.${'$'}instance;
+            }
+            
+            @sealed
+            class ${'$'}TestCompanion {
+              ${'$'}TestCompanion._() : super();
+              static final ${'$'}TestCompanion ${'$'}instance = ${'$'}TestCompanion._();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `companion object with method`() = assertCompile {
+        kotlin(
+            """
+            class Test {
+                companion object {
+                    fun compute() = 343
+                }
+            }
+            """
+        )
 
         dart(
             """
@@ -99,13 +131,187 @@ class Object : BaseTest {
 
             @sealed
             class Test {
-              static final $TestCompanion $companion = $TestCompanion.$instance;
+              static final ${'$'}TestCompanion ${'$'}companion = ${'$'}TestCompanion.${'$'}instance;
+              static int compute() => ${'$'}TestCompanion.${'$'}instance.${'$'}compute();
             }
-            
+
             @sealed
-            class $TestCompanion {
-              $TestCompanion._() : super();
-              static final $TestCompanion $instance = $TestCompanion._();
+            class ${'$'}TestCompanion {
+              ${'$'}TestCompanion._() : super();
+              @nonVirtual
+              int ${'$'}compute() {
+                return 343;
+              }
+
+              static final ${'$'}TestCompanion ${'$'}instance = ${'$'}TestCompanion._();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `object with property`() = assertCompile {
+        kotlin(
+            """
+            object Test {
+                val property = 3
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {
+              Test._() : super();
+              @nonVirtual
+              final int ${'$'}property = 3;
+              static final Test ${'$'}instance = Test._();
+              static final int property = Test.${'$'}instance.${'$'}property;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `object with property getter`() = assertCompile {
+        kotlin(
+            """
+            object Test {
+                val property: Int
+                    get() = 42
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {
+              Test._() : super();
+              @nonVirtual
+              int get ${'$'}property {
+                return 42;
+              }
+
+              static final Test ${'$'}instance = Test._();
+              static int get property => Test.${'$'}instance.${'$'}property;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `object with property getter and setter`() = assertCompile {
+        kotlin(
+            """
+            object Test {
+                var property: Int
+                    get() = 42
+                    set(value) {}
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {
+              Test._() : super();
+              @nonVirtual
+              int get ${'$'}property {
+                return 42;
+              }
+
+              @nonVirtual
+              void set ${'$'}property(int value) {}
+              static final Test ${'$'}instance = Test._();
+              static int get property => Test.${'$'}instance.${'$'}property;
+              static void set property(int value) => Test.${'$'}instance.${'$'}property = value;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `object with property getter and setter with backing field`() = assertCompile {
+        kotlin(
+            """
+            object Test {
+                var property: Int = 0
+                    get() = 42
+                    set(value) { field = value }
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {
+              Test._() : super();
+              @nonVirtual
+              int _${'$'}propertyBackingField = 0;
+              @nonVirtual
+              int get ${'$'}property {
+                return 42;
+              }
+
+              @nonVirtual
+              void set ${'$'}property(int value) {
+                this._${'$'}propertyBackingField = value;
+              }
+
+              static final Test ${'$'}instance = Test._();
+              static int get property => Test.${'$'}instance.${'$'}property;
+              static void set property(int value) => Test.${'$'}instance.${'$'}property = value;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `object with private property getter and setter with backing field`() = assertCompile {
+        kotlin(
+            """
+            object Test {
+                private var property: Int = 0
+                    get() = 42
+                    set(value) { field = value }
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {
+              Test._() : super();
+              @nonVirtual
+              int _${'$'}propertyBackingField = 0;
+              @nonVirtual
+              int get _${'$'}property {
+                return 42;
+              }
+
+              @nonVirtual
+              void set _${'$'}property(int value) {
+                this._${'$'}propertyBackingField = value;
+              }
+
+              static final Test ${'$'}instance = Test._();
+              static int get _property => Test.${'$'}instance._${'$'}property;
+              static void set _property(int value) => Test.${'$'}instance._${'$'}property = value;
             }
             """
         )

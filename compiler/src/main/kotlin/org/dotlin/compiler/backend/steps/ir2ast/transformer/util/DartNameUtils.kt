@@ -21,6 +21,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer.util
 
 import org.dotlin.compiler.backend.dartAnnotatedName
 import org.dotlin.compiler.backend.dartImportAliasPrefix
+import org.dotlin.compiler.backend.steps.ir2ast.ir.isExplicitBackingField
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrivate
 import org.dotlin.compiler.backend.util.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
@@ -132,9 +133,7 @@ private fun IrDeclarationWithName.getDartNameOrNull(allowNested: Boolean): DartI
             else -> ""
         }
 
-        name = DartSimpleIdentifier(
-            name.value + uniqueParametersPart + uniqueTypeParametersPart + uniqueValueTypeSuffix
-        )
+        name = name.copy(suffix = uniqueParametersPart + uniqueTypeParametersPart + uniqueValueTypeSuffix)
     }
 
     // Nested classes, interfaces, etc.
@@ -149,20 +148,29 @@ private fun IrDeclarationWithName.getDartNameOrNull(allowNested: Boolean): DartI
             .toDartSimpleIdentifier()
     }
 
+    // Instance methods from objects get prefixed with '$'.
+    if (isFromObjectAndStaticallyAvailable) {
+        name = name?.asGenerated()
+    }
+
+    // Property backing fields are prefixed with '$' and suffixed with 'BackingField'.
+    if (this is IrField && isExplicitBackingField) {
+        name = name?.copy(isGenerated = true, suffix = "BackingField")
+    }
+
     if (this is IrDeclarationWithVisibility) {
         name = when {
             // Start name with underscore if the declaration is private and name didn't already start with one.
             isPrivate && name?.isPrivate == false -> name.asPrivate()
             // If a name starts with an underscore but is not for a private declaration, remove the underscore(s).
-            !isPrivate && name?.isPrivate == true -> name.value.replace(Regex("^_+"), "").toDartSimpleIdentifier()
+            !isPrivate && name?.isPrivate == true -> name.copy(isPrivate = false)
             else -> name
         }
     }
 
     return when {
         aliasPrefix != null && name != null -> DartPrefixedIdentifier(aliasPrefix, name)
-        name != null -> name
-        else -> null
+        else -> name
     }
 }
 

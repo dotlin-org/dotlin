@@ -35,20 +35,28 @@ sealed interface DartIdentifier : DartExpression {
 
 @JvmInline
 value class DartSimpleIdentifier(override val value: String) : DartIdentifier {
-    constructor(value: String, isPrivate: Boolean, isGenerated: Boolean = false) :
-            this(
-                when {
-                    isPrivate -> when {
-                        isGenerated -> "_\$$value"
-                        else -> "_$value"
-                    }
-                    isGenerated -> "\$$value"
-                    else -> value
-                }
-            )
-
     init {
         require(value.isNotEmpty())
+    }
+
+    fun copy(
+        isPrivate: Boolean = this.isPrivate,
+        isGenerated: Boolean = this.isGenerated,
+        prefix: String = "",
+        suffix: String = ""
+    ): DartSimpleIdentifier {
+        val value = "$prefix$baseValue$suffix"
+
+        return DartSimpleIdentifier(
+            when {
+                isPrivate -> when {
+                    isGenerated -> "_\$$value"
+                    else -> "_$value"
+                }
+                isGenerated -> "\$$value"
+                else -> value
+            }
+        )
     }
 
     val isPrivate: Boolean
@@ -59,18 +67,17 @@ value class DartSimpleIdentifier(override val value: String) : DartIdentifier {
 
     /**
      * The [value] of this identifier without private (`_`) or generation (`$`) prefixes.
+     *
+     * Will remove multiple instances of `_` and `$`.
      */
     val baseValue: String
-        get() = value.removePrefix("_").removePrefix("$")
+        get() = value.replace(Regex("^_+"), "").replace(Regex("^\\$+"), "")
 
-    fun asPrivate(): DartSimpleIdentifier =
-        DartSimpleIdentifier(baseValue, isPrivate = true, isGenerated = isGenerated)
+    fun asPrivate(): DartSimpleIdentifier = copy(isPrivate = true)
 
-    fun asGenerated(): DartSimpleIdentifier =
-        DartSimpleIdentifier(baseValue, isPrivate = isPrivate, isGenerated = true)
+    fun asGenerated(): DartSimpleIdentifier = copy(isGenerated = true)
 
-    fun asGeneratedPrivate(): DartSimpleIdentifier =
-        DartSimpleIdentifier(baseValue, isPrivate = true, isGenerated = true)
+    fun asGeneratedPrivate(): DartSimpleIdentifier = copy(isPrivate = true, isGenerated = true)
 
     override fun toString() = value
 }
