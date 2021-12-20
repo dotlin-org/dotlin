@@ -23,8 +23,7 @@ package dotlin
     AnnotationTarget.CLASS,
     AnnotationTarget.CONSTRUCTOR,
     AnnotationTarget.FUNCTION,
-    AnnotationTarget.PROPERTY_GETTER,
-    AnnotationTarget.PROPERTY_SETTER,
+    AnnotationTarget.PROPERTY,
     AnnotationTarget.FILE
 )
 @Retention(AnnotationRetention.SOURCE)

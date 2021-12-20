@@ -19,11 +19,16 @@
 
 package org.dotlin.compiler.backend
 
+import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.backend.util.falseIfNull
 import org.dotlin.compiler.backend.util.getSingleAnnotationStringArgumentOf
 import org.dotlin.compiler.backend.util.hasOverriddenAnnotation
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
+import org.jetbrains.kotlin.ir.declarations.IrField
 import org.jetbrains.kotlin.ir.declarations.IrOverridableDeclaration
+import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.util.isGetter
+import org.jetbrains.kotlin.ir.util.isSetter
 
 object DotlinAnnotations {
     const val dartName = "dotlin.DartName"
@@ -39,7 +44,15 @@ fun IrDeclaration.hasDartGetterAnnotation() =
     (this as? IrOverridableDeclaration<*>?)?.hasOverriddenAnnotation(DotlinAnnotations.dartBuiltInGetter).falseIfNull()
 
 val IrDeclaration.dartAnnotatedName: String?
-    get() = getSingleAnnotationStringArgumentOf(DotlinAnnotations.dartName)
+    get() = when (this) {
+        is IrField -> correspondingProperty ?: this
+        is IrSimpleFunction -> when {
+            isGetter -> correspondingProperty!!
+            isSetter -> correspondingProperty!!
+            else -> this
+        }
+        else -> this
+    }.run { getSingleAnnotationStringArgumentOf(DotlinAnnotations.dartName) }
 
 val IrDeclaration.dartImportAliasLibrary: String?
     get() = getSingleAnnotationStringArgumentOf(DotlinAnnotations.dartBuiltInImportAlias)
