@@ -65,14 +65,14 @@ class Iterator : BaseTest {
 
               @nonVirtual
               @override
-              late int _${'$'}current;
+              late int _${'$'}currentBackingField;
               @nonVirtual
               @override
-              int get current => this._${'$'}current;
+              int get current => this._${'$'}currentBackingField;
               @protected
               @nonVirtual
               @override
-              void set current(int value) => this._${'$'}current = value;
+              void set current(int value) => this._${'$'}currentBackingField = value;
               @nonVirtual
               @override
               bool moveNext() {
@@ -155,14 +155,14 @@ class Iterator : BaseTest {
 
               @nonVirtual
               @override
-              late int _${'$'}current;
+              late int _${'$'}currentBackingField;
               @nonVirtual
               @override
-              int get current => this._${'$'}current;
+              int get current => this._${'$'}currentBackingField;
               @protected
               @nonVirtual
               @override
-              void set current(int value) => this._${'$'}current = value;
+              void set current(int value) => this._${'$'}currentBackingField = value;
               @nonVirtual
               @override
               bool moveNext() {
