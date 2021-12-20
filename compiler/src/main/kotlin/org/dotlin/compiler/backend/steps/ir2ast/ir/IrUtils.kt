@@ -178,11 +178,6 @@ val IrValueParameter.otherPropertyDependents: List<IrProperty>
             .toList()
     }
 
-/**
- * Whether the [IrExpression] is 'complex' in terms of Dart final initializers.
- */
-fun IrExpression?.isComplex() = this != null && this !is IrConst<*>
-
 fun IrExpression?.isThisReference() = this is IrGetValue && symbol.owner.name == Name.special("<this>")
 
 fun IrExpression.wrap() = IrExpressionBodyImpl(this)

@@ -51,7 +51,10 @@ fun IrDeclaration.isDartConst(): Boolean = when (this) {
     else -> false
 }
 
-fun IrExpression.isDartConst(context: DartTransformContext): Boolean = when (this) {
+/**
+ * **NOTE**: Always pass `context` when calling in a [IrDartTransformer].
+ */
+fun IrExpression.isDartConst(context: DartTransformContext? = null): Boolean = when (this) {
     // Enums are always constructed as const.
     is IrEnumConstructorCall -> true
     is IrConst<*> -> true
@@ -59,7 +62,7 @@ fun IrExpression.isDartConst(context: DartTransformContext): Boolean = when (thi
     is IrConstructorCall -> when (symbol.owner.origin) {
         // The constructor of _$DefaultMarker should always be invoked with const.
         IrDartDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE -> true
-        else -> context.annotatedExpressions[this]?.hasAnnotation(DotlinAnnotations.dartConst) ?: false
+        else -> context?.annotatedExpressions?.get(this)?.hasAnnotation(DotlinAnnotations.dartConst) ?: false
     }
     else -> false
 }

@@ -242,6 +242,43 @@ class Dotlin : BaseTest {
     }
 
     @Test
+    fun `@DartConst constructor with parameter with default value calling const constructor`() = assertCompile {
+        kotlin(
+            """
+            class Testable @DartConst constructor()
+
+            class Test @DartConst constructor(val testable: Testable = Testable())
+
+            fun main() {
+                Test()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Testable {
+              const Testable() : super();
+            }
+
+            @sealed
+            class Test {
+              const Test({this.testable = const Testable()}) : super();
+              @nonVirtual
+              final Testable testable;
+            }
+
+            void main() {
+              Test();
+            }
+            """
+        )
+    }
+
+    @Test
     fun `@DartBuiltIn`() = assertCompile {
         kotlin(
             """

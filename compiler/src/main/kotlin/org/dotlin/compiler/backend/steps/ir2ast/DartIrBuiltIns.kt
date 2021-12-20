@@ -59,5 +59,6 @@ class DartIrBuiltIns(
 
     class Dotlin(builtIns: DartIrBuiltIns) {
         val dart = builtIns.symbolAt<IrSimpleFunctionSymbol>("dotlin", "dart")
+        val dartConst = builtIns.symbolAt<IrClassSymbol>("dotlin", "DartConst")
     }
 }
