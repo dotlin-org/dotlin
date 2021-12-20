@@ -23,11 +23,13 @@ import org.dotlin.compiler.backend.hasDartGetterAnnotation
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.*
+import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.ObjectLowering
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.*
 import org.dotlin.compiler.backend.util.toPair
 import org.dotlin.compiler.dart.ast.collection.DartCollectionElementList
 import org.dotlin.compiler.dart.ast.expression.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
+import org.dotlin.compiler.dart.ast.expression.identifier.toDartSimpleIdentifier
 import org.dotlin.compiler.dart.ast.expression.invocation.DartFunctionExpressionInvocation
 import org.dotlin.compiler.dart.ast.expression.invocation.DartMethodInvocation
 import org.dotlin.compiler.dart.ast.expression.literal.*
@@ -270,7 +272,10 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
     }
 
     override fun visitGetObjectValue(irGetObjectValue: IrGetObjectValue, data: DartTransformContext) =
-        irGetObjectValue.symbol.owner.dartName
+        DartPropertyAccessExpression(
+            target = irGetObjectValue.symbol.owner.dartName,
+            propertyName = ObjectLowering.INSTANCE_FIELD_NAME.toDartSimpleIdentifier()
+        )
 
     override fun visitSetValue(irSetValue: IrSetValue, context: DartTransformContext): DartExpression {
         return DartAssignmentExpression(

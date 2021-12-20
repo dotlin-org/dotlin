@@ -29,10 +29,13 @@ import org.dotlin.compiler.dart.ast.expression.identifier.DartPrefixedIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.toDartSimpleIdentifier
 import org.jetbrains.kotlin.backend.common.lower.parents
+import org.jetbrains.kotlin.backend.jvm.codegen.psiElement
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classOrNull
+import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
+import org.jetbrains.kotlin.psi.psiUtil.startsWithComment
 
 private fun IrDeclarationWithName.getDartNameOrNull(allowNested: Boolean): DartIdentifier? {
     val aliasPrefix = dartImportAliasPrefix?.toDartSimpleIdentifier()
@@ -146,6 +149,13 @@ private fun IrDeclarationWithName.getDartNameOrNull(allowNested: Boolean): DartI
             .plus(name)
             .joinToString(separator = "$")
             .toDartSimpleIdentifier()
+    }
+
+    // TODO: Handle case if there's a nested class named "Companion" (error or different name)
+    // Handle companion objects.
+    if (this is IrClass && isCompanion && (name == null || name.value == "Companion")) {
+        val suffix = name?.baseValue ?: "Companion"
+        name = parentAsClass.dartNameAsSimple.copy(suffix = "\$$suffix")
     }
 
     // Instance methods from objects get prefixed with '$'.
