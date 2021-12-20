@@ -32,14 +32,12 @@ import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.util.isAnnotation
-import org.jetbrains.kotlin.ir.util.isEffectivelyExternal
 import org.jetbrains.kotlin.name.FqName
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UNCHECKED_CAST")
 object IrToDartCompilationUnitTransformer : IrDartAstTransformer<DartCompilationUnit> {
     override fun visitFile(irFile: IrFile, context: DartTransformContext) = DartCompilationUnit(
         declarations = irFile.declarations
-            .filterNot { it.isEffectivelyExternal() }
             .map { it.accept(context) },
         // Add import alias directives against Kotlin/Dart built-ins name clashes.
         directives = irFile.annotations

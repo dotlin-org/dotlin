@@ -93,7 +93,7 @@ class ObjectLowering(private val context: DartLoweringContext) : IrDeclarationTr
 
                 declaration.file.addChild(obj)
 
-                transformations = remove() and add(
+                staticContainer.addChild(
                     context.irFactory.buildField {
                         isStatic = true
                         type = obj.defaultType
@@ -112,6 +112,8 @@ class ObjectLowering(private val context: DartLoweringContext) : IrDeclarationTr
                         )
                     }
                 )
+
+                transformations = just { remove() }
             }
             else -> {
                 staticContainer = obj
