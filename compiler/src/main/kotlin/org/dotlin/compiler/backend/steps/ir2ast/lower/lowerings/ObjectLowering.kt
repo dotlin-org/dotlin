@@ -40,6 +40,11 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.Name
 
 class ObjectLowering(private val context: DartLoweringContext) : IrDeclarationTransformer {
+    companion object {
+        const val INSTANCE_FIELD_NAME = "\$instance"
+        const val COMPANION_FIELD_NAME = "\$companion"
+    }
+
     override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrClass || !declaration.isObject) return noChange()
 
@@ -47,15 +52,10 @@ class ObjectLowering(private val context: DartLoweringContext) : IrDeclarationTr
         val staticContainer: IrClass
         val transformations: Transformations<IrDeclaration>
 
-        val obj = declaration.deepCopyWith {
-            name = when {
-                declaration.isCompanion -> Name.identifier("$" + declaration.parentAsClass.name.identifier + "Companion")
-                else -> declaration.name
-            }
+        val obj = declaration.apply {
+            val newObj = this
 
             origin = IrDartDeclarationOrigin.OBJECT
-        }.apply {
-            val newObj = this
 
             primaryConstructor!!.visibility = DescriptorVisibilities.PRIVATE
 
@@ -63,7 +63,7 @@ class ObjectLowering(private val context: DartLoweringContext) : IrDeclarationTr
                 context.irFactory.buildField {
                     isStatic = true
                     type = defaultType
-                    name = Name.identifier("\$instance")
+                    name = Name.identifier(INSTANCE_FIELD_NAME)
                     origin = IrDartDeclarationOrigin.OBJECT_INSTANCE_FIELD
                 }.apply {
                     parent = newObj
@@ -91,13 +91,14 @@ class ObjectLowering(private val context: DartLoweringContext) : IrDeclarationTr
             obj.isCompanion -> {
                 staticContainer = obj.parentAsClass
 
-                declaration.file.addChild(obj)
+                // We don't use addChild on purpose, we want to keep parent info.
+                declaration.file.declarations.add(obj)
 
                 staticContainer.addChild(
                     context.irFactory.buildField {
                         isStatic = true
                         type = obj.defaultType
-                        name = Name.identifier("\$companion")
+                        name = Name.identifier(COMPANION_FIELD_NAME)
                         origin = IrDartDeclarationOrigin.OBJECT_INSTANCE_FIELD
                     }.apply {
                         parent = obj
@@ -106,7 +107,7 @@ class ObjectLowering(private val context: DartLoweringContext) : IrDeclarationTr
                             context.createIrBuilder(symbol).buildStatement {
                                 irGetField(
                                     receiver = irGetObject(obj.symbol),
-                                    field = obj.fieldWithName("\$instance"),
+                                    field = obj.fieldWithName(INSTANCE_FIELD_NAME),
                                 )
                             }
                         )

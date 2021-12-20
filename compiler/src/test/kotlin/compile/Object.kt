@@ -101,13 +101,13 @@ class Object : BaseTest {
 
             @sealed
             class Test {
-              static final ${'$'}TestCompanion ${'$'}companion = ${'$'}TestCompanion.${'$'}instance;
+              static final Test${'$'}Companion ${'$'}companion = Test${'$'}Companion.${'$'}instance.${'$'}instance;
             }
             
             @sealed
-            class ${'$'}TestCompanion {
-              ${'$'}TestCompanion._() : super();
-              static final ${'$'}TestCompanion ${'$'}instance = ${'$'}TestCompanion._();
+            class Test${'$'}Companion {
+              Test${'$'}Companion._() : super();
+              static final Test${'$'}Companion ${'$'}instance = Test${'$'}Companion._();
             }
             """
         )
@@ -122,6 +122,10 @@ class Object : BaseTest {
                     fun compute() = 343
                 }
             }
+
+            fun main() {
+                Test.compute()
+            }
             """
         )
 
@@ -131,19 +135,23 @@ class Object : BaseTest {
 
             @sealed
             class Test {
-              static final ${'$'}TestCompanion ${'$'}companion = ${'$'}TestCompanion.${'$'}instance;
-              static int compute() => ${'$'}TestCompanion.${'$'}instance.${'$'}compute();
+              static final Test${'$'}Companion ${'$'}companion = Test${'$'}Companion.${'$'}instance.${'$'}instance;
+              static int compute() => Test${'$'}Companion.${'$'}instance.${'$'}compute();
+            }
+
+            void main() {
+              Test${'$'}Companion.${'$'}instance.${'$'}compute();
             }
 
             @sealed
-            class ${'$'}TestCompanion {
-              ${'$'}TestCompanion._() : super();
+            class Test${'$'}Companion {
+              Test${'$'}Companion._() : super();
               @nonVirtual
               int ${'$'}compute() {
                 return 343;
               }
 
-              static final ${'$'}TestCompanion ${'$'}instance = ${'$'}TestCompanion._();
+              static final Test${'$'}Companion ${'$'}instance = Test${'$'}Companion._();
             }
             """
         )
