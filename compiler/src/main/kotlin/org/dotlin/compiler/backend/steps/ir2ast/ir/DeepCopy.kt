@@ -319,18 +319,19 @@ class DeepCopier(
     typeRemapper: TypeRemapper,
     symbolRenamer: SymbolRenamer,
     private val declarationRebuilder: DeclarationRebuilder,
-) : DeepCopyIrTreeWithSymbols(symbolRemapper, typeRemapper, symbolRenamer), IrCustomElementHelper {
-    override fun visitExpression(expression: IrExpression) = visitExpression(
+) : DeepCopyIrTreeWithSymbols(symbolRemapper, typeRemapper, symbolRenamer), IrCustomElementTransformerHelperVoid {
+    override fun visitExpression(expression: IrExpression) = visitCustomExpression(
         expression,
-        helperVisitExpression = { super<IrCustomElementHelper>.visitExpression(it) },
-        superVisitExpression = { super<DeepCopyIrTreeWithSymbols>.visitExpression(it) }
-    )
+        data = null,
+        fallback = { super<DeepCopyIrTreeWithSymbols>.visitExpression(expression) }
+    ) as IrExpression
 
-    override fun visitBody(body: IrBody) = visitBody(
-        body,
-        helperVisitBody = { super<IrCustomElementHelper>.visitBody(body) },
-        superVisitBody = { super<DeepCopyIrTreeWithSymbols>.visitBody(body) }
-    )
+    override fun visitBody(body: IrBody) =
+        visitCustomBody(
+            body,
+            data = null,
+            fallback = { super<DeepCopyIrTreeWithSymbols>.visitBody(body) }
+        ) as IrBody
 
     override fun visitDartCodeExpression(expression: IrDartCodeExpression): IrDartCodeExpression =
         IrDartCodeExpression(
@@ -347,6 +348,13 @@ class DeepCopier(
     override fun visitNullAwareExpression(expression: IrNullAwareExpression): IrNullAwareExpression =
         IrNullAwareExpression(expression.expression.transform())
             .copyAttributes(expression)
+
+    override fun visitIfNullExpression(expression: IrIfNullExpression): IrIfNullExpression =
+        IrIfNullExpression(
+            expression.left.transform(),
+            expression.right.transform(),
+            expression.type.remapType(),
+        ).copyAttributes(expression)
 
     override fun visitConjunctionExpression(expression: IrConjunctionExpression): IrConjunctionExpression =
         IrConjunctionExpression(
@@ -370,9 +378,10 @@ class DeepCopier(
     }
 
     override fun visitClass(declaration: IrClass) = declaration.let {
-        val builder = declarationRebuilder.getClassBuilder(declaration.symbol) ?: return super.visitClass(declaration)
+        val builder = declarationRebuilder.getClassBuilder(declaration.symbol)
+            ?: return super<DeepCopyIrTreeWithSymbols>.visitClass(declaration)
 
-        super.visitClass(
+        super<DeepCopyIrTreeWithSymbols>.visitClass(
             object : IrClass() {
                 override var annotations = it.annotations
                 override var attributeOwnerId = it.attributeOwnerId
@@ -408,9 +417,10 @@ class DeepCopier(
     }
 
     override fun visitSimpleFunction(declaration: IrSimpleFunction) = declaration.let {
-        val builder = declarationRebuilder.getFunctionBuilder(it.symbol) ?: return super.visitSimpleFunction(it)
+        val builder = declarationRebuilder.getFunctionBuilder(it.symbol)
+            ?: return super<DeepCopyIrTreeWithSymbols>.visitSimpleFunction(it)
 
-        super.visitSimpleFunction(
+        super<DeepCopyIrTreeWithSymbols>.visitSimpleFunction(
             object : IrSimpleFunction() {
                 override var annotations = it.annotations
                 override var attributeOwnerId = it.attributeOwnerId
@@ -449,9 +459,10 @@ class DeepCopier(
     }
 
     override fun visitConstructor(declaration: IrConstructor) = declaration.let {
-        val builder = declarationRebuilder.getFunctionBuilder(it.symbol) ?: return super.visitConstructor(it)
+        val builder = declarationRebuilder.getFunctionBuilder(it.symbol)
+            ?: return super<DeepCopyIrTreeWithSymbols>.visitConstructor(it)
 
-        super.visitConstructor(
+        super<DeepCopyIrTreeWithSymbols>.visitConstructor(
             object : IrConstructor() {
                 override var annotations = it.annotations
                 override var body = it.body
@@ -483,9 +494,10 @@ class DeepCopier(
 
 
     override fun visitProperty(declaration: IrProperty) = declaration.let {
-        val builder = declarationRebuilder.getPropertyBuilder(it.symbol) ?: return super.visitProperty(it)
+        val builder = declarationRebuilder.getPropertyBuilder(it.symbol)
+            ?: return super<DeepCopyIrTreeWithSymbols>.visitProperty(it)
 
-        super.visitProperty(
+        super<DeepCopyIrTreeWithSymbols>.visitProperty(
             object : IrProperty() {
                 override var annotations = it.annotations
                 override var attributeOwnerId = it.attributeOwnerId
@@ -519,9 +531,10 @@ class DeepCopier(
     }
 
     override fun visitField(declaration: IrField) = declaration.let {
-        val builder = declarationRebuilder.getFieldBuilder(it.symbol) ?: return super.visitField(it)
+        val builder = declarationRebuilder.getFieldBuilder(it.symbol)
+            ?: return super<DeepCopyIrTreeWithSymbols>.visitField(it)
 
-        super.visitField(
+        super<DeepCopyIrTreeWithSymbols>.visitField(
             object : IrField() {
                 override var annotations = it.annotations
                 override var correspondingPropertySymbol = it.correspondingPropertySymbol
@@ -547,9 +560,10 @@ class DeepCopier(
     }
 
     override fun visitValueParameter(declaration: IrValueParameter) = declaration.let {
-        val builder = declarationRebuilder.getValueParameterBuilder(it.symbol) ?: return super.visitValueParameter(it)
+        val builder = declarationRebuilder.getValueParameterBuilder(it.symbol)
+            ?: return super<DeepCopyIrTreeWithSymbols>.visitValueParameter(it)
 
-        super.visitValueParameter(
+        super<DeepCopyIrTreeWithSymbols>.visitValueParameter(
             object : IrValueParameter() {
                 override var annotations = it.annotations
                 override var defaultValue = it.defaultValue

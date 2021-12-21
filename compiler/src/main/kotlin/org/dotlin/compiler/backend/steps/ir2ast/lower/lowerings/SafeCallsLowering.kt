@@ -33,9 +33,8 @@ class SafeCallsLowering(private val context: DartLoweringContext) : IrExpression
 
         val receiver = (irBlock.statements.first() as IrVariable).initializer!!
 
-        val value = expression.statements.last().let {
+        val value = irBlock.statements.last().let {
             it as IrWhen
-
             it.branches.last().result
         } as IrMemberAccessExpression<*>
 

@@ -47,16 +47,6 @@ import org.jetbrains.kotlin.ir.util.irCall
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
-    override fun visitExpression(expression: IrExpression, context: DartTransformContext): DartExpression {
-        return when (expression) {
-            is IrDartCodeExpression -> visitCode(expression, context)
-            is IrAnnotatedExpression -> visitAnnotatedExpression(expression, context)
-            is IrNullAwareExpression -> visitNullAwareExpression(expression, context)
-            is IrBinaryInfixExpression -> visitBinaryInfixExpression(expression, context)
-            else -> super.visitExpression(expression, context)
-        }
-    }
-
     override fun visitExpressionBody(irBody: IrExpressionBody, data: DartTransformContext) =
         irBody.expression.accept(data)
 
@@ -360,7 +350,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
             )
         }
 
-    private fun visitAnnotatedExpression(
+    override fun visitAnnotatedExpression(
         irAnnotated: IrAnnotatedExpression,
         context: DartTransformContext
     ): DartExpression =
@@ -370,7 +360,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
             irAnnotated.expression.accept(it)
         }
 
-    private fun visitNullAwareExpression(
+    override fun visitNullAwareExpression(
         irNullAware: IrNullAwareExpression,
         context: DartTransformContext
     ): DartExpression = (irNullAware.expression.accept(context) as DartPossiblyNullAwareExpression).asNullAware()
@@ -389,7 +379,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         )
     }
 
-    private fun visitBinaryInfixExpression(
+    override fun visitBinaryInfixExpression(
         binaryInfix: IrBinaryInfixExpression,
         context: DartTransformContext
     ): DartExpression {
@@ -399,10 +389,11 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         return when (binaryInfix) {
             is IrConjunctionExpression -> DartConjunctionExpression(left, right)
             is IrDisjunctionExpression -> DartDisjunctionExpression(left, right)
+            is IrIfNullExpression -> DartIfNullExpression(left, right)
         }
     }
 
-    private fun visitCode(
+    override fun visitDartCodeExpression(
         irCode: IrDartCodeExpression,
         context: DartTransformContext
     ): DartExpression = DartCode(irCode.code)

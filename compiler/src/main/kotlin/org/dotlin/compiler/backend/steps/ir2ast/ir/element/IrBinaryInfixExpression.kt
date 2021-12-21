@@ -26,8 +26,8 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 
 sealed class IrBinaryInfixExpression(override var type: IrType) : IrCustomExpression() {
-    abstract val left: IrExpression
-    abstract val right: IrExpression
+    abstract var left: IrExpression
+    abstract var right: IrExpression
 
     override fun <D> acceptChildren(visitor: IrElementVisitor<Unit, D>, data: D) {
         left.accept(visitor, data)
@@ -35,22 +35,22 @@ sealed class IrBinaryInfixExpression(override var type: IrType) : IrCustomExpres
     }
 
     override fun <D> transformChildren(transformer: IrElementTransformer<D>, data: D) {
-        left.transform(transformer, data)
-        right.transform(transformer, data)
+        left = left.transform(transformer, data)
+        right = right.transform(transformer, data)
     }
 }
 
 class IrConjunctionExpression(
-    override val left: IrExpression,
-    override val right: IrExpression,
+    override var left: IrExpression,
+    override var right: IrExpression,
     override var type: IrType,
 ) : IrBinaryInfixExpression(type) {
     override fun transform(transformer: IrCustomElementTransformerVoid) = transformer.visitConjunctionExpression(this)
 }
 
 class IrDisjunctionExpression(
-    override val left: IrExpression,
-    override val right: IrExpression,
+    override var left: IrExpression,
+    override var right: IrExpression,
     override var type: IrType,
 ) : IrBinaryInfixExpression(type) {
     override fun transform(transformer: IrCustomElementTransformerVoid) = transformer.visitDisjunctionExpression(this)
