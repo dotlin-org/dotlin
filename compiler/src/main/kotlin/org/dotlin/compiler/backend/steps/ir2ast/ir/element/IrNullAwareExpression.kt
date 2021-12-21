@@ -26,7 +26,7 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 
 class IrNullAwareExpression(
-    val expression: IrExpression,
+    var expression: IrExpression,
 ) : IrCustomExpression() {
     override var type: IrType = expression.type
 
@@ -35,7 +35,7 @@ class IrNullAwareExpression(
     }
 
     override fun <D> transformChildren(transformer: IrElementTransformer<D>, data: D) {
-        expression.transform(transformer, data)
+        expression = expression.transform(transformer, data)
     }
 
     override fun transform(transformer: IrCustomElementTransformerVoid) = transformer.visitNullAwareExpression(this)

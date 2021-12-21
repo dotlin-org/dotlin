@@ -20,83 +20,151 @@
 package org.dotlin.compiler.backend.steps.ir2ast.ir
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.*
+import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
+import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 
 /**
- * Call [visitExpression] and [visitBody] in your own transformer. If null, return your original super.
+ * Call [visitExpression] and [visitBody] in your own transformer.
  */
-interface IrCustomElementHelper {
-    fun visitExpression(expression: IrExpression): IrExpression? {
-        return when (expression) {
-            is IrAnnotatedExpression -> visitAnnotatedExpression(expression)
-            is IrNullAwareExpression -> visitNullAwareExpression(expression)
-            is IrConjunctionExpression -> visitConjunctionExpression(expression)
-            is IrDisjunctionExpression -> visitDisjunctionExpression(expression)
-            else -> null
-        }
-
-    }
-
-    fun visitDartCodeExpression(expression: IrDartCodeExpression): IrDartCodeExpression
-    fun visitAnnotatedExpression(expression: IrAnnotatedExpression): IrAnnotatedExpression
-    fun visitNullAwareExpression(expression: IrNullAwareExpression): IrNullAwareExpression
-    fun visitConjunctionExpression(expression: IrConjunctionExpression): IrConjunctionExpression
-    fun visitDisjunctionExpression(expression: IrDisjunctionExpression): IrDisjunctionExpression
-    fun visitExpressionBodyWithOrigin(body: IrExpressionBodyWithOrigin): IrExpressionBodyWithOrigin
-
-    fun visitBody(body: IrBody): IrBody? {
-        return when (body) {
-            is IrExpressionBodyWithOrigin -> visitExpressionBodyWithOrigin(body)
-            else -> null
-        }
-    }
+interface IrCustomElementVisitorHelper<out R, in D> {
+    fun visitDartCodeExpression(expression: IrDartCodeExpression, data: D): R
+    fun visitAnnotatedExpression(expression: IrAnnotatedExpression, data: D): R
+    fun visitNullAwareExpression(expression: IrNullAwareExpression, data: D): R
+    fun visitIfNullExpression(expression: IrIfNullExpression, data: D): R
+    fun visitConjunctionExpression(expression: IrConjunctionExpression, data: D): R
+    fun visitDisjunctionExpression(expression: IrDisjunctionExpression, data: D): R
+    fun visitExpressionBodyWithOrigin(body: IrExpressionBodyWithOrigin, data: D): R
 }
 
-fun IrCustomElementHelper.visitExpression(
+fun <R, D> IrCustomElementVisitorHelper<R, D>.visitCustomExpression(
     expression: IrExpression,
-    helperVisitExpression: (IrExpression) -> IrExpression?,
-    superVisitExpression: (IrExpression) -> IrExpression
-) = helperVisitExpression(expression) ?: superVisitExpression(expression)
+    data: D,
+    fallback: () -> R
+) = when (expression) {
+    is IrDartCodeExpression -> visitDartCodeExpression(expression, data)
+    is IrAnnotatedExpression -> visitAnnotatedExpression(expression, data)
+    is IrNullAwareExpression -> visitNullAwareExpression(expression, data)
+    is IrIfNullExpression -> visitIfNullExpression(expression, data)
+    is IrConjunctionExpression -> visitConjunctionExpression(expression, data)
+    is IrDisjunctionExpression -> visitDisjunctionExpression(expression, data)
+    else -> fallback()
+}
 
-fun IrCustomElementHelper.visitBody(
+fun <R, D> IrCustomElementVisitorHelper<R, D>.visitCustomBody(
     body: IrBody,
-    helperVisitBody: (IrBody) -> IrBody?,
-    superVisitBody: (IrBody) -> IrBody
-) =
-    helperVisitBody(body) ?: superVisitBody(body)
+    data: D,
+    fallback: () -> R
+) = when (body) {
+    is IrExpressionBodyWithOrigin -> visitExpressionBodyWithOrigin(body, data)
+    else -> fallback()
+}
 
-abstract class IrCustomElementTransformerVoid : IrElementTransformerVoid(), IrCustomElementHelper {
-    override fun visitExpression(expression: IrExpression) = visitExpression(
-        expression,
-        helperVisitExpression = { super<IrCustomElementHelper>.visitExpression(it) },
-        superVisitExpression = { super<IrElementTransformerVoid>.visitExpression(it) }
-    )
+interface IrCustomElementVisitor<out R, in D> : IrElementVisitor<R, D>, IrCustomElementVisitorHelper<R, D> {
+    override fun visitExpression(expression: IrExpression, data: D) =
+        visitCustomExpression(expression, data, fallback = { super.visitExpression(expression, data) })
 
-    override fun visitBody(body: IrBody) = visitBody(
+    override fun visitBody(body: IrBody, data: D) =
+        visitCustomBody(body, data, fallback = { super.visitBody(body, data) })
+
+    override fun visitDartCodeExpression(expression: IrDartCodeExpression, data: D) = visitExpression(expression, data)
+    override fun visitAnnotatedExpression(expression: IrAnnotatedExpression, data: D) =
+        visitExpression(expression, data)
+
+    override fun visitNullAwareExpression(expression: IrNullAwareExpression, data: D) =
+        visitExpression(expression, data)
+
+
+    override fun visitExpressionBodyWithOrigin(body: IrExpressionBodyWithOrigin, data: D) = visitBody(body, data)
+
+    fun visitBinaryInfixExpression(expression: IrBinaryInfixExpression, data: D) = visitExpression(expression, data)
+    override fun visitIfNullExpression(expression: IrIfNullExpression, data: D) =
+        visitBinaryInfixExpression(expression, data)
+
+    override fun visitConjunctionExpression(expression: IrConjunctionExpression, data: D) =
+        visitBinaryInfixExpression(expression, data)
+
+    override fun visitDisjunctionExpression(expression: IrDisjunctionExpression, data: D) =
+        visitBinaryInfixExpression(expression, data)
+}
+
+/**
+ * Call [visitExpression] and [visitBody] in your own transformer.
+ */
+interface IrCustomElementTransformerHelper<in D> : IrElementTransformer<D>, IrCustomElementVisitorHelper<IrElement, D> {
+    override fun visitDartCodeExpression(expression: IrDartCodeExpression, data: D) =
+        super.visitExpression(expression, data)
+
+    override fun visitAnnotatedExpression(expression: IrAnnotatedExpression, data: D) =
+        super.visitExpression(expression, data)
+
+    override fun visitNullAwareExpression(expression: IrNullAwareExpression, data: D) =
+        super.visitExpression(expression, data)
+
+    override fun visitIfNullExpression(expression: IrIfNullExpression, data: D) =
+        super.visitExpression(expression, data)
+
+    override fun visitConjunctionExpression(expression: IrConjunctionExpression, data: D) =
+        super.visitExpression(expression, data)
+
+    override fun visitDisjunctionExpression(expression: IrDisjunctionExpression, data: D) =
+        super.visitExpression(expression, data)
+
+    override fun visitExpressionBodyWithOrigin(body: IrExpressionBodyWithOrigin, data: D) = super.visitBody(body, data)
+}
+
+interface IrCustomElementTransformerHelperVoid : IrCustomElementTransformerHelper<Nothing?> {
+    fun visitDartCodeExpression(expression: IrDartCodeExpression): IrExpression =
+        super.visitDartCodeExpression(expression, null)
+
+    override fun visitAnnotatedExpression(expression: IrAnnotatedExpression, data: Nothing?) =
+        visitAnnotatedExpression(expression)
+
+    fun visitAnnotatedExpression(expression: IrAnnotatedExpression): IrExpression =
+        super.visitAnnotatedExpression(expression, null)
+
+    override fun visitNullAwareExpression(expression: IrNullAwareExpression, data: Nothing?) =
+        visitNullAwareExpression(expression)
+
+    fun visitNullAwareExpression(expression: IrNullAwareExpression): IrExpression =
+        super.visitNullAwareExpression(expression, null)
+
+    fun visitIfNullExpression(expression: IrIfNullExpression): IrExpression =
+        super.visitIfNullExpression(expression, null)
+
+    override fun visitConjunctionExpression(expression: IrConjunctionExpression, data: Nothing?) =
+        visitConjunctionExpression(expression)
+
+    fun visitConjunctionExpression(expression: IrConjunctionExpression): IrExpression =
+        super.visitConjunctionExpression(expression, null)
+
+    override fun visitDisjunctionExpression(expression: IrDisjunctionExpression, data: Nothing?) =
+        visitDisjunctionExpression(expression)
+
+    fun visitDisjunctionExpression(expression: IrDisjunctionExpression): IrExpression =
+        super.visitDisjunctionExpression(expression, null)
+
+    override fun visitExpressionBodyWithOrigin(body: IrExpressionBodyWithOrigin, data: Nothing?) =
+        visitExpressionBodyWithOrigin(body)
+
+    fun visitExpressionBodyWithOrigin(body: IrExpressionBodyWithOrigin): IrBody =
+        super.visitExpressionBodyWithOrigin(body, null)
+}
+
+abstract class IrCustomElementTransformerVoid : IrElementTransformerVoid(), IrCustomElementTransformerHelperVoid {
+    override fun visitExpression(expression: IrExpression) =
+        visitCustomExpression(
+            expression,
+            data = null,
+            fallback = { super<IrElementTransformerVoid>.visitExpression(expression) }
+        ) as IrExpression
+
+    override fun visitBody(body: IrBody) = visitCustomBody(
         body,
-        helperVisitBody = { super<IrCustomElementHelper>.visitBody(it) },
-        superVisitBody = { super<IrElementTransformerVoid>.visitBody(it) }
-    )
-
-    override fun visitDartCodeExpression(expression: IrDartCodeExpression) =
-        expression.transformChildrenVoid().let { expression }
-
-    override fun visitAnnotatedExpression(expression: IrAnnotatedExpression) =
-        expression.transformChildrenVoid().let { expression }
-
-    override fun visitNullAwareExpression(expression: IrNullAwareExpression) =
-        expression.transformChildrenVoid().let { expression }
-
-    override fun visitConjunctionExpression(expression: IrConjunctionExpression) =
-        expression.transformChildrenVoid().let { expression }
-
-    override fun visitDisjunctionExpression(expression: IrDisjunctionExpression) =
-        expression.transformChildrenVoid().let { expression }
-
-    override fun visitExpressionBodyWithOrigin(body: IrExpressionBodyWithOrigin): IrExpressionBodyWithOrigin {
-        body.transformChildrenVoid()
-        return body
-    }
+        data = null,
+        fallback = { super<IrElementTransformerVoid>.visitBody(body) }
+    ) as IrBody
 }
