@@ -621,4 +621,25 @@ class Expression : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `elvis`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+               null ?: ""
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              null ?? '';
+            }
+            """
+        )
+    }
 }
