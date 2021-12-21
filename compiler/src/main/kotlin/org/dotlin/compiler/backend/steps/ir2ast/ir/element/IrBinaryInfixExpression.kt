@@ -55,3 +55,11 @@ class IrDisjunctionExpression(
 ) : IrBinaryInfixExpression(type) {
     override fun transform(transformer: IrCustomElementTransformerVoid) = transformer.visitDisjunctionExpression(this)
 }
+
+class IrIfNullExpression(
+    override var left: IrExpression,
+    override var right: IrExpression,
+    override var type: IrType,
+) : IrBinaryInfixExpression(type) {
+    override fun transform(transformer: IrCustomElementTransformerVoid) = transformer.visitIfNullExpression(this)
+}

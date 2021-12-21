@@ -62,6 +62,7 @@ private val lowerings = listOf(
     ::InvokeCallsLowering,
     ::UnitReturnsLowering,
     ::SafeCallsLowering,
+    ::ElvisLowering,
     ::InitBlocksLowering,
     ::MultipleTypeParametersLowering,
     ::DefaultConstructorsLowering,
