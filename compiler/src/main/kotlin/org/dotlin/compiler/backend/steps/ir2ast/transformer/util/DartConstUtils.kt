@@ -64,5 +64,24 @@ fun IrExpression.isDartConst(context: DartTransformContext? = null): Boolean = w
         IrDartDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE -> true
         else -> context?.annotatedExpressions?.get(this)?.hasAnnotation(DotlinAnnotations.dartConst) ?: false
     }
+    is IrWhen, is IrIfNullExpression -> {
+        var isConst = true
+
+        acceptChildren(
+            object : IrCustomElementVisitor<Unit, Nothing?> {
+                override fun visitElement(element: IrElement, data: Nothing?) {
+                    if (element is IrExpression) {
+                        isConst = isConst && element.isDartConst(context)
+                    }
+
+                    element.acceptChildren(this, null)
+                }
+
+            },
+            data = null
+        )
+
+        isConst
+    }
     else -> false
 }
