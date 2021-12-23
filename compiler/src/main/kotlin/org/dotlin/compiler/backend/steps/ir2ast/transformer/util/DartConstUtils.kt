@@ -21,17 +21,17 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer.util
 
 import org.dotlin.compiler.backend.DotlinAnnotations
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementVisitor
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrAnnotatedExpression
+import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrIfNullExpression
 import org.dotlin.compiler.backend.util.hasAnnotation
+import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrField
-import org.jetbrains.kotlin.ir.expressions.IrConst
-import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
-import org.jetbrains.kotlin.ir.expressions.IrEnumConstructorCall
-import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.util.isAnnotationClass
 import org.jetbrains.kotlin.ir.util.isEnumClass
 import org.jetbrains.kotlin.ir.util.parentAsClass
