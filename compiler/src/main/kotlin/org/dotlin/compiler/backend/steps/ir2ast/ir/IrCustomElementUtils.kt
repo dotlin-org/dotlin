@@ -77,7 +77,6 @@ interface IrCustomElementVisitor<out R, in D> : IrElementVisitor<R, D>, IrCustom
     override fun visitNullAwareExpression(expression: IrNullAwareExpression, data: D) =
         visitExpression(expression, data)
 
-
     override fun visitExpressionBodyWithOrigin(body: IrExpressionBodyWithOrigin, data: D) = visitBody(body, data)
 
     fun visitBinaryInfixExpression(expression: IrBinaryInfixExpression, data: D) = visitExpression(expression, data)

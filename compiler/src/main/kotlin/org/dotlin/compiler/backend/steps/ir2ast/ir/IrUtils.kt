@@ -37,7 +37,6 @@ import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
-import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.util.collectionUtils.filterIsInstanceAnd
 
@@ -69,15 +68,19 @@ fun IrExpression.hasAny(block: (IrElement) -> Boolean) =
 fun IrExpression.hasAnyChildren(block: (IrElement) -> Boolean): Boolean {
     var hasIt = false
 
-    val visitor = object : IrElementVisitor<Unit, Unit> {
-        override fun visitElement(element: IrElement, data: Unit) {
+    val visitor = object : IrCustomElementVisitor<Unit, Nothing?> {
+        override fun visitElement(element: IrElement, data: Nothing?) {
             if (!hasIt && block(element)) {
                 hasIt = true
+            }
+
+            if (!hasIt) {
+                element.acceptChildren(this, null)
             }
         }
     }
 
-    acceptChildren(visitor, Unit)
+    acceptChildren(visitor, null)
 
     return hasIt
 }
@@ -123,8 +126,8 @@ fun IrExpression.hasDirectReferenceTo(parameter: IrValueParameter): Boolean {
 fun IrExpression.hasIndirectReferenceTo(parameter: IrValueParameter): Boolean {
     var hasReference = false
 
-    val visitor = object : IrElementVisitor<Unit, Unit> {
-        override fun visitElement(element: IrElement, data: Unit) {
+    val visitor = object : IrCustomElementVisitor<Unit, Nothing?> {
+        override fun visitElement(element: IrElement, data: Nothing?) {
             if (!hasReference && element is IrDeclarationReference) {
                 hasReference = element.symbol == parameter.symbol
 
@@ -142,15 +145,15 @@ fun IrExpression.hasIndirectReferenceTo(parameter: IrValueParameter): Boolean {
                     hasReference =
                         hasReference || ownerCorrespondingPropertySymbol?.owner?.hasReferenceTo(parameter) ?: false
                 }
+            }
 
-                if (!hasReference) {
-                    element.acceptChildren(this, Unit)
-                }
+            if (!hasReference) {
+                element.acceptChildren(this, null)
             }
         }
     }
 
-    acceptChildren(visitor, Unit)
+    acceptChildren(visitor, null)
 
     return hasReference
 }
