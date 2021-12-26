@@ -240,6 +240,20 @@ class DeclarationReferenceRemapper(
 ) : IrCustomElementTransformerVoid() {
     constructor(mapping: Pair<IrSymbol, IrSymbol>) : this(mapOf(mapping))
 
+    private inline fun <reified S : IrSymbol> IrOverridableDeclaration<S>.remapOverrides() {
+        overriddenSymbols = overriddenSymbols.map { mapping[it] as? S ?: it }
+    }
+
+    override fun visitSimpleFunction(declaration: IrSimpleFunction) = declaration.apply {
+        transformChildrenVoid()
+        remapOverrides()
+    }
+
+    override fun visitProperty(declaration: IrProperty) = declaration.apply {
+        transformChildrenVoid()
+        remapOverrides()
+    }
+
     override fun visitValueAccess(expression: IrValueAccessExpression): IrExpression {
         return when (mapping[expression.symbol]) {
             null -> super.visitValueAccess(expression)

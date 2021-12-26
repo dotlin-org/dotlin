@@ -57,24 +57,42 @@ val IrOverridableDeclaration<*>.isOverride: Boolean
 val IrValueParameter.isOverride: Boolean
     get() = resolveOverride() != null
 
-fun IrExpression.hasReferenceToThis() = hasAny { it is IrExpression && it.isThisReference() }
+fun IrCall.isSuperCall() = superQualifierSymbol != null
+
+fun IrCall.isQualifiedSuperCall(parentClass: IrClass): Boolean {
+    if (superQualifierSymbol == null) return false
+
+    return parentClass.hasAnyChildren<IrSimpleFunction> {
+        it.overrides(symbol.owner) && it.overriddenSymbols.size > 1
+    }
+}
+
+fun IrStatement.hasReferenceToThis() = hasAny<IrExpression> { it.isThisReference() }
 
 fun IrProperty.hasReferenceToThis() = backingField?.initializer?.expression?.hasReferenceToThis() ?: false
 
-fun IrExpression.hasAny(block: (IrElement) -> Boolean) =
-    block(this) || hasAnyChildren(block)
+inline fun <reified T : IrElement> IrElement.hasAny(crossinline block: (T) -> Boolean) =
+    (this is T && block(this)) || hasAnyChildren(block)
 
+inline fun <reified T : IrElement> IrElement.hasAnyChildren(crossinline block: (T) -> Boolean) =
+    firstOrNullChild(block) != null
 
-fun IrExpression.hasAnyChildren(block: (IrElement) -> Boolean): Boolean {
-    var hasIt = false
+inline fun <reified T : IrElement> IrElement.firstOrNull(crossinline block: (T) -> Boolean): T? =
+    when {
+        this is T && block(this) -> this
+        else -> firstOrNullChild(block)
+    }
+
+inline fun <reified T : IrElement> IrElement.firstOrNullChild(crossinline block: (T) -> Boolean): T? {
+    var first: T? = null
 
     val visitor = object : IrCustomElementVisitorVoid {
         override fun visitElement(element: IrElement) {
-            if (!hasIt && block(element)) {
-                hasIt = true
+            if (element is T && first == null && block(element)) {
+                first = element
             }
 
-            if (!hasIt) {
+            if (first == null) {
                 element.acceptChildrenVoid(this)
             }
         }
@@ -82,9 +100,32 @@ fun IrExpression.hasAnyChildren(block: (IrElement) -> Boolean): Boolean {
 
     acceptChildrenVoid(visitor)
 
-    return hasIt
+    return first
 }
 
+inline fun <reified T : IrElement> IrElement.filter(crossinline block: (T) -> Boolean): List<T> =
+    when {
+        this is T && block(this) -> listOf(this)
+        else -> filterChildren(block)
+    }
+
+inline fun <reified T : IrElement> IrElement.filterChildren(crossinline block: (T) -> Boolean): List<T> {
+    val matches = mutableListOf<T>()
+
+    val visitor = object : IrCustomElementVisitorVoid {
+        override fun visitElement(element: IrElement) {
+            if (element is T && block(element)) {
+                matches.add(element)
+            }
+
+            element.acceptChildrenVoid(this)
+        }
+    }
+
+    acceptChildrenVoid(visitor)
+
+    return matches
+}
 
 val IrDeclaration.parentClassProperties: Sequence<IrProperty>
     get() = parentClassOrNull?.properties

@@ -56,7 +56,12 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
     ): DartExpression {
         val irReceiver = irCallLike.extensionReceiver ?: irCallLike.dispatchReceiver
         val irSingleArgument by lazy { irCallLike.getValueArgument(0)!! }
-        val optionalReceiver by lazy { irReceiver?.accept(context) }
+        val optionalReceiver by lazy {
+            when {
+                irCallLike is IrCall && irCallLike.isSuperCall() -> DartSuperExpression
+                else -> irReceiver?.accept(context)
+            }
+        }
         val receiver by lazy { optionalReceiver!! }
         val singleArgument by lazy { irSingleArgument.accept(context) }
 
