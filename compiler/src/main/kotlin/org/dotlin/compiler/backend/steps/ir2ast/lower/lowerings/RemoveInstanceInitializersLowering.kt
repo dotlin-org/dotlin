@@ -20,19 +20,24 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
-import org.jetbrains.kotlin.backend.common.BodyLoweringPass
+import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
+import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
+import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.expressions.IrBlockBody
-import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.expressions.IrInstanceInitializerCall
 
 @Suppress("UnnecessaryVariable")
-class RemoveInstanceInitializersLowering(private val context: DartLoweringContext) : BodyLoweringPass {
-    override fun lower(irBody: IrBody, container: IrDeclaration) {
-        if (irBody !is IrBlockBody || container !is IrConstructor) return
+class RemoveInstanceInitializersLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
+    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+        if (declaration !is IrConstructor) return noChange()
 
-        irBody.statements.removeIf { it is IrInstanceInitializerCall }
+        val body = declaration.body
+        if (body !is IrBlockBody) return noChange()
+
+        body.statements.removeIf { it is IrInstanceInitializerCall }
+
+        return noChange()
     }
-
 }

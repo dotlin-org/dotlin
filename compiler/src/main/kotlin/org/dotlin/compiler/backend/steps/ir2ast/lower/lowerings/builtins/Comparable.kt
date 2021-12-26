@@ -38,20 +38,20 @@ import org.jetbrains.kotlin.types.Variance
  * remove the `compareTo` again, since that's alredy defined in Dart's `Comparable`.
  */
 object Comparable {
-    class PreOperatorsLowering(private val context: DartLoweringContext) : IrDeclarationTransformer {
-        override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+    class PreOperatorsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
+        override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
             if (declaration !is IrClass || !declaration.defaultType.isComparable()) return noChange()
 
             declaration.file.addChild(
-                context.irFactory.buildFun {
+                irFactory.buildFun {
                     name = Name.identifier("compareTo")
                     isOperator = true
-                    returnType = context.irBuiltIns.intType
+                    returnType = irBuiltIns.intType
                     origin = IrDartDeclarationOrigin.COMPARABLE_TEMPORARY_COMPARE_TO
                 }.apply {
                     val typeParameter = addTypeParameter {
                         name = Name.identifier("T")
-                        superTypes += context.irBuiltIns.anyType.makeNullable()
+                        superTypes += irBuiltIns.anyType.makeNullable()
                     }
 
                     extensionReceiverParameter = buildReceiverParameter(
@@ -81,8 +81,8 @@ object Comparable {
         }
     }
 
-    class PostOperatorsLowering(private val context: DartLoweringContext) : IrFileTransformer {
-        override fun transform(file: IrFile) {
+    class PostOperatorsLowering(override val context: DartLoweringContext) : IrFileLowering {
+        override fun DartLoweringContext.transform(file: IrFile) {
             file.declarations.removeIf {
                 it.origin == IrDartDeclarationOrigin.COMPARABLE_TEMPORARY_COMPARE_TO
             }

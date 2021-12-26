@@ -35,8 +35,8 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrReturnImpl
 import org.jetbrains.kotlin.name.Name
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-class WhensWithSubjectExpressionsLowering(private val context: DartLoweringContext) : IrExpressionTransformer {
-    override fun <D> transform(
+class WhensWithSubjectExpressionsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
+    override fun <D> DartLoweringContext.transform(
         expression: IrExpression,
         container: D
     ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
@@ -44,7 +44,7 @@ class WhensWithSubjectExpressionsLowering(private val context: DartLoweringConte
 
         val whenExpression = expression.statements.last() as IrWhen
 
-        val anonymousFunction = context.irFactory.buildFun {
+        val anonymousFunction = irFactory.buildFun {
             name = Name.special("<anonymous>")
             returnType = whenExpression.type
         }.apply {
@@ -65,13 +65,13 @@ class WhensWithSubjectExpressionsLowering(private val context: DartLoweringConte
             )
         }
 
-        val invokeMethod = context.irFactory.buildFun {
+        val invokeMethod = irFactory.buildFun {
             name = Name.identifier("invoke")
             isOperator = true
             returnType = whenExpression.type
         }.apply {
             parent = anonymousFunction
-            dispatchReceiverParameter = context.irBuiltIns.functionN(0).thisReceiver
+            dispatchReceiverParameter = irBuiltIns.functionN(0).thisReceiver
         }
 
         val functionExpression = IrFunctionExpressionImpl(

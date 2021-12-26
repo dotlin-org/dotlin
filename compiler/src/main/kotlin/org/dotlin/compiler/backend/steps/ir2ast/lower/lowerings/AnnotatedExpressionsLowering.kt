@@ -41,23 +41,23 @@ import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.calls.callUtil.getResolvedCall
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
-class AnnotatedExpressionsLowering(private val context: DartLoweringContext) : IrExpressionTransformer {
-    override fun <D> transform(
+class AnnotatedExpressionsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
+    override fun <D> DartLoweringContext.transform(
         expression: IrExpression,
         container: D
     ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
         val annotations = expression
-            .getAnnotationNames(context.bindingContext, container)
+            .getAnnotationNames(bindingContext, container)
             // Turn the annotation names into descriptors.
             .mapNotNull {
-                context.irModuleFragment.descriptor.findClassAcrossModuleDependencies(
+                irModuleFragment.descriptor.findClassAcrossModuleDependencies(
                     ClassId(
                         it.parent(),
                         it.shortName()
                     )
                 )
             }
-            .map { context.symbolTable.referenceClass(it) }
+            .map { symbolTable.referenceClass(it) }
             // Turn the descriptors into primary constructor calls.
             .map {
                 IrConstructorCallImpl(

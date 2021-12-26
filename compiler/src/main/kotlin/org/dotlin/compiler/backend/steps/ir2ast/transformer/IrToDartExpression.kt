@@ -43,7 +43,6 @@ import org.jetbrains.kotlin.ir.types.isBoolean
 import org.jetbrains.kotlin.ir.types.isChar
 import org.jetbrains.kotlin.ir.types.isInt
 import org.jetbrains.kotlin.ir.types.isString
-import org.jetbrains.kotlin.ir.util.irCall
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
@@ -357,7 +356,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         // Dart doesn't support annotated expressions, so the annotations are not outputted. But they are passed
         // down so annotations can still be checked in child expressions.
         context.withAnnotatedExpression(from = irAnnotated) {
-            irAnnotated.expression.accept(it)
+            irAnnotated.expression.accept(context)
         }
 
     override fun visitNullAwareExpression(

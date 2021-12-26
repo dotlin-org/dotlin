@@ -19,22 +19,27 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.*
+import org.dotlin.compiler.backend.steps.ir2ast.attributes.attributeOwner
+import org.dotlin.compiler.backend.steps.ir2ast.ir.buildStatement
+import org.dotlin.compiler.backend.steps.ir2ast.ir.otherPropertyDependents
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
-import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationTransformer
+import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
 import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.ir.builders.irBlockBody
 import org.jetbrains.kotlin.ir.builders.irGet
 import org.jetbrains.kotlin.ir.builders.irSetField
-import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.declarations.IrConstructor
+import org.jetbrains.kotlin.ir.declarations.IrDeclaration
+import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.ir.util.statements
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UnnecessaryVariable")
-class PropertiesReferencingParametersLowering(private val context: DartLoweringContext) : IrDeclarationTransformer {
-    override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class PropertiesReferencingParametersLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
+    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrValueParameter) return noChange()
 
         val irValueParameter = declaration
@@ -42,7 +47,7 @@ class PropertiesReferencingParametersLowering(private val context: DartLoweringC
         val currentIrFunction = irValueParameter.parent as IrFunction
         val currentFunctionIsConstructor = currentIrFunction is IrConstructor
 
-        val irBuilder = context.createIrBuilder(currentIrFunction.symbol)
+        val irBuilder = createIrBuilder(currentIrFunction.symbol)
 
         // If a parameter is used by a property initializer, we need to move that initializer to the constructor body
         // in Dart.
@@ -54,8 +59,8 @@ class PropertiesReferencingParametersLowering(private val context: DartLoweringC
 
             otherPropertyDependents.mapNotNullTo(body.statements) { prop ->
                 val value = prop.backingField?.initializer?.expression
-                if (!prop.isInitializedInBody && value != null) {
-                    prop.markAsInitializedInBody()
+                if (!prop.isInitializedInConstructorBody && value != null) {
+                    propertiesInitializedInConstructorBody.add(prop.attributeOwner())
 
                     irBuilder.buildStatement {
                         irSetField(
@@ -73,9 +78,5 @@ class PropertiesReferencingParametersLowering(private val context: DartLoweringC
         }
 
         return noChange()
-    }
-
-    private fun IrProperty.markAsInitializedInBody() {
-        backingField!!.setInitializerOriginTo(IrDartStatementOrigin.COMPLEX_PROPERTY_INITIALIZED_IN_BODY)
     }
 }

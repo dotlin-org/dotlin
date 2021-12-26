@@ -39,13 +39,13 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.Name
 
-class ObjectLowering(private val context: DartLoweringContext) : IrDeclarationTransformer {
+class ObjectLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
     companion object {
         const val INSTANCE_FIELD_NAME = "\$instance"
         const val COMPANION_FIELD_NAME = "\$companion"
     }
 
-    override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrClass || !declaration.isObject) return noChange()
 
         val instanceField: IrField
@@ -60,7 +60,7 @@ class ObjectLowering(private val context: DartLoweringContext) : IrDeclarationTr
             primaryConstructor!!.visibility = DescriptorVisibilities.PRIVATE
 
             addChild(
-                context.irFactory.buildField {
+                irFactory.buildField {
                     isStatic = true
                     type = defaultType
                     name = Name.identifier(INSTANCE_FIELD_NAME)
@@ -69,7 +69,7 @@ class ObjectLowering(private val context: DartLoweringContext) : IrDeclarationTr
                     parent = newObj
 
                     initializer = IrExpressionBodyImpl(
-                        context.buildStatement(symbol) {
+                        buildStatement(symbol) {
                             IrConstructorCallImpl(
                                 UNDEFINED_OFFSET, UNDEFINED_OFFSET,
                                 type = defaultType,
@@ -95,7 +95,7 @@ class ObjectLowering(private val context: DartLoweringContext) : IrDeclarationTr
                 declaration.file.declarations.add(obj)
 
                 staticContainer.addChild(
-                    context.irFactory.buildField {
+                    irFactory.buildField {
                         isStatic = true
                         type = obj.defaultType
                         name = Name.identifier(COMPANION_FIELD_NAME)
@@ -104,7 +104,7 @@ class ObjectLowering(private val context: DartLoweringContext) : IrDeclarationTr
                         parent = obj
 
                         initializer = IrExpressionBodyImpl(
-                            context.createIrBuilder(symbol).buildStatement {
+                            createIrBuilder(symbol).buildStatement {
                                 irGetField(
                                     receiver = irGetObject(obj.symbol),
                                     field = obj.fieldWithName(INSTANCE_FIELD_NAME),
@@ -172,7 +172,7 @@ class ObjectLowering(private val context: DartLoweringContext) : IrDeclarationTr
                                 isStatic = true
                             }?.apply {
                                 initializer = IrExpressionBodyImpl(
-                                    expression = context.buildStatement(symbol) {
+                                    expression = buildStatement(symbol) {
                                         irGetField(
                                             receiver = irGetField(receiver = null, instanceField),
                                             original.backingField!!,

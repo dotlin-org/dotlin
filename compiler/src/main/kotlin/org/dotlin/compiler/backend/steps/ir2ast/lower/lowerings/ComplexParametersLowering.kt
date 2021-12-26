@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
+import org.dotlin.compiler.backend.steps.ir2ast.attributes.attributeOwner
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
@@ -40,8 +41,8 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.Name
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UnnecessaryVariable")
-class ComplexParametersLowering(private val context: DartLoweringContext) : IrDeclarationTransformer {
-    override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class ComplexParametersLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
+    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrValueParameter) return noChange()
 
         val irValueParameter = declaration
@@ -54,7 +55,7 @@ class ComplexParametersLowering(private val context: DartLoweringContext) : IrDe
         val hasDefaultValue = originalDefaultValue != null
         val hasComplexDefaultValue = hasDefaultValue && originalDefaultValue!!.expression.isComplex()
 
-        val irBuilder = context.createIrBuilder(currentIrFunction.symbol)
+        val irBuilder = createIrBuilder(currentIrFunction.symbol)
 
         var newIrValueParameter: IrValueParameter? = null
 
@@ -66,7 +67,7 @@ class ComplexParametersLowering(private val context: DartLoweringContext) : IrDe
         if (!irValueParameter.isOverride && hasComplexDefaultValue) {
             val originalType = irValueParameter.type
             newIrValueParameter = irValueParameter.asAssignable(
-                origin = IrDartDeclarationOrigin.COMPLEX_PARAM(originalType)
+                origin = IrDartDeclarationOrigin.WAS_COMPLEX_PARAM(originalType)
             )
 
             val newDefaultValue = originalDefaultValue!!.apply {
@@ -86,11 +87,11 @@ class ComplexParametersLowering(private val context: DartLoweringContext) : IrDe
                                             UNDEFINED_OFFSET,
                                             field.symbol,
                                             field.type,
-                                            irGet(owner.parentClassOrNull!!.thisReceiver!!),
-                                            IrDartStatementOrigin.COMPLEX_PARAM_PROPERTY_REFERENCE_REMAPPED(
-                                                originalParameter = owner
-                                            )
-                                        )
+                                            receiver = irGet(owner.parentClassOrNull!!.thisReceiver!!),
+                                        ).also {
+                                            it.copyAttributes(exp)
+                                            parameterPropertyReferencesInParameterDefaultValue.add(exp.attributeOwner())
+                                        }
                                     }
                                 }
                                 else -> exp
@@ -195,7 +196,7 @@ class ComplexParametersLowering(private val context: DartLoweringContext) : IrDe
             }
 
             if (isPropertyInitializer) {
-                correspondingProperty!!.markAsToBeInitializedInFieldInitializerList(originalDefaultValue)
+                propertiesInitializedInFieldInitializerList.add(correspondingProperty!!.attributeOwner())
             }
 
             currentIrFunction.body = irBuilder.irBlockBody {

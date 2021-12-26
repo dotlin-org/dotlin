@@ -34,9 +34,14 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrReturnImpl
  * Return expressions returning [Unit] are simplified to two statements: The expression it was returning and an
  * empty return.
  */
-class UnitReturnsLowering(private val context: DartLoweringContext) : IrStatementAndBodyExpressionTransformer {
-    override val statementTransformer = object : IrStatementTransformer {
-        override fun transform(statement: IrStatement, body: IrBlockBody): Transformations<IrStatement> {
+class UnitReturnsLowering(override val context: DartLoweringContext) : IrStatementAndBodyExpressionLowering {
+    override val statementTransformer = object : IrStatementLowering {
+        override val context = this@UnitReturnsLowering.context
+
+        override fun DartLoweringContext.transform(
+            statement: IrStatement,
+            body: IrBlockBody
+        ): Transformations<IrStatement> {
             if (statement.isNoMatch()) return noChange()
 
             statement as IrReturn
@@ -56,8 +61,13 @@ class UnitReturnsLowering(private val context: DartLoweringContext) : IrStatemen
 
     }
 
-    override val bodyExpressionTransformer = object : IrBodyExpressionTransformer {
-        override fun transform(expression: IrExpression, body: IrExpressionBody): Transformation<IrExpression>? {
+    override val bodyExpressionTransformer = object : IrBodyExpressionLowering {
+        override val context = this@UnitReturnsLowering.context
+
+        override fun DartLoweringContext.transform(
+            expression: IrExpression,
+            body: IrExpressionBody
+        ): Transformation<IrExpression>? {
             if (expression.isNoMatch()) return noChange()
 
             expression as IrReturn

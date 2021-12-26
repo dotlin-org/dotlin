@@ -33,8 +33,8 @@ import org.jetbrains.kotlin.name.Name
  * This lowering mostly applies to anonymous function expressions that are invoked.
  */
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-class InvokeCallsLowering(private val context: DartLoweringContext) : IrExpressionTransformer {
-    override fun transform(expression: IrExpression): Transformation<IrExpression>? {
+class InvokeCallsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
+    override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
         if (expression !is IrCall || expression.origin != IrStatementOrigin.INVOKE) return noChange()
 
         val invokeMethod = expression.symbol.owner

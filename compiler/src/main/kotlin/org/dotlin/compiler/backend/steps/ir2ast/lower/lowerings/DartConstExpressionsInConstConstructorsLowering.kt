@@ -19,9 +19,10 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementTransformerVoid
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrAnnotatedExpression
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
-import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationTransformer
+import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
 import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartConst
@@ -32,15 +33,14 @@ import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.util.primaryConstructor
-import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 
 /**
  * Adds a `@DartConst` annotation to all expressions in const constructors.
  */
-class DartConstExpressionsInConstConstructorsLowering(private val context: DartLoweringContext) :
-    IrDeclarationTransformer {
-    override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class DartConstExpressionsInConstConstructorsLowering(override val context: DartLoweringContext) :
+    IrDeclarationLowering {
+    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrValueParameter) return noChange()
 
         val parent = declaration.parent
@@ -48,17 +48,17 @@ class DartConstExpressionsInConstConstructorsLowering(private val context: DartL
         if (parent !is IrConstructor || !parent.isDartConst()) return noChange()
 
         val defaultValue = declaration.defaultValue ?: return noChange()
-        val dartConst = context.dartBuiltIns.dotlin.dartConst.owner.primaryConstructor!!.symbol
+        val dartConst = dartBuiltIns.dotlin.dartConst.owner.primaryConstructor!!.symbol
 
         defaultValue.transformChildrenVoid(
-            object : IrElementTransformerVoid() {
+            object : IrCustomElementTransformerVoid() {
                 override fun visitConstructorCall(expression: IrConstructorCall): IrExpression {
                     expression.transformChildrenVoid()
 
                     return IrAnnotatedExpression(
                         expression = expression,
                         annotations = listOf(
-                            context.buildStatement(parent.symbol) {
+                            buildStatement(parent.symbol) {
                                 irCall(dartConst)
                             }
                         )

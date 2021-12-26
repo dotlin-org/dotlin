@@ -19,9 +19,8 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartStatementOrigin
+import org.dotlin.compiler.backend.steps.ir2ast.attributes.attributeOwner
 import org.dotlin.compiler.backend.steps.ir2ast.ir.hasReferenceToThis
-import org.dotlin.compiler.backend.steps.ir2ast.ir.setInitializerOriginTo
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.builders.irGet
 import org.jetbrains.kotlin.ir.builders.irSetField
@@ -32,8 +31,8 @@ import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.ir.util.primaryConstructor
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-class PropertiesReferencingThisLowering(val context: DartLoweringContext) : IrDeclarationTransformer {
-    override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class PropertiesReferencingThisLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
+    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrProperty || !declaration.hasReferenceToThis()) return noChange()
 
         val primaryConstructor = declaration.parentAsClass.primaryConstructor ?: return noChange()
@@ -42,12 +41,10 @@ class PropertiesReferencingThisLowering(val context: DartLoweringContext) : IrDe
         // If we have a reference to this in the initializer, backingField is guaranteed to not be null.
         val backingField = declaration.backingField!!
 
-        backingField.setInitializerOriginTo(
-            IrDartStatementOrigin.PROPERTY_REFERENCING_THIS_INITIALIZED_IN_BODY
-        )
+        propertiesInitializedInConstructorBody.add(declaration.attributeOwner())
 
         primaryConstructorBody.statements.add(
-            context.buildStatement(primaryConstructor.symbol) {
+            buildStatement(primaryConstructor.symbol) {
                 irSetField(
                     receiver = irGet(declaration.parentAsClass.thisReceiver!!),
                     field = backingField,

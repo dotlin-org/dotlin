@@ -34,7 +34,7 @@ sealed class IrDartDeclarationOrigin(private val name: String) : IrDeclarationOr
      */
     object COMPLEX_PARAM_DEFAULT_VALUE : IrDartDeclarationOrigin("COMPLEX_PARAM_DEFAULT_VALUE_MARKER")
 
-    data class COMPLEX_PARAM(val originalType: IrType) : IrDartDeclarationOrigin("COMPLEX_PARAM")
+    data class WAS_COMPLEX_PARAM(val originalType: IrType) : IrDartDeclarationOrigin("WAS_COMPLEX_PARAM")
 
     object SYNTHETIC_OPERATOR : IrDartDeclarationOrigin("SYNTHETIC_OPERATOR")
 
@@ -43,11 +43,6 @@ sealed class IrDartDeclarationOrigin(private val name: String) : IrDeclarationOr
     object OBJECT : IrDartDeclarationOrigin("OBJECT")
 
     object OBJECT_INSTANCE_FIELD : IrDartDeclarationOrigin("OBJECT_INSTANCE_FIELD")
-
-    /**
-     * References an element only present in Dart code.
-     */
-    object EXTERNAL_DART_REFERENCE : IrDartDeclarationOrigin("EXTERNAL_DART_REFERENCE")
 
     /**
      * The constructor was made a factory in Dart, as to initialize complex parameters in its body,

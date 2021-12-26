@@ -22,8 +22,9 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 import org.dotlin.compiler.backend.DotlinAnnotations
 import org.dotlin.compiler.backend.dartHideImportLibrary
 import org.dotlin.compiler.backend.dartImportAliasLibrary
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementVisitorVoid
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
-import org.dotlin.compiler.backend.steps.ir2ast.lower.IrFileTransformer
+import org.dotlin.compiler.backend.steps.ir2ast.lower.IrFileLowering
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.simpleDartNameOrNull
 import org.dotlin.compiler.backend.util.getAnnotation
 import org.jetbrains.kotlin.ir.IrElement
@@ -43,18 +44,15 @@ import org.jetbrains.kotlin.ir.util.SYNTHETIC_OFFSET
 import org.jetbrains.kotlin.ir.util.TypeRemapper
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.ir.util.remapTypes
-import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
-import kotlin.collections.mutableMapOf
-import kotlin.collections.plus
 import kotlin.collections.set
 
 /**
  * A fake synthetic annotation is created to tell the IrToDartCompilationUnitTransformer to add the import directives
  * for Kotlin classes that would name clash with Dart built-ins.
  */
-class DartBuiltInImportsLowering(private val context: DartLoweringContext) : IrFileTransformer {
-    override fun transform(file: IrFile) {
+class DartBuiltInImportsLowering(override val context: DartLoweringContext) : IrFileLowering {
+    override fun DartLoweringContext.transform(file: IrFile) {
         // We use a key with the name of the library and name of the aliases declaration to avoid duplicates.
         val importAliases = mutableMapOf<Pair<String, String>, IrConstructorCall>()
 
@@ -78,7 +76,7 @@ class DartBuiltInImportsLowering(private val context: DartLoweringContext) : IrF
                     0,
                     IrConstImpl.string(
                         SYNTHETIC_OFFSET, SYNTHETIC_OFFSET,
-                        context.irBuiltIns.stringType,
+                        irBuiltIns.stringType,
                         value = importLibrary
                     )
                 )
@@ -87,7 +85,7 @@ class DartBuiltInImportsLowering(private val context: DartLoweringContext) : IrF
                     1,
                     IrConstImpl.string(
                         SYNTHETIC_OFFSET, SYNTHETIC_OFFSET,
-                        context.irBuiltIns.stringType,
+                        irBuiltIns.stringType,
                         value = declarationName
                     )
                 )
@@ -95,7 +93,7 @@ class DartBuiltInImportsLowering(private val context: DartLoweringContext) : IrF
         }
 
         file.acceptChildrenVoid(
-            object : IrElementVisitorVoid {
+            object : IrCustomElementVisitorVoid {
                 override fun visitDeclarationReference(expression: IrDeclarationReference) {
                     super.visitDeclarationReference(expression)
 

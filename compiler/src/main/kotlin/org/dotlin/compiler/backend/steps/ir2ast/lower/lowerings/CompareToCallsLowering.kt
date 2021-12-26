@@ -27,8 +27,8 @@ import org.jetbrains.kotlin.ir.expressions.*
 /**
  * Simplifies `x.compareTo(y) >= 0` to `x.compareTo(y)` which eventually gets simplified to `x >= y`.
  */
-class CompareToCallsLowering(private val context: DartLoweringContext) : IrExpressionTransformer {
-    override fun transform(expression: IrExpression): Transformation<IrExpression>? {
+class CompareToCallsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
+    override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
         // Conditions for match: `expression` must be IrCall and a built in operator. First arg must be IrCall and have
         // the same `origin` as `expression`. First arg must be an operator and must have name "compareTo".
         // `expression` must have origins of either LT, GT, LTEQ or GTEQ.
@@ -53,7 +53,7 @@ class CompareToCallsLowering(private val context: DartLoweringContext) : IrExpre
 
         if (secondArg !is IrConst<*> || secondArg.kind != IrConstKind.Int || secondArg.value != 0) return noChange()
 
-        firstArg.type = context.irBuiltIns.booleanType
+        firstArg.type = irBuiltIns.booleanType
 
         return replaceWith(firstArg)
     }

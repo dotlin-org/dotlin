@@ -36,10 +36,10 @@ import org.jetbrains.kotlin.ir.util.isGetter
 import org.jetbrains.kotlin.ir.util.isSetter
 import org.jetbrains.kotlin.name.Name
 
-class ExtensionsLowering(private val context: DartLoweringContext) : IrDeclarationTransformer {
+class ExtensionsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
     private val extensionContainers = mutableMapOf<String, IrClass>()
 
-    override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         val extensionReceiver = when (declaration) {
             is IrFunction -> when {
                 !declaration.isGetter && !declaration.isSetter -> declaration.extensionReceiverParameter
@@ -71,7 +71,7 @@ class ExtensionsLowering(private val context: DartLoweringContext) : IrDeclarati
         )
 
         val extensionContainer = extensionContainers.getOrPut(extensionContainerName) {
-            context.irFactory.buildClass {
+            irFactory.buildClass {
                 origin = IrDartDeclarationOrigin.EXTENSION
                 name = Name.identifier(extensionContainerName)
             }.apply {
