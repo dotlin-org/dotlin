@@ -27,6 +27,30 @@ import org.junit.jupiter.api.Test
 @DisplayName("Compile: Expression")
 class Expression : BaseTest {
     @Test
+    fun `access top-level property`() = assertCompile {
+        kotlin(
+            """
+            val topLevelProperty: Int = 0
+
+            fun main() {
+                topLevelProperty
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            final int topLevelProperty = 0;
+            void main() {
+              topLevelProperty;
+            }
+            """
+        )
+    }
+
+    @Test
     fun `constructor call`() = assertCompile {
         kotlin(
             """
