@@ -81,25 +81,23 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
                             .filterIsInstance<IrDelegatingConstructorCall>()
                             .singleOrNull()
                             ?.let { irDelegatingConstructorCall ->
+                                val delegateIrConstructor = irDelegatingConstructorCall.symbol.owner
+
+                                val name = delegateIrConstructor.dartNameOrNull
                                 val arguments =
                                     irDelegatingConstructorCall.accept(IrToDartArgumentListTransformer, context)
-                                val delegateIrConstructor = irDelegatingConstructorCall.symbol.owner
 
                                 statements.remove(irDelegatingConstructorCall)
 
+                                val delegateIsOurs = irConstructor
+                                    .parentAsClass
+                                    .declarations
+                                    .any { it.symbol == delegateIrConstructor.symbol }
+
                                 // If the delegate constructor is in our class, we call `this`, otherwise we call `super`.
                                 when {
-                                    irConstructor
-                                        .parentAsClass
-                                        .declarations
-                                        .any { it.symbol == delegateIrConstructor.symbol } ->
-                                        DartRedirectingConstructorInvocation(
-                                            name = delegateIrConstructor.dartNameOrNull,
-                                            arguments = arguments,
-                                        )
-                                    else -> DartSuperConstructorInvocation(
-                                        arguments = arguments,
-                                    )
+                                    delegateIsOurs -> DartRedirectingConstructorInvocation(name, arguments)
+                                    else -> DartSuperConstructorInvocation(name, arguments)
                                 }
                             }
                     )
