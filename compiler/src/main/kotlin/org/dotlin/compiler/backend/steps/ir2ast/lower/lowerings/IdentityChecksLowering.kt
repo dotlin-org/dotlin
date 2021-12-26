@@ -30,16 +30,16 @@ import org.jetbrains.kotlin.ir.util.copyTypeAndValueArgumentsFrom
 /**
  * Lowers `a === b` into `identical(a, b)`.
  */
-class IdentityChecksLowering(private val context: DartLoweringContext) : IrExpressionTransformer {
-    override fun transform(expression: IrExpression): Transformation<IrExpression>? {
+class IdentityChecksLowering(override val context: DartLoweringContext) : IrExpressionLowering {
+    override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
         if (expression !is IrCall || expression.origin != IrStatementOrigin.EQEQEQ) return noChange()
 
         return replaceWith(
             IrCallImpl(
                 UNDEFINED_OFFSET,
                 UNDEFINED_OFFSET,
-                type = context.irBuiltIns.booleanType,
-                symbol = context.dartBuiltIns.identical,
+                type = irBuiltIns.booleanType,
+                symbol = dartBuiltIns.identical,
                 typeArgumentsCount = 0,
                 valueArgumentsCount = 2,
             ).apply {

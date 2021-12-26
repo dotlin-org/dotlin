@@ -20,6 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartIrBuiltIns
+import org.dotlin.compiler.backend.steps.ir2ast.attributes.ExtraIrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.ir.buildStatement
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.DefaultMapping
@@ -36,10 +37,7 @@ import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.declarations.impl.IrFactoryImpl
-import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrGetValue
-import org.jetbrains.kotlin.ir.expressions.IrSetValue
-import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
+import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
@@ -57,8 +55,9 @@ class DartLoweringContext(
     override val configuration: CompilerConfiguration,
     val symbolTable: SymbolTable,
     val bindingContext: BindingContext,
-    val irModuleFragment: IrModuleFragment
-) : CommonBackendContext {
+    val irModuleFragment: IrModuleFragment,
+    private val extraIrAttributes: ExtraIrAttributes = ExtraIrAttributes.DEFAULT,
+) : CommonBackendContext, ExtraIrAttributes by extraIrAttributes {
     override val builtIns = irModuleFragment.descriptor.builtIns
     override var inVerbosePhase = false
     override val internalPackageFqn = FqName("kotlin.dart")

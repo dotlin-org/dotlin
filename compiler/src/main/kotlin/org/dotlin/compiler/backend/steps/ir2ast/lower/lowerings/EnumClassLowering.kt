@@ -56,8 +56,8 @@ private object Documentation {
 }
 
 @Suppress("UnnecessaryVariable")
-class EnumClassLowering(private val context: DartLoweringContext) : IrDeclarationTransformer {
-    override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class EnumClassLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
+    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrClass || !declaration.isEnumClass) return noChange()
 
         // TODO: Apply @sealed annotation
@@ -73,14 +73,14 @@ class EnumClassLowering(private val context: DartLoweringContext) : IrDeclaratio
         enumConstructor.apply {
             val nameParameter = buildValueParameter(this@apply) {
                 name = Name.identifier("name")
-                type = context.irBuiltIns.stringType
+                type = irBuiltIns.stringType
                 origin = IrDeclarationOrigin.DEFINED // TODO: Different origin
                 index = 0
             }
 
             val ordinalParameter = buildValueParameter(this@apply) {
                 name = Name.identifier("ordinal")
-                type = context.irBuiltIns.intType
+                type = irBuiltIns.intType
                 origin = IrDeclarationOrigin.DEFINED // TODO: Different origin
                 index = 1
             }
@@ -115,7 +115,7 @@ class EnumClassLowering(private val context: DartLoweringContext) : IrDeclaratio
                 removeIf { it is IrEnumConstructorCall }
 
                 add(
-                    context.buildStatement(symbol) {
+                    buildStatement(symbol) {
                         irDelegatingConstructorCall(
                             callee = enumSuperType.classOrNull!!.owner.primaryConstructor!!
                         ).apply {
@@ -131,7 +131,7 @@ class EnumClassLowering(private val context: DartLoweringContext) : IrDeclaratio
             .filterIsInstance<IrEnumEntry>()
             .let { enumEntries ->
                 enumEntries.associateWith { enumEntry ->
-                    context.irFactory.buildField {
+                    irFactory.buildField {
                         name = enumEntry.name
                         type = enum.defaultType
                         isStatic = true
@@ -139,7 +139,7 @@ class EnumClassLowering(private val context: DartLoweringContext) : IrDeclaratio
                     }.apply {
                         parent = enum
 
-                        initializer = context.buildStatement(symbol) {
+                        initializer = buildStatement(symbol) {
                             irCallConstructor(
                                 enumConstructor.symbol,
                                 typeArguments = emptyList()
@@ -178,7 +178,7 @@ class EnumClassLowering(private val context: DartLoweringContext) : IrDeclaratio
                 body = IrBlockBodyImpl(
                     UNDEFINED_OFFSET, UNDEFINED_OFFSET,
                     statements = listOf(
-                        context.buildStatement(symbol) {
+                        buildStatement(symbol) {
                             irReturn(
                                 irVararg(
                                     enum.defaultType,

@@ -22,11 +22,14 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrIfNullExpression
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.declarations.IrVariable
-import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.expressions.IrBlock
+import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
+import org.jetbrains.kotlin.ir.expressions.IrWhen
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UnnecessaryVariable")
-class ElvisLowering(private val context: DartLoweringContext) : IrExpressionTransformer {
-    override fun transform(expression: IrExpression): Transformation<IrExpression>? {
+class ElvisLowering(override val context: DartLoweringContext) : IrExpressionLowering {
+    override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
         if (expression !is IrBlock || expression.origin != IrStatementOrigin.ELVIS) return noChange()
 
         val irBlock = expression

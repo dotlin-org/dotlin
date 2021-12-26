@@ -47,8 +47,8 @@ import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.name.Name
 
-class IteratorLowering(private val context: DartLoweringContext) : IrDeclarationTransformer {
-    override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class IteratorLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
+    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrClass || !declaration.isIterator()) return noChange()
 
         declaration.apply {
@@ -67,8 +67,8 @@ class IteratorLowering(private val context: DartLoweringContext) : IrDeclaration
     }
 }
 
-class IteratorSubtypeBackingFieldsLowering(private val context: DartLoweringContext) : IrDeclarationTransformer {
-    override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class IteratorSubtypeBackingFieldsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
+    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrClass ||
             declaration.isInterface ||
             !declaration.allSuperInterfaces().any { it.isIterator() }
@@ -80,7 +80,7 @@ class IteratorSubtypeBackingFieldsLowering(private val context: DartLoweringCont
             declaration.propertyWithName("current").apply {
                 val property = this
 
-                backingField = context.irFactory.buildField {
+                backingField = irFactory.buildField {
                     name = Name.identifier("current")
                     type = property.type
                     isFinal = false
@@ -93,7 +93,7 @@ class IteratorSubtypeBackingFieldsLowering(private val context: DartLoweringCont
                 }
 
                 getter!!.body = IrExpressionBodyImpl(
-                    expression = context.buildStatement(symbol) {
+                    expression = buildStatement(symbol) {
                         irGetField(
                             receiver = irGet(declaration.thisReceiver!!),
                             field = backingField!!
@@ -103,7 +103,7 @@ class IteratorSubtypeBackingFieldsLowering(private val context: DartLoweringCont
 
                 setter!!.apply {
                     body = IrExpressionBodyImpl(
-                        expression = context.buildStatement(symbol) {
+                        expression = buildStatement(symbol) {
                             irSetField(
                                 receiver = irGet(declaration.thisReceiver!!),
                                 field = backingField!!,
@@ -122,8 +122,8 @@ class IteratorSubtypeBackingFieldsLowering(private val context: DartLoweringCont
 /**
  * All `return`s are updated in `next()` (or `previous()` of subtypes of `Iterator` to update `current`.
  */
-class IteratorSubtypeReturnsLowering(private val context: DartLoweringContext) : IrExpressionTransformer {
-    override fun <D> transform(
+class IteratorSubtypeReturnsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
+    override fun <D> DartLoweringContext.transform(
         expression: IrExpression,
         container: D
     ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
@@ -142,7 +142,7 @@ class IteratorSubtypeReturnsLowering(private val context: DartLoweringContext) :
 
         if (expression !is IrReturn) return noChange()
 
-        val iteratorClass = context.irBuiltIns.iteratorClass.owner
+        val iteratorClass = irBuiltIns.iteratorClass.owner
         val property = iteratorClass.propertyWithName("current")
 
         return replaceWith(
@@ -150,7 +150,7 @@ class IteratorSubtypeReturnsLowering(private val context: DartLoweringContext) :
                 UNDEFINED_OFFSET, UNDEFINED_OFFSET,
                 type = expression.type,
                 returnTargetSymbol = expression.returnTargetSymbol,
-                value = context.buildStatement(container.symbol) {
+                value = buildStatement(container.symbol) {
                     irCall(
                         property.setter!!.symbol,
                         type = property.type,
@@ -168,7 +168,6 @@ class IteratorSubtypeReturnsLowering(private val context: DartLoweringContext) :
         )
     }
 }
-
 
 private fun IrClass.isIterator() = defaultType.classifier.signature ==
         getPublicSignature(StandardNames.COLLECTIONS_PACKAGE_FQ_NAME, "Iterator")

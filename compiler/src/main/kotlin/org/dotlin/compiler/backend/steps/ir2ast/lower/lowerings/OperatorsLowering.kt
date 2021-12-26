@@ -45,8 +45,8 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.addIfNotNull
 
 @Suppress("UnnecessaryVariable")
-class OperatorsLowering(private val context: DartLoweringContext) : IrDeclarationTransformer {
-    override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class OperatorsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
+    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrSimpleFunction || !declaration.isOperator) return noChange()
 
         val irFunction = declaration
@@ -75,11 +75,11 @@ class OperatorsLowering(private val context: DartLoweringContext) : IrDeclaratio
                     irFunction.deepCopyWith(remapReferences = false) {
                         name = Name.identifier(operatorIdentifier)
                         isOperator = true
-                        returnType = context.irBuiltIns.booleanType
+                        returnType = irBuiltIns.booleanType
                         origin = operatorOrigin
                     }.apply {
-                        val intClassifier = context.irBuiltIns.intType.classifierOrFail
-                        val (operatorStatementOrigin, operatorSymbol) = context.irBuiltIns.run {
+                        val intClassifier = irBuiltIns.intType.classifierOrFail
+                        val (operatorStatementOrigin, operatorSymbol) = irBuiltIns.run {
                             when (operatorIdentifier) {
                                 "<" -> IrStatementOrigin.LT to lessFunByOperandType[intClassifier]!!
                                 ">" -> IrStatementOrigin.GT to greaterFunByOperandType[intClassifier]!!
@@ -91,13 +91,13 @@ class OperatorsLowering(private val context: DartLoweringContext) : IrDeclaratio
 
                         val otherParam = irFunction.valueParameters.first().copy(parent = this)
 
-                        body = context.irFactory.createExpressionBody(
-                            context.buildStatement(symbol) {
+                        body = irFactory.createExpressionBody(
+                            buildStatement(symbol) {
                                 primitiveOp2(
                                     UNDEFINED_OFFSET,
                                     UNDEFINED_OFFSET,
                                     primitiveOpSymbol = operatorSymbol,
-                                    primitiveOpReturnType = context.irBuiltIns.booleanType,
+                                    primitiveOpReturnType = irBuiltIns.booleanType,
                                     origin = operatorStatementOrigin,
                                     argument1 = irCall(irFunction).apply {
                                         setReceiverFrom(irFunction)
@@ -173,7 +173,7 @@ class OperatorsLowering(private val context: DartLoweringContext) : IrDeclaratio
                 }.apply {
                     val irOperatorFunction = this
 
-                    this.body = IrExpressionBodyImpl(body(context.createIrBuilder(symbol)))
+                    this.body = IrExpressionBodyImpl(body(createIrBuilder(symbol)))
                     valueParameters = parameters.onEach {
                         it.parent = irOperatorFunction
                     }

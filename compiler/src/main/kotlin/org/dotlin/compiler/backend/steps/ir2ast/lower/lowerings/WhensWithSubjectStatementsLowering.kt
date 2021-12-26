@@ -30,8 +30,11 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
 /**
  * Changes the origin so that [WhensWithSubjectExpressionsLowering] doesn't change anything.
  */
-class WhensWithSubjectStatementsLowering(private val context: DartLoweringContext) : IrStatementTransformer {
-    override fun transform(statement: IrStatement, body: IrBlockBody): Transformations<IrStatement> {
+class WhensWithSubjectStatementsLowering(override val context: DartLoweringContext) : IrStatementLowering {
+    override fun DartLoweringContext.transform(
+        statement: IrStatement,
+        body: IrBlockBody
+    ): Transformations<IrStatement> {
         if (statement !is IrBlock || statement.origin != IrStatementOrigin.WHEN) return noChange()
 
         return just {

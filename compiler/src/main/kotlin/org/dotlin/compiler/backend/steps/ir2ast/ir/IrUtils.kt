@@ -36,7 +36,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
-import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
+import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.util.collectionUtils.filterIsInstanceAnd
 
@@ -68,19 +68,19 @@ fun IrExpression.hasAny(block: (IrElement) -> Boolean) =
 fun IrExpression.hasAnyChildren(block: (IrElement) -> Boolean): Boolean {
     var hasIt = false
 
-    val visitor = object : IrCustomElementVisitor<Unit, Nothing?> {
-        override fun visitElement(element: IrElement, data: Nothing?) {
+    val visitor = object : IrCustomElementVisitorVoid {
+        override fun visitElement(element: IrElement) {
             if (!hasIt && block(element)) {
                 hasIt = true
             }
 
             if (!hasIt) {
-                element.acceptChildren(this, null)
+                element.acceptChildrenVoid(this)
             }
         }
     }
 
-    acceptChildren(visitor, null)
+    acceptChildrenVoid(visitor)
 
     return hasIt
 }
@@ -126,8 +126,8 @@ fun IrExpression.hasDirectReferenceTo(parameter: IrValueParameter): Boolean {
 fun IrExpression.hasIndirectReferenceTo(parameter: IrValueParameter): Boolean {
     var hasReference = false
 
-    val visitor = object : IrCustomElementVisitor<Unit, Nothing?> {
-        override fun visitElement(element: IrElement, data: Nothing?) {
+    val visitor = object : IrCustomElementVisitorVoid {
+        override fun visitElement(element: IrElement) {
             if (!hasReference && element is IrDeclarationReference) {
                 hasReference = element.symbol == parameter.symbol
 
@@ -148,12 +148,12 @@ fun IrExpression.hasIndirectReferenceTo(parameter: IrValueParameter): Boolean {
             }
 
             if (!hasReference) {
-                element.acceptChildren(this, null)
+                element.acceptChildrenVoid(this)
             }
         }
     }
 
-    acceptChildren(visitor, null)
+    acceptChildrenVoid(visitor)
 
     return hasReference
 }
@@ -271,54 +271,35 @@ val IrField.isInitializedByParameter: Boolean
                 initializerValue.origin == IrStatementOrigin.INITIALIZE_PROPERTY_FROM_PARAMETER
     }
 
-val IrProperty.isToBeInitializedInFieldInitializerList: Boolean
-    get() = backingField?.isToBeInitializedInFieldInitializerList.falseIfNull()
-
-val IrField.isToBeInitializedInFieldInitializerList: Boolean
-    get() = hasInitializerOriginOf<IrDartStatementOrigin.COMPLEX_PARAM_PROPERTY_TO_BE_INITIALIZED_IN_FIELD_INITIALIZER_LIST>()
-
-val IrProperty.isInitializedInBody: Boolean
-    get() = backingField?.isInitializedInBody.falseIfNull()
-
-val IrField.isInitializedInBody: Boolean
-    get() = hasInitializerOriginOf(IrDartStatementOrigin.COMPLEX_PROPERTY_INITIALIZED_IN_BODY) ||
-            hasInitializerOriginOf(IrDartStatementOrigin.PROPERTY_REFERENCING_THIS_INITIALIZED_IN_BODY)
-
-fun IrField.hasInitializerOriginOf(origin: IrStatementOrigin) =
-    (initializer as? IrExpressionBodyWithOrigin)?.origin == origin
-
-inline fun <reified T : IrStatementOrigin> IrField.hasInitializerOriginOf() =
-    (initializer as? IrExpressionBodyWithOrigin)?.origin is T
-
 val IrProperty.isOverride: Boolean
     get() = getter?.isOverride.falseIfNull() || setter?.isOverride.falseIfNull()
 
 val IrProperty.type: IrType
     get() = backingField?.type ?: getter?.returnType!!
 
-private val IrStatement.leftHandOfSet: IrDeclaration?
+val IrStatement.leftHandOfSet: IrDeclaration?
     get() = when (this) {
         is IrSetValue -> symbol.owner
         is IrSetField -> symbol.owner
         else -> null
     }
 
+val IrStatement.rightHandOfSet: IrExpression?
+    get() = when (this) {
+        is IrSetValue -> value
+        is IrSetField -> value
+        else -> null
+    }
+
 val IrStatement.propertyItAssignsTo: IrProperty?
-    get() = (leftHandOfSet as? IrField)?.correspondingPropertySymbol?.owner
+    get() = when (val lhs = leftHandOfSet) {
+        is IrField -> lhs.correspondingProperty
+        is IrValueParameter -> lhs.correspondingProperty
+        else -> null
+    }
 
 val IrStatement.parameterItAssignsTo: IrValueParameter?
     get() = leftHandOfSet as? IrValueParameter
-
-val IrStatement.isInitializerForPropertyToBeInitializedInFieldInitializerList: Boolean
-    get() = this is IrSetValue && isInitializerForPropertyToBeInitializedInFieldInitializerList
-
-val IrSetValue.isInitializerForPropertyToBeInitializedInFieldInitializerList: Boolean
-    get() {
-        val assignee = leftHandOfSet as? IrValueParameter ?: return false
-        val correspondingProperty = assignee.correspondingProperty ?: return false
-
-        return correspondingProperty.isToBeInitializedInFieldInitializerList && isInitializerForComplexParameter
-    }
 
 val IrStatement.isInitializerForComplexParameter: Boolean
     get() = this is IrSetValue &&
@@ -330,14 +311,6 @@ val IrProperty.hasImplicitGetter: Boolean
 
 val IrProperty.hasImplicitSetter: Boolean
     get() = setter != null && setter!!.isImplicitSetter
-
-fun IrProperty.markAsToBeInitializedInFieldInitializerList(defaultValue: IrExpressionBody) {
-    backingField!!.setInitializerOriginTo(
-        IrDartStatementOrigin.COMPLEX_PARAM_PROPERTY_TO_BE_INITIALIZED_IN_FIELD_INITIALIZER_LIST(defaultValue)
-    )
-}
-
-fun IrProperty.unsetInitializerOrigin() = backingField!!.unsetInitializerOrigin()
 
 /**
  * Also keeps in account that extensions are lowered into classes.
@@ -370,12 +343,6 @@ fun IrField.setInitializerOriginTo(
         expression = initializer!!.expression,
         origin = origin
     )
-}
-
-fun IrField.unsetInitializerOrigin() {
-    if (initializer == null) return
-
-    initializer = IrExpressionBodyImpl(initializer!!.expression)
 }
 
 val IrField.isOverride: Boolean
@@ -417,18 +384,8 @@ fun IrValueParameter.copy(
 fun List<IrValueParameter>.copy(parent: IrFunction? = null) =
     map { it.copy(parent = parent ?: it.parent as IrFunction) }
 
-fun IrValueParameter.wasComplex() = origin is IrDartDeclarationOrigin.COMPLEX_PARAM
-
-fun IrFunction.isEqualsOverriddenFromAny() =
-    name == Name.identifier("equals") &&
-            dispatchReceiverParameter != null &&
-            valueParameters.single().type.isNullableAny() &&
-            (this as? IrSimpleFunction)?.overriddenSymbols
-                ?.singleOrNull()
-                ?.owner
-                ?.parentClassOrNull
-                ?.defaultType
-                ?.isAny() ?: false
+val IrValueParameter.wasComplex: Boolean
+    get() = origin is IrDartDeclarationOrigin.WAS_COMPLEX_PARAM
 
 val IrFunctionAccessExpression.valueArguments: List<IrExpression?>
     get() = (0 until valueArgumentsCount).map { getValueArgument(it) }
@@ -438,11 +395,11 @@ val IrFunctionAccessExpression.typeArguments: List<IrType>
 
 fun IrElement.replaceExpressions(block: (IrExpression) -> IrExpression) {
     transformChildren(
-        object : IrElementTransformerVoid() {
+        object : IrCustomElementTransformerVoid() {
             override fun visitExpression(expression: IrExpression): IrExpression {
                 expression.transformChildrenVoid()
 
-                return block(expression)
+                return block(expression).copyAttributes(expression)
             }
         },
         data = null

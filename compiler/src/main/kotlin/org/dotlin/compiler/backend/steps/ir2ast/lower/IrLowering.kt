@@ -21,8 +21,8 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementVisitorVoid
 import org.dotlin.compiler.backend.util.replace
-import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.*
@@ -30,25 +30,29 @@ import org.jetbrains.kotlin.ir.expressions.IrBlockBody
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrExpressionBody
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
-import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 
 typealias Transformations<E> = Sequence<Transformation<E>>
 
-interface IrTransformer<E : IrElement, R> {
-    fun transform(element: E): R
+interface IrLowering {
+    fun lower(irFile: IrFile)
+    val context: DartLoweringContext
 }
 
-interface IrSingleTransformer<E : IrElement> : IrTransformer<E, Transformation<E>?>
+interface IrTransformerLowering<E : IrElement, R> : IrLowering {
+    fun DartLoweringContext.transform(element: E): R
+}
 
-interface IrMultipleTransformer<E : IrElement> : IrTransformer<E, Transformations<E>>
+interface IrSingleLowering<E : IrElement> : IrTransformerLowering<E, Transformation<E>?>
 
-interface IrDeclarationTransformer : IrMultipleTransformer<IrDeclaration>, FileLoweringPass {
+interface IrMultipleLowering<E : IrElement> : IrTransformerLowering<E, Transformations<E>>
+
+interface IrDeclarationLowering : IrMultipleLowering<IrDeclaration> {
     @Suppress("UNCHECKED_CAST")
     private fun IrDeclarationContainer.transformDeclarations(
-        transform: (IrDeclaration) -> Transformations<IrDeclaration>
+        transform: DartLoweringContext.(IrDeclaration) -> Transformations<IrDeclaration>
     ) {
-        declarations.transformBy(::transform, also = {
+        declarations.transformBy({ transform(context, it) }, also = {
             if (it is IrDeclarationContainer) {
                 it.transformDeclarations(transform)
             }
@@ -57,25 +61,25 @@ interface IrDeclarationTransformer : IrMultipleTransformer<IrDeclaration>, FileL
                 it.apply {
                     valueParameters = valueParameters.toMutableList<IrDeclaration>()
                         .apply {
-                            transformBy(::transform)
+                            transformBy(transform = { p -> transform(context, p) })
                         } as List<IrValueParameter>
                 }
             }
         })
     }
 
-    override fun lower(irFile: IrFile) = irFile.transformDeclarations(::transform)
+    override fun lower(irFile: IrFile) = irFile.transformDeclarations { context.transform(it) }
 
-    override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration>
+    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration>
 }
 
-interface IrFileTransformer : FileLoweringPass {
-    override fun lower(irFile: IrFile) = transform(irFile)
+interface IrFileLowering : IrLowering {
+    override fun lower(irFile: IrFile) = context.transform(irFile)
 
-    fun transform(file: IrFile)
+    fun DartLoweringContext.transform(file: IrFile)
 }
 
-interface IrExpressionTransformer : IrSingleTransformer<IrExpression>, FileLoweringPass {
+interface IrExpressionLowering : IrSingleLowering<IrExpression> {
     override fun lower(irFile: IrFile) {
         irFile.transformChildren(
             object : IrElementTransformer<IrDeclaration?> {
@@ -93,29 +97,29 @@ interface IrExpressionTransformer : IrSingleTransformer<IrExpression>, FileLower
                     }
 
                     expression.transformChildren(this, parent)
-                    return expression.transformBy { transform(it, parent) }
+                    return expression.transformBy { context.transform(it, parent) }
                 }
             },
             null
         )
     }
 
-    override fun transform(expression: IrExpression): Transformation<IrExpression>? = noChange()
-    fun <D> transform(
+    override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? = noChange()
+    fun <D> DartLoweringContext.transform(
         expression: IrExpression,
         container: D
     ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent =
         transform(expression)
 }
 
-interface IrStatementTransformer : IrMultipleTransformer<IrStatement>, FileLoweringPass {
+interface IrStatementLowering : IrMultipleLowering<IrStatement> {
     override fun lower(irFile: IrFile) {
         irFile.acceptChildrenVoid(
-            object : IrElementVisitorVoid {
+            object : IrCustomElementVisitorVoid {
                 override fun visitBlockBody(body: IrBlockBody) {
                     super.visitBlockBody(body)
 
-                    body.statements.transformBy({ transform(it, body) })
+                    body.statements.transformBy({ context.transform(it, body) })
                 }
 
                 override fun visitElement(element: IrElement) = element.acceptChildrenVoid(this)
@@ -123,18 +127,19 @@ interface IrStatementTransformer : IrMultipleTransformer<IrStatement>, FileLower
         )
     }
 
-    override fun transform(statement: IrStatement) = noChange()
-    fun transform(statement: IrStatement, body: IrBlockBody): Transformations<IrStatement> = transform(statement)
+    override fun DartLoweringContext.transform(statement: IrStatement) = noChange()
+    fun DartLoweringContext.transform(statement: IrStatement, body: IrBlockBody): Transformations<IrStatement> =
+        transform(statement)
 }
 
-interface IrBodyExpressionTransformer : IrSingleTransformer<IrExpression>, FileLoweringPass {
+interface IrBodyExpressionLowering : IrSingleLowering<IrExpression> {
     override fun lower(irFile: IrFile) {
         irFile.acceptChildrenVoid(
-            object : IrElementVisitorVoid {
+            object : IrCustomElementVisitorVoid {
                 override fun visitExpressionBody(body: IrExpressionBody) {
                     super.visitExpressionBody(body)
 
-                    body.expression = body.expression.transformBy { transform(it, body) }
+                    body.expression = body.expression.transformBy { context.transform(it, body) }
                 }
 
                 override fun visitElement(element: IrElement) = element.acceptChildrenVoid(this)
@@ -142,14 +147,14 @@ interface IrBodyExpressionTransformer : IrSingleTransformer<IrExpression>, FileL
         )
     }
 
-    override fun transform(expression: IrExpression) = noChange()
+    override fun DartLoweringContext.transform(expression: IrExpression) = noChange()
 
-    fun transform(expression: IrExpression, body: IrExpressionBody) = transform(expression)
+    fun DartLoweringContext.transform(expression: IrExpression, body: IrExpressionBody) = transform(expression)
 }
 
-interface IrStatementAndBodyExpressionTransformer : FileLoweringPass {
-    val statementTransformer: IrStatementTransformer
-    val bodyExpressionTransformer: IrBodyExpressionTransformer
+interface IrStatementAndBodyExpressionLowering : IrLowering {
+    val statementTransformer: IrStatementLowering
+    val bodyExpressionTransformer: IrBodyExpressionLowering
 
     override fun lower(irFile: IrFile) {
         statementTransformer.lower(irFile)
@@ -225,18 +230,18 @@ infix fun <E : IrElement> Iterable<Transformation<E>>.and(other: Iterable<Transf
 infix fun <E : IrElement> Iterable<Transformation<E>>.and(other: Sequence<Transformation<E>>) =
     this.asSequence().and(other)
 
-fun <E : IrElement> IrTransformer<E, *>.just(transformation: Transformation<E>) = sequenceOf(transformation)
-fun <E : IrElement> IrTransformer<E, *>.just(transformation: () -> Transformation<E>) = just(transformation())
+fun <E : IrElement> IrTransformerLowering<E, *>.just(transformation: Transformation<E>) = sequenceOf(transformation)
+fun <E : IrElement> IrTransformerLowering<E, *>.just(transformation: () -> Transformation<E>) = just(transformation())
 
-fun <E : IrElement> IrTransformer<E, *>.replace(element: E, with: E) =
+fun <E : IrElement> IrTransformerLowering<E, *>.replace(element: E, with: E) =
     Transformation.Replace(old = element, new = with)
 
-fun <E : IrElement> IrTransformer<E, *>.replaceWith(element: E) =
+fun <E : IrElement> IrTransformerLowering<E, *>.replaceWith(element: E) =
     Transformation.Replace(old = null, new = element)
 
-fun <E : IrElement> IrTransformer<E, *>.add(element: E) = Transformation.Add(element)
-fun <E : IrElement> IrTransformer<E, *>.remove(element: E? = null) = Transformation.Remove(element)
+fun <E : IrElement> IrTransformerLowering<E, *>.add(element: E) = Transformation.Add(element)
+fun <E : IrElement> IrTransformerLowering<E, *>.remove(element: E? = null) = Transformation.Remove(element)
 
-fun <E : IrElement> IrSingleTransformer<E>.noChange(): Transformation<E>? = null
-fun <E : IrElement> IrMultipleTransformer<E>.noChange() = emptySequence<Transformation<E>>()
+fun <E : IrElement> IrSingleLowering<E>.noChange(): Transformation<E>? = null
+fun <E : IrElement> IrMultipleLowering<E>.noChange() = emptySequence<Transformation<E>>()
 

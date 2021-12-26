@@ -22,7 +22,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 import org.dotlin.compiler.backend.steps.ir2ast.ir.deepCopyWith
 import org.dotlin.compiler.backend.steps.ir2ast.ir.firstNonFakeOverrideOrNull
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
-import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationTransformer
+import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
 import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
 import org.dotlin.compiler.backend.util.replace
@@ -40,8 +40,8 @@ import org.jetbrains.kotlin.ir.util.parentAsClass
  * all default implementations of interfaces are copied into the implementer.
  */
 @Suppress("UnnecessaryVariable")
-class DefaultInterfaceImplementationsLowering(private val context: DartLoweringContext) : IrDeclarationTransformer {
-    override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class DefaultInterfaceImplementationsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
+    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrClass || declaration.isInterface) return noChange()
 
         val irClass = declaration

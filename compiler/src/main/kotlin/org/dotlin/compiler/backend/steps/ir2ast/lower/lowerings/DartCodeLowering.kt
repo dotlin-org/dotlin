@@ -29,9 +29,9 @@ import org.jetbrains.kotlin.ir.expressions.IrExpression
 /**
  * Converts `dart(..)` calls to specific Dart code literal IR element.
  */
-class DartCodeLowering(private val context: DartLoweringContext) : IrExpressionTransformer {
-    override fun transform(expression: IrExpression): Transformation<IrExpression>? {
-        if (expression !is IrCall || expression.symbol != context.dartBuiltIns.dotlin.dart) return noChange()
+class DartCodeLowering(override val context: DartLoweringContext) : IrExpressionLowering {
+    override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
+        if (expression !is IrCall || expression.symbol != dartBuiltIns.dotlin.dart) return noChange()
 
         val code = (expression.valueArguments[0] as IrConst<*>).value as String
 

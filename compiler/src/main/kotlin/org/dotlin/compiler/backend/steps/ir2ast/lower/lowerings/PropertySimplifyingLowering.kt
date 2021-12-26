@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.declarations.buildField
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrProperty
+import org.jetbrains.kotlin.ir.declarations.copyAttributes
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetFieldImpl
@@ -33,7 +34,6 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrSetFieldImpl
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.isGetter
 import org.jetbrains.kotlin.ir.util.isSetter
-import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.Name
 
@@ -41,8 +41,8 @@ import org.jetbrains.kotlin.name.Name
  * Properties get simplified to either a field or their getter and setter.
  */
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UnnecessaryVariable")
-class PropertySimplifyingLowering(val context: DartLoweringContext) : IrDeclarationTransformer {
-    override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class PropertySimplifyingLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
+    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrProperty) return noChange()
 
         val irProperty = declaration
@@ -50,7 +50,7 @@ class PropertySimplifyingLowering(val context: DartLoweringContext) : IrDeclarat
         // If we have an implicit getter, and in the case of vars, also an implicit setter, we replace
         // the property with a field.
         if (irProperty.isSimple) {
-            val irField = context.irFactory.buildField {
+            val irField = irFactory.buildField {
                 name = irProperty.name
                 type = irProperty.type
                 isFinal = !irProperty.isVar
@@ -64,7 +64,7 @@ class PropertySimplifyingLowering(val context: DartLoweringContext) : IrDeclarat
             }
 
             irProperty.file.transformChildrenVoid(
-                object : IrElementTransformerVoid() {
+                object : IrCustomElementTransformerVoid() {
                     override fun visitCall(expression: IrCall): IrExpression {
                         expression.transformChildrenVoid(this)
 
@@ -91,7 +91,7 @@ class PropertySimplifyingLowering(val context: DartLoweringContext) : IrDeclarat
                                 type = irField.type
                             )
                             else -> expression
-                        }
+                        }.copyAttributes(expression)
                     }
                 }
             )

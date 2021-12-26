@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
+import org.dotlin.compiler.backend.steps.ir2ast.attributes.attributeOwner
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
@@ -31,19 +32,18 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.util.statements
-import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.Name
 
 @Suppress("UnnecessaryVariable")
-class ConstructorPassingComplexParamToSuperLowering(private val context: DartLoweringContext) :
-    IrDeclarationTransformer {
-    override fun transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class ConstructorPassingComplexParamToSuperLowering(override val context: DartLoweringContext) :
+    IrDeclarationLowering {
+    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrConstructor) return noChange()
 
         val originalConstructor = declaration
 
-        val originalComplexParams = originalConstructor.valueParameters.filter { it.wasComplex() }
+        val originalComplexParams = originalConstructor.valueParameters.filter { it.wasComplex }
         val originalBody = originalConstructor.body as? IrBlockBody ?: return noChange()
 
         val superCall = originalBody.statements
@@ -69,15 +69,18 @@ class ConstructorPassingComplexParamToSuperLowering(private val context: DartLow
             originalByActualParams = originalConstructor.valueParameters
                 .associateWith {
                     it.deepCopyWith {
-                        origin = when {
-                            it.wasComplex() -> IrDartDeclarationOrigin.FACTORY_REDIRECT_ACTUAL_PARAM
-                            else -> it.origin
+                        when (val itsOrigin = it.origin) {
+                            is IrDartDeclarationOrigin.WAS_COMPLEX_PARAM -> {
+                                this.origin = IrDartDeclarationOrigin.FACTORY_REDIRECT_ACTUAL_PARAM
+                                type = itsOrigin.originalType
+                            }
+                            else -> {
+                                origin = itsOrigin
+                                type = it.type
+                            }
                         }
-                        type = (it.origin as? IrDartDeclarationOrigin.COMPLEX_PARAM)?.originalType ?: it.type
                     }.apply {
-                        correspondingProperty
-
-                        if (it.wasComplex()) {
+                        if (it.wasComplex) {
                             defaultValue = null
                         }
                     }
@@ -93,7 +96,7 @@ class ConstructorPassingComplexParamToSuperLowering(private val context: DartLow
                         if (it is IrDelegatingConstructorCall) {
                             superCall.also {
                                 transformChildrenVoid(
-                                    object : IrElementTransformerVoid() {
+                                    object : IrCustomElementTransformerVoid() {
                                         override fun visitExpression(expression: IrExpression): IrExpression {
                                             expression.transformChildrenVoid()
 
@@ -105,7 +108,7 @@ class ConstructorPassingComplexParamToSuperLowering(private val context: DartLow
                                                             UNDEFINED_OFFSET,
                                                             UNDEFINED_OFFSET,
                                                             symbol = newSymbol,
-                                                        )
+                                                        ).copyAttributes(expression)
                                                     } ?: expression
                                             }
 
@@ -127,8 +130,8 @@ class ConstructorPassingComplexParamToSuperLowering(private val context: DartLow
                 .filter { it.origin == IrDartDeclarationOrigin.FACTORY_REDIRECT_ACTUAL_PARAM }
                 .forEach { param ->
                     param.correspondingProperty?.let { prop ->
-                        if (prop.isToBeInitializedInFieldInitializerList) {
-                            prop.unsetInitializerOrigin()
+                        if (prop.isInitializedInFieldInitializerList) {
+                            propertiesInitializedInFieldInitializerList.remove(prop.attributeOwner())
                         }
                     }
                 }
@@ -140,11 +143,11 @@ class ConstructorPassingComplexParamToSuperLowering(private val context: DartLow
         }.apply {
             valueParameters = originalConstructor.valueParameters.copy(parent = this@apply)
 
-            body = context.irFactory.createBlockBody(
+            body = irFactory.createBlockBody(
                 UNDEFINED_OFFSET,
                 UNDEFINED_OFFSET,
                 body!!.initializersForComplexParams +
-                        context.buildStatement(symbol) {
+                        buildStatement(symbol) {
                             irReturn(
                                 irCallConstructor(actualConstructor.symbol, emptyList()).apply {
                                     actualConstructor.valueParameters.onEach {
@@ -153,27 +156,25 @@ class ConstructorPassingComplexParamToSuperLowering(private val context: DartLow
                                 }
                             )
                         }
-            ).also { body ->
-                body.statements.removeIf { it is IrDelegatingConstructorCall }
+            ).apply {
+                statements.removeIf { it is IrDelegatingConstructorCall }
 
                 // Setters for complex property parameters reference the property now instead of the parameter, reverse
                 // that.
-                body.statements.forEach { statement ->
+                statements.forEach { statement ->
                     if (statement.isInitializerForComplexParameter) {
                         statement.replaceExpressions { exp ->
-                            if (exp !is IrGetField
-                                || exp.origin !is IrDartStatementOrigin.COMPLEX_PARAM_PROPERTY_REFERENCE_REMAPPED
-                            ) {
-                                return@replaceExpressions exp
-                            }
+                            if (exp !is IrGetField) return@replaceExpressions exp
 
-                            val origin = exp.origin as IrDartStatementOrigin.COMPLEX_PARAM_PROPERTY_REFERENCE_REMAPPED
+                            val originalParameterReference = parameterPropertyReferencesInParameterDefaultValue
+                                .firstOrNull { it.attributeOwnerId == exp.attributeOwnerId }
+                                ?: return@replaceExpressions exp
 
-                            return@replaceExpressions IrGetValueImpl(
+                            IrGetValueImpl(
                                 UNDEFINED_OFFSET,
                                 UNDEFINED_OFFSET,
-                                origin.originalParameter.symbol,
-                            )
+                                originalParameterReference.symbol,
+                            ).copyAttributes(originalParameterReference)
                         }
                     }
                 }

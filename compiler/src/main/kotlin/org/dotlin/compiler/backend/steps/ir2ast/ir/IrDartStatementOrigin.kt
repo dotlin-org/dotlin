@@ -19,8 +19,6 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.ir
 
-import org.jetbrains.kotlin.ir.declarations.IrValueParameter
-import org.jetbrains.kotlin.ir.expressions.IrExpressionBody
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 
 @Suppress("ClassName")
@@ -36,22 +34,6 @@ sealed class IrDartStatementOrigin(private val name: String) : IrStatementOrigin
     object COMPLEX_PARAM_INIT_DEFAULT_VALUE : IrDartStatementOrigin("COMPLEX_PARAM_INIT_DEFAULT_VALUE")
 
     object COMPLEX_PARAM_INIT_NULLABLE : IrDartStatementOrigin("COMPLEX_PARAM_INIT_NULLABLE")
-
-    object COMPLEX_PROPERTY_INITIALIZED_IN_BODY
-        : IrDartStatementOrigin("COMPLEX_PARAM_PROPERTY_INITIALIZED_IN_BODY")
-
-    class COMPLEX_PARAM_PROPERTY_TO_BE_INITIALIZED_IN_FIELD_INITIALIZER_LIST(val originalDefaultValue: IrExpressionBody) :
-        IrDartStatementOrigin("COMPLEX_PARAM_PROPERTY_TO_BE_INITIALIZED_IN_FIELD_INITIALIZER_LIST")
-
-    class COMPLEX_PARAM_PROPERTY_REFERENCE_REMAPPED(val originalParameter: IrValueParameter) :
-        IrDartStatementOrigin("COMPLEX_PARAM_PROPERTY_REFERENCE_REMAPPED")
-
-    /**
-     * A field initializer cannot reference `this` in Dart, and thus must be initialized in the
-     * body and be marked `late`.
-     */
-    object PROPERTY_REFERENCING_THIS_INITIALIZED_IN_BODY :
-        IrDartStatementOrigin("PROPERTY_REFERENCING_THIS_INITIALIZED_IN_BODY")
 
     /**
      * Constructors for objects are always const.

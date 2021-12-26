@@ -29,8 +29,8 @@ import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.IrWhen
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UnnecessaryVariable")
-class ConjunctionsDisjunctionsLowering(private val context: DartLoweringContext) : IrExpressionTransformer {
-    override fun <D> transform(
+class ConjunctionsDisjunctionsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
+    override fun <D> DartLoweringContext.transform(
         expression: IrExpression,
         container: D
     ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
@@ -48,7 +48,7 @@ class ConjunctionsDisjunctionsLowering(private val context: DartLoweringContext)
             else -> irWhen.branches.last().result
         }
 
-        val type = context.irBuiltIns.booleanType
+        val type = irBuiltIns.booleanType
 
         return replaceWith(
             when {

@@ -25,8 +25,8 @@ import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.*
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UnnecessaryVariable")
-class SafeCallsLowering(private val context: DartLoweringContext) : IrExpressionTransformer {
-    override fun transform(expression: IrExpression): Transformation<IrExpression>? {
+class SafeCallsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
+    override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
         if (expression !is IrBlock || expression.origin != IrStatementOrigin.SAFE_CALL) return noChange()
 
         val irBlock = expression

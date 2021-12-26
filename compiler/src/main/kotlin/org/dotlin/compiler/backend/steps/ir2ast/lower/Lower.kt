@@ -26,8 +26,9 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.resolve.BindingContext
+import kotlin.reflect.KFunction1
 
-private val lowerings = listOf(
+private val lowerings: List<KFunction1<DartLoweringContext, IrLowering>> = listOf(
     Comparable::PreOperatorsLowering,
     ::DartBuiltInImportsLowering,
     ::ExternalDeclarationsLowering,
@@ -73,7 +74,7 @@ fun IrModuleFragment.lower(
     configuration: CompilerConfiguration,
     symbolTable: SymbolTable,
     bindingContext: BindingContext
-) {
+): DartLoweringContext {
     val context = DartLoweringContext(
         configuration,
         irModuleFragment = this,
@@ -84,4 +85,6 @@ fun IrModuleFragment.lower(
     lowerings.forEach { lowering ->
         files.forEach { lowering(context).lower(it) }
     }
+
+    return context
 }

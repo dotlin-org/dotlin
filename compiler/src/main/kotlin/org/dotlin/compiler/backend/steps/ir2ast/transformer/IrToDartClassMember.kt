@@ -35,7 +35,6 @@ import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrBlockBody
 import org.jetbrains.kotlin.ir.expressions.IrDelegatingConstructorCall
-import org.jetbrains.kotlin.ir.expressions.IrSetValue
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.isGetter
 import org.jetbrains.kotlin.ir.util.isSetter
@@ -62,19 +61,18 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
             )
         }
 
-    override fun visitConstructor(irConstructor: IrConstructor, context: DartTransformContext) =
+    override fun visitConstructor(irConstructor: IrConstructor, context: DartTransformContext) = context.run {
         irConstructor.transformBy(context) {
             val initializers = (irConstructor.body as? IrBlockBody)?.run {
                 // Constructor parameters with complex default values are initialized in the body. We move them to the
                 // Dart field initializer list, if possible.
                 statements
-                    .filterIsInstance<IrSetValue>()
-                    .filter { it.isInitializerForPropertyToBeInitializedInFieldInitializerList }
+                    .filter { it.propertyItAssignsTo?.isInitializedInFieldInitializerList == true }
                     .also { statements.removeAll(it) }
-                    .map { setValue ->
+                    .map {
                         DartConstructorFieldInitializer(
-                            fieldName = setValue.symbol.owner.dartName,
-                            expression = setValue.value.accept(context)
+                            fieldName = it.propertyItAssignsTo!!.simpleDartName,
+                            expression = it.rightHandOfSet!!.accept(context)
                         )
                     } +
                         // Handle super/this constructor call.
@@ -122,8 +120,9 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
                 )
             )
         }
+    }
 
-    override fun visitField(irField: IrField, context: DartTransformContext): DartClassMember {
+    override fun visitField(irField: IrField, context: DartTransformContext): DartFieldDeclaration = context.run {
         val fieldName = irField.dartName
         val fieldType = irField.type.accept(context)
 
@@ -138,12 +137,12 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
             isFinal = it?.isVar != true
             isConst = irField.isDartConst() || it?.isConst == true
             isAbstract = it?.modality == Modality.ABSTRACT
-            isLate = it?.isLateinit == true
+            isLate = it?.isLateinit == true || it?.isInitializedInConstructorBody == true
         }
 
         val initializer = when {
             // Only if the property is not initialized anywhere else will we add the initializer.
-            irProperty == null || !irProperty.isInitializedByParameter && !irProperty.isInitializedInBody -> {
+            irProperty == null || !irProperty.isInitializedByParameter && !irProperty.isInitializedInConstructorBody -> {
                 irField.initializer?.accept(context)
             }
             else -> null
@@ -157,7 +156,7 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
                 ),
                 isFinal = isFinal,
                 isConst = isConst,
-                isLate = isLate || irField.isInitializedInBody,
+                isLate = isLate,
                 type = fieldType
             ),
             isStatic = irField.isStatic,
