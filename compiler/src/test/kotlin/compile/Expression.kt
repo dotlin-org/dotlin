@@ -51,6 +51,30 @@ class Expression : BaseTest {
     }
 
     @Test
+    fun `access private top-level property`() = assertCompile {
+        kotlin(
+            """
+            private val topLevelProperty: Int = 0
+
+            fun main() {
+                topLevelProperty
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            final int _topLevelProperty = 0;
+            void main() {
+              _topLevelProperty;
+            }
+            """
+        )
+    }
+
+    @Test
     fun `constructor call`() = assertCompile {
         kotlin(
             """

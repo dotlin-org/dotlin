@@ -57,6 +57,9 @@ class PropertySimplifyingLowering(override val context: DartLoweringContext) : I
                 isStatic = irProperty.backingField?.isStatic == true ||
                         (irProperty.getter?.dispatchReceiverParameter == null &&
                                 irProperty.setter?.dispatchReceiverParameter == null)
+                visibility = irProperty.visibility
+                isExternal = irProperty.isExternal
+                metadata = irProperty.metadata
             }.apply {
                 parent = irProperty.parent
                 correspondingPropertySymbol = irProperty.symbol
