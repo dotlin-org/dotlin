@@ -2521,6 +2521,41 @@ class Class : BaseTest {
     }
 
     @Test
+    fun `class secondary constructor invoking other secondary constructor`() = assertCompile {
+        kotlin(
+            """
+            class Test(x: Int, y: Int, z: Int) {
+                @DartName("twoDimensional")
+                constructor(x: Int, y: Int) : this(x, y, -1)
+
+                @DartName("oneDimensional")
+                constructor(x: Int) : this(x, -1)
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {
+              Test(
+                int x,
+                int y,
+                int z,
+              ) : super();
+              Test.twoDimensional(
+                int x,
+                int y,
+              ) : this(x, y, -1);
+              Test.oneDimensional(int x) : this.twoDimensional(x, -1);
+            }
+            """
+        )
+    }
+
+    @Test
     fun `nested class`() = assertCompile {
         kotlin(
             """

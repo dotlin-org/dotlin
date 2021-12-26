@@ -74,8 +74,9 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
                             fieldName = it.propertyItAssignsTo!!.simpleDartName,
                             expression = it.rightHandOfSet!!.accept(context)
                         )
-                    } +
-                        // Handle super/this constructor call.
+                    }
+                    // Handle super/this constructor call.
+                    .plus(
                         statements
                             .filterIsInstance<IrDelegatingConstructorCall>()
                             .singleOrNull()
@@ -88,8 +89,12 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
 
                                 // If the delegate constructor is in our class, we call `this`, otherwise we call `super`.
                                 when {
-                                    irConstructor.parentAsClass.declarations.any { it.symbol == delegateIrConstructor.symbol } ->
+                                    irConstructor
+                                        .parentAsClass
+                                        .declarations
+                                        .any { it.symbol == delegateIrConstructor.symbol } ->
                                         DartRedirectingConstructorInvocation(
+                                            name = delegateIrConstructor.dartNameOrNull,
                                             arguments = arguments,
                                         )
                                     else -> DartSuperConstructorInvocation(
@@ -97,6 +102,7 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
                                     )
                                 }
                             }
+                    )
             }?.filterNotNull() ?: emptyList()
 
             DartConstructorDeclaration(
