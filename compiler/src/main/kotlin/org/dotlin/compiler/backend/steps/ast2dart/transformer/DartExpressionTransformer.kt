@@ -142,6 +142,8 @@ object DartExpressionTransformer : DartAstNodeTransformer {
 
     override fun visitThisExpression(thisExpression: DartThisExpression, context: DartGenerationContext) = "this"
 
+    override fun visitSuperExpression(superExpression: DartSuperExpression, context: DartGenerationContext) = "super"
+
     override fun visitBinaryInfixExpression(binaryInfix: DartBinaryInfixExpression, context: DartGenerationContext) =
         binaryInfix.let {
             val left = it.left.accept(context)

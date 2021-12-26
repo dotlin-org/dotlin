@@ -690,4 +690,39 @@ class Expression : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `call super`() = assertCompile {
+        kotlin(
+            """
+                open class Base {
+                    open fun sayHello() = "Hello."
+                }
+
+                class Test : Base() {
+                    override fun sayHello() = super.sayHello()
+                }
+                """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            class Base {
+              String sayHello() {
+                return 'Hello.';
+              }
+            }
+
+            @sealed
+            class Test extends Base {
+              @override
+              String sayHello() {
+                return super.sayHello();
+              }
+            }
+            """
+        )
+    }
 }

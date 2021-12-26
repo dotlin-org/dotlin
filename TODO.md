@@ -119,7 +119,7 @@
     - [x] Non-qualified this
     - [ ] Qualified this (`this@label`)
     - [ ] Function literal this
-  - [ ] Super expressions
+  - [x] Super expressions
   - [ ] Jump expressions
     - [x] Throw expressions
     - [x] Return expressions

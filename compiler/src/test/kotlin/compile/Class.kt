@@ -1573,6 +1573,217 @@ class Class : BaseTest {
                 """
             )
         }
+
+        @Test
+        fun `diamond problem`() = assertCompile {
+            kotlin(
+                """
+                interface Base {
+                    fun sayHello(): String
+                }
+
+                interface A : Base {
+                    override fun sayHello() = "I am A"
+                }
+
+                interface B : Base {
+                    override fun sayHello() = "I am B"
+                }
+
+                class Test : A, B {
+                    override fun sayHello() = super<B>.sayHello()
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                abstract class Base {
+                  String sayHello();
+                }
+
+                abstract class A implements Base {
+                  @override
+                  String sayHello() {
+                    return 'I am A';
+                  }
+                }
+
+                abstract class B implements Base {
+                  @override
+                  String sayHello() {
+                    return 'I am B';
+                  }
+                }
+
+                @sealed
+                class Test implements A, B {
+                  @override
+                  String sayHello() {
+                    return this._B${'$'}sayHello();
+                  }
+
+                  String _B${'$'}sayHello() {
+                    return 'I am B';
+                  }
+                }
+                """
+            )
+        }
+
+        @Test
+        fun  `diamond problem with getter`() = assertCompile {
+            kotlin(
+                """
+                interface Base {
+                    val greeting: String
+                }
+
+                interface A : Base {
+                    override val greeting: String
+                        get() = "I am A"
+                }
+
+                interface B : Base {
+                    override val greeting: String
+                        get() = "I am B"
+                }
+
+                class Test : A, B {
+                    override val greeting: String
+                        get() = super<B>.greeting
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                abstract class Base {
+                  abstract final String greeting;
+                }
+
+                abstract class A implements Base {
+                  @override
+                  String get greeting {
+                    return 'I am A';
+                  }
+                }
+
+                abstract class B implements Base {
+                  @override
+                  String get greeting {
+                    return 'I am B';
+                  }
+                }
+
+                @sealed
+                class Test implements A, B {
+                  @override
+                  String get greeting {
+                    return this._B${'$'}greeting;
+                  }
+
+                  String get _B${'$'}greeting {
+                    return 'I am B';
+                  }
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `diamond problem with getter and setter`() = assertCompile {
+            kotlin(
+                """
+                fun sideEffect(x: String) {}
+
+                interface Base {
+                    var greeting: String
+                }
+
+                interface A : Base {
+                    override var greeting: String
+                        get() = "I am A"
+                        set(value) = sideEffect("I am A")
+                }
+
+                interface B : Base {
+                    override var greeting: String
+                        get() = "I am B"
+                        set(value) = sideEffect("I am B")
+                }
+
+                class Test : A, B {
+                    override var greeting: String
+                        get() = super<A>.greeting
+                        set(value) {
+                            super<B>.greeting = value
+                        }
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                void sideEffect(String x) {}
+
+                abstract class Base {
+                  abstract String greeting;
+                }
+
+                abstract class A implements Base {
+                  @override
+                  String get greeting {
+                    return 'I am A';
+                  }
+
+                  @override
+                  void set greeting(String value) {
+                    return sideEffect('I am A');
+                  }
+                }
+
+                abstract class B implements Base {
+                  @override
+                  String get greeting {
+                    return 'I am B';
+                  }
+
+                  @override
+                  void set greeting(String value) {
+                    return sideEffect('I am B');
+                  }
+                }
+
+                @sealed
+                class Test implements A, B {
+                  @override
+                  String get greeting {
+                    return this._A${'$'}greeting;
+                  }
+
+                  @override
+                  void set greeting(String value) {
+                    this._B${'$'}greeting = value;
+                  }
+
+                  String get _A${'$'}greeting {
+                    return 'I am A';
+                  }
+
+                  void set _B${'$'}greeting(String value) {
+                    return sideEffect('I am B');
+                  }
+                }
+                """
+            )
+        }
     }
 
     @Test

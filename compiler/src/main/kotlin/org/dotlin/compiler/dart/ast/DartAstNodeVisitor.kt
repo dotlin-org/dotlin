@@ -141,6 +141,9 @@ interface DartAstNodeVisitor<R, C> {
     fun visitIsExpression(isExpression: DartIsExpression, context: C): R = visitAstNode(isExpression, context)
     fun visitAsExpression(asExpression: DartAsExpression, context: C): R = visitAstNode(asExpression, context)
     fun visitThisExpression(thisExpression: DartThisExpression, context: C): R = visitAstNode(thisExpression, context)
+    fun visitSuperExpression(superExpression: DartSuperExpression, context: C): R =
+        visitAstNode(superExpression, context)
+
     fun visitBinaryInfixExpression(binaryInfix: DartBinaryInfixExpression, context: C): R =
         visitAstNode(binaryInfix, context)
 
