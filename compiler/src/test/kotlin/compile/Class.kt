@@ -621,11 +621,11 @@ class Class : BaseTest {
 
                 @sealed
                 class Test {
-                  Test(int param) : super() {
-                    this.property = param;
-                  }
+                  Test(int param)
+                      : property = param,
+                        super();
                   @nonVirtual
-                  late final int property;
+                  final int property;
                 }
                 """
             )
@@ -652,12 +652,12 @@ class Class : BaseTest {
                     int x,
                     int y,
                     int z,
-                  ) : super() {
-                    this.sum = (x + y) + z;
+                  )   : sum = (x + y) + z,
+                        super() {
                     this.sumTimesSum = this.sum * this.sum;
                   }
                   @nonVirtual
-                  late final int sum;
+                  final int sum;
                   @nonVirtual
                   late final int sumTimesSum;
                 }
@@ -800,6 +800,60 @@ class Class : BaseTest {
             )
         }
     }
+
+    @Test
+    fun `class with property initialized by parameter`() =
+        assertCompile {
+            kotlin(
+                """
+                    class Vector(x: Int) {
+                        val y = x
+                    }
+                    """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                @sealed
+                class Vector {
+                  Vector(int x)
+                      : y = x,
+                        super();
+                  @nonVirtual
+                  final int y;
+                }
+                """
+            )
+        }
+
+    @Test
+    fun `class with property initialized by parameter or if null other value`() =
+        assertCompile {
+            kotlin(
+                """
+                    class Vector(x: Int?) {
+                        val y = x ?: 3
+                    }
+                    """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                @sealed
+                class Vector {
+                  Vector(int? x)
+                      : y = x ?? 3,
+                        super();
+                  @nonVirtual
+                  final int y;
+                }
+                """
+            )
+        }
 
     @Nested
     inner class Inheritance {
@@ -1590,7 +1644,7 @@ class Class : BaseTest {
                   abstract final int y;
                   abstract final int z;
                 }
-                
+
                 @sealed
                 class VectorImpl extends Vector {
                   VectorImpl._${'$'}(
@@ -1601,8 +1655,8 @@ class Class : BaseTest {
                     this.x = 0,
                     this.z = 0,
                     int v = 3,
-                  }) : super(length) {
-                    this.sum = complexValue(r);
+                  })  : sum = complexValue(r),
+                        super(length) {
                     this.sumPower = (this.sum * 2) * o;
                     this.sumPowerTwo = ((this.x * this.sum) * 2) + complexValue(r);
                   }
@@ -1629,7 +1683,7 @@ class Class : BaseTest {
                   @override
                   final int z;
                   @nonVirtual
-                  late final int sum;
+                  final int sum;
                   @nonVirtual
                   late final int sumPower;
                   @nonVirtual
@@ -1639,11 +1693,11 @@ class Class : BaseTest {
                     return 3;
                   }
                 }
-                
+
                 int complexValue(int? x) {
                   return 343;
                 }
-                
+
                 @sealed
                 class _$DefaultValue {
                   const _$DefaultValue();
