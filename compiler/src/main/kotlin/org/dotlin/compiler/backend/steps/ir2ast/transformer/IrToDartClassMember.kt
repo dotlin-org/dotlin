@@ -142,7 +142,7 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
 
         val initializer = when {
             // Only if the property is not initialized anywhere else will we add the initializer.
-            irProperty == null || !irProperty.isInitializedByParameter && !irProperty.isInitializedInConstructorBody -> {
+            irProperty == null || !irProperty.isInitializedByParameter && !irProperty.isInitializedSomewhereElse -> {
                 irField.initializer?.accept(context)
             }
             else -> null

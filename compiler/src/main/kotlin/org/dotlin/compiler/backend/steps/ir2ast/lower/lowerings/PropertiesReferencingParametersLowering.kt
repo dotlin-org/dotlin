@@ -21,6 +21,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.attributes.attributeOwner
 import org.dotlin.compiler.backend.steps.ir2ast.ir.buildStatement
+import org.dotlin.compiler.backend.steps.ir2ast.ir.hasReferenceToThis
 import org.dotlin.compiler.backend.steps.ir2ast.ir.otherPropertyDependents
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
@@ -59,8 +60,11 @@ class PropertiesReferencingParametersLowering(override val context: DartLowering
 
             otherPropertyDependents.mapNotNullTo(body.statements) { prop ->
                 val value = prop.backingField?.initializer?.expression
-                if (!prop.isInitializedInConstructorBody && value != null) {
-                    propertiesInitializedInConstructorBody.add(prop.attributeOwner())
+                if (!prop.isInitializedSomewhereElse && value != null) {
+                    when {
+                        value.hasReferenceToThis() -> propertiesInitializedInConstructorBody.add(prop.attributeOwner())
+                        else -> propertiesInitializedInFieldInitializerList.add(prop.attributeOwner())
+                    }
 
                     irBuilder.buildStatement {
                         irSetField(
