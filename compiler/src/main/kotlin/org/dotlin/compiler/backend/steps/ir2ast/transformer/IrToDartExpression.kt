@@ -36,6 +36,7 @@ import org.dotlin.compiler.dart.ast.expression.literal.*
 import org.dotlin.compiler.dart.ast.type.DartNamedType
 import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
 import org.jetbrains.kotlin.ir.declarations.IrField
+import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.IrTypeOperator.*
@@ -53,27 +54,27 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         irCallLike: IrFunctionAccessExpression,
         context: DartTransformContext,
     ): DartExpression {
-        val irLeft = irCallLike.extensionReceiver ?: irCallLike.dispatchReceiver
-        val irRight by lazy { irCallLike.getValueArgument(0)!! }
-        val optionalLeft by lazy { irLeft?.accept(context) }
-        val left by lazy { optionalLeft!! }
-        val right by lazy { irRight.accept(context) }
+        val irReceiver = irCallLike.extensionReceiver ?: irCallLike.dispatchReceiver
+        val irSingleArgument by lazy { irCallLike.getValueArgument(0)!! }
+        val optionalReceiver by lazy { irReceiver?.accept(context) }
+        val receiver by lazy { optionalReceiver!! }
+        val singleArgument by lazy { irSingleArgument.accept(context) }
 
-        val infixLeft by lazy { left.possiblyParenthesize() }
-        val infixRight by lazy { right.possiblyParenthesize() }
+        val infixReceiver by lazy { receiver.possiblyParenthesize() }
+        val infixSingleArgument by lazy { singleArgument.possiblyParenthesize() }
 
         fun methodInvocation(methodName: DartSimpleIdentifier): DartMethodInvocation {
             return DartMethodInvocation(
-                target = left,
+                target = receiver,
                 methodName = methodName,
-                arguments = DartArgumentList(right)
+                arguments = DartArgumentList(singleArgument)
             )
         }
 
         return when (val origin = irCallLike.origin) {
             IrStatementOrigin.PLUS -> {
-                val irLeftType = irLeft!!.type
-                val irRightType = irRight.type
+                val irLeftType = irReceiver!!.type
+                val irRightType = irSingleArgument.type
 
                 when {
                     // Built-in: String + Any? (or null) will use the Dart extension.
@@ -84,29 +85,32 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                     irLeftType.isChar() && irRightType.isInt() -> {
                         methodInvocation(irCallLike.symbol.owner.dartNameAsSimple)
                     }
-                    else -> DartPlusExpression(infixLeft, infixRight)
+                    else -> DartPlusExpression(infixReceiver, infixSingleArgument)
                 }
             }
             IrStatementOrigin.MINUS -> when {
                 // Built-in: String - int will use the Dart extension.
-                irLeft!!.type.isChar() && irRight.type.isInt() -> {
+                irReceiver!!.type.isChar() && irSingleArgument.type.isInt() -> {
                     methodInvocation(irCallLike.symbol.owner.dartNameAsSimple)
                 }
-                else -> DartMinusExpression(infixLeft, infixRight)
+                else -> DartMinusExpression(infixReceiver, infixSingleArgument)
             }
-            IrStatementOrigin.MUL -> DartMultiplyExpression(infixLeft, infixRight)
+            IrStatementOrigin.MUL -> DartMultiplyExpression(infixReceiver, infixSingleArgument)
             IrStatementOrigin.DIV -> {
                 when {
                     // Dart's int divide operator returns a double, while Kotlin's Int divide operator returns an
                     // Int. So, we use the ~/ Dart operator, which returns an int.
-                    irLeft!!.type.isInt() && irRight.type.isInt() -> DartIntegerDivideExpression(infixLeft, infixRight)
-                    else -> DartDivideExpression(infixLeft, infixRight)
+                    irReceiver!!.type.isInt() && irSingleArgument.type.isInt() -> DartIntegerDivideExpression(
+                        infixReceiver,
+                        infixSingleArgument
+                    )
+                    else -> DartDivideExpression(infixReceiver, infixSingleArgument)
                 }
             }
-            IrStatementOrigin.PERC -> DartModuloExpression(left, right)
+            IrStatementOrigin.PERC -> DartModuloExpression(receiver, singleArgument)
             IrStatementOrigin.GT, IrStatementOrigin.GTEQ, IrStatementOrigin.LT, IrStatementOrigin.LTEQ -> {
                 val (actualLeft, actualRight) = if (irCallLike.valueArgumentsCount == 1) {
-                    infixLeft to infixRight
+                    infixReceiver to infixSingleArgument
                 } else {
                     irCallLike.valueArguments.mapNotNull { it?.accept(context)?.possiblyParenthesize() }.toPair()
                 }
@@ -131,30 +135,31 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
             IrStatementOrigin.EQ ->
                 DartAssignmentExpression(
                     left = DartPropertyAccessExpression(
-                        target = infixLeft,
+                        target = infixReceiver,
                         propertyName = (irCallLike.symbol.owner as IrSimpleFunction)
                             .correspondingProperty!!.dartNameAsSimple
                     ),
-                    right = right,
+                    right = singleArgument,
                 )
             else -> {
-
-
                 val hasDartGetterAnnotation = irCallLike.symbol.owner.hasDartGetterAnnotation()
 
                 when {
-                    irCallLike.origin == IrStatementOrigin.EXCL && irLeft!!.type.isBoolean() -> {
-                        DartNegatedExpression(left.possiblyParenthesize())
+                    irCallLike.origin == IrStatementOrigin.EXCL && irReceiver!!.type.isBoolean() -> {
+                        DartNegatedExpression(receiver.possiblyParenthesize())
                     }
                     origin == IrStatementOrigin.GET_PROPERTY || origin == IrStatementOrigin.GET_LOCAL_PROPERTY
                             || hasDartGetterAnnotation -> {
                         val irSimpleFunction = irCallLike.symbol.owner as IrSimpleFunction
-                        val propertyName = when {
-                            hasDartGetterAnnotation -> irSimpleFunction.dartNameAsSimple
-                            else -> irSimpleFunction.correspondingProperty!!.dartNameAsSimple
+                        val irAccessed = when {
+                            hasDartGetterAnnotation -> irSimpleFunction
+                            else -> irSimpleFunction.correspondingProperty!!
                         }
 
-                        DartPropertyAccessExpression(infixLeft, propertyName)
+                        when (irReceiver) {
+                            null -> irAccessed.dartName
+                            else -> DartPropertyAccessExpression(infixReceiver, irAccessed.dartNameAsSimple)
+                        }
                     }
                     else -> {
                         val arguments = irCallLike.accept(IrToDartArgumentListTransformer, context)
@@ -175,7 +180,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                                 val functionName = irCallLike.symbol.owner.dartName
 
                                 @Suppress("UnnecessaryVariable")
-                                when (val receiver = optionalLeft) {
+                                when (val receiver = optionalReceiver) {
                                     null -> DartFunctionExpressionInvocation(
                                         function = functionName,
                                         arguments = arguments
@@ -251,13 +256,19 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
     }
 
     override fun visitGetField(irGetField: IrGetField, context: DartTransformContext): DartExpression {
-        val receiver = irGetField.receiver?.accept(context) ?: irGetField.type.owner.dartName
+        val receiver = when (irGetField.symbol.owner.parent) {
+            is IrFile -> null
+            else -> irGetField.receiver?.accept(context) ?: irGetField.type.owner.dartName
+        }
         val name = irGetField.symbol.owner.relevantDartName
 
-        return DartPropertyAccessExpression(
-            target = receiver.possiblyParenthesize(),
-            propertyName = name,
-        )
+        return when (receiver) {
+            null -> name
+            else -> DartPropertyAccessExpression(
+                target = receiver.possiblyParenthesize(),
+                propertyName = name,
+            )
+        }
     }
 
     override fun visitGetObjectValue(irGetObjectValue: IrGetObjectValue, data: DartTransformContext) =

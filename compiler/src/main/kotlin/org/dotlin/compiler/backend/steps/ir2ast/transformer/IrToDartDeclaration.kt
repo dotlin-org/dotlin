@@ -21,16 +21,18 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
+import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isDartExtension
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartAnnotations
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.simpleDartName
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.transformBy
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.*
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnitMember
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartClassDeclaration
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartExtendsClause
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartImplementsClause
 import org.dotlin.compiler.dart.ast.declaration.extension.DartExtensionDeclaration
 import org.dotlin.compiler.dart.ast.declaration.function.DartTopLevelFunctionDeclaration
+import org.dotlin.compiler.dart.ast.declaration.variable.DartTopLevelVariableDeclaration
+import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
+import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
 import org.dotlin.compiler.dart.ast.expression.DartFunctionExpression
 import org.dotlin.compiler.dart.ast.type.DartNamedType
 import org.jetbrains.kotlin.descriptors.ClassKind
@@ -66,7 +68,6 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
             ClassKind.CLASS, ClassKind.INTERFACE, ClassKind.OBJECT, ClassKind.ANNOTATION_CLASS, ClassKind.ENUM_CLASS -> {
                 val name = irClass.simpleDartName
                 val isDefaultValueClass = irClass.origin == IrDartDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE
-
 
                 DartClassDeclaration(
                     name = name,
@@ -167,6 +168,21 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
         )
     }
 
+    override fun visitField(irField: IrField, context: DartTransformContext) = DartTopLevelVariableDeclaration(
+        variables = DartVariableDeclarationList(
+            listOf(
+                DartVariableDeclaration(
+                    name = irField.dartName,
+                    expression = irField.initializer?.expression?.accept(context),
+                ),
+            ),
+            isConst = irField.isDartConst(),
+            isFinal = irField.isFinal,
+            isLate = irField.correspondingProperty?.isLateinit == true,
+            type = irField.type.accept(context)
+        ),
+        annotations = irField.dartAnnotations,
+    )
 }
 
 fun IrDeclaration.accept(context: DartTransformContext) = accept(IrToDartDeclarationTransformer, context)

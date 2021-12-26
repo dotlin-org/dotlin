@@ -35,6 +35,7 @@ import org.dotlin.compiler.dart.ast.declaration.function.DartTopLevelFunctionDec
 import org.dotlin.compiler.dart.ast.declaration.function.body.DartBlockFunctionBody
 import org.dotlin.compiler.dart.ast.declaration.function.body.DartEmptyFunctionBody
 import org.dotlin.compiler.dart.ast.declaration.function.body.DartExpressionFunctionBody
+import org.dotlin.compiler.dart.ast.declaration.variable.DartTopLevelVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
 import org.dotlin.compiler.dart.ast.directive.DartCombinator
@@ -81,6 +82,9 @@ interface DartAstNodeVisitor<R, C> {
 
     fun visitFieldDeclaration(fieldDeclaration: DartFieldDeclaration, context: C): R =
         visitAstNode(fieldDeclaration, context)
+
+    fun visitTopLevelVariableDeclaration(variableDeclaration: DartTopLevelVariableDeclaration, context: C): R =
+        visitAstNode(variableDeclaration, context)
 
     fun visitVariableDeclaration(variableDeclaration: DartVariableDeclaration, context: C): R =
         visitAstNode(variableDeclaration, context)

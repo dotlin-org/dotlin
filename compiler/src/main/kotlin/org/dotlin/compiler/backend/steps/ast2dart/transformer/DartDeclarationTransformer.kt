@@ -24,6 +24,7 @@ import org.dotlin.compiler.dart.ast.declaration.DartDeclaration
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartClassDeclaration
 import org.dotlin.compiler.dart.ast.declaration.extension.DartExtensionDeclaration
 import org.dotlin.compiler.dart.ast.declaration.function.DartTopLevelFunctionDeclaration
+import org.dotlin.compiler.dart.ast.declaration.variable.DartTopLevelVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
 
@@ -81,6 +82,11 @@ object DartDeclarationTransformer : DartAstNodeTransformer {
 
         "${annotations}extension $name$typeParameters on $type$members"
     }
+
+    override fun visitTopLevelVariableDeclaration(
+        variableDeclaration: DartTopLevelVariableDeclaration,
+        context: DartGenerationContext
+    ) = variableDeclaration.variables.accept(context) + ";"
 
     override fun visitVariableDeclaration(
         variableDeclaration: DartVariableDeclaration,
