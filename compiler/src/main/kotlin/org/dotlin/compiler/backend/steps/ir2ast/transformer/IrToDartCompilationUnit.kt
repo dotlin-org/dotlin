@@ -42,12 +42,12 @@ object IrToDartCompilationUnitTransformer : IrDartAstTransformer<DartCompilation
         // Add import alias directives against Kotlin/Dart built-ins name clashes.
         directives = irFile.annotations
             .asSequence()
-            .filter { it.isDartBuiltInImportAlias() || it.isDartBuiltInHideImport() }
+            .filter { it.isDartImportAlias() || it.isDartHideImport() }
             .map {
                 val importLibrary = (it.valueArguments[0] as IrConst<String>).value
                 val hiddenName = (it.valueArguments[1] as IrConst<String>).value
                 val aliasName = when {
-                    it.isDartBuiltInImportAlias() -> importLibrary.split(':')[1]
+                    it.isDartImportAlias() -> importLibrary.split(':')[1]
                     else -> null
                 }
 
@@ -83,10 +83,10 @@ object IrToDartCompilationUnitTransformer : IrDartAstTransformer<DartCompilation
             .optimizeImports()
     )
 
-    private fun IrConstructorCall.isDartBuiltInImportAlias() =
+    private fun IrConstructorCall.isDartImportAlias() =
         isAnnotation(FqName(DotlinAnnotations.dartImportAlias))
 
-    private fun IrConstructorCall.isDartBuiltInHideImport() =
+    private fun IrConstructorCall.isDartHideImport() =
         isAnnotation(FqName(DotlinAnnotations.dartHideImport))
 }
 
