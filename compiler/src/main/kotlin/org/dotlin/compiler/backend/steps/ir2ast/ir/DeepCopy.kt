@@ -166,23 +166,33 @@ inline fun <reified D : IrDeclaration, B : IrDeclarationBuilder> D.deepCopyWith(
     createBuilder: () -> B,
     updateFrom: B.(D) -> Unit,
     remapReferences: Boolean,
-): D = deepCopyWithSymbols(parent) { symbolRemapper, typeRemapper ->
-    val builder = createBuilder().also {
-        updateFrom(it, this)
-    }
+): D {
+    lateinit var deepCopier: DeepCopier
 
-    block(builder)
+    return deepCopyWithSymbols(parent) { symbolRemapper, typeRemapper ->
+        val builder = createBuilder().also {
+            updateFrom(it, this)
+        }
 
-    DeepCopier(
-        symbolRemapper,
-        typeRemapper,
-        symbolRenamer = SingleSymbolRenamer(symbol, builder.name),
-        declarationRebuilder = SingleDeclarationRebuilder(symbol, builder)
-    )
-}.also {
-    if (remapReferences) {
-        relevantUpperParent.remapReferences(symbol to it.symbol)
-        relevantUpperParent.remapTypes(SimpleTypeRemapper(SymbolReferenceRemapper(symbol to it.symbol)))
+        block(builder)
+
+        DeepCopier(
+            symbolRemapper,
+            typeRemapper,
+            symbolRenamer = SingleSymbolRenamer(symbol, builder.name),
+            declarationRebuilder = SingleDeclarationRebuilder(symbol, builder)
+        ).also {
+            deepCopier = it
+        }
+    }.also {
+        if (remapReferences) {
+            relevantUpperParent.remapReferences(symbol to it.symbol)
+            relevantUpperParent.remapTypes(
+                DeepCopyTypeRemapper(SymbolReferenceRemapper(symbol to it.symbol)).also { remapper ->
+                    remapper.deepCopy = deepCopier
+                }
+            )
+        }
     }
 }
 

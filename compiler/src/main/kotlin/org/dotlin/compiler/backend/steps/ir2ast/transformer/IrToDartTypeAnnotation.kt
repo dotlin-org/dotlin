@@ -20,6 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
+import org.dotlin.compiler.backend.steps.ir2ast.IrVoidType
 import org.dotlin.compiler.backend.steps.ir2ast.ir.owner
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
 import org.dotlin.compiler.dart.ast.type.DartNamedType
@@ -37,6 +38,7 @@ fun IrType.accept(context: DartTransformContext): DartTypeAnnotation {
             typeArguments = DartTypeArgumentList(arguments.map { it.accept(context) }.toMutableList()),
         )
         is IrDynamicType -> DartTypeAnnotation.DYNAMIC
+        is IrVoidType -> DartTypeAnnotation.VOID
         else -> throw UnsupportedOperationException()
     }
 }

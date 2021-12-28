@@ -2909,6 +2909,30 @@ class Class : BaseTest {
     }
 
     @Test
+    fun `class with Unit type argument`() = assertCompile {
+        kotlin(
+            """
+            open class Base<T>
+
+            class Test : Base<Unit>()
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            class Base<T> {}
+
+            @sealed
+            class Test extends Base<void> {
+              Test() : super();
+            }
+            """
+        )
+    }
+
+    @Test
     fun `class with type parameter with method`() = assertCompile {
         kotlin(
             """

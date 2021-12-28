@@ -18,9 +18,10 @@
 package kotlin
 
 /**
- * The type with only one value: the `Unit` object. This type corresponds to the `void` type in Dart.
+ * The type with only one value: the `Unit` object.
+ *
+ * This type corresponds to the `void` type in Dart, iff used as a return type or type argument.
  */
-@DartName("void")
 object Unit {
     override fun toString() = "kotlin.Unit"
 }
