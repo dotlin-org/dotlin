@@ -645,7 +645,7 @@ class Dotlin : BaseTest {
               }
             }
 
-            Nothing something() {
+            Never something() {
               throw UnsupportedOperationException.empty();
             }
             """

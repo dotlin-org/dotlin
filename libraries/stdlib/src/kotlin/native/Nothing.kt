@@ -15,10 +15,17 @@
  * limitations under the License.
  */
 
+@file:Suppress(
+    "WRONG_EXTERNAL_DECLARATION" // TODO: Fix in analyzer
+)
+
 package kotlin
 
 /**
  * Nothing has no instances. You can use Nothing to represent "a value that never exists": for example,
  * if a function has the return type of Nothing, it means that it never returns (always throws an exception).
+ *
+ * Corresponds to `Never` in Dart.
  */
-class Nothing private constructor()
+@DartName("Never")
+external class Nothing private constructor()
