@@ -145,7 +145,7 @@
     - [x] One upper bound
     - [x] Multiple upper bounds
 - [x] Exceptions
-- [ ] Nothing type
+- [x] Nothing type
 - [ ] Function overloading
 - [ ] Coroutines
 - [ ] Type aliases
