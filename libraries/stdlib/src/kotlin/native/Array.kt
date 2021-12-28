@@ -26,10 +26,9 @@ package kotlin
  * See [Kotlin language documentation](https://kotlinlang.org/docs/reference/basic-types.html#arrays)
  * for more information on arrays.
  */
-@DartBuiltIn
-@DartBuiltIn.ImportAlias("dart:core")
+@DartImportAlias("dart:core")
 @DartName("List")
-class Array<T> {
+external class Array<T> {
     /**
      * Creates a new array with the specified [size], where each element is calculated by calling the specified
      * [init] function.

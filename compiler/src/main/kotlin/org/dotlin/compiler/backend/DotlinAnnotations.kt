@@ -34,14 +34,13 @@ object DotlinAnnotations {
     const val dartName = "dotlin.DartName"
     const val dartConst = "dotlin.DartConst"
 
-    const val dartBuiltIn = "dotlin.DartBuiltIn"
-    const val dartBuiltInGetter = "dotlin.DartBuiltIn.Getter"
-    const val dartBuiltInImportAlias = "dotlin.DartBuiltIn.ImportAlias"
-    const val dartBuiltInHideImport = "dotlin.DartBuiltIn.HideImport"
+    const val dartGetter = "dotlin.DartGetter"
+    const val dartImportAlias = "dotlin.DartImportAlias"
+    const val dartHideImport = "dotlin.DartHideImport"
 }
 
 fun IrDeclaration.hasDartGetterAnnotation() =
-    (this as? IrOverridableDeclaration<*>?)?.hasOverriddenAnnotation(DotlinAnnotations.dartBuiltInGetter).falseIfNull()
+    (this as? IrOverridableDeclaration<*>?)?.hasOverriddenAnnotation(DotlinAnnotations.dartGetter).falseIfNull()
 
 val IrDeclaration.dartAnnotatedName: String?
     get() = when (this) {
@@ -55,10 +54,10 @@ val IrDeclaration.dartAnnotatedName: String?
     }.run { getSingleAnnotationStringArgumentOf(DotlinAnnotations.dartName) }
 
 val IrDeclaration.dartImportAliasLibrary: String?
-    get() = getSingleAnnotationStringArgumentOf(DotlinAnnotations.dartBuiltInImportAlias)
+    get() = getSingleAnnotationStringArgumentOf(DotlinAnnotations.dartImportAlias)
 
 val IrDeclaration.dartHideImportLibrary: String?
-    get() = getSingleAnnotationStringArgumentOf(DotlinAnnotations.dartBuiltInHideImport)
+    get() = getSingleAnnotationStringArgumentOf(DotlinAnnotations.dartHideImport)
 
 val IrDeclaration.dartImportAliasPrefix: String?
     get() = dartImportAliasLibrary?.let { it.split(':')[1] }

@@ -279,40 +279,13 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartBuiltIn`() = assertCompile {
-        kotlin(
-            """
-            @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
-
-            @DartBuiltIn
-            class Test
-
-            fun main() {
-                Test()
-            }
-            """
-        )
-
-        dart(
-            """
-            import 'package:meta/meta.dart';
-
-            void main() {
-              Test();
-            }
-            """
-        )
-    }
-
-
-    @Test
-    fun `@DartBuiltInGetter`() = assertCompile {
+    fun `@DartGetter`() = assertCompile {
         kotlin(
             """
             @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
             class Hobbit {
-                @DartBuiltIn.Getter
+                @DartGetter
                 fun isProudfoot(): Boolean = true
             }
 
@@ -342,13 +315,13 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartBuiltInGetter override`() = assertCompile {
+    fun `@DartGetter override`() = assertCompile {
         kotlin(
             """
             @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
             open class Hobbit {
-                @DartBuiltIn.Getter
+                @DartGetter
                 open fun isProudfoot(): Boolean = false
             }
 
@@ -388,14 +361,13 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartBuiltInImportAlias`() = assertCompile {
+    fun `@DartImportAlias`() = assertCompile {
         kotlin(
             """
             @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
-            @DartBuiltIn
-            @DartBuiltIn.ImportAlias("dart:core")
-            class List
+            @DartImportAlias("dart:core")
+            external class List
 
             fun main() {
                 List()
@@ -417,16 +389,15 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartBuiltInImportAlias separate input files`() = assertCompileFiles {
+    fun `@DartImportAlias separate input files`() = assertCompileFiles {
         kotlin(
             """
             @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
             package test
 
-            @DartBuiltIn
-            @DartBuiltIn.ImportAlias("dart:core")
-            class List
+            @DartImportAlias("dart:core")
+            external class List
             """
         )
 
@@ -456,14 +427,13 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartBuiltInImportAlias type reference only`() = assertCompile {
+    fun `@DartImportAlias type reference only`() = assertCompile {
         kotlin(
             """
             @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
-            @DartBuiltIn
-            @DartBuiltIn.ImportAlias("dart:core")
-            class List
+            @DartImportAlias("dart:core")
+            external class List
 
             fun test(list: List) {}
             """
@@ -481,12 +451,12 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartBuiltInHideImport`() = assertCompile {
+    fun `@DartHideImport`() = assertCompile {
         kotlin(
             """
             @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
-            @DartBuiltIn.HideImport("dart:core")
+            @DartHideImport("dart:core")
             class Enum
 
             fun main() {
@@ -511,15 +481,15 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartBuiltInHideImport twice`() = assertCompile {
+    fun `@DartHideImport twice`() = assertCompile {
         kotlin(
             """
             @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
-            @DartBuiltIn.HideImport("dart:core")
+            @DartHideImport("dart:core")
             class Enum
 
-            @DartBuiltIn.HideImport("dart:core")
+            @DartHideImport("dart:core")
             class List
 
             fun main() {
@@ -547,17 +517,17 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartBuiltInHideImport twice, multiple files`() = assertCompileFiles {
+    fun `@DartHideImport twice, multiple files`() = assertCompileFiles {
         kotlin(
             """
             @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
             package test
 
-            @DartBuiltIn.HideImport("dart:core")
+            @DartHideImport("dart:core")
             class Something
 
-            @DartBuiltIn.HideImport("dart:core")
+            @DartHideImport("dart:core")
             class SomethingElse
             """
         )

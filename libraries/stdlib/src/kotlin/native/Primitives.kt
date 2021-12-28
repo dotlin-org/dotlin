@@ -19,18 +19,21 @@
     "NON_ABSTRACT_FUNCTION_WITH_NO_BODY",
     "MUST_BE_INITIALIZED_OR_BE_ABSTRACT",
     "UNUSED_PARAMETER",
-    "DIVISION_BY_ZERO"
+    "DIVISION_BY_ZERO",
+    "WRONG_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
+    "WRONG_INITIALIZER_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
+    "EXTERNAL_DELEGATED_CONSTRUCTOR_CALL" // TODO: Fix in analyzer
 )
 
 package kotlin
 
 /**
  * Represents a 8-bit signed integer.
+ *
  * In Dart, values of this type are represented as values of the primitive type `int`.
  */
-@DartBuiltIn
 @DartName("int")
-class Byte private constructor() : Number(), Comparable<Byte> {
+external class Byte private constructor() : Number(), Comparable<Byte> {
     companion object {
         /**
          * A constant holding the minimum value an instance of Byte can have.
@@ -276,11 +279,11 @@ class Byte private constructor() : Number(), Comparable<Byte> {
 
 /**
  * Represents a 16-bit signed integer.
+ *
  * In Dart, values of this type are represented as values of the primitive type `int`.
  */
-@DartBuiltIn
 @DartName("int")
-class Short private constructor() : Number(), Comparable<Short> {
+external class Short private constructor() : Number(), Comparable<Short> {
     companion object {
         /**
          * A constant holding the minimum value an instance of Short can have.
@@ -524,11 +527,11 @@ class Short private constructor() : Number(), Comparable<Short> {
 
 /**
  * Represents a 32-bit signed integer.
+ *
  * In Dart, values of this type are represented as values of the primitive type `int`.
  */
-@DartBuiltIn
 @DartName("int")
-class Int private constructor() : Number(), Comparable<Int> {
+external class Int private constructor() : Number(), Comparable<Int> {
     companion object {
         /**
          * A constant holding the minimum value an instance of Int can have.
@@ -807,11 +810,11 @@ class Int private constructor() : Number(), Comparable<Int> {
 
 /**
  * Represents a 64-bit signed integer.
+ *
  * In Dart, values of this type are represented as values of the primitive type `long`.
  */
-@DartBuiltIn
 @DartName("int")
-class Long private constructor() : Number(), Comparable<Long> {
+external class Long private constructor() : Number(), Comparable<Long> {
     companion object {
         /**
          * A constant holding the minimum value an instance of Long can have.
@@ -1094,11 +1097,11 @@ class Long private constructor() : Number(), Comparable<Long> {
 
 /**
  * Represents a single-precision 32-bit IEEE 754 floating point number.
+ *
  * In Dart, values of this type are represented as values of the primitive type `double`.
  */
-@DartBuiltIn
 @DartName("double")
-class Float private constructor() : Number(), Comparable<Float> {
+external class Float private constructor() : Number(), Comparable<Float> {
     companion object {
         /**
          * A constant holding the smallest *positive* nonzero value of Float.
@@ -1347,11 +1350,11 @@ class Float private constructor() : Number(), Comparable<Float> {
 
 /**
  * Represents a double-precision 64-bit IEEE 754 floating point number.
+ *
  * In Dart, values of this type are represented as values of the primitive type `double`.
  */
-@DartBuiltIn
 @DartName("double")
-class Double private constructor() : Number(), Comparable<Double> {
+external class Double private constructor() : Number(), Comparable<Double> {
     companion object {
         /**
          * A constant holding the smallest *positive* nonzero value of Double.

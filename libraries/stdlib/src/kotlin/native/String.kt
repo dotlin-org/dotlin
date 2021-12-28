@@ -15,7 +15,12 @@
  * limitations under the License.
  */
 
-@file:Suppress("NON_ABSTRACT_FUNCTION_WITH_NO_BODY", "MUST_BE_INITIALIZED_OR_BE_ABSTRACT", "UNUSED_PARAMETER")
+@file:Suppress(
+    "NON_ABSTRACT_FUNCTION_WITH_NO_BODY",
+    "MUST_BE_INITIALIZED_OR_BE_ABSTRACT",
+    "UNUSED_PARAMETER",
+    "EXTERNAL_TYPE_EXTENDS_NON_EXTERNAL_TYPE" // TODO: Fix in analyzer?
+)
 
 package kotlin
 
@@ -23,8 +28,7 @@ package kotlin
  * The `String` class represents character strings. All string literals in Kotlin programs, such as `"abc"`, are
  * implemented as instances of this class.
  */
-@DartBuiltIn
-class String : Comparable<String>, CharSequence {
+external class String : Comparable<String>, CharSequence {
     companion object {}
     
     /**

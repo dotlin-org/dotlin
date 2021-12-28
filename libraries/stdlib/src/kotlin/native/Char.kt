@@ -15,7 +15,14 @@
  * limitations under the License.
  */
 
-@file:Suppress("NON_ABSTRACT_FUNCTION_WITH_NO_BODY", "MUST_BE_INITIALIZED_OR_BE_ABSTRACT", "UNUSED_PARAMETER")
+@file:Suppress(
+    "NON_ABSTRACT_FUNCTION_WITH_NO_BODY",
+    "MUST_BE_INITIALIZED_OR_BE_ABSTRACT",
+    "UNUSED_PARAMETER",
+    "WRONG_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
+    "WRONG_INITIALIZER_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
+    "EXTERNAL_DELEGATED_CONSTRUCTOR_CALL" // TODO: Fix in analyzer
+)
 
 package kotlin
 
@@ -24,9 +31,8 @@ package kotlin
  *
  * In Dart, values of this type are represented as values of the primitive type `int`.
  */
-@DartBuiltIn
 @DartName("int")
-class Char private constructor() : Comparable<Char> {
+external class Char private constructor() : Comparable<Char> {
     /**
      * Compares this value with the specified value for order.
      *
