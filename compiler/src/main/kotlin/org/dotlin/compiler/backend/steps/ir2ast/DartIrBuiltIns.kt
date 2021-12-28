@@ -22,9 +22,11 @@ package org.dotlin.compiler.backend.steps.ir2ast
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
+import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -55,10 +57,20 @@ class DartIrBuiltIns(
 
     val iterator = symbolAt<IrClassSymbol>("dart.core", "Iterator")
 
+    val voidType = IrVoidType
+
     val dotlin = Dotlin(this)
 
     class Dotlin(builtIns: DartIrBuiltIns) {
         val dart = builtIns.symbolAt<IrSimpleFunctionSymbol>("dotlin", "dart")
         val dartConst = builtIns.symbolAt<IrClassSymbol>("dotlin", "DartConst")
     }
+}
+
+object IrVoidType : IrType {
+    override val annotations = emptyList<IrConstructorCall>()
+
+    override fun equals(other: Any?) = this === other
+
+    override fun hashCode() = 0
 }

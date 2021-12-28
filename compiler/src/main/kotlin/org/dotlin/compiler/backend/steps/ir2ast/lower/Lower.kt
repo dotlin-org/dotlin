@@ -62,6 +62,7 @@ private val lowerings: List<KFunction1<DartLoweringContext, IrLowering>> = listO
     ::WhensWithSubjectExpressionsLowering,
     ::SingleExpressionBlocksLowering,
     ::UnitReturnsLowering,
+    ::UnitTypesLowering,
     ::SafeCallsLowering,
     ::ElvisLowering,
     ::InitBlocksLowering,
