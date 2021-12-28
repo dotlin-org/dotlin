@@ -24,6 +24,8 @@ import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
 import org.dotlin.compiler.dart.ast.statement.*
+import org.dotlin.compiler.dart.ast.statement.trycatch.DartCatchClause
+import org.dotlin.compiler.dart.ast.statement.trycatch.DartTryStatement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.*
@@ -71,6 +73,23 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement> {
         )
     }
 
+    override fun visitTry(irTry: IrTry, context: DartTransformContext) = irTry.let {
+        fun IrExpression.acceptAsBlock() = DartBlock(
+            statements = (this as IrBlock).statements.accept(context)
+        )
+
+        DartTryStatement(
+            body = it.tryResult.acceptAsBlock(),
+            catchClauses = it.catches.map { catch ->
+                DartCatchClause(
+                    body = catch.result.acceptAsBlock(),
+                    exceptionType = catch.catchParameter.type.accept(context),
+                    exceptionParameter = catch.catchParameter.dartName,
+                )
+            },
+            finallyBlock = it.finallyExpression?.acceptAsBlock()
+        )
+    }
 
     override fun visitBlock(irBlock: IrBlock, context: DartTransformContext) = irBlock.run {
         // If there's only a single statement in the block, we remove the block.

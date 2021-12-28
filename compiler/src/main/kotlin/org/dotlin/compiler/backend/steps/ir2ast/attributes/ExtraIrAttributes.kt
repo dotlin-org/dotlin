@@ -22,6 +22,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.attributes
 import org.jetbrains.kotlin.ir.declarations.IrAttributeContainer
 import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
+import org.jetbrains.kotlin.ir.expressions.IrTry
 
 /**
  * All [IrElement]s referenced must be the `attributeOwnerId`s.
@@ -32,6 +33,7 @@ interface ExtraIrAttributes {
             override val propertiesInitializedInConstructorBody = mutableSetOf<IrProperty>()
             override val propertiesInitializedInFieldInitializerList = mutableSetOf<IrProperty>()
             override val parameterPropertyReferencesInParameterDefaultValue = mutableSetOf<IrGetValue>()
+            override val tryStatements = mutableSetOf<IrTry>()
         }
     }
 
@@ -61,6 +63,14 @@ interface ExtraIrAttributes {
      * parameter itself (since the value of the parameter might be outdated, because of how Dart syntax works).
      */
     val parameterPropertyReferencesInParameterDefaultValue: MutableSet<IrGetValue>
+
+    /**
+     * Try statements don't have to be lowered as much as try expressions, so they are marked.
+     */
+    val tryStatements: MutableSet<IrTry>
+
+    val IrTry.isStatement: Boolean
+        get() = this in tryStatements
 }
 
 /**

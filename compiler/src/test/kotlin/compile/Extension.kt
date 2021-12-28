@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test
 
 @DisplayName("Compile: Extension")
 class Extension : BaseTest {
-
     @Test
     fun extension() = assertCompile {
         kotlin(

@@ -19,28 +19,27 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
+import org.dotlin.compiler.backend.steps.ir2ast.attributes.attributeOwner
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
+import org.jetbrains.kotlin.ir.IrStatement
+import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
+import org.jetbrains.kotlin.ir.builders.declarations.buildFun
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
-import org.jetbrains.kotlin.ir.expressions.IrBlock
-import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
-import org.jetbrains.kotlin.ir.expressions.IrWhen
+import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.expressions.impl.*
+import org.jetbrains.kotlin.name.Name
 
+/**
+ * Marks `IrTry`s that are statements as such for [TryExpressionsLowering].
+ */
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-class WhensWithSubjectExpressionsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun <D> DartLoweringContext.transform(
-        expression: IrExpression,
-        container: D
-    ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
-        if (expression !is IrBlock || expression.origin != IrStatementOrigin.WHEN) return noChange()
+class TryStatementsLowering(override val context: DartLoweringContext) : IrStatementLowering {
+    override fun DartLoweringContext.transform(statement: IrStatement): Sequence<Transformation<IrStatement>> {
+        if (statement !is IrTry) return noChange()
 
-        val whenExpression = expression.statements.last() as IrWhen
+        context.tryStatements.add(statement.attributeOwner())
 
-        return replaceWith(
-            wrapInAnonymousFunctionInvocation(whenExpression, container) {
-                expression.statements.withLastAsReturn(at = it)
-            }
-        )
+        return noChange()
     }
 }

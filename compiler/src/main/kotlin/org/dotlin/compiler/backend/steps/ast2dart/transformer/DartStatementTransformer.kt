@@ -21,6 +21,8 @@ package org.dotlin.compiler.backend.steps.ast2dart.transformer
 
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
 import org.dotlin.compiler.dart.ast.statement.*
+import org.dotlin.compiler.dart.ast.statement.trycatch.DartCatchClause
+import org.dotlin.compiler.dart.ast.statement.trycatch.DartTryStatement
 
 object DartStatementTransformer : DartAstNodeTransformer {
     override fun visitBlock(block: DartBlock, context: DartGenerationContext): String {
@@ -42,13 +44,45 @@ object DartStatementTransformer : DartAstNodeTransformer {
         return "return $value;"
     }
 
-    override fun visitIfStatement(statement: DartIfStatement, context: DartGenerationContext): String {
-        val condition = "if (${statement.condition.accept(context)})"
-        val thenStatement = statement.thenStatement.accept(context)
-        val elseStatement = statement.elseStatement?.accept(context)?.let { "else $it" } ?: ""
+    override fun visitIfStatement(statement: DartIfStatement, context: DartGenerationContext) = statement.let {
+        val condition = "if (${it.condition.accept(context)})"
+        val thenStatement = it.thenStatement.accept(context)
+        val elseStatement = it.elseStatement?.accept(context)?.let { "else $it" } ?: ""
 
-        return "$condition$thenStatement$elseStatement"
+        "$condition$thenStatement$elseStatement"
+    }
+
+    override fun visitTryStatement(statement: DartTryStatement, context: DartGenerationContext) = statement.let {
+        val body = it.body.accept(context)
+        val catchClauses = when {
+            it.catchClauses.isNotEmpty() -> it.catchClauses.joinToString(" ") { clause -> clause.accept(context) }
+            else -> ""
+        }
+        val finallyClause = when (it.finallyBlock) {
+            null -> ""
+            else -> "finally ${it.finallyBlock.accept(context)}"
+        }
+
+        "try $body$catchClauses $finallyClause"
+    }
+
+    override fun visitCatchClause(catchClause: DartCatchClause, context: DartGenerationContext) = catchClause.let {
+        val catchPart = when (it.exceptionParameter) {
+            null -> ""
+            else -> listOfNotNull(it.exceptionParameter, it.stackTraceParameter)
+                .joinToString(prefix = "catch (", postfix = ")") { param -> param.accept(context) }
+        }
+
+        val onPart = when (it.exceptionType) {
+            null -> ""
+            else -> "on ${it.exceptionType.accept(context)}"
+        }
+
+        val body = it.body.accept(context)
+
+        "$onPart $catchPart$body"
     }
 }
 
 fun DartStatement.accept(context: DartGenerationContext) = accept(DartStatementTransformer, context)
+fun DartCatchClause.accept(context: DartGenerationContext) = accept(DartStatementTransformer, context)
