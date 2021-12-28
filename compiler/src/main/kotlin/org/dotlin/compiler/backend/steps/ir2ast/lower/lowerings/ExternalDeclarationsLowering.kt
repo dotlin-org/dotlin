@@ -33,11 +33,7 @@ import kotlin.contracts.ExperimentalContracts
 
 class ExternalDeclarationsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
     override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
-        if (!declaration.hasAnnotation(DotlinAnnotations.dartBuiltIn) &&
-            !declaration.isEffectivelyExternal()
-        ) {
-            return noChange()
-        }
+        if (!declaration.isEffectivelyExternal()) return noChange()
 
         // We don't want to remove companion objects.
         if (declaration.isCompanion()) {

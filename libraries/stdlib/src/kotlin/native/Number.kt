@@ -20,9 +20,8 @@ package kotlin
 /**
  * Superclass for all platform classes representing numeric values.
  */
-@DartBuiltIn
 @DartName("num")
-abstract class Number {
+external abstract class Number {
     /**
      * Returns the value of this number as a [Double], which may involve rounding.
      */

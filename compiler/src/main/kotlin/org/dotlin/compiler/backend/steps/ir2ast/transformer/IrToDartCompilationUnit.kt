@@ -84,10 +84,10 @@ object IrToDartCompilationUnitTransformer : IrDartAstTransformer<DartCompilation
     )
 
     private fun IrConstructorCall.isDartBuiltInImportAlias() =
-        isAnnotation(FqName(DotlinAnnotations.dartBuiltInImportAlias))
+        isAnnotation(FqName(DotlinAnnotations.dartImportAlias))
 
     private fun IrConstructorCall.isDartBuiltInHideImport() =
-        isAnnotation(FqName(DotlinAnnotations.dartBuiltInHideImport))
+        isAnnotation(FqName(DotlinAnnotations.dartHideImport))
 }
 
 fun IrFile.accept(context: DartTransformContext) = accept(IrToDartCompilationUnitTransformer, context)

@@ -15,17 +15,22 @@
  * limitations under the License.
  */
 
-@file:Suppress("NON_ABSTRACT_FUNCTION_WITH_NO_BODY", "MUST_BE_INITIALIZED_OR_BE_ABSTRACT", "UNUSED_PARAMETER")
+@file:Suppress(
+    "NON_ABSTRACT_FUNCTION_WITH_NO_BODY",
+    "MUST_BE_INITIALIZED_OR_BE_ABSTRACT",
+    "UNUSED_PARAMETER",
+    "WRONG_EXTERNAL_DECLARATION" // TODO: Fix in analyzer
+)
 
 package kotlin
 
 /**
- * Represents a value which is either `true` or `false`. In Dart, values of this type are
- * represented as values of type `bool`.
+ * Represents a value which is either `true` or `false`.
+ *
+ * In Dart, values of this type are represented as values of type `bool`.
  */
-@DartBuiltIn
 @DartName("bool")
-class Boolean private constructor() : Comparable<Boolean> {
+external class Boolean private constructor() : Comparable<Boolean> {
     /**
      * Returns the inverse of this boolean.
      */

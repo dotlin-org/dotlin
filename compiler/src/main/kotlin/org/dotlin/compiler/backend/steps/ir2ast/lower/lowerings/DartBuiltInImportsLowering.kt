@@ -60,8 +60,8 @@ class DartBuiltInImportsLowering(override val context: DartLoweringContext) : Ir
             val declarationName = declaration.simpleDartNameOrNull?.value ?: return
             val importLibrary = declaration.dartImportAliasLibrary ?: declaration.dartHideImportLibrary ?: return
             val annotation =
-                declaration.getAnnotation(DotlinAnnotations.dartBuiltInImportAlias)
-                    ?: declaration.getAnnotation(DotlinAnnotations.dartBuiltInHideImport)
+                declaration.getAnnotation(DotlinAnnotations.dartImportAlias)
+                    ?: declaration.getAnnotation(DotlinAnnotations.dartHideImport)
                     ?: return
 
             importAliases[importLibrary to declarationName] = IrConstructorCallImpl(

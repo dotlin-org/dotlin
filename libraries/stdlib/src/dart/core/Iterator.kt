@@ -34,7 +34,7 @@ package dart.core
  * The [current] value must not be accessed before calling [moveNext]
  * or after a call to [moveNext] has returned false.
  */
-@DartBuiltIn.ImportAlias("dart:core")
+@DartImportAlias("dart:core")
 external sealed interface Iterator<out E> {
     /**
      * Advances the iterator to the next element of the iteration.
