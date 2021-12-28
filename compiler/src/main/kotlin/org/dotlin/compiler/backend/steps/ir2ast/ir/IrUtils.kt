@@ -272,6 +272,7 @@ val IrDeclarationWithVisibility.isPrivate
 inline fun <reified T : IrDeclarationWithName> List<IrDeclaration>.withName(name: String): T =
     filterIsInstance<T>().first { it.name == Name.identifier(name) }
 
+fun List<IrDeclaration>.constructorWithName(name: String) = withName<IrConstructor>(name)
 fun List<IrDeclaration>.methodWithName(name: String) = withName<IrSimpleFunction>(name)
 fun List<IrDeclaration>.propertyWithName(name: String) = withName<IrProperty>(name)
 fun List<IrDeclaration>.getterWithName(name: String) = propertyWithName(name).getter!!
@@ -281,6 +282,7 @@ fun List<IrDeclaration>.fieldWithName(name: String) = withName<IrField>(name)
 inline fun <reified T : IrDeclarationWithName> IrDeclarationContainer.declarationWithName(name: String) =
     declarations.withName<T>(name)
 
+fun IrDeclarationContainer.constructorWithName(name: String) = declarationWithName<IrConstructor>(name)
 fun IrDeclarationContainer.methodWithName(name: String) = declarationWithName<IrSimpleFunction>(name)
 fun IrDeclarationContainer.propertyWithName(name: String) = declarationWithName<IrProperty>(name)
 fun IrDeclarationContainer.getterWithName(name: String) = propertyWithName(name).getter!!

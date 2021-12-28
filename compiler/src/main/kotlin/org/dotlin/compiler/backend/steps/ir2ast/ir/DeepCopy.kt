@@ -20,6 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast.ir
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.*
+import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.builders.declarations.*
@@ -99,12 +100,10 @@ inline fun <reified T : IrFunction> T.deepCopyWith(
     }
 
     if (remapReferences) {
-        relevantUpperParent.transformChildrenVoid(
-            DeclarationReferenceRemapper(
-                valueParameters.zip(it.valueParameters)
-                    .map { (old, new) -> old.symbol to new.symbol }
-                    .toMap()
-            )
+        relevantUpperParent.remapReferences(
+            valueParameters.zip(it.valueParameters)
+                .map { (old, new) -> old.symbol to new.symbol }
+                .toMap()
         )
     }
 }
@@ -182,7 +181,7 @@ inline fun <reified D : IrDeclaration, B : IrDeclarationBuilder> D.deepCopyWith(
     )
 }.also {
     if (remapReferences) {
-        relevantUpperParent.transformChildrenVoid(DeclarationReferenceRemapper(symbol to it.symbol))
+        relevantUpperParent.remapReferences(symbol to it.symbol)
         relevantUpperParent.remapTypes(SimpleTypeRemapper(SymbolReferenceRemapper(symbol to it.symbol)))
     }
 }
@@ -235,11 +234,14 @@ class SingleSymbolRenamer(private val symbol: IrSymbol, private val name: Name) 
     override fun getTypeAliasName(symbol: IrTypeAliasSymbol) = newNameIfMatch(symbol) { symbol.owner.name }
 }
 
+fun IrElement.remapReferences(mapping: Pair<IrSymbol, IrSymbol>) = remapReferences(mapOf(mapping))
+
+fun IrElement.remapReferences(mapping: Map<IrSymbol, IrSymbol>) =
+    transformChildrenVoid(DeclarationReferenceRemapper(mapping))
+
 class DeclarationReferenceRemapper(
     private val mapping: Map<out IrSymbol, IrSymbol>
 ) : IrCustomElementTransformerVoid() {
-    constructor(mapping: Pair<IrSymbol, IrSymbol>) : this(mapOf(mapping))
-
     private inline fun <reified S : IrSymbol> IrOverridableDeclaration<S>.remapOverrides() {
         overriddenSymbols = overriddenSymbols.map { mapping[it] as? S ?: it }
     }

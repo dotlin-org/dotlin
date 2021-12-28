@@ -28,10 +28,14 @@ import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.name.FqName
 
 @Suppress("UNCHECKED_CAST")
-fun IrAnnotationContainer.getSingleAnnotationStringArgumentOf(name: String) = getAnnotation(FqName(name))
+fun IrAnnotationContainer.getSingleAnnotationStringArgumentOf(name: String) = getAnnotation(name)
     ?.getValueArgument(0)
     ?.let { it as? IrConst<String> }
     ?.value
+
+@Suppress("UNCHECKED_CAST")
+fun IrAnnotationContainer.getSingleAnnotationTypeArgumentOf(name: String) =
+    getAnnotation(name)?.getTypeArgument(0)
 
 fun IrAnnotationContainer.getAnnotation(name: String) = getAnnotation(FqName(name))
 

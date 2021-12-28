@@ -56,3 +56,10 @@ internal annotation class DartImportAlias(val library: String)
 )
 @Retention(AnnotationRetention.SOURCE)
 internal annotation class DartHideImport(val library: String)
+
+/**
+ * Specifies that whenever this type is used in a catch clause, it should be caught as the type [T] instead.
+ */
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.SOURCE)
+internal annotation class DartCatchAs<T>
