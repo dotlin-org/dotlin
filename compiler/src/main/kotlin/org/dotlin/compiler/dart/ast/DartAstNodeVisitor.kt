@@ -49,6 +49,8 @@ import org.dotlin.compiler.dart.ast.parameter.DartFieldFormalParameter
 import org.dotlin.compiler.dart.ast.parameter.DartFormalParameterList
 import org.dotlin.compiler.dart.ast.parameter.DartSimpleFormalParameter
 import org.dotlin.compiler.dart.ast.statement.*
+import org.dotlin.compiler.dart.ast.statement.trycatch.DartCatchClause
+import org.dotlin.compiler.dart.ast.statement.trycatch.DartTryStatement
 import org.dotlin.compiler.dart.ast.type.DartNamedType
 import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
 import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameter
@@ -96,6 +98,8 @@ interface DartAstNodeVisitor<R, C> {
     fun visitExtendsClause(extendsClause: DartExtendsClause, context: C): R = visitAstNode(extendsClause, context)
     fun visitImplementsClause(implementsClause: DartImplementsClause, context: C): R =
         visitAstNode(implementsClause, context)
+
+    fun visitCatchClause(catchClause: DartCatchClause, context: C): R = visitAstNode(catchClause, context)
 
     // Constructor initializers
     fun visitConstructorInvocation(invocation: DartConstructorInvocation, context: C): R =
@@ -185,6 +189,7 @@ interface DartAstNodeVisitor<R, C> {
 
     fun visitReturnStatement(statement: DartReturnStatement, context: C): R = visitAstNode(statement, context)
     fun visitIfStatement(statement: DartIfStatement, context: C): R = visitAstNode(statement, context)
+    fun visitTryStatement(statement: DartTryStatement, context: C): R = visitAstNode(statement, context)
 
     // Type
 

@@ -25,12 +25,17 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementVisitorVoid
 import org.dotlin.compiler.backend.util.replace
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
+import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
+import org.jetbrains.kotlin.ir.builders.declarations.buildFun
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.expressions.IrBlockBody
-import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrExpressionBody
+import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.expressions.impl.IrBlockBodyImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionExpressionImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrReturnImpl
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
+import org.jetbrains.kotlin.name.Name
 
 typealias Transformations<E> = Sequence<Transformation<E>>
 
@@ -110,6 +115,67 @@ interface IrExpressionLowering : IrSingleLowering<IrExpression> {
         container: D
     ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent =
         transform(expression)
+
+    fun <D> DartLoweringContext.wrapInAnonymousFunctionInvocation(
+        exp: IrExpression,
+        container: D,
+        statements: (IrSimpleFunction) -> List<IrStatement> = { listOf(exp) }
+    ): IrCall where D : IrDeclaration, D : IrDeclarationParent {
+        val anonymousFunction = context.irFactory.buildFun {
+            name = Name.special("<anonymous>")
+            returnType = exp.type
+        }.apply {
+            parent = container
+
+            body = IrBlockBodyImpl(
+                UNDEFINED_OFFSET,
+                UNDEFINED_OFFSET,
+                statements(this)
+            )
+        }
+
+        val invokeMethod = irFactory.buildFun {
+            name = Name.identifier("invoke")
+            isOperator = true
+            returnType = exp.type
+        }.apply {
+            parent = anonymousFunction
+            dispatchReceiverParameter = irBuiltIns.functionN(0).thisReceiver
+        }
+
+        val functionExpression = IrFunctionExpressionImpl(
+            UNDEFINED_OFFSET,
+            UNDEFINED_OFFSET,
+            type = exp.type,
+            function = anonymousFunction,
+            origin = IrStatementOrigin.INVOKE
+        )
+
+        return IrCallImpl(
+            UNDEFINED_OFFSET,
+            UNDEFINED_OFFSET,
+            type = exp.type,
+            symbol = invokeMethod.symbol,
+            typeArgumentsCount = 0,
+            valueArgumentsCount = 0,
+            origin = IrStatementOrigin.INVOKE,
+        ).apply {
+            dispatchReceiver = functionExpression
+        }
+    }
+
+    fun List<IrStatement>.withLastAsReturn(at: IrSimpleFunction) =
+        dropLast(1) + last().let {
+            it as IrExpression
+
+            IrReturnImpl(
+                UNDEFINED_OFFSET,
+                UNDEFINED_OFFSET,
+                type = it.type,
+                returnTargetSymbol = at.symbol,
+                value = it
+            )
+        }
 }
 
 interface IrStatementLowering : IrMultipleLowering<IrStatement> {

@@ -22,161 +22,247 @@ package compile
 import BaseTest
 import assertCompile
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 @DisplayName("Compile: Statement")
 class Statement : BaseTest {
-    @Test
-    fun `if else`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                if (0 == 1) {
-                    main()
-                } else {
-                    main()
+    @Nested
+    inner class When {
+        @Test
+        fun `if else`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    if (0 == 1) {
+                        main()
+                    } else {
+                        main()
+                    }
                 }
-            }
-            """
-        )
+                """
+            )
 
-        dart(
-            """
-            import 'package:meta/meta.dart';
+            dart(
+                """
+                import 'package:meta/meta.dart';
 
-            void main() {
-              if (0 == 1) {
-                main();
-              } else {
-                main();
-              }
-            }
-            """
-        )
+                void main() {
+                  if (0 == 1) {
+                    main();
+                  } else {
+                    main();
+                  }
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `if else if`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    if (1 + 1 == 3) {
+                        main()
+                    } else if (3 + 3 == 7){
+                        main()
+                    }
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                void main() {
+                  if ((1 + 1) == 3) {
+                    main();
+                  } else if ((3 + 3) == 7) {
+                    main();
+                  }
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `when`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    when {
+                        1 + 1 == 3 -> main()
+                        3 + 3 == 7 -> main()
+                    }
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                void main() {
+                  if ((1 + 1) == 3) {
+                    main();
+                  } else if ((3 + 3) == 7) {
+                    main();
+                  }
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `when with else`() = assertCompile {
+            kotlin(
+                """
+                fun main(x: Int) {
+                    when {
+                        1 + 1 == 3 -> main(2)
+                        3 + 3 == 7 -> main(6)
+                        else -> main(10)
+                    }
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                void main(int x) {
+                  if ((1 + 1) == 3) {
+                    main(2);
+                  } else if ((3 + 3) == 7) {
+                    main(6);
+                  } else {
+                    main(10);
+                  }
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `when with subject`() = assertCompile {
+            kotlin(
+                """
+                fun test(y: Int) = y * 3
+
+                fun main(x: Int) {
+                    when(x) {
+                        4 -> test(2)
+                        12 -> test(6)
+                    }
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                int test(int y) {
+                  return y * 3;
+                }
+
+                void main(int x) {
+                  {
+                    final int tmp0_subject = x;
+                    if (tmp0_subject == 4) {
+                      test(2);
+                    } else if (tmp0_subject == 12) {
+                      test(6);
+                    }
+                  }
+                }
+                """
+            )
+        }
     }
 
-    @Test
-    fun `if else if`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                if (1 + 1 == 3) {
-                    main()
-                } else if (3 + 3 == 7){
-                    main()
+    @Nested
+    @DisplayName("Try-catch")
+    inner class TryCatch {
+        @Test
+        fun `try-catch`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    try {
+                        thisThrows()
+                    } catch (e: RuntimeException) {
+                        thisThrows()
+                    }
                 }
-            }
-            """
-        )
 
-        dart(
-            """
-            import 'package:meta/meta.dart';
-
-            void main() {
-              if ((1 + 1) == 3) {
-                main();
-              } else if ((3 + 3) == 7) {
-                main();
-              }
-            }
-            """
-        )
-    }
-
-    @Test
-    fun `when`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                when {
-                    1 + 1 == 3 -> main()
-                    3 + 3 == 7 -> main()
+                fun thisThrows(): Int {
+                    throw RuntimeException("You done did it now")
                 }
-            }
-            """
-        )
+                """
+            )
 
-        dart(
-            """
-            import 'package:meta/meta.dart';
+            dart(
+                """
+                import 'package:meta/meta.dart';
 
-            void main() {
-              if ((1 + 1) == 3) {
-                main();
-              } else if ((3 + 3) == 7) {
-                main();
-              }
-            }
-            """
-        )
-    }
-
-    @Test
-    fun `when with else`() = assertCompile {
-        kotlin(
-            """
-            fun main(x: Int) {
-                when {
-                    1 + 1 == 3 -> main(2)
-                    3 + 3 == 7 -> main(6)
-                    else -> main(10)
+                void main() {
+                  try {
+                    thisThrows();
+                  } on RuntimeException catch (e) {
+                    thisThrows();
+                  }
                 }
-            }
-            """
-        )
 
-        dart(
-            """
-            import 'package:meta/meta.dart';
-
-            void main(int x) {
-              if ((1 + 1) == 3) {
-                main(2);
-              } else if ((3 + 3) == 7) {
-                main(6);
-              } else {
-                main(10);
-              }
-            }
-            """
-        )
-    }
-
-    @Test
-    fun `when with subject`() = assertCompile {
-        kotlin(
-            """
-            fun test(y: Int) = y * 3
-
-            fun main(x: Int) {
-                when(x) {
-                    4 -> test(2)
-                    12 -> test(6)
+                int thisThrows() {
+                  throw RuntimeException.message('You done did it now');
                 }
-            }
-            """
-        )
+                """
+            )
+        }
 
-        dart(
-            """
-            import 'package:meta/meta.dart';
-
-            int test(int y) {
-              return y * 3;
-            }
-
-            void main(int x) {
-              {
-                final int tmp0_subject = x;
-                if (tmp0_subject == 4) {
-                  test(2);
-                } else if (tmp0_subject == 12) {
-                  test(6);
+        @Test
+        fun `multiple statements in body`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    try {
+                        thisThrows()
+                        thisThrows()
+                    } catch (e: RuntimeException) {
+                        thisThrows()
+                        thisThrows()
+                    }
                 }
-              }
-            }
-            """
-        )
+
+                fun thisThrows(): Int {
+                    throw RuntimeException("You done did it now")
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                void main() {
+                  try {
+                    thisThrows();
+                    thisThrows();
+                  } on RuntimeException catch (e) {
+                    thisThrows();
+                    thisThrows();
+                  }
+                }
+
+                int thisThrows() {
+                  throw RuntimeException.message('You done did it now');
+                }
+                """
+            )
+        }
     }
 }

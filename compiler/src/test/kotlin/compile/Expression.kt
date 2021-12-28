@@ -671,7 +671,7 @@ class Expression : BaseTest {
     }
 
     @Test
-    fun `elvis`() = assertCompile {
+    fun elvis() = assertCompile {
         kotlin(
             """
             fun main() {
@@ -721,6 +721,45 @@ class Expression : BaseTest {
               String sayHello() {
                 return super.sayHello();
               }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `try-catch`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                val x = try {
+                    thisThrows()
+                } catch (e: RuntimeException) {
+                    thisThrows()
+                }
+            }
+
+            fun thisThrows(): Int {
+                throw RuntimeException("You done did it now")
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              final int x = () {
+                try {
+                  return thisThrows();
+                } on RuntimeException catch (e) {
+                  return thisThrows();
+                }
+              }.call();
+            }
+
+            int thisThrows() {
+              throw RuntimeException.message('You done did it now');
             }
             """
         )
