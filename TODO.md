@@ -81,7 +81,7 @@
       - [x] Single string literal
       - [ ] Multiline string literal
       - [x] String interpolations
-  - [ ] Try catch expressions
+  - [x] Try catch expressions
   - [x] Conditional expressions
   - [x] When expressions
   - [x] Disjunctions
@@ -144,7 +144,7 @@
   - [x] Constraints
     - [x] One upper bound
     - [x] Multiple upper bounds
-- [ ] Exceptions
+- [x] Exceptions
 - [ ] Nothing type
 - [ ] Function overloading
 - [ ] Coroutines

@@ -16,102 +16,262 @@
  */
 
 @file:Suppress(
-    "NON_ABSTRACT_FUNCTION_WITH_NO_BODY",
-    "NON_MEMBER_FUNCTION_NO_BODY",
-    "MUST_BE_INITIALIZED_OR_BE_ABSTRACT",
-    "UNUSED_PARAMETER",
-    "PRIMARY_CONSTRUCTOR_DELEGATION_CALL_EXPECTED",
-    "EXTENSION_PROPERTY_MUST_HAVE_ACCESSORS_OR_BE_ABSTRACT"
+    "EXTENSION_PROPERTY_MUST_HAVE_ACCESSORS_OR_BE_ABSTRACT",
+    "SEALED_INHERITOR_IN_DIFFERENT_PACKAGE"
 )
 
 package kotlin
 
-open class Error : Throwable {
-    constructor()
-    constructor(message: String?)
-    constructor(message: String?, cause: Throwable?)
-    constructor(cause: Throwable?)
+import dart.core.StackTrace
+
+open class Error(
+    override val message: String?,
+    override val cause: Throwable?,
+    override val stackTrace: StackTrace? = StackTrace.CURRENT
+) : Throwable(message, cause), dart.core.Error {
+    @DartName("message")
+    constructor(message: String?) : this(message, null)
+
+    @DartName("cause")
+    constructor(cause: Throwable?) : this(cause?.toString(), cause)
+
+    @DartName("empty")
+    constructor() : this(null, null)
 }
 
-open class Exception : Throwable {
-    constructor()
-    constructor(message: String?)
-    constructor(message: String?, cause: Throwable?)
-    constructor(cause: Throwable?)
+open class Exception(override val message: String?, override val cause: Throwable?) : Throwable(message, cause),
+    dart.core.Exception {
+    @DartName("message")
+    constructor(message: String?) : this(message, null)
+
+    @DartName("cause")
+    constructor(cause: Throwable?) : this(cause?.toString(), cause)
+
+    @DartName("empty")
+    constructor() : this(null, null)
 }
 
-open class RuntimeException : Exception {
-    constructor()
-    constructor(message: String?)
-    constructor(message: String?, cause: Throwable?)
-    constructor(cause: Throwable?)
+open class RuntimeException(override val message: String?, override val cause: Throwable?) : Exception(message, cause) {
+    @DartName("message")
+    constructor(message: String?) : this(message, null)
+
+    @DartName("cause")
+    constructor(cause: Throwable?) : this(cause?.toString(), cause)
+
+    @DartName("empty")
+    constructor() : this(null, null)
 }
 
-open class IllegalArgumentException : RuntimeException {
-    constructor()
-    constructor(message: String?)
-    constructor(message: String?, cause: Throwable?)
-    constructor(cause: Throwable?)
+@DartCatchAs<dart.core.ArgumentError>
+open class IllegalArgumentException(
+    override val message: String?,
+    override val cause: Throwable?,
+    override val stackTrace: StackTrace? = StackTrace.CURRENT,
+    override val invalidValue: dynamic = null,
+    override val name: String? = null,
+) : RuntimeException(message, cause), dart.core.ArgumentError {
+    @DartName("message")
+    constructor(message: String?) : this(message = message, cause = null)
+
+    @DartName("cause")
+    constructor(cause: Throwable?) : this(cause?.toString(), cause)
+
+    @DartName("empty")
+    constructor() : this(message = null, cause = null)
+
+    @DartName("from")
+    constructor(error: dart.core.ArgumentError) : this(
+        message = error.message,
+        cause = null,
+        stackTrace = error.stackTrace,
+        invalidValue = error.invalidValue,
+        name = error.name,
+    )
 }
 
-open class IllegalStateException : RuntimeException {
-    constructor()
-    constructor(message: String?)
-    constructor(message: String?, cause: Throwable?)
-    constructor(cause: Throwable?)
+@DartCatchAs<dart.core.StateError>
+open class IllegalStateException(
+    message: String?,
+    override val cause: Throwable?,
+    override val stackTrace: StackTrace? = StackTrace.CURRENT,
+) : RuntimeException(message, cause), dart.core.StateError {
+    @DartName("message")
+    constructor(message: String?) : this(message, null)
+
+    @DartName("cause")
+    constructor(cause: Throwable?) : this(cause?.toString(), cause)
+
+    @DartName("empty")
+    constructor() : this(null, null)
+
+    @DartName("from")
+    constructor(error: dart.core.StateError) : this(
+        message = error.message,
+        cause = null,
+        stackTrace = error.stackTrace,
+    )
+
+    override val message: String = message ?: messageFallback
 }
 
-open class IndexOutOfBoundsException : RuntimeException {
-    constructor()
-    constructor(message: String?)
+@DartCatchAs<dart.core.IndexError>
+open class IndexOutOfBoundsException(
+    override val message: String?,
+    override val stackTrace: StackTrace? = StackTrace.CURRENT,
+    override val invalidValue: dynamic = null,
+    override val name: String? = null,
+    override val indexable: dynamic = null,
+    override val length: Int = -1
+) : RuntimeException(message, cause = null), dart.core.IndexError {
+    @DartName("empty")
+    constructor() : this(null)
+
+    @DartName("from")
+    constructor(error: dart.core.IndexError) : this(
+        message = error.message?.toString(),
+        stackTrace = error.stackTrace,
+        invalidValue = error.invalidValue,
+        name = error.name,
+        indexable = error.indexable,
+        length = error.length
+    )
 }
 
-open class ConcurrentModificationException : RuntimeException {
-    constructor()
-    constructor(message: String?)
-    @Deprecated("The constructor is not supported on all platforms and will be removed from kotlin-stdlib-common soon.", level = DeprecationLevel.ERROR)
-    constructor(message: String?, cause: Throwable?)
-    @Deprecated("The constructor is not supported on all platforms and will be removed from kotlin-stdlib-common soon.", level = DeprecationLevel.ERROR)
-    constructor(cause: Throwable?)
+@DartCatchAs<dart.core.ConcurrentModificationError>
+open class ConcurrentModificationException(
+    override val message: String?,
+    override val cause: Throwable?,
+    override val stackTrace: StackTrace? = StackTrace.CURRENT,
+    override val modifiedObject: Any? = null
+) :
+    RuntimeException(message, cause), dart.core.ConcurrentModificationError {
+    @DartName("message")
+    constructor(message: String?) : this(message, null)
+
+    @DartName("cause")
+    constructor(cause: Throwable?) : this(cause?.toString(), cause)
+
+    @DartName("empty")
+    constructor() : this(null, null)
+
+    @DartName("from")
+    constructor(error: dart.core.ConcurrentModificationError) : this(
+        message = null,
+        cause = null,
+        stackTrace = error.stackTrace,
+        modifiedObject = error.modifiedObject,
+    )
 }
 
-open class UnsupportedOperationException : RuntimeException {
-    constructor()
-    constructor(message: String?)
-    constructor(message: String?, cause: Throwable?)
-    constructor(cause: Throwable?)
+@DartCatchAs<dart.core.UnsupportedError>
+open class UnsupportedOperationException(
+    override val message: String?,
+    override val cause: Throwable?,
+    override val stackTrace: StackTrace? = StackTrace.CURRENT,
+) :
+    RuntimeException(message, cause), dart.core.UnsupportedError {
+    @DartName("message")
+    constructor(message: String?) : this(message, null)
+
+    @DartName("cause")
+    constructor(cause: Throwable?) : this(cause?.toString(), cause)
+
+    @DartName("empty")
+    constructor() : this(null, null)
+
+    @DartName("from")
+    constructor(error: dart.core.UnsupportedError) : this(
+        message = error.message,
+        cause = null,
+        stackTrace = error.stackTrace
+    )
 }
 
-open class NumberFormatException : IllegalArgumentException {
-    constructor()
-    constructor(message: String?)
+@DartCatchAs<dart.core.FormatException>
+open class NumberFormatException(
+    message: String?,
+    override val source: dynamic = null,
+    override val offset: Int? = null,
+    override val stackTrace: StackTrace? = StackTrace.CURRENT,
+) : IllegalArgumentException(message, cause = null), dart.core.FormatException {
+    @DartName("empty")
+    constructor() : this(null)
+
+    @DartName("from")
+    constructor(error: dart.core.FormatException) : this(
+        message = error.message,
+        source = error.source,
+        offset = error.offset
+    )
+
+    override val message: String = message ?: messageFallback
 }
 
-open class NullPointerException : RuntimeException {
-    constructor()
-    constructor(message: String?)
+@DartCatchAs<dart.core.TypeError>
+open class NullPointerException(
+    override val message: String?,
+    override val stackTrace: StackTrace? = StackTrace.CURRENT,
+) : RuntimeException(message, cause = null),
+    dart.core.TypeError {
+    @DartName("empty")
+    constructor() : this(null)
+
+    @DartName("from")
+    constructor(error: dart.core.TypeError) : this(
+        message = null,
+        stackTrace = error.stackTrace,
+    )
 }
 
-open class ClassCastException : RuntimeException {
-    constructor()
-    constructor(message: String?)
+@DartCatchAs<dart.core.TypeError>
+open class ClassCastException(
+    override val message: String?,
+    override val stackTrace: StackTrace? = StackTrace.CURRENT,
+) : RuntimeException(message, cause = null), dart.core.TypeError {
+    @DartName("empty")
+    constructor() : this(null)
+
+    @DartName("from")
+    constructor(error: dart.core.TypeError) : this(
+        message = null,
+        stackTrace = error.stackTrace,
+    )
 }
 
-open class AssertionError : Error {
-    constructor()
-    constructor(message: Any?)
+@DartCatchAs<dart.core.AssertionError>
+open class AssertionError(
+    override val message: String?,
+    override val stackTrace: StackTrace? = StackTrace.CURRENT,
+) : Error(message, cause = null), dart.core.AssertionError {
+    @DartName("message")
+    constructor(message: Any?) : this(message?.toString())
+
+    @DartName("empty")
+    constructor() : this(null)
+
+    @DartName("from")
+    constructor(error: dart.core.AssertionError) : this(
+        message = error.message?.toString(),
+        stackTrace = error.stackTrace,
+    )
 }
 
-open class NoSuchElementException : RuntimeException {
-    constructor()
-    constructor(message: String?)
+open class NoSuchElementException(override val message: String?) : RuntimeException(message, cause = null) {
+    @DartName("empty")
+    constructor() : this(null)
 }
 
+//@DartCatchAs<dart.core.IntegerDivisionByZeroException> TODO
 @SinceKotlin("1.3")
-open class ArithmeticException : RuntimeException {
-    constructor()
-    constructor(message: String?)
+open class ArithmeticException(message: String?) : RuntimeException(message, cause = null),
+    dart.core.IntegerDivisionByZeroException {
+    @DartName("empty")
+    constructor() : this(null)
+
+    override val message = message ?: super<dart.core.IntegerDivisionByZeroException>.message
 }
+
+private val messageFallback = "<unspecified>"
 
 /**
  * Returns the detailed description of this throwable with its stack trace.
@@ -123,20 +283,20 @@ open class ArithmeticException : RuntimeException {
  * - the detailed description of each throwable in the [Throwable.cause] chain.
  */
 @SinceKotlin("1.4")
-fun Throwable.stackTraceToString(): String
+fun Throwable.stackTraceToString(): String = "" // TODO
 
 /**
  * Prints the [detailed description][Throwable.stackTraceToString] of this throwable to the standard output or standard error output.
  */
 @SinceKotlin("1.4")
-fun Throwable.printStackTrace(): Unit
+fun Throwable.printStackTrace(): Unit {} // TODO
 
 /**
  * When supported by the platform, adds the specified exception to the list of exceptions that were
  * suppressed in order to deliver this exception.
  */
 @SinceKotlin("1.4")
-fun Throwable.addSuppressed(exception: Throwable)
+fun Throwable.addSuppressed(exception: Throwable) {}
 
 /**
  * Returns a list of all exceptions that were suppressed in order to deliver this exception.
@@ -146,6 +306,6 @@ fun Throwable.addSuppressed(exception: Throwable)
  * - if the platform doesn't support suppressed exceptions;
  * - if this [Throwable] instance has disabled the suppression.
  */
-//@SinceKotlin("1.4")
-//val Throwable.suppressedExceptions: List<Throwable>
-// TODO
+@SinceKotlin("1.4")
+val Throwable.suppressedExceptions: List<Throwable>
+    get() = dart("<Throwable>[]") // TODO?

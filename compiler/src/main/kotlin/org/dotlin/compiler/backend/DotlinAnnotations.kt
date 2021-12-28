@@ -22,11 +22,13 @@ package org.dotlin.compiler.backend
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.backend.util.falseIfNull
 import org.dotlin.compiler.backend.util.getSingleAnnotationStringArgumentOf
+import org.dotlin.compiler.backend.util.getSingleAnnotationTypeArgumentOf
 import org.dotlin.compiler.backend.util.hasOverriddenAnnotation
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrField
 import org.jetbrains.kotlin.ir.declarations.IrOverridableDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.isGetter
 import org.jetbrains.kotlin.ir.util.isSetter
 
@@ -34,9 +36,11 @@ object DotlinAnnotations {
     const val dartName = "dotlin.DartName"
     const val dartConst = "dotlin.DartConst"
 
+    // Internal annotations.
     const val dartGetter = "dotlin.DartGetter"
     const val dartImportAlias = "dotlin.DartImportAlias"
     const val dartHideImport = "dotlin.DartHideImport"
+    const val dartCatchAs = "dotlin.DartCatchAs"
 }
 
 fun IrDeclaration.hasDartGetterAnnotation() =
@@ -61,3 +65,6 @@ val IrDeclaration.dartHideImportLibrary: String?
 
 val IrDeclaration.dartImportAliasPrefix: String?
     get() = dartImportAliasLibrary?.let { it.split(':')[1] }
+
+val IrDeclaration.dartCatchAsType: IrType?
+    get() = getSingleAnnotationTypeArgumentOf(DotlinAnnotations.dartCatchAs)
