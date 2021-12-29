@@ -22,15 +22,13 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartNameAsSimple
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartNameWith
 import org.dotlin.compiler.backend.util.sentenceCase
 import org.jetbrains.kotlin.backend.common.ir.copyTypeParameters
 import org.jetbrains.kotlin.backend.common.ir.createParameterDeclarations
 import org.jetbrains.kotlin.ir.builders.declarations.buildClass
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.types.IrSimpleType
-import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.classOrNull
-import org.jetbrains.kotlin.ir.types.typeOrNull
+import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.isGetter
 import org.jetbrains.kotlin.ir.util.isSetter
@@ -49,19 +47,27 @@ class ExtensionsLowering(override val context: DartLoweringContext) : IrDeclarat
             else -> return noChange()
         } ?: return noChange()
 
-        var receiverTypeParameters = listOf<IrTypeParameter>()
-        val extensionReceiverType = extensionReceiver.type
-
         // Any type parameters used to declare the receiver type go to the top of the Dart extension declaration, and
         // are removed from the function type parameters.
-        if (declaration is IrFunction && extensionReceiverType is IrSimpleType) {
-            receiverTypeParameters = declaration.typeParameters
-                .filter {
-                    extensionReceiverType.arguments.any { arg ->
-                        (arg.typeOrNull as? IrSimpleType)?.classifier == it.symbol
+        val receiverTypeParameters = when (val extensionReceiverType = extensionReceiver.type) {
+            is IrSimpleType -> {
+                when (val classifier = extensionReceiverType.classifierOrNull?.owner) {
+                    is IrTypeParameter -> listOf(classifier)
+                    else -> when (declaration) {
+                        is IrFunction -> declaration.typeParameters
+                            .filter {
+                                extensionReceiverType.arguments.any { arg ->
+                                    (arg.typeOrNull as? IrSimpleType)?.classifier == it.symbol
+                                }
+                            }
+                        else -> emptyList()
                     }
                 }
+            }
+            else -> emptyList()
+        }
 
+        if (declaration is IrFunction) {
             declaration.typeParameters -= receiverTypeParameters
         }
 
@@ -91,15 +97,18 @@ class ExtensionsLowering(override val context: DartLoweringContext) : IrDeclarat
     }
 
     private fun IrType.getExtensionContainerName(currentFile: IrFile, hasExtensionTypeArguments: Boolean): String {
-        val owner = classOrNull!!.owner
+        val (file, mainName) = when (val classifier = classifierOrNull?.owner) {
+            is IrClass -> classifier.file to classifier.dartNameAsSimple
+            is IrTypeParameter -> classifier.file to classifier.dartNameWith(superTypes = true)
+            else -> throw UnsupportedOperationException("Cannot handle extension for $classifier yet")
+        }
         val prefix = '$'
         val packagePrefix = when {
-            owner.file != currentFile -> owner.file.fqName.pathSegments()
+            file != currentFile -> file.fqName.pathSegments()
                 .map { it.identifier }
                 .joinToString { it.sentenceCase() }
             else -> ""
         }
-        val className = owner.dartNameAsSimple
         val typeArguments = when {
             !hasExtensionTypeArguments && this is IrSimpleType -> arguments
                 .mapNotNull { it.typeOrNull?.classOrNull?.owner?.dartNameAsSimple?.value }
@@ -108,6 +117,6 @@ class ExtensionsLowering(override val context: DartLoweringContext) : IrDeclarat
         }
         val suffix = "Extensions"
 
-        return "$prefix$packagePrefix$className$typeArguments$suffix"
+        return "$prefix$packagePrefix$mainName$typeArguments$suffix"
     }
 }

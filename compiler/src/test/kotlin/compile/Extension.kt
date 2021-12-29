@@ -229,4 +229,71 @@ class Extension : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `extension with generic receiver type`() = assertCompile {
+        kotlin(
+            """
+            fun <T> T.doIt() {}
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            extension ${'$'}TMustBeAnyExtensions<T> on T {
+              void doIt() {}
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `extension with generic receiver type with explicit bound`() = assertCompile {
+        kotlin(
+            """
+            class Test<T>
+
+            fun <T : Test<T>> T.doIt() {}
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test<T> {}
+
+            extension ${'$'}TMustBeTestWithTExtensions<T extends Test<T>> on T {
+              void doIt() {}
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `extension with generic receiver type with explicit specified bound`() = assertCompile {
+        kotlin(
+            """
+            class Test<T>
+
+            fun <T : Test<String>> T.doIt() {}
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test<T> {}
+
+            extension ${'$'}TMustBeTestWithStringExtensions<T extends Test<String>> on T {
+              void doIt() {}
+            }
+            """
+        )
+    }
 }
