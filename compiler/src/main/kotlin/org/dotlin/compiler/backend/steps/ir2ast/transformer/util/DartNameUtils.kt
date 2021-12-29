@@ -29,13 +29,10 @@ import org.dotlin.compiler.dart.ast.expression.identifier.DartPrefixedIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.toDartSimpleIdentifier
 import org.jetbrains.kotlin.backend.common.lower.parents
-import org.jetbrains.kotlin.backend.jvm.codegen.psiElement
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.classOrNull
+import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
-import org.jetbrains.kotlin.psi.psiUtil.startsWithComment
 
 private fun IrDeclarationWithName.getDartNameOrNull(allowNested: Boolean): DartIdentifier? {
     val aliasPrefix = dartImportAliasPrefix?.toDartSimpleIdentifier()
@@ -75,8 +72,6 @@ private fun IrDeclarationWithName.getDartNameOrNull(allowNested: Boolean): DartI
         var uniqueValueTypeSuffix = ""
         var needsTypeParamBoundInfo = false
 
-        fun IrType?.displayName() = this?.classOrNull?.owner?.name?.toString() ?: ""
-
         if (this != baseOverload) {
             needsTypeParamBoundInfo = true
 
@@ -88,10 +83,13 @@ private fun IrDeclarationWithName.getDartNameOrNull(allowNested: Boolean): DartI
                 .toSet()
 
             uniqueValueTypeSuffix =
-                ourValueTypes.subtract(overloadValueTypes).firstOrNull().displayName()
+                ourValueTypes.subtract(overloadValueTypes).firstOrNull().let {
+                    when (it?.classOrNull) {
+                        null -> ""
+                        else -> it.dartNameWith(superTypes = true)
+                    }
+                }
         }
-
-        fun List<*>.isLastPart(index: Int) = index == size - 1 && size != 1
 
         val uniqueParametersPart = when {
             uniqueParameters.isNotEmpty() -> "With" + uniqueParameters
@@ -99,7 +97,7 @@ private fun IrDeclarationWithName.getDartNameOrNull(allowNested: Boolean): DartI
                     val part = parameter.name.toString().sentenceCase()
 
                     when {
-                        uniqueParameters.isLastPart(index) -> "And$part"
+                        uniqueParameters.isLastIndexAndNotSingle(index) -> "And$part"
                         else -> part
                     }
                 }
@@ -110,25 +108,10 @@ private fun IrDeclarationWithName.getDartNameOrNull(allowNested: Boolean): DartI
         val uniqueTypeParametersPart = when {
             uniqueParameters.isEmpty() && uniqueTypeParameters.isNotEmpty() -> "WithGeneric" + uniqueTypeParameters
                 .mapIndexed { index, parameter ->
-                    val namePart = parameter.name.toString().sentenceCase()
-                    val boundPart by lazy {
-                        parameter.superTypes.mapIndexed { index, superType ->
-                            val superTypePart = superType.displayName()
-
-                            when {
-                                parameter.superTypes.isLastPart(index) -> "And$superTypePart"
-                                else -> superTypePart
-                            }
-                        }.joinToString(separator = "")
-                    }
-
-                    val part = namePart + when {
-                        needsTypeParamBoundInfo && boundPart.isNotEmpty() -> "MustBe$boundPart"
-                        else -> ""
-                    }
+                    val part = parameter.dartNameWith(needsTypeParamBoundInfo)
 
                     when {
-                        uniqueTypeParameters.isLastPart(index) -> "And$part"
+                        uniqueTypeParameters.isLastIndexAndNotSingle(index) -> "And$part"
                         else -> part
                     }
                 }
@@ -184,6 +167,42 @@ private fun IrDeclarationWithName.getDartNameOrNull(allowNested: Boolean): DartI
     }
 }
 
+private fun IrType?.dartNameWith(superTypes: Boolean): String =
+    when (val classifier = this?.classifierOrNull?.owner) {
+        is IrClass -> when (this) {
+            is IrSimpleType -> classifier.name.toString() + arguments.mapNotNull {
+                it.typeOrNull?.dartNameWith(superTypes)
+            }.let {
+                when {
+                    it.isNotEmpty() -> "With" + it.joinToString(separator = "And")
+                    else -> ""
+                }
+            }
+            else -> classifier.name.toString()
+        }
+        is IrTypeParameter -> classifier.dartNameWith(superTypes = false)
+        else -> ""
+    }
+
+fun IrTypeParameter.dartNameWith(superTypes: Boolean): String {
+    val namePart = name.toString().sentenceCase()
+    val boundPart by lazy {
+        this.superTypes.mapIndexed { index, superType ->
+            val superTypePart = superType.dartNameWith(superTypes)
+
+            when {
+                this.superTypes.isLastIndexAndNotSingle(index) -> "And$superTypePart"
+                else -> superTypePart
+            }
+        }.joinToString(separator = "")
+    }
+
+    return namePart + when {
+        superTypes && boundPart.isNotEmpty() -> "MustBe$boundPart"
+        else -> ""
+    }
+}
+
 val IrDeclarationWithName.dartName: DartIdentifier
     get() = dartNameOrNull.let {
         require(it != null) { "Name (${name.asString()}) cannot be special" }
@@ -228,3 +247,5 @@ val IrConstructor.dartName: DartSimpleIdentifier
 
 val IrConstructor.dartNameOrNull: DartSimpleIdentifier?
     get() = dartNameAsSimpleOrNull
+
+private fun List<*>.isLastIndexAndNotSingle(index: Int) = index == size - 1 && size != 1
