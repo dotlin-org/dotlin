@@ -184,8 +184,17 @@ interface IrStatementLowering : IrMultipleLowering<IrStatement> {
             object : IrCustomElementVisitorVoid {
                 override fun visitBlockBody(body: IrBlockBody) {
                     super.visitBlockBody(body)
-
                     body.statements.transformBy({ context.transform(it, body) })
+                }
+
+                override fun visitBlock(expression: IrBlock) {
+                    super.visitBlock(expression)
+                    expression.statements.transformBy({ context.transform(it, expression) })
+                }
+
+                override fun visitScript(declaration: IrScript) {
+                    super.visitScript(declaration)
+                    declaration.statements.transformBy({ context.transform(it, declaration) })
                 }
 
                 override fun visitElement(element: IrElement) = element.acceptChildrenVoid(this)
@@ -194,8 +203,10 @@ interface IrStatementLowering : IrMultipleLowering<IrStatement> {
     }
 
     override fun DartLoweringContext.transform(statement: IrStatement) = noChange()
-    fun DartLoweringContext.transform(statement: IrStatement, body: IrBlockBody): Transformations<IrStatement> =
-        transform(statement)
+    fun DartLoweringContext.transform(
+        statement: IrStatement,
+        container: IrStatementContainer
+    ): Transformations<IrStatement> = transform(statement)
 }
 
 interface IrBodyExpressionLowering : IrSingleLowering<IrExpression> {
