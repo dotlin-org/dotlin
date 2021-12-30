@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
+import org.dotlin.compiler.backend.steps.ir2ast.ir.isStatementIn
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.declarations.buildFun
@@ -48,9 +49,7 @@ class TryExpressionsLowering(override val context: DartLoweringContext) : IrExpr
             }
         }
 
-        if (expression.isStatement) return noChange()
-
-
+        if (expression.isStatementIn(container)) return noChange()
 
         return replaceWith(
             wrapInAnonymousFunctionInvocation(expression, container) {

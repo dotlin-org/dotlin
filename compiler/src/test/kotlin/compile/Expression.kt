@@ -21,6 +21,7 @@ package compile
 
 import BaseTest
 import assertCompile
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
@@ -761,6 +762,133 @@ class Expression : BaseTest {
             int thisThrows() {
               throw RuntimeException.message('You done did it now');
             }
+            """
+        )
+    }
+
+    @Test
+    fun `return`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+               null ?: return
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              try {
+                null ?? (throw const ${'$'}Return<void>(null));
+              } on ${'$'}Return<void> catch (r) {
+                return;
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `return with const value`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                test(null)
+            }
+
+            fun test(x: Int?): Int {
+                val y = x ?: return -1
+                return y
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              test(null);
+            }
+
+            int test(int? x) {
+              try {
+                final int y = x ?? (throw const ${'$'}Return<int>(-1));
+                return y;
+              } on ${'$'}Return<int> catch (r) {
+                return r.value;
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `return with non-const value`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                test(x = null, fallback = 3)
+            }
+
+            fun test(x: Int?, fallback: Int): Int {
+                val y = x ?: return fallback
+                return y
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              test(null, 3);
+            }
+
+            int test(
+              int? x,
+              int fallback,
+            ) {
+              try {
+                final int y = x ?? (throw ${'$'}Return<int>(fallback));
+                return y;
+              } on ${'$'}Return<int> catch (r) {
+                return r.value;
+              }
+            }
+            """
+        )
+    }
+
+    @Disabled
+    @Test
+    fun `return in when`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                test(x = null, fallback = 3)
+            }
+
+            fun test(x: Int?, fallback: Int): Int {
+                val y = when (x) {
+                    null -> return fallback
+                    1 -> x * x
+                    2 -> x / x
+                    3 -> x + x
+                    else -> x
+                }
+
+                return y
+            }
+            """
+        )
+
+        dart(
+            """
             """
         )
     }

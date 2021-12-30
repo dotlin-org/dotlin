@@ -173,6 +173,21 @@ abstract class IrCustomElementTransformerVoid : IrElementTransformerVoid(), IrCu
     ) as IrBody
 }
 
+abstract class IrCustomElementTransformer<in D> : IrElementTransformer<D>, IrCustomElementTransformerHelper<D> {
+    override fun visitExpression(expression: IrExpression, data: D) =
+        visitCustomExpression(
+            expression,
+            data = data,
+            fallback = { super<IrCustomElementTransformerHelper>.visitExpression(expression, data) }
+        ) as IrExpression
+
+    override fun visitBody(body: IrBody, data: D) = visitCustomBody(
+        body,
+        data = data,
+        fallback = { super<IrCustomElementTransformerHelper>.visitBody(body, data) }
+    ) as IrBody
+}
+
 interface IrCustomElementVisitorVoid : IrElementVisitorVoid, IrCustomElementVisitor<Unit, Nothing?> {
     override fun visitExpression(expression: IrExpression, data: Nothing?) =
         visitCustomExpression(

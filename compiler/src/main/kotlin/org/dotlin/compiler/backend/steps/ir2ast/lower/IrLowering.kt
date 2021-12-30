@@ -22,6 +22,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementVisitorVoid
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionWithParentTransformer
 import org.dotlin.compiler.backend.util.replace
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
@@ -87,21 +88,12 @@ interface IrFileLowering : IrLowering {
 interface IrExpressionLowering : IrSingleLowering<IrExpression> {
     override fun lower(irFile: IrFile) {
         irFile.transformChildren(
-            object : IrElementTransformer<IrDeclaration?> {
-                override fun visitDeclaration(
-                    declaration: IrDeclarationBase,
-                    parent: IrDeclaration?
-                ): IrStatement {
-                    val newParent = if (declaration is IrDeclarationParent) declaration else parent
-                    return super.visitDeclaration(declaration, newParent)
-                }
-
-                override fun visitExpression(expression: IrExpression, parent: IrDeclaration?): IrExpression {
-                    if (parent == null || parent !is IrDeclarationParent) {
-                        throw IllegalStateException("Expected parent but was $parent")
-                    }
-
-                    expression.transformChildren(this, parent)
+            object : IrExpressionWithParentTransformer() {
+                override fun <P> visitExpressionWithParent(
+                    expression: IrExpression,
+                    parent: P
+                ): IrExpression where P : IrDeclaration, P : IrDeclarationParent {
+                    expression.transformChildren(parent)
                     return expression.transformBy { context.transform(it, parent) }
                 }
             },

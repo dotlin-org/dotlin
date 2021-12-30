@@ -39,9 +39,12 @@ object DartStatementTransformer : DartAstNodeTransformer {
     ) = statement.variables.accept(context) + ";"
 
     override fun visitReturnStatement(statement: DartReturnStatement, context: DartGenerationContext): String {
-        val value = statement.expression.accept(context)
+        val value = when (statement.expression) {
+            null -> ""
+            else -> " " + statement.expression.accept(context)
+        }
 
-        return "return $value;"
+        return "return$value;"
     }
 
     override fun visitIfStatement(statement: DartIfStatement, context: DartGenerationContext) = statement.let {

@@ -23,12 +23,12 @@ import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 import org.dotlin.compiler.dart.ast.expression.DartExpression
 
 data class DartReturnStatement(
-    val expression: DartExpression,
+    val expression: DartExpression?,
 ) : DartStatement {
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
         visitor.visitReturnStatement(this, data)
 
     override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
-        expression.accept(visitor, data)
+        expression?.accept(visitor, data)
     }
 }

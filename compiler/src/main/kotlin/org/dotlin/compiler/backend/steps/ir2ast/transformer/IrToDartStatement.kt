@@ -20,8 +20,8 @@
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
+import org.dotlin.compiler.backend.steps.ir2ast.IrVoidType
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartNameWith
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
 import org.dotlin.compiler.dart.ast.statement.*
@@ -34,7 +34,14 @@ import org.jetbrains.kotlin.ir.expressions.*
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement> {
     override fun visitReturn(expression: IrReturn, context: DartTransformContext) =
-        DartReturnStatement(expression.value.accept(context))
+        DartReturnStatement(
+            expression = expression.value.let {
+                when (it.type) {
+                    is IrVoidType -> null
+                    else -> it.accept(context)
+                }
+            }
+        )
 
     override fun visitWhen(irWhen: IrWhen, context: DartTransformContext) = irWhen.branches.reversed().toList().run {
         drop(1).fold(
