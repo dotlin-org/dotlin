@@ -22,9 +22,9 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartStatementOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.IrStatement
-import org.jetbrains.kotlin.ir.expressions.IrBlock
-import org.jetbrains.kotlin.ir.expressions.IrBlockBody
-import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
+import org.jetbrains.kotlin.ir.declarations.IrDeclaration
+import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
+import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
 
 /**
@@ -33,7 +33,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
 class WhensWithSubjectStatementsLowering(override val context: DartLoweringContext) : IrStatementLowering {
     override fun DartLoweringContext.transform(
         statement: IrStatement,
-        body: IrBlockBody
+        container: IrStatementContainer
     ): Transformations<IrStatement> {
         if (statement !is IrBlock || statement.origin != IrStatementOrigin.WHEN) return noChange()
 
@@ -50,5 +50,23 @@ class WhensWithSubjectStatementsLowering(override val context: DartLoweringConte
                 )
             }
         }
+    }
+}
+
+@Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+class WhensWithSubjectExpressionsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
+    override fun <D> DartLoweringContext.transform(
+        expression: IrExpression,
+        container: D
+    ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
+        if (expression !is IrBlock || expression.origin != IrStatementOrigin.WHEN) return noChange()
+
+        val whenExpression = expression.statements.last() as IrWhen
+
+        return replaceWith(
+            wrapInAnonymousFunctionInvocation(whenExpression, container) {
+                expression.statements.withLastAsReturn(at = it)
+            }
+        )
     }
 }

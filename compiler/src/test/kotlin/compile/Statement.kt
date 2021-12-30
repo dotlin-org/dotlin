@@ -77,9 +77,9 @@ class Statement : BaseTest {
                 import 'package:meta/meta.dart';
 
                 void main() {
-                  if ((1 + 1) == 3) {
+                  if (1 + 1 == 3) {
                     main();
-                  } else if ((3 + 3) == 7) {
+                  } else if (3 + 3 == 7) {
                     main();
                   }
                 }
@@ -105,9 +105,9 @@ class Statement : BaseTest {
                 import 'package:meta/meta.dart';
 
                 void main() {
-                  if ((1 + 1) == 3) {
+                  if (1 + 1 == 3) {
                     main();
-                  } else if ((3 + 3) == 7) {
+                  } else if (3 + 3 == 7) {
                     main();
                   }
                 }
@@ -134,9 +134,9 @@ class Statement : BaseTest {
                 import 'package:meta/meta.dart';
 
                 void main(int x) {
-                  if ((1 + 1) == 3) {
+                  if (1 + 1 == 3) {
                     main(2);
-                  } else if ((3 + 3) == 7) {
+                  } else if (3 + 3 == 7) {
                     main(6);
                   } else {
                     main(10);

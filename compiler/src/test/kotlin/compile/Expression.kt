@@ -208,9 +208,9 @@ class Expression : BaseTest {
             }
 
             void main() {
-              final int x = (1 + 1) == 3
+              final int x = 1 + 1 == 3
                   ? test()
-                  : (3 + 3) == 7
+                  : 3 + 3 == 7
                       ? test()
                       : test();
             }
@@ -244,9 +244,9 @@ class Expression : BaseTest {
             }
 
             void main() {
-              final int x = (1 + 1) == 3
+              final int x = 1 + 1 == 3
                   ? test()
-                  : (3 + 3) == 7
+                  : 3 + 3 == 7
                       ? test()
                       : test();
             }
