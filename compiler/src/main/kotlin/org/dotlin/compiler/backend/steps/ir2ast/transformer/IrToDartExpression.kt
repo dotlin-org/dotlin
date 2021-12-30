@@ -65,8 +65,8 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         val receiver by lazy { optionalReceiver!! }
         val singleArgument by lazy { irSingleArgument.accept(context) }
 
-        val infixReceiver by lazy { receiver.possiblyParenthesize() }
-        val infixSingleArgument by lazy { singleArgument.possiblyParenthesize() }
+        val infixReceiver by lazy { receiver.possiblyParenthesize(inBinaryInfix = true) }
+        val infixSingleArgument by lazy { singleArgument.possiblyParenthesize(inBinaryInfix = true) }
 
         fun methodInvocation(methodName: DartSimpleIdentifier): DartMethodInvocation {
             return DartMethodInvocation(
@@ -112,12 +112,14 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                     else -> DartDivideExpression(infixReceiver, infixSingleArgument)
                 }
             }
-            IrStatementOrigin.PERC -> DartModuloExpression(receiver, singleArgument)
+            IrStatementOrigin.PERC -> DartModuloExpression(infixReceiver, infixSingleArgument)
             IrStatementOrigin.GT, IrStatementOrigin.GTEQ, IrStatementOrigin.LT, IrStatementOrigin.LTEQ -> {
                 val (actualLeft, actualRight) = if (irCallLike.valueArgumentsCount == 1) {
                     infixReceiver to infixSingleArgument
                 } else {
-                    irCallLike.valueArguments.mapNotNull { it?.accept(context)?.possiblyParenthesize() }.toPair()
+                    irCallLike.valueArguments
+                        .mapNotNull { it?.accept(context)?.possiblyParenthesize(inBinaryInfix = true) }
+                        .toPair()
                 }
 
                 return DartComparisonExpression(
@@ -134,8 +136,8 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
             }
             IrStatementOrigin.EQEQ ->
                 DartEqualityExpression(
-                    left = irCallLike.getValueArgument(0)!!.accept(context).possiblyParenthesize(),
-                    right = irCallLike.getValueArgument(1)!!.accept(context).possiblyParenthesize(),
+                    left = irCallLike.getValueArgument(0)!!.accept(context).possiblyParenthesize(inEquals = true),
+                    right = irCallLike.getValueArgument(1)!!.accept(context).possiblyParenthesize(inEquals = true),
                 )
             IrStatementOrigin.EQ ->
                 DartAssignmentExpression(
@@ -151,7 +153,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
 
                 when {
                     irCallLike.origin == IrStatementOrigin.EXCL && irReceiver!!.type.isBoolean() -> {
-                        DartNegatedExpression(receiver.possiblyParenthesize())
+                        DartNegatedExpression(receiver.possiblyParenthesize(isReceiver = true))
                     }
                     origin == IrStatementOrigin.GET_PROPERTY || origin == IrStatementOrigin.GET_LOCAL_PROPERTY
                             || hasDartGetterAnnotation -> {
@@ -191,7 +193,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                                         arguments = arguments
                                     )
                                     else -> DartMethodInvocation(
-                                        target = receiver.possiblyParenthesize(),
+                                        target = receiver.possiblyParenthesize(isReceiver = true),
                                         methodName = functionName as DartSimpleIdentifier,
                                         arguments = arguments
                                     )
@@ -270,7 +272,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         return when (receiver) {
             null -> name
             else -> DartPropertyAccessExpression(
-                target = receiver.possiblyParenthesize(),
+                target = receiver.possiblyParenthesize(isReceiver = true),
                 propertyName = name,
             )
         }
@@ -295,7 +297,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
 
         val assignee = if (receiver != null)
             DartPropertyAccessExpression(
-                target = receiver.possiblyParenthesize(),
+                target = receiver.possiblyParenthesize(isReceiver = true),
                 propertyName = name,
             )
         else
@@ -398,8 +400,8 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         binaryInfix: IrBinaryInfixExpression,
         context: DartTransformContext
     ): DartExpression {
-        val left = binaryInfix.left.accept(context)
-        val right = binaryInfix.right.accept(context)
+        val left = binaryInfix.left.accept(context).possiblyParenthesize(inBinaryInfix = true)
+        val right = binaryInfix.right.accept(context).possiblyParenthesize(inBinaryInfix = true)
 
         return when (binaryInfix) {
             is IrConjunctionExpression -> DartConjunctionExpression(left, right)
@@ -413,9 +415,30 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         context: DartTransformContext
     ): DartExpression = DartCode(irCode.code)
 
-    private fun DartExpression.possiblyParenthesize(): DartExpression = when (this) {
-        is DartConditionalExpression, is DartAsExpression, is DartBinaryInfixExpression -> parenthesize()
-        else -> this
+    private fun DartExpression.possiblyParenthesize(
+        isReceiver: Boolean = false,
+        inEquals: Boolean = false,
+        inBinaryInfix: Boolean = inEquals,
+    ): DartExpression {
+        require(listOf(isReceiver, inEquals, inBinaryInfix).any { it == true }) { "One parameter must be true" }
+
+        return when {
+            isReceiver || inBinaryInfix -> when (this) {
+                is DartConditionalExpression, is DartAsExpression, is DartThrowExpression -> parenthesize()
+                else -> when {
+                    inEquals -> when (this) {
+                        is DartEqualityExpression -> parenthesize()
+                        else -> this
+                    }
+                    isReceiver -> when (this) {
+                        is DartBinaryInfixExpression -> parenthesize()
+                        else -> this
+                    }
+                    else -> this
+                }
+            }
+            else -> this
+        }
     }
 }
 
