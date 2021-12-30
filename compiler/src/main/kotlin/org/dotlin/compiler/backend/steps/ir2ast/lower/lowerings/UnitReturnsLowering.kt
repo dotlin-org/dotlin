@@ -19,69 +19,32 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
+import org.dotlin.compiler.backend.steps.ir2ast.ir.irReturnVoid
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.jetbrains.kotlin.ir.IrStatement
-import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.builders.irGetObject
-import org.jetbrains.kotlin.ir.declarations.IrFunction
-import org.jetbrains.kotlin.ir.expressions.IrBlockBody
+import org.jetbrains.kotlin.ir.declarations.IrDeclaration
+import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
+import org.jetbrains.kotlin.ir.declarations.copyAttributes
 import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrExpressionBody
+import org.jetbrains.kotlin.ir.expressions.IrGetObjectValue
 import org.jetbrains.kotlin.ir.expressions.IrReturn
-import org.jetbrains.kotlin.ir.expressions.impl.IrReturnImpl
+import org.jetbrains.kotlin.ir.types.isUnit
 
-/**
- * Return expressions returning [Unit] are simplified to two statements: The expression it was returning and an
- * empty return.
- */
-class UnitReturnsLowering(override val context: DartLoweringContext) : IrStatementAndBodyExpressionLowering {
-    override val statementTransformer = object : IrStatementLowering {
-        override val context = this@UnitReturnsLowering.context
+class UnitReturnsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
+    override fun <D> DartLoweringContext.transform(
+        expression: IrExpression,
+        container: D
+    ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
+        if (expression !is IrReturn) return noChange()
 
-        override fun DartLoweringContext.transform(
-            statement: IrStatement,
-            body: IrBlockBody
-        ): Transformations<IrStatement> {
-            if (statement.isNoMatch()) return noChange()
+        val value = expression.value
+        if (value !is IrGetObjectValue || value.symbol != irBuiltIns.unitClass) return noChange()
 
-            statement as IrReturn
-
-            return remove(statement) and add(statement.value) and add(
-                IrReturnImpl(
-                    UNDEFINED_OFFSET,
-                    UNDEFINED_OFFSET,
-                    type = context.irBuiltIns.unitType,
-                    returnTargetSymbol = statement.returnTargetSymbol,
-                    value = context.buildStatement(statement.returnTargetSymbol) {
-                        irGetObject(context.irBuiltIns.unitClass)
-                    }
-                )
-            )
-        }
-
-    }
-
-    override val bodyExpressionTransformer = object : IrBodyExpressionLowering {
-        override val context = this@UnitReturnsLowering.context
-
-        override fun DartLoweringContext.transform(
-            expression: IrExpression,
-            body: IrExpressionBody
-        ): Transformation<IrExpression>? {
-            if (expression.isNoMatch()) return noChange()
-
-            expression as IrReturn
-
-            return replaceWith(expression.value)
-        }
-
-    }
-
-    private fun IrStatement.isNoMatch(): Boolean {
-        return this !is IrReturn ||
-                type != context.irBuiltIns.unitType ||
-                returnTargetSymbol.owner !is IrFunction ||
-                (returnTargetSymbol.owner as IrFunction).returnType != context.irBuiltIns.unitType
+        return replaceWith(
+            buildStatement(container.symbol) {
+                irReturnVoid(expression.returnTargetSymbol)
+                    .copyAttributes(expression)
+            }
+        )
     }
 }
 

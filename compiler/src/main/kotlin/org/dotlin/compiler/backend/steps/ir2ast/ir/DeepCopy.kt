@@ -277,7 +277,7 @@ class DeclarationReferenceRemapper(
         return when (mapping[expression.symbol]) {
             null -> super.visitDeclarationReference(expression)
             else -> expression.deepCopy()
-        }.also { it.transformChildrenVoid() }
+        }
     }
 
     override fun visitMemberAccess(expression: IrMemberAccessExpression<*>) =

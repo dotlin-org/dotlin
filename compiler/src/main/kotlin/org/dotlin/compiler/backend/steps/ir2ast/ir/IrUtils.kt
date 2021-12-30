@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.ir
 
+import org.dotlin.compiler.backend.steps.ir2ast.IrVoidType
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrExpressionBodyWithOrigin
 import org.dotlin.compiler.backend.util.falseIfNull
 import org.jetbrains.kotlin.backend.common.ir.*
@@ -33,6 +34,8 @@ import org.jetbrains.kotlin.ir.builders.irCall
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrReturnImpl
+import org.jetbrains.kotlin.ir.symbols.IrReturnTargetSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
@@ -418,6 +421,18 @@ fun IrBuilderWithScope.irCall(
         valueArguments.forEachIndexed { index, arg -> putValueArgument(index, arg) }
     }
 
+fun IrBuilderWithScope.irReturnVoid(
+    returnTargetSymbol: IrReturnTargetSymbol = scope.scopeOwnerSymbol as IrReturnTargetSymbol
+): IrReturn =
+    IrReturnImpl(
+        UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+        type = IrVoidType,
+        returnTargetSymbol = returnTargetSymbol,
+        value = irNull().apply {
+            type = IrVoidType
+        }
+    )
+
 fun IrValueParameter.copy(
     parent: IrFunction = this.parent as IrFunction,
     origin: IrDeclarationOrigin = this.origin,
@@ -470,3 +485,11 @@ fun IrDeclaration.firstNonFakeOverrideOrSelf() = when (this) {
     !is IrOverridableDeclaration<*> -> this
     else -> firstNonFakeOverrideOrSelf()
 }
+
+fun IrExpression.isStatementIn(container: IrStatementContainer) = this in container.statements
+
+fun IrExpression.isStatementIn(container: IrFunction) =
+    (container.body as? IrBlockBody?)?.let { isStatementIn(it) } == true
+
+fun IrExpression.isStatementIn(container: IrDeclaration) =
+    (container as? IrFunction)?.let { isStatementIn(it) } == true

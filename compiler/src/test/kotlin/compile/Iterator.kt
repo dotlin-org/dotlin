@@ -34,7 +34,7 @@ class Iterator : BaseTest {
             class TestIterator : Iterator<Int> {
                 fun doImportantThing() {}
 
-                override fun next(): Int{
+                override fun next(): Int {
                     doImportantThing()
                     return 3
                 }

@@ -265,4 +265,25 @@ class Statement : BaseTest {
             )
         }
     }
+
+    @Test
+    fun `return without value`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                return
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              return;
+            }
+            """
+        )
+    }
 }

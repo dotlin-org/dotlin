@@ -23,10 +23,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
 import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
-import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrFunction
-import org.jetbrains.kotlin.ir.declarations.IrTypeParametersContainer
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
@@ -38,18 +35,20 @@ import org.jetbrains.kotlin.ir.util.TypeRemapper
 import org.jetbrains.kotlin.ir.util.remapTypes
 import org.jetbrains.kotlin.types.Variance
 
-/**
- * Return expressions returning [Unit] are simplified to two statements: The expression it was returning and an
- * empty return.
- */
 class UnitTypesLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
     override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
-        if (declaration !is IrFunction && declaration !is IrClass) return noChange()
+        fun IrFunction.transformReturnType() {
+            if (returnType.isUnit()) returnType = dartBuiltIns.voidType
+        }
 
-        declaration.let {
-            when {
-                it is IrFunction && it.returnType.isUnit() -> it.returnType = dartBuiltIns.voidType
-                it is IrClass -> it.superTypes.forEach { superType ->
+        declaration.also {
+            when (it) {
+                is IrFunction -> it.transformReturnType()
+                is IrProperty -> it.apply {
+                    getter?.transformReturnType()
+                    setter?.transformReturnType()
+                }
+                is IrClass -> it.superTypes.forEach { superType ->
                     when (superType) {
                         is IrSimpleType -> IrSimpleTypeImpl(
                             kotlinType = superType.originalKotlinType,
