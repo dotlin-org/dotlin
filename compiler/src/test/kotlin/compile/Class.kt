@@ -3224,7 +3224,7 @@ class Class : BaseTest {
                 class Builder<T extends Marker> {
                   @nonVirtual
                   void startBuild(T item) {
-                    (item as Marker).mark();
+                    item.mark();
                     (item as Identifiable).identify();
                     (item as Buildable).build();
                     this._identifyAndExec(item as Identifiable);
@@ -3621,6 +3621,160 @@ class Class : BaseTest {
 
                   @nonVirtual
                   void _identifyAndExec(Identifiable? id) {}
+                }
+
+                @sealed
+                class SomeItem implements Buildable, Identifiable {
+                  @override
+                  void build() {}
+                  @override
+                  void identify() {}
+                }
+
+                void main() {
+                  Builder<SomeItem>().startBuild(SomeItem());
+                }
+                """
+            )
+        }
+
+    @Test
+    fun `class with multiple type parameter bounds with function call that has parameter of common super type`() =
+        assertCompile {
+            kotlin(
+                """
+                interface Buildable {
+                    fun build()
+                }
+
+                interface Identifiable {
+                    fun identify()
+                }
+
+                class Builder<T> where T : Buildable, T : Identifiable {
+                    fun startBuild(item: T) {
+                        item.identify()
+                        item.build()
+
+                        identifyAndExec(item)
+                    }
+
+                    private fun identifyAndExec(id: Any) {}
+                }
+
+                class SomeItem : Buildable, Identifiable {
+                    override fun build() {}
+                    override fun identify() {}
+                }
+
+                fun main() {
+                    Builder<SomeItem>().startBuild(SomeItem())
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                abstract class Buildable {
+                  void build();
+                }
+
+                abstract class Identifiable {
+                  void identify();
+                }
+
+                @sealed
+                class Builder<T extends Object> {
+                  @nonVirtual
+                  void startBuild(T item) {
+                    (item as Identifiable).identify();
+                    (item as Buildable).build();
+                    this._identifyAndExec(item);
+                  }
+
+                  @nonVirtual
+                  void _identifyAndExec(Object id) {}
+                }
+
+                @sealed
+                class SomeItem implements Buildable, Identifiable {
+                  @override
+                  void build() {}
+                  @override
+                  void identify() {}
+                }
+
+                void main() {
+                  Builder<SomeItem>().startBuild(SomeItem());
+                }
+                """
+            )
+    }
+
+    @Test
+    fun `class with multiple type parameter bounds with function call that has parameter of Any type`() =
+        assertCompile {
+            kotlin(
+                """
+                interface Marker
+
+                interface Buildable : Marker {
+                    fun build()
+                }
+
+                interface Identifiable : Marker {
+                    fun identify()
+                }
+
+                class Builder<T> where T : Buildable, T : Identifiable {
+                    fun startBuild(item: T) {
+                        item.identify()
+                        item.build()
+
+                        identifyAndExec(item)
+                    }
+
+                    private fun identifyAndExec(id: Any) {}
+                }
+
+                class SomeItem : Buildable, Identifiable {
+                    override fun build() {}
+                    override fun identify() {}
+                }
+
+                fun main() {
+                    Builder<SomeItem>().startBuild(SomeItem())
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                abstract class Marker {}
+
+                abstract class Buildable implements Marker {
+                  void build();
+                }
+
+                abstract class Identifiable implements Marker {
+                  void identify();
+                }
+
+                @sealed
+                class Builder<T extends Marker> {
+                  @nonVirtual
+                  void startBuild(T item) {
+                    (item as Identifiable).identify();
+                    (item as Buildable).build();
+                    this._identifyAndExec(item);
+                  }
+
+                  @nonVirtual
+                  void _identifyAndExec(Object id) {}
                 }
 
                 @sealed

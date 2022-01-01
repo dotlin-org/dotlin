@@ -534,7 +534,7 @@ class Function : BaseTest {
                 }
 
                 void test<T extends Book>(T book) {
-                  (book as Book).read();
+                  book.read();
                   (book as Novel).enjoy();
                   (book as Memoir).intrigue();
                   lookUp(book as Memoir);

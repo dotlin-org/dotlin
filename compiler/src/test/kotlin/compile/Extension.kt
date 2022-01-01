@@ -296,4 +296,72 @@ class Extension : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `extension with multiple type parameter bounds`() = assertCompile {
+        kotlin(
+            """
+            interface Buildable {
+                fun build()
+            }
+
+            interface Identifiable {
+                fun identify()
+            }
+
+            private fun identifyAndExec(id: Identifiable) {}
+
+            fun <T> T.buildAndIdentify() where T : Buildable, T : Identifiable {
+                identify()
+                build()
+                identifyAndExec(this)
+            }
+
+            class SomeItem : Buildable, Identifiable {
+                override fun build() {}
+                override fun identify() {}
+            }
+
+            fun main() {
+                SomeItem().buildAndIdentify()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            abstract class Buildable {
+              void build();
+            }
+
+            abstract class Identifiable {
+              void identify();
+            }
+
+            void _identifyAndExec(Identifiable id) {}
+
+            @sealed
+            class SomeItem implements Buildable, Identifiable {
+              @override
+              void build() {}
+              @override
+              void identify() {}
+            }
+
+            void main() {
+              SomeItem().buildAndIdentify();
+            }
+
+            extension ${'$'}TMustBeBuildableAndIdentifiableExtensions<T extends Object> on T {
+              void buildAndIdentify() {
+                (this as Identifiable).identify();
+                (this as Buildable).build();
+                _identifyAndExec(this as Identifiable);
+              }
+            }
+            """
+        )
+    }
 }
