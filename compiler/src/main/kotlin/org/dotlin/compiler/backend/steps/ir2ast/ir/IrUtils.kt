@@ -37,11 +37,14 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrReturnImpl
 import org.jetbrains.kotlin.ir.symbols.IrReturnTargetSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
+import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.util.collectionUtils.filterIsInstanceAnd
+import org.jetbrains.kotlin.utils.addToStdlib.cast
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 val IrSimpleFunction.correspondingProperty: IrProperty?
     get() = correspondingPropertySymbol?.owner
@@ -493,3 +496,13 @@ fun IrExpression.isStatementIn(container: IrFunction) =
 
 fun IrExpression.isStatementIn(container: IrDeclaration) =
     (container as? IrFunction)?.let { isStatementIn(it) } == true
+
+val IrType.typeParameterOrNull: IrTypeParameter?
+    get() = classifierOrNull?.safeAs<IrTypeParameterSymbol>()?.owner
+
+infix fun IrType.polymorphicallyIs(other: IrType): Boolean {
+    if (other.isAny()) return true
+    if (this == other || this.makeNullable() == other) return true
+
+    return this.superTypes().any { it polymorphicallyIs other }
+}

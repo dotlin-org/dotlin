@@ -22,6 +22,8 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementTransformerVoid
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrNullAwareExpression
 import org.dotlin.compiler.backend.steps.ir2ast.ir.firstNonFakeOverrideOrSelf
+import org.dotlin.compiler.backend.steps.ir2ast.ir.polymorphicallyIs
+import org.dotlin.compiler.backend.steps.ir2ast.ir.typeParameterOrNull
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
@@ -33,10 +35,7 @@ import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.declarations.IrTypeParametersContainer
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrTypeOperatorCallImpl
-import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.defaultType
-import org.jetbrains.kotlin.ir.types.isNullable
-import org.jetbrains.kotlin.ir.types.makeNullable
+import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.ir.util.superTypes
@@ -57,7 +56,8 @@ class MultipleTypeParametersLowering(override val context: DartLoweringContext) 
             }
             .map { (param, superType) ->
                 when {
-                    // If all original super types of all type parameters are nullable, the new super type should be too.
+                    // If all original super types of all type parameters are nullable,
+                    // the new super type should be too.
                     declaration.typeParameters
                         .map { it.defaultType.superTypes() }
                         .flatten()
@@ -107,21 +107,29 @@ class MultipleTypeParametersLowering(override val context: DartLoweringContext) 
                 ) {
                     if (castType == null) return
 
+                    // No need to cast if the type is already exactly correct.
+                    if (type == castType) return
+
                     val matchedType = declaration.typeParameters
                         .map { it.defaultType }
                         .firstOrNull { type == it } ?: return
 
-                    fun IrType.makeNullableIfNecessary() = when {
-                        isInNullAware || matchedType.isNullable() -> makeNullable()
-                        else -> this
+                    val possiblyNullableCastType = when {
+                        isInNullAware || matchedType.isNullable() -> castType.makeNullable()
+                        else -> castType
+                    }
+
+                    // We don't need to cast if the types are polymorphically equivalent.
+                    if (type polymorphicallyIs possiblyNullableCastType) {
+                        return
                     }
 
                     set(
                         IrTypeOperatorCallImpl(
                             UNDEFINED_OFFSET, UNDEFINED_OFFSET,
-                            type = castType.makeNullableIfNecessary(),
+                            type = possiblyNullableCastType,
                             operator = IrTypeOperator.CAST,
-                            typeOperand = castType.makeNullableIfNecessary(),
+                            typeOperand = possiblyNullableCastType,
                             argument = this
                         )
                     )
