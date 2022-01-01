@@ -34,6 +34,7 @@ package kotlin
  */
 @DartName("int")
 external class Byte private constructor() : Number(), Comparable<Byte> {
+    @DartName("Byte\$Companion")
     companion object {
         /**
          * A constant holding the minimum value an instance of Byte can have.
@@ -284,6 +285,7 @@ external class Byte private constructor() : Number(), Comparable<Byte> {
  */
 @DartName("int")
 external class Short private constructor() : Number(), Comparable<Short> {
+    @DartName("Short\$Companion")
     companion object {
         /**
          * A constant holding the minimum value an instance of Short can have.
@@ -532,6 +534,7 @@ external class Short private constructor() : Number(), Comparable<Short> {
  */
 @DartName("int")
 external class Int private constructor() : Number(), Comparable<Int> {
+    @DartName("Int\$Companion")
     companion object {
         /**
          * A constant holding the minimum value an instance of Int can have.
@@ -815,6 +818,7 @@ external class Int private constructor() : Number(), Comparable<Int> {
  */
 @DartName("int")
 external class Long private constructor() : Number(), Comparable<Long> {
+    @DartName("Long\$Companion")
     companion object {
         /**
          * A constant holding the minimum value an instance of Long can have.
@@ -1102,6 +1106,7 @@ external class Long private constructor() : Number(), Comparable<Long> {
  */
 @DartName("double")
 external class Float private constructor() : Number(), Comparable<Float> {
+    @DartName("Float\$Companion")
     companion object {
         /**
          * A constant holding the smallest *positive* nonzero value of Float.
@@ -1355,6 +1360,7 @@ external class Float private constructor() : Number(), Comparable<Float> {
  */
 @DartName("double")
 external class Double private constructor() : Number(), Comparable<Double> {
+    @DartName("Double\$Companion")
     companion object {
         /**
          * A constant holding the smallest *positive* nonzero value of Double.
