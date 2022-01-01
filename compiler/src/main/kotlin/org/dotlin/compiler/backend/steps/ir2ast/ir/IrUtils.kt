@@ -501,8 +501,12 @@ val IrType.typeParameterOrNull: IrTypeParameter?
     get() = classifierOrNull?.safeAs<IrTypeParameterSymbol>()?.owner
 
 infix fun IrType.polymorphicallyIs(other: IrType): Boolean {
-    if (other.isAny()) return true
+    if (other.isNullableAny() || (!this.isNullable() && other.isAny())) return true
     if (this == other || this.makeNullable() == other) return true
 
-    return this.superTypes().any { it polymorphicallyIs other }
+    return when {
+        other.isTypeParameter() -> other.superTypes().all { this polymorphicallyIs it }
+        else -> this.superTypes().any { it polymorphicallyIs other }
+    }
+
 }
