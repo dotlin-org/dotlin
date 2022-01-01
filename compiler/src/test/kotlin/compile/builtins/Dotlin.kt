@@ -186,6 +186,81 @@ class Dotlin : BaseTest {
     }
 
     @Test
+    fun `@DartName on companion object`() = assertCompile {
+        kotlin(
+            """
+            class Kot {
+              @DartName("Lin")
+              companion object
+            }
+
+            fun main() {
+                Kot()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Kot {
+              static final Lin ${'$'}companion = Lin.${'$'}instance;
+            }
+
+            void main() {
+              Kot();
+            }
+
+            @sealed
+            class Lin {
+              Lin._() : super();
+              static final Lin ${'$'}instance = Lin._();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartName on class and companion object`() = assertCompile {
+        kotlin(
+            """
+            @DartName("Dot")
+            class Kot {
+              @DartName("Lin")
+              companion object
+            }
+
+            fun main() {
+                Kot()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Dot {
+              static final Lin ${'$'}companion = Lin.${'$'}instance;
+            }
+
+            void main() {
+              Dot();
+            }
+
+            @sealed
+            class Lin {
+              Lin._() : super();
+              static final Lin ${'$'}instance = Lin._();
+            }
+            """
+        )
+    }
+
+    @Test
     fun `@DartConst constructor`() = assertCompile {
         kotlin(
             """

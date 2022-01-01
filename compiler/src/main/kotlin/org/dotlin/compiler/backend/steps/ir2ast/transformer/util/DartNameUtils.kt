@@ -122,8 +122,9 @@ private fun IrDeclarationWithName.getDartNameOrNull(allowNested: Boolean): DartI
         name = name.copy(suffix = uniqueParametersPart + uniqueTypeParametersPart + uniqueValueTypeSuffix)
     }
 
+    // TODO: Handle case if there's a nested class named "Companion" (error or different name)?
     // Nested classes, interfaces, etc.
-    if (allowNested && this is IrClass && parentClassOrNull != null) {
+    if (allowNested && annotatedName == null && this is IrClass && parentClassOrNull != null) {
         name = parents
             .filterIsInstance<IrClass>()
             .toList()
@@ -132,13 +133,6 @@ private fun IrDeclarationWithName.getDartNameOrNull(allowNested: Boolean): DartI
             .plus(name)
             .joinToString(separator = "$")
             .toDartSimpleIdentifier()
-    }
-
-    // TODO: Handle case if there's a nested class named "Companion" (error or different name)
-    // Handle companion objects.
-    if (this is IrClass && isCompanion && (name == null || name.value == "Companion")) {
-        val suffix = name?.baseValue ?: "Companion"
-        name = parentAsClass.dartNameAsSimple.copy(suffix = "\$$suffix")
     }
 
     // Instance methods from objects get prefixed with '$'.
