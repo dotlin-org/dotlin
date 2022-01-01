@@ -105,10 +105,7 @@ class ObjectLowering(override val context: DartLoweringContext) : IrDeclarationL
 
                         initializer = IrExpressionBodyImpl(
                             createIrBuilder(symbol).buildStatement {
-                                irGetField(
-                                    receiver = irGetObject(obj.symbol),
-                                    field = obj.fieldWithName(INSTANCE_FIELD_NAME),
-                                )
+                                irGetObject(obj.symbol)
                             }
                         )
                     }

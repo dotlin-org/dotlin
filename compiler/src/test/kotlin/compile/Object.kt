@@ -101,7 +101,7 @@ class Object : BaseTest {
 
             @sealed
             class Test {
-              static final Test${'$'}Companion ${'$'}companion = Test${'$'}Companion.${'$'}instance.${'$'}instance;
+              static final Test${'$'}Companion ${'$'}companion = Test${'$'}Companion.${'$'}instance;
             }
             
             @sealed
@@ -135,7 +135,7 @@ class Object : BaseTest {
 
             @sealed
             class Test {
-              static final Test${'$'}Companion ${'$'}companion = Test${'$'}Companion.${'$'}instance.${'$'}instance;
+              static final Test${'$'}Companion ${'$'}companion = Test${'$'}Companion.${'$'}instance;
               static int compute() => Test${'$'}Companion.${'$'}instance.${'$'}compute();
             }
 
