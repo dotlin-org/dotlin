@@ -23,7 +23,6 @@ import org.dotlin.compiler.backend.steps.ir2ast.attributes.attributeOwner
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartNameWith
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartConst
 import org.jetbrains.kotlin.backend.common.ir.createParameterDeclarations
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder

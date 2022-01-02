@@ -25,11 +25,9 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartNameAsSimple
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartNameWith
 import org.dotlin.compiler.backend.util.sentenceCase
-import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.DefaultMapping
 import org.jetbrains.kotlin.backend.common.ir.*
-import org.jetbrains.kotlin.backend.common.ir.copyTypeParameters
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities

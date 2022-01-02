@@ -23,7 +23,6 @@ import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartNameWith
 import org.dotlin.compiler.dart.ast.parameter.*
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
