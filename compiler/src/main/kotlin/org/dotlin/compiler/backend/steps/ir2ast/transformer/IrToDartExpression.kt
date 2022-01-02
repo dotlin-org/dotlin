@@ -319,13 +319,19 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         val expression = irTypeOperatorCall.argument.accept(context)
         val type = irTypeOperatorCall.typeOperand.accept(context)
 
+        fun DartExpression.parenthesize() = possiblyParenthesize(isReceiver = true, inBinaryInfix = true)
+
         return when (val operator = irTypeOperatorCall.operator) {
-            CAST, IMPLICIT_CAST -> DartAsExpression(expression, type)
+            CAST, IMPLICIT_CAST -> DartAsExpression(expression.parenthesize(), type)
             IMPLICIT_NOTNULL -> TODO()
             IMPLICIT_COERCION_TO_UNIT -> expression
             IMPLICIT_INTEGER_COERCION -> TODO()
             SAFE_CAST -> TODO()
-            INSTANCEOF, NOT_INSTANCEOF -> DartIsExpression(expression, type, isNegated = operator == NOT_INSTANCEOF)
+            INSTANCEOF, NOT_INSTANCEOF -> DartIsExpression(
+                expression.parenthesize(),
+                type,
+                isNegated = operator == NOT_INSTANCEOF
+            )
             SAM_CONVERSION -> TODO()
             IMPLICIT_DYNAMIC_CAST -> expression
             REINTERPRET_CAST -> TODO()
