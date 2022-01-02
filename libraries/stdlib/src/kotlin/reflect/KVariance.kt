@@ -1,6 +1,6 @@
 /*
  * Copyright 2010-2019 JetBrains s.r.o.
- * Copyright 2021 Wilko Manger
+ * Copyright 2021-2022 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
