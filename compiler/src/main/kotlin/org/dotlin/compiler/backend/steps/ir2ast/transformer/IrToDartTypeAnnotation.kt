@@ -23,7 +23,6 @@ import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.IrVoidType
 import org.dotlin.compiler.backend.steps.ir2ast.ir.owner
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartNameWith
 import org.dotlin.compiler.dart.ast.type.DartNamedType
 import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
 import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList

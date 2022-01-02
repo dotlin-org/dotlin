@@ -24,9 +24,14 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.typeParameterOrNull
 import org.dotlin.compiler.backend.steps.ir2ast.ir.typeParametersOrSelf
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.backend.common.ir.addChild
-import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.types.*
-import org.jetbrains.kotlin.ir.util.*
+import org.jetbrains.kotlin.ir.declarations.IrDeclaration
+import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.declarations.IrTypeParametersContainer
+import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.defaultType
+import org.jetbrains.kotlin.ir.util.TypeRemapper
+import org.jetbrains.kotlin.ir.util.file
+import org.jetbrains.kotlin.ir.util.remapTypes
 
 class ExtensionsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
     override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {

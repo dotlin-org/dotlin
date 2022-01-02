@@ -19,17 +19,15 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrNullAwareExpression
 import org.dotlin.compiler.backend.steps.ir2ast.ir.extensionReceiverOrNull
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrimitiveNumber
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.builders.irCall
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
-import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.declarations.copyAttributes
-import org.jetbrains.kotlin.ir.expressions.*
-import org.jetbrains.kotlin.ir.util.irConstructorCall
+import org.jetbrains.kotlin.ir.expressions.IrCall
+import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.util.primaryConstructor
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UnnecessaryVariable")

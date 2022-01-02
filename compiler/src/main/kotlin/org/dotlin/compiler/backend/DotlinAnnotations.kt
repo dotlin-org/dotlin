@@ -25,7 +25,6 @@ import org.dotlin.compiler.backend.util.getSingleAnnotationTypeArgumentOf
 import org.dotlin.compiler.backend.util.hasOverriddenAnnotation
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrField
-import org.jetbrains.kotlin.ir.declarations.IrOverridableDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.isGetter

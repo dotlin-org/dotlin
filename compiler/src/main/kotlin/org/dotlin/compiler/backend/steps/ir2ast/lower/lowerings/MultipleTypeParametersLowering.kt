@@ -23,7 +23,6 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementTransformerVoi
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrNullAwareExpression
 import org.dotlin.compiler.backend.steps.ir2ast.ir.firstNonFakeOverrideOrSelf
 import org.dotlin.compiler.backend.steps.ir2ast.ir.polymorphicallyIs
-import org.dotlin.compiler.backend.steps.ir2ast.ir.typeParameterOrNull
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
@@ -35,7 +34,10 @@ import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.declarations.IrTypeParametersContainer
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrTypeOperatorCallImpl
-import org.jetbrains.kotlin.ir.types.*
+import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.defaultType
+import org.jetbrains.kotlin.ir.types.isNullable
+import org.jetbrains.kotlin.ir.types.makeNullable
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.ir.util.superTypes

@@ -28,7 +28,6 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclarationBase
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.expressions.IrExpression
-import kotlin.math.exp
 
 open class IrExpressionWithParentTransformer : IrCustomElementTransformer<IrDeclaration?>() {
     final override fun visitDeclaration(
@@ -67,7 +66,7 @@ fun IrElement.transformExpressionChildren(
     initialParent: IrDeclaration
 ) = transformChildren(transformer, initialParent)
 
-private fun  IrElement.transformExpressionsWithOptionalParent(
+private fun IrElement.transformExpressionsWithOptionalParent(
     initialParent: IrDeclaration?,
     transform: Transform
 ) = transformChildren(

@@ -19,10 +19,8 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.DotlinAnnotations
 import org.dotlin.compiler.backend.steps.ir2ast.ir.deepCopyWith
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.dotlin.compiler.backend.util.hasAnnotation
 import org.jetbrains.kotlin.backend.common.lower.parents
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrClass

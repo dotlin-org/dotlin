@@ -21,7 +21,8 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer.util
 
 import org.dotlin.compiler.backend.dartAnnotatedName
 import org.dotlin.compiler.backend.dartImportAliasPrefix
-import org.dotlin.compiler.backend.steps.ir2ast.ir.*
+import org.dotlin.compiler.backend.steps.ir2ast.ir.isExplicitBackingField
+import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrivate
 import org.dotlin.compiler.backend.util.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartPrefixedIdentifier
@@ -30,8 +31,6 @@ import org.dotlin.compiler.dart.ast.expression.identifier.toDartSimpleIdentifier
 import org.jetbrains.kotlin.backend.common.lower.parents
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.types.*
-import org.jetbrains.kotlin.ir.util.defaultType
-import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 
 private fun IrDeclarationWithName.getDartNameOrNull(allowNested: Boolean): DartIdentifier? {

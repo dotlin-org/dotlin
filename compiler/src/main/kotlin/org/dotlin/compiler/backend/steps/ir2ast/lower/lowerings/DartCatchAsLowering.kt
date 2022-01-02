@@ -20,18 +20,24 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.dartCatchAsType
-import org.dotlin.compiler.backend.steps.ir2ast.ir.constructorWithName
 import org.dotlin.compiler.backend.steps.ir2ast.ir.remapReferences
-import org.dotlin.compiler.backend.steps.ir2ast.lower.*
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.lower.IrExpressionLowering
+import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformation
+import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartNameOrNull
-import org.jetbrains.kotlin.ir.builders.*
+import org.jetbrains.kotlin.ir.builders.irCallConstructor
+import org.jetbrains.kotlin.ir.builders.irGet
+import org.jetbrains.kotlin.ir.builders.irIfThenElse
+import org.jetbrains.kotlin.ir.builders.irNotIs
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
-import org.jetbrains.kotlin.ir.expressions.*
-import org.jetbrains.kotlin.ir.expressions.impl.*
+import org.jetbrains.kotlin.ir.expressions.IrBlock
+import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrTry
+import org.jetbrains.kotlin.ir.expressions.impl.IrTryImpl
 import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.util.constructors
-import org.jetbrains.kotlin.ir.util.primaryConstructor
 
 /**
  * Must run after [TryExpressionsLowering].

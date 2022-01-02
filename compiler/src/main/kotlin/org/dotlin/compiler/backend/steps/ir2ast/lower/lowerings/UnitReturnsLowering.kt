@@ -27,7 +27,6 @@ import org.jetbrains.kotlin.ir.declarations.copyAttributes
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetObjectValue
 import org.jetbrains.kotlin.ir.expressions.IrReturn
-import org.jetbrains.kotlin.ir.types.isUnit
 
 class UnitReturnsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
     override fun <D> DartLoweringContext.transform(

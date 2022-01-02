@@ -24,7 +24,6 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementVisitor
 import org.dotlin.compiler.backend.steps.ir2ast.ir.todo
 import org.dotlin.compiler.dart.ast.DartAstNode
 import org.jetbrains.kotlin.ir.IrElement
-import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 
 interface IrDartAstTransformer<N : DartAstNode?> : IrCustomElementVisitor<N, DartTransformContext> {
     override fun visitElement(element: IrElement, data: DartTransformContext): N {

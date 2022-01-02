@@ -21,10 +21,8 @@ package org.dotlin.compiler.dart.ast.statement.trycatch
 
 import org.dotlin.compiler.dart.ast.DartAstNode
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
-import org.dotlin.compiler.dart.ast.expression.DartExpression
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.dotlin.compiler.dart.ast.statement.DartBlock
-import org.dotlin.compiler.dart.ast.statement.DartStatement
 import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
 
 data class DartCatchClause(
