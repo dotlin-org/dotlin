@@ -148,6 +148,9 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                     ),
                     right = singleArgument,
                 )
+            IrStatementOrigin.EXCLEXCL -> DartNotNullAssertionExpression(
+                singleArgument.possiblyParenthesize(isReceiver = true)
+            )
             else -> {
                 val hasDartGetterAnnotation = irCallLike.symbol.owner.hasDartGetterAnnotation()
 
