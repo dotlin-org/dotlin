@@ -1692,7 +1692,7 @@ private fun <T> T.clamp(min: T, max: T): T where T : Comparable<T>, T : Number {
     }
 
     return when (clamped) {
-        is Double -> dart("(clamped as double).toInt()")
+        is Double -> dart("(clamped as double).toInt() as T")
         else -> clamped
     }
 }
