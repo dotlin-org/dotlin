@@ -3,8 +3,8 @@
 ### Language features
 - [x] Top level functions
 - [ ] Built-ins
-  - [ ] Annotation
-  - [ ] Any
+  - [x] Annotation
+  - [x] Any
   - [ ] Arrays
     - [ ] Array
     - [ ] ByteArray
@@ -15,16 +15,16 @@
     - [ ] FloatArray
     - [ ] DoubleArray
     - [ ] BooleanArray
-  - [ ] Boolean
+  - [x] Boolean
   - [ ] Char
   - [ ] CharSequence
   - [ ] Collections
-  - [ ] Comparable
-  - [ ] Enum
+  - [x] Comparable
+  - [x] Enum
   - [x] Iterator
   - [ ] Library
-  - [ ] Nothing
-  - [ ] Number
+  - [x] Nothing
+  - [x] Number
   - [ ] Primitives
     - [ ] Byte
     - [ ] Short
@@ -32,8 +32,8 @@
     - [ ] Long
     - [ ] Float
     - [ ] Double
-  - [ ] String
-  - [ ] Throwable
+  - [x] String
+  - [x] Throwable
 - [ ] Classes
   - [x] Regular classes
   - [x] Abstract classes
@@ -89,23 +89,23 @@
   - [x] Comparisons
   - [ ] Equality
     - [x] Structural equality
-    - [ ] Referential equality
+    - [x] Referential equality
     - [ ] Float equality specifics
   - [x] Type checking expression
   - [ ] Containment check expression
-  - [ ] Elvis expressions
+  - [x] Elvis expressions
   - [ ] Range expressions
   - [x] Additions
   - [x] Multiplications
   - [x] Cast expressions
   - [ ] Prefix increment expressions
   - [ ] Prefix decrement expressions
-  - [ ] Unary minus expressions
+  - [x] Unary minus expressions
   - [ ] Unary plus expressions
   - [ ] Logical not expressions
   - [ ] Postfix increment expressions
   - [ ] Postfix decrement expressions
-  - [ ] Not-null assertions
+  - [x] Not-null assertions
   - [ ] Indexing expressions
   - [x] Function calls
   - [x] Constructor calls
@@ -130,10 +130,10 @@
   - [ ] Loops
     - [ ] For loop
     - [ ] While loop
-- [ ] Visibility
+- [x] Visibility
   - [x] Private
-  - [ ] Protected
-  - [ ] Internal
+  - [x] Protected
+  - [x] Internal
 - [x] Operator overloading
 - [ ] Extensions
     - [x] Extension methods
@@ -146,7 +146,7 @@
     - [x] Multiple upper bounds
 - [x] Exceptions
 - [x] Nothing type
-- [ ] Function overloading
+- [x] Function overloading
 - [ ] Coroutines
 - [ ] Type aliases
 - [ ] Annotations
