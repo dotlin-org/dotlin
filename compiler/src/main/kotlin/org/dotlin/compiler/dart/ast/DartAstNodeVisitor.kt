@@ -130,12 +130,6 @@ interface DartAstNodeVisitor<R, C> {
     fun visitParenthesizedExpression(parenthesizedExpression: DartParenthesizedExpression, context: C): R =
         visitAstNode(parenthesizedExpression, context)
 
-    fun visitNegatedExpressionExpression(negatedExpression: DartNegatedExpression, context: C): R =
-        visitAstNode(negatedExpression, context)
-
-    fun visitNotNullAssertion(notNullAssertion: DartNotNullAssertionExpression, context: C): R =
-        visitAstNode(notNullAssertion, context)
-
     fun visitInstanceCreationExpression(instanceCreation: DartInstanceCreationExpression, context: C): R =
         visitAstNode(instanceCreation, context)
 
@@ -153,6 +147,12 @@ interface DartAstNodeVisitor<R, C> {
 
     fun visitBinaryInfixExpression(binaryInfix: DartBinaryInfixExpression, context: C): R =
         visitAstNode(binaryInfix, context)
+
+    fun visitPrefixExpression(prefixExpression: DartPrefixExpression, context: C): R =
+        visitAstNode(prefixExpression, context)
+
+    fun visitPostfixExpression(postfixExpression: DartPostfixExpression, context: C): R =
+        visitAstNode(postfixExpression, context)
 
     fun visitThrowExpression(throwExpression: DartThrowExpression, context: C): R =
         visitAstNode(throwExpression, context)

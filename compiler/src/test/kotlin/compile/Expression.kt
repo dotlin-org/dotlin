@@ -1045,4 +1045,48 @@ class Expression : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `unary minus on Int literal`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                -1
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              -1;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `unary minus on Int variable`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                val x = 3
+                -x
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              final int x = 3;
+              -x;
+            }
+            """
+        )
+    }
 }
