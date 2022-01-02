@@ -22,7 +22,8 @@
     "DIVISION_BY_ZERO",
     "WRONG_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
     "WRONG_INITIALIZER_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "EXTERNAL_DELEGATED_CONSTRUCTOR_CALL" // TODO: Fix in analyzer
+    "EXTERNAL_DELEGATED_CONSTRUCTOR_CALL", // TODO: Fix in analyzer
+    "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
 )
 
 package kotlin
@@ -225,7 +226,8 @@ external class Byte private constructor() : Number(), Comparable<Byte> {
     operator fun rangeTo(other: Long): LongRange
 
     /** Returns this value. */
-    override fun toByte(): Byte
+    @DartExtension
+    override fun toByte(): Byte = this
     /**
      * Converts this [Byte] value to [Char].
      *
@@ -236,7 +238,8 @@ external class Byte private constructor() : Number(), Comparable<Byte> {
      */
     @Deprecated("Direct conversion to Char is deprecated. Use toInt().toChar() or Char constructor instead.", ReplaceWith("this.toInt().toChar()"))
     @DeprecatedSinceKotlin(warningSince = "1.5")
-    override fun toChar(): Char
+    @DartExtension
+    override fun toChar(): Char = clampToChar()
     /**
      * Converts this [Byte] value to [Short].
      *
@@ -245,7 +248,8 @@ external class Byte private constructor() : Number(), Comparable<Byte> {
      * The least significant 8 bits of the resulting `Short` value are the same as the bits of this `Byte` value,
      * whereas the most significant 8 bits are filled with the sign bit of this value.
      */
-    override fun toShort(): Short
+    @DartExtension
+    override fun toShort(): Short = this as Short
     /**
      * Converts this [Byte] value to [Int].
      *
@@ -254,7 +258,8 @@ external class Byte private constructor() : Number(), Comparable<Byte> {
      * The least significant 8 bits of the resulting `Int` value are the same as the bits of this `Byte` value,
      * whereas the most significant 24 bits are filled with the sign bit of this value.
      */
-    override fun toInt(): Int
+    @DartExtension
+    override fun toInt(): Int = this as Int
     /**
      * Converts this [Byte] value to [Long].
      *
@@ -263,19 +268,22 @@ external class Byte private constructor() : Number(), Comparable<Byte> {
      * The least significant 8 bits of the resulting `Long` value are the same as the bits of this `Byte` value,
      * whereas the most significant 56 bits are filled with the sign bit of this value.
      */
-    override fun toLong(): Long
+    @DartExtension
+    override fun toLong(): Long = this as Long
     /**
      * Converts this [Byte] value to [Float].
      *
      * The resulting `Float` value represents the same numerical value as this `Byte`.
      */
-    override fun toFloat(): Float
+    @DartExtension
+    override fun toFloat(): Float = dartIntToFloat()
     /**
      * Converts this [Byte] value to [Double].
      *
      * The resulting `Double` value represents the same numerical value as this `Byte`.
      */
-    override fun toDouble(): Double
+    @DartExtension
+    override fun toDouble(): Double = dartIntToDouble()
 }
 
 /**
@@ -483,7 +491,8 @@ external class Short private constructor() : Number(), Comparable<Short> {
      *
      * The resulting `Byte` value is represented by the least significant 8 bits of this `Short` value.
      */
-    override fun toByte(): Byte
+    @DartExtension
+    override fun toByte(): Byte = clampToByte()
     /**
      * Converts this [Short] value to [Char].
      *
@@ -492,9 +501,11 @@ external class Short private constructor() : Number(), Comparable<Short> {
      */
     @Deprecated("Direct conversion to Char is deprecated. Use toInt().toChar() or Char constructor instead.", ReplaceWith("this.toInt().toChar()"))
     @DeprecatedSinceKotlin(warningSince = "1.5")
-    override fun toChar(): Char
+    @DartExtension
+    override fun toChar(): Char = clampToChar()
     /** Returns this value. */
-    override fun toShort(): Short
+    @DartExtension
+    override fun toShort(): Short = this
     /**
      * Converts this [Short] value to [Int].
      *
@@ -503,7 +514,8 @@ external class Short private constructor() : Number(), Comparable<Short> {
      * The least significant 16 bits of the resulting `Int` value are the same as the bits of this `Short` value,
      * whereas the most significant 16 bits are filled with the sign bit of this value.
      */
-    override fun toInt(): Int
+    @DartExtension
+    override fun toInt(): Int = this as Int
     /**
      * Converts this [Short] value to [Long].
      *
@@ -512,19 +524,22 @@ external class Short private constructor() : Number(), Comparable<Short> {
      * The least significant 16 bits of the resulting `Long` value are the same as the bits of this `Short` value,
      * whereas the most significant 48 bits are filled with the sign bit of this value.
      */
-    override fun toLong(): Long
+    @DartExtension
+    override fun toLong(): Long = this as Long
     /**
      * Converts this [Short] value to [Float].
      *
      * The resulting `Float` value represents the same numerical value as this `Short`.
      */
-    override fun toFloat(): Float
+    @DartExtension
+    override fun toFloat(): Float = dartIntToFloat()
     /**
      * Converts this [Short] value to [Double].
      *
      * The resulting `Double` value represents the same numerical value as this `Short`.
      */
-    override fun toDouble(): Double
+    @DartExtension
+    override fun toDouble(): Double = dartIntToDouble()
 }
 
 /**
@@ -765,7 +780,8 @@ external class Int private constructor() : Number(), Comparable<Int> {
      *
      * The resulting `Byte` value is represented by the least significant 8 bits of this `Int` value.
      */
-    override fun toByte(): Byte
+    @DartExtension
+    override fun toByte(): Byte = clampToByte()
     /**
      * Converts this [Int] value to [Char].
      *
@@ -774,7 +790,8 @@ external class Int private constructor() : Number(), Comparable<Int> {
      *
      * The resulting `Char` code is represented by the least significant 16 bits of this `Int` value.
      */
-    override fun toChar(): Char
+    @DartExtension
+    override fun toChar(): Char = clampToChar()
     /**
      * Converts this [Int] value to [Short].
      *
@@ -783,9 +800,11 @@ external class Int private constructor() : Number(), Comparable<Int> {
      *
      * The resulting `Short` value is represented by the least significant 16 bits of this `Int` value.
      */
-    override fun toShort(): Short
+    @DartExtension
+    override fun toShort(): Short = clampToShort()
     /** Returns this value. */
-    override fun toInt(): Int
+    @DartExtension
+    override fun toInt(): Int = this
     /**
      * Converts this [Int] value to [Long].
      *
@@ -794,7 +813,8 @@ external class Int private constructor() : Number(), Comparable<Int> {
      * The least significant 32 bits of the resulting `Long` value are the same as the bits of this `Int` value,
      * whereas the most significant 32 bits are filled with the sign bit of this value.
      */
-    override fun toLong(): Long
+    @DartExtension
+    override fun toLong(): Long = this as Long
     /**
      * Converts this [Int] value to [Float].
      *
@@ -802,13 +822,15 @@ external class Int private constructor() : Number(), Comparable<Int> {
      * In case when this `Int` value is exactly between two `Float`s,
      * the one with zero at least significant bit of mantissa is selected.
      */
-    override fun toFloat(): Float
+    @DartExtension
+    override fun toFloat(): Float = dartIntToFloat()
     /**
      * Converts this [Int] value to [Double].
      *
      * The resulting `Double` value represents the same numerical value as this `Int`.
      */
-    override fun toDouble(): Double
+    @DartExtension
+    override fun toDouble(): Double = dartIntToDouble()
 }
 
 /**
@@ -1049,7 +1071,8 @@ external class Long private constructor() : Number(), Comparable<Long> {
      *
      * The resulting `Byte` value is represented by the least significant 8 bits of this `Long` value.
      */
-    override fun toByte(): Byte
+    @DartExtension
+    override fun toByte(): Byte = clampToByte()
     /**
      * Converts this [Long] value to [Char].
      *
@@ -1060,7 +1083,8 @@ external class Long private constructor() : Number(), Comparable<Long> {
      */
     @Deprecated("Direct conversion to Char is deprecated. Use toInt().toChar() or Char constructor instead.", ReplaceWith("this.toInt().toChar()"))
     @DeprecatedSinceKotlin(warningSince = "1.5")
-    override fun toChar(): Char
+    @DartExtension
+    override fun toChar(): Char = clampToChar()
     /**
      * Converts this [Long] value to [Short].
      *
@@ -1069,7 +1093,8 @@ external class Long private constructor() : Number(), Comparable<Long> {
      *
      * The resulting `Short` value is represented by the least significant 16 bits of this `Long` value.
      */
-    override fun toShort(): Short
+    @DartExtension
+    override fun toShort(): Short = clampToShort()
     /**
      * Converts this [Long] value to [Int].
      *
@@ -1078,9 +1103,11 @@ external class Long private constructor() : Number(), Comparable<Long> {
      *
      * The resulting `Int` value is represented by the least significant 32 bits of this `Long` value.
      */
-    override fun toInt(): Int
+    @DartExtension
+    override fun toInt(): Int = clampToInt()
     /** Returns this value. */
-    override fun toLong(): Long
+    @DartExtension
+    override fun toLong(): Long = this
     /**
      * Converts this [Long] value to [Float].
      *
@@ -1088,7 +1115,8 @@ external class Long private constructor() : Number(), Comparable<Long> {
      * In case when this `Long` value is exactly between two `Float`s,
      * the one with zero at least significant bit of mantissa is selected.
      */
-    override fun toFloat(): Float
+    @DartExtension
+    override fun toFloat(): Float = dartIntToFloat()
     /**
      * Converts this [Long] value to [Double].
      *
@@ -1096,7 +1124,8 @@ external class Long private constructor() : Number(), Comparable<Long> {
      * In case when this `Long` value is exactly between two `Double`s,
      * the one with zero at least significant bit of mantissa is selected.
      */
-    override fun toDouble(): Double
+    @DartExtension
+    override fun toDouble(): Double = dartIntToDouble()
 }
 
 /**
@@ -1310,7 +1339,8 @@ external class Float private constructor() : Number(), Comparable<Float> {
      */
     @Deprecated("Unclear conversion. To achieve the same result convert to Int explicitly and then to Byte.", ReplaceWith("toInt().toByte()"))
     @DeprecatedSinceKotlin(warningSince = "1.3", errorSince = "1.5")
-    override fun toByte(): Byte
+    @DartExtension
+    override fun toByte(): Byte = clampToByte()
     /**
      * Converts this [Float] value to [Char].
      *
@@ -1318,7 +1348,8 @@ external class Float private constructor() : Number(), Comparable<Float> {
      */
     @Deprecated("Direct conversion to Char is deprecated. Use toInt().toChar() or Char constructor instead.", ReplaceWith("this.toInt().toChar()"))
     @DeprecatedSinceKotlin(warningSince = "1.5")
-    override fun toChar(): Char
+    @DartExtension
+    override fun toChar(): Char = clampToChar()
     /**
      * Converts this [Float] value to [Short].
      *
@@ -1326,7 +1357,8 @@ external class Float private constructor() : Number(), Comparable<Float> {
      */
     @Deprecated("Unclear conversion. To achieve the same result convert to Int explicitly and then to Short.", ReplaceWith("toInt().toShort()"))
     @DeprecatedSinceKotlin(warningSince = "1.3", errorSince = "1.5")
-    override fun toShort(): Short
+    @DartExtension
+    override fun toShort(): Short = clampToShort()
     /**
      * Converts this [Float] value to [Int].
      *
@@ -1334,7 +1366,8 @@ external class Float private constructor() : Number(), Comparable<Float> {
      * Returns zero if this `Float` value is `NaN`, [Int.MIN_VALUE] if it's less than `Int.MIN_VALUE`,
      * [Int.MAX_VALUE] if it's bigger than `Int.MAX_VALUE`.
      */
-    override fun toInt(): Int
+    @DartExtension
+    override fun toInt(): Int = clampToInt()
     /**
      * Converts this [Float] value to [Long].
      *
@@ -1342,15 +1375,18 @@ external class Float private constructor() : Number(), Comparable<Float> {
      * Returns zero if this `Float` value is `NaN`, [Long.MIN_VALUE] if it's less than `Long.MIN_VALUE`,
      * [Long.MAX_VALUE] if it's bigger than `Long.MAX_VALUE`.
      */
-    override fun toLong(): Long
+    @DartExtension
+    override fun toLong(): Long = clampToLong()
     /** Returns this value. */
-    override fun toFloat(): Float
+    @DartExtension
+    override fun toFloat(): Float = this
     /**
      * Converts this [Float] value to [Double].
      *
      * The resulting `Double` value represents the same numerical value as this `Float`.
      */
-    override fun toDouble(): Double
+    @DartExtension
+    override fun toDouble(): Double = this as Double
 }
 
 /**
@@ -1556,7 +1592,6 @@ external class Double private constructor() : Number(), Comparable<Double> {
     /** Returns the negative of this value. */
     operator fun unaryMinus(): Double
 
-
     /**
      * Converts this [Double] value to [Byte].
      *
@@ -1564,7 +1599,8 @@ external class Double private constructor() : Number(), Comparable<Double> {
      */
     @Deprecated("Unclear conversion. To achieve the same result convert to Int explicitly and then to Byte.", ReplaceWith("toInt().toByte()"))
     @DeprecatedSinceKotlin(warningSince = "1.3", errorSince = "1.5")
-    override fun toByte(): Byte
+    @DartExtension
+    override fun toByte(): Byte = clampToByte()
     /**
      * Converts this [Double] value to [Char].
      *
@@ -1572,7 +1608,8 @@ external class Double private constructor() : Number(), Comparable<Double> {
      */
     @Deprecated("Direct conversion to Char is deprecated. Use toInt().toChar() or Char constructor instead.", ReplaceWith("this.toInt().toChar()"))
     @DeprecatedSinceKotlin(warningSince = "1.5")
-    override fun toChar(): Char
+    @DartExtension
+    override fun toChar(): Char = clampToChar()
     /**
      * Converts this [Double] value to [Short].
      *
@@ -1580,7 +1617,8 @@ external class Double private constructor() : Number(), Comparable<Double> {
      */
     @Deprecated("Unclear conversion. To achieve the same result convert to Int explicitly and then to Short.", ReplaceWith("toInt().toShort()"))
     @DeprecatedSinceKotlin(warningSince = "1.3", errorSince = "1.5")
-    override fun toShort(): Short
+    @DartExtension
+    override fun toShort(): Short = clampToShort()
     /**
      * Converts this [Double] value to [Int].
      *
@@ -1588,7 +1626,8 @@ external class Double private constructor() : Number(), Comparable<Double> {
      * Returns zero if this `Double` value is `NaN`, [Int.MIN_VALUE] if it's less than `Int.MIN_VALUE`,
      * [Int.MAX_VALUE] if it's bigger than `Int.MAX_VALUE`.
      */
-    override fun toInt(): Int
+    @DartExtension
+    override fun toInt(): Int = clampToInt()
     /**
      * Converts this [Double] value to [Long].
      *
@@ -1596,7 +1635,8 @@ external class Double private constructor() : Number(), Comparable<Double> {
      * Returns zero if this `Double` value is `NaN`, [Long.MIN_VALUE] if it's less than `Long.MIN_VALUE`,
      * [Long.MAX_VALUE] if it's bigger than `Long.MAX_VALUE`.
      */
-    override fun toLong(): Long
+    @DartExtension
+    override fun toLong(): Long = clampToLong()
     /**
      * Converts this [Double] value to [Float].
      *
@@ -1604,8 +1644,49 @@ external class Double private constructor() : Number(), Comparable<Double> {
      * In case when this `Double` value is exactly between two `Float`s,
      * the one with zero at least significant bit of mantissa is selected.
      */
-    override fun toFloat(): Float
+    @DartExtension
+    override fun toFloat(): Float = this as Float
     /** Returns this value. */
-    override fun toDouble(): Double
+    @DartExtension
+    override fun toDouble(): Double = this
 }
 
+// TODO: Fix in analyzer
+@Suppress("UNCHECKED_CAST")
+private fun <T> T.clampToByte(): Byte where T : Comparable<T>, T : Number =
+    clamp(Byte.MIN_VALUE as T, Byte.MAX_VALUE as T) as Byte
+
+@Suppress("UNCHECKED_CAST")
+private fun <T> T.clampToChar(): Char where T : Comparable<T>, T : Number =
+    clamp(Char.MIN_VALUE as T, Char.MAX_VALUE as T) as Char
+
+@Suppress("UNCHECKED_CAST")
+private fun <T> T.clampToShort(): Short where T : Comparable<T>, T : Number =
+    clamp(Short.MIN_VALUE as T, Short.MAX_VALUE as T) as Short
+
+@Suppress("UNCHECKED_CAST")
+private fun <T> T.clampToInt(): Int where T : Comparable<T>, T : Number =
+    clamp(Int.MIN_VALUE as T, Int.MAX_VALUE as T) as Int
+
+@Suppress("UNCHECKED_CAST")
+private fun <T> T.clampToLong(): Long where T : Comparable<T>, T : Number =
+    clamp(Long.MIN_VALUE as T, Long.MAX_VALUE as T) as Long
+
+@Suppress("UNCHECKED_CAST")
+private fun <T> T.dartIntToFloat(): Float where T : Comparable<T>, T : Number = dartIntToDouble() as Float
+
+@Suppress("UNCHECKED_CAST")
+private fun <T> T.dartIntToDouble(): Double where T : Comparable<T>, T : Number = dart("(this as int).toDouble()")
+
+private fun <T> T.clamp(min: T, max: T): T where T : Comparable<T>, T : Number {
+    val clamped = when {
+        this >= min && this <= max -> this
+        this < min -> max
+        else -> min // this > max
+    }
+
+    return when (clamped) {
+        is Double -> dart("(clamped as double).toInt()")
+        else -> clamped
+    }
+}
