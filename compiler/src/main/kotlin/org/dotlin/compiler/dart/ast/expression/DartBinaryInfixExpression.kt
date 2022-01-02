@@ -106,11 +106,18 @@ data class DartIfNullExpression(
     override val operator = DartBinaryInfixOperator("??")
 }
 
-data class DartEqualityExpression(
+data class DartEqualsExpression(
     override val left: DartExpression,
     override val right: DartExpression,
 ) : DartBinaryInfixExpression {
     override val operator = DartBinaryInfixOperator("==")
+}
+
+data class DartNotEqualsExpression(
+    override val left: DartExpression,
+    override val right: DartExpression,
+) : DartBinaryInfixExpression {
+    override val operator = DartBinaryInfixOperator("!=")
 }
 
 data class DartConjunctionExpression(

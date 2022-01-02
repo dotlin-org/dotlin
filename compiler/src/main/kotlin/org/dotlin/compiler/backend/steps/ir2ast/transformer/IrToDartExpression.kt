@@ -134,11 +134,23 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                     right = actualRight,
                 )
             }
-            IrStatementOrigin.EQEQ ->
-                DartEqualityExpression(
-                    left = irCallLike.getValueArgument(0)!!.accept(context).possiblyParenthesize(inEquals = true),
-                    right = irCallLike.getValueArgument(1)!!.accept(context).possiblyParenthesize(inEquals = true),
-                )
+            IrStatementOrigin.EQEQ, IrStatementOrigin.EXCLEQ -> {
+                val isNegated = origin == IrStatementOrigin.EXCLEQ
+
+                fun IrExpression.accept() = accept(context).possiblyParenthesize(inEquals = true)
+
+                val (left, right) = when {
+                    isNegated -> irReceiver as IrCall
+                    else -> irCallLike
+                }.let {
+                    it.getValueArgument(0)!!.accept() to it.getValueArgument(1)!!.accept()
+                }
+
+                when {
+                    isNegated -> DartNotEqualsExpression(left, right)
+                    else -> DartEqualsExpression(left, right)
+                }
+            }
             IrStatementOrigin.EQ ->
                 DartAssignmentExpression(
                     left = DartPropertyAccessExpression(
@@ -439,7 +451,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                 is DartConditionalExpression, is DartAsExpression, is DartThrowExpression -> parenthesize()
                 else -> when {
                     inEquals -> when (this) {
-                        is DartEqualityExpression -> parenthesize()
+                        is DartEqualsExpression -> parenthesize()
                         else -> this
                     }
                     isReceiver -> when (this) {
