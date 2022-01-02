@@ -1116,7 +1116,7 @@ external class Long private constructor() : Number(), Comparable<Long> {
      * the one with zero at least significant bit of mantissa is selected.
      */
     @DartExtension
-    override fun toFloat(): Float = intToDouble()
+    override fun toFloat(): Float = intToFloat()
     /**
      * Converts this [Long] value to [Double].
      *
@@ -1380,6 +1380,7 @@ external class Float private constructor() : Number(), Comparable<Float> {
     /** Returns this value. */
     @DartExtension
     override fun toFloat(): Float = this
+    // TODO: Fix "cast can never succeed" in analyzer
     /**
      * Converts this [Float] value to [Double].
      *
@@ -1674,7 +1675,7 @@ private fun <T> T.clampToLong(): Long where T : Comparable<T>, T : Number =
 
 @Suppress("UNCHECKED_CAST")
 private fun Double.clampToFloat(): Float =
-    clamp(-Float.MIN_VALUE as T, Float.MAX_VALUE as T) as Float
+    clamp(-Float.MIN_VALUE as Double, Float.MAX_VALUE as Double) as Float
 
 @Suppress("UNCHECKED_CAST")
 private fun <T> T.intToFloat(): Float where T : Comparable<T>, T : Number =
