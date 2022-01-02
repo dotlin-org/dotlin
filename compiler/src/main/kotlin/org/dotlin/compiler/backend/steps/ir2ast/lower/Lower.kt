@@ -31,6 +31,7 @@ import kotlin.reflect.KFunction1
 private val lowerings: List<KFunction1<DartLoweringContext, IrLowering>> = listOf(
     Comparable::PreOperatorsLowering,
     ::DartBuiltInImportsLowering,
+    ::DartExtensionsLowering,
     ::ExternalDeclarationsLowering,
     ::EnumLowering,
     ::IdentityChecksLowering,
@@ -47,6 +48,7 @@ private val lowerings: List<KFunction1<DartLoweringContext, IrLowering>> = listO
     ::OperatorsLowering,
     Comparable::PostOperatorsLowering,
     ::ExtensionsLowering,
+    ::ConflictingExtensionCallsLowering,
     ::SortStatementsLowering,
     ::ConstructorPassingComplexParamToSuperLowering,
     ::CompareToCallsLowering,

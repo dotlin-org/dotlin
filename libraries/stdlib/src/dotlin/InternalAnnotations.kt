@@ -28,6 +28,20 @@ package dotlin
 internal annotation class DartGetter
 
 /**
+ * Specifies that the annotated method or property is an extension in Dart.
+ *
+ * Applies to any overrides in subtypes as well.
+ *
+ * If used on an `abstract` member, the member must be `external`.
+ */
+@Target(
+    AnnotationTarget.FUNCTION,
+    AnnotationTarget.PROPERTY
+)
+@Retention(AnnotationRetention.SOURCE)
+internal annotation class DartExtension
+
+/**
  * Specifies that whenever this declaration is referenced it should do so with a certain alias. This can be used
  * to circumvent name conflicts with existing Dart names.
  *

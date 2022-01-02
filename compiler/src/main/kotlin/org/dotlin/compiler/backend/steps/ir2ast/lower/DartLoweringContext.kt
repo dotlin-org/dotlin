@@ -21,33 +21,39 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartIrBuiltIns
 import org.dotlin.compiler.backend.steps.ir2ast.attributes.ExtraIrAttributes
-import org.dotlin.compiler.backend.steps.ir2ast.ir.buildStatement
+import org.dotlin.compiler.backend.steps.ir2ast.ir.*
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartNameAsSimple
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartNameWith
+import org.dotlin.compiler.backend.util.sentenceCase
+import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.DefaultMapping
-import org.jetbrains.kotlin.backend.common.ir.Ir
-import org.jetbrains.kotlin.backend.common.ir.SharedVariablesManager
-import org.jetbrains.kotlin.backend.common.ir.Symbols
+import org.jetbrains.kotlin.backend.common.ir.*
+import org.jetbrains.kotlin.backend.common.ir.copyTypeParameters
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.IrSingleStatementBuilder
-import org.jetbrains.kotlin.ir.declarations.IrFile
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.ir.declarations.IrVariable
+import org.jetbrains.kotlin.ir.builders.declarations.buildClass
+import org.jetbrains.kotlin.ir.builders.declarations.buildConstructor
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrFactoryImpl
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.symbols.IrVariableSymbol
-import org.jetbrains.kotlin.ir.types.IrDynamicType
-import org.jetbrains.kotlin.ir.types.IrTypeSystemContext
-import org.jetbrains.kotlin.ir.types.IrTypeSystemContextImpl
+import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
+import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.types.impl.IrDynamicTypeImpl
 import org.jetbrains.kotlin.ir.util.SymbolTable
+import org.jetbrains.kotlin.ir.util.defaultType
+import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.types.Variance
 
@@ -140,4 +146,93 @@ class DartLoweringContext(
         origin: IrStatementOrigin? = null,
         builder: IrSingleStatementBuilder.() -> T
     ) = createIrBuilder(symbol, UNDEFINED_OFFSET, UNDEFINED_OFFSET).buildStatement(origin, builder)
+
+    private val extensionContainers = mutableMapOf<IrFile, MutableMap<String, IrClass>>()
+
+    /**
+     * Returns the container this extension should go to. The container lives in the file of the extension. If no
+     * container exists, one is created. The created container is _not_ added to the file, the [ExtensionsLowering]
+     * should do that.
+     *
+     * Returns `null` if the declaration is not an extension.
+     */
+    val IrDeclaration.extensionContainer: IrClass?
+        get() {
+            val receiver = extensionReceiverOrNull ?: return null
+            val receiverType = receiver.type
+            val receiverTypeParameters = receiverType.typeParametersOrSelf
+
+            val containerName = run {
+                val (file, mainName) = when (val classifier = receiverType.classifierOrNull?.owner) {
+                    is IrClass -> classifier.file to classifier.defaultType.let {
+                        when {
+                            it.isPrimitiveNumber() -> classifier.name.identifier
+                            else -> classifier.dartNameAsSimple
+                        }
+                    }
+                    is IrTypeParameter -> classifier.file to classifier.dartNameWith(superTypes = true)
+                    else -> throw UnsupportedOperationException("Cannot handle extension for $this yet")
+                }
+                val prefix = '$'
+                val packagePrefix = when {
+                    file != this.file -> file.fqName.pathSegments()
+                        .map { it.identifier }
+                        .joinToString { it.sentenceCase() }
+                    else -> ""
+                }
+                val typeArguments = when (receiverType) {
+                    is IrSimpleType -> receiverType.arguments
+                        .mapNotNull { it.typeOrNull?.classOrNull?.owner?.dartNameAsSimple?.value }
+                        .joinToString { it.sentenceCase() }
+                    else -> ""
+                }
+                val suffix = "Extensions"
+
+                "$prefix$packagePrefix$mainName$typeArguments$suffix"
+            }
+
+            val file = file
+
+            return extensionContainers
+                .getOrPut(file) { mutableMapOf() }
+                .getOrPut(containerName) {
+                    irFactory.buildClass {
+                        origin = IrDartDeclarationOrigin.EXTENSION
+                        name = Name.identifier(containerName)
+                    }.apply {
+                        parent = file
+
+                        copyTypeParameters(receiverTypeParameters)
+                        createParameterDeclarations()
+
+                        addChild(
+                            irFactory.buildConstructor {
+                                visibility = DescriptorVisibilities.PUBLIC
+                                returnType = defaultType
+                                isPrimary = true
+                            }.apply {
+                                val constructor = this
+
+                                valueParameters = listOf(
+                                    irFactory.createValueParameter(
+                                        UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+                                        origin = IrDeclarationOrigin.DEFINED,
+                                        symbol = IrValueParameterSymbolImpl(),
+                                        name = Name.identifier("value"),
+                                        index = 0,
+                                        type = receiverType,
+                                        varargElementType = null,
+                                        isCrossinline = false,
+                                        isNoinline = false,
+                                        isHidden = false,
+                                        isAssignable = false
+                                    ).apply {
+                                        parent = constructor
+                                    }
+                                )
+                            }
+                        )
+                    }
+                }
+        }
 }

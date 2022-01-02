@@ -19,12 +19,14 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.ir
 
+import org.dotlin.compiler.backend.hasDartExtensionAnnotation
 import org.dotlin.compiler.backend.steps.ir2ast.IrVoidType
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrExpressionBodyWithOrigin
 import org.dotlin.compiler.backend.util.falseIfNull
 import org.jetbrains.kotlin.backend.common.ir.*
 import org.jetbrains.kotlin.backend.common.ir.isStatic
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
+import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -43,7 +45,6 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.util.collectionUtils.filterIsInstanceAnd
-import org.jetbrains.kotlin.utils.addToStdlib.cast
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 val IrSimpleFunction.correspondingProperty: IrProperty?
@@ -365,7 +366,7 @@ val IrProperty.hasImplicitSetter: Boolean
  * Also keeps in account that extensions are lowered into classes.
  */
 val IrFunction.isStatic: Boolean
-    get() = isStatic && !(parent as IrClass).isDartExtension
+    get() = isStatic && !(parent as IrClass).isDartExtensionContainer
 
 val IrFunction.isImplicitGetter: Boolean
     get() = isGetter && origin == IrDeclarationOrigin.DEFAULT_PROPERTY_ACCESSOR &&
@@ -467,9 +468,8 @@ fun IrElement.replaceExpressions(block: (IrExpression) -> IrExpression) {
     )
 }
 
-val IrClass.isDartExtension: Boolean
+val IrClass.isDartExtensionContainer: Boolean
     get() = origin == IrDartDeclarationOrigin.EXTENSION
-
 
 @Suppress("UNCHECKED_CAST")
 fun <D : IrOverridableDeclaration<*>> D.firstNonFakeOverrideOrSelf(): D = when {
@@ -508,5 +508,60 @@ infix fun IrType.polymorphicallyIs(other: IrType): Boolean {
         other.isTypeParameter() -> other.superTypes().all { this polymorphicallyIs it }
         else -> this.superTypes().any { it polymorphicallyIs other }
     }
-
 }
+
+fun IrType.isPrimitiveNumber() =
+    isByte() || isChar() || isShort() || isInt() || isLong() || isFloat() || isDouble()
+
+val IrDeclaration.isAbstract: Boolean
+    get() = when (this) {
+        is IrSimpleFunction -> modality == Modality.ABSTRACT
+        is IrProperty -> getter?.isAbstract == true
+        else -> false
+    }
+
+/**
+ * Accounts for the `@DartExtension` annotation.
+ */
+val IrDeclaration.extensionReceiverOrNull: IrValueParameter?
+    get() = when (this) {
+        is IrFunction -> when {
+            !isAbstract && hasDartExtensionAnnotation() -> dispatchReceiverParameter ?: extensionReceiverParameter
+            else -> extensionReceiverParameter
+        }
+        is IrProperty -> getter?.extensionReceiverOrNull
+        else -> null
+    }
+
+/**
+ * Accounts for the `@DartExtension` annotation.
+ */
+val IrFunctionAccessExpression.extensionReceiverOrNull: IrExpression?
+    get() = when {
+        symbol.owner.hasDartExtensionAnnotation() -> dispatchReceiver
+        else -> extensionReceiver
+    }
+
+val IrClass.extensionTypeOrNull: IrType?
+    get() = when {
+        isDartExtensionContainer -> declarations.firstNotNullOfOrNull {
+            when (it) {
+                is IrFunction -> it.extensionReceiverParameter?.type
+                is IrProperty -> it.getter?.extensionReceiverParameter?.type
+                else -> null
+            }
+        }
+        else -> null
+    }
+
+/**
+ * All the type parameters used in this type, or the type parameter this type represents.
+ */
+val IrType.typeParametersOrSelf: List<IrTypeParameter>
+    get() = when (val typeParameter = typeParameterOrNull) {
+        null -> when (this) {
+            is IrSimpleType -> arguments.mapNotNull { it.typeOrNull?.typeParameterOrNull }
+            else -> listOf()
+        }
+        else -> listOf(typeParameter)
+    }

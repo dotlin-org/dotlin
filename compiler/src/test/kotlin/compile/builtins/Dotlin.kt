@@ -436,6 +436,137 @@ class Dotlin : BaseTest {
     }
 
     @Test
+    fun `@DartExtension`() = assertCompile {
+        kotlin(
+            """
+            @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
+            class Hobbit {
+                @DartExtension
+                fun isProudfoot(): Boolean = true
+            }
+
+            fun main() {
+                Hobbit().isProudfoot()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Hobbit {}
+
+            void main() {
+              Hobbit().isProudfoot();
+            }
+
+            extension ${'$'}HobbitExtensions on Hobbit {
+              bool isProudfoot() {
+                return true;
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartExtension override`() = assertCompile {
+        kotlin(
+            """
+            @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
+            open class Hobbit {
+                @DartExtension
+                open fun isProudfoot(): Boolean = false
+            }
+
+            class Proudfoot : Hobbit() {
+                override fun isProudfoot(): Boolean = true
+            }
+
+            fun main() {
+                Proudfoot().isProudfoot()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            class Hobbit {}
+
+            @sealed
+            class Proudfoot extends Hobbit {}
+
+            void main() {
+              Proudfoot().isProudfoot();
+            }
+
+            extension ${'$'}HobbitExtensions on Hobbit {
+              bool isProudfoot() {
+                return false;
+              }
+            }
+
+            extension ${'$'}ProudfootExtensions on Proudfoot {
+              bool isProudfoot() {
+                return true;
+              }
+            }
+            """
+        )
+    }
+
+    // TODO: Analysis error if @DartExtension is used on non-external abstract method, or is override from
+    // non-external abstract method
+    @Test
+    fun `@DartExtension on abstract method`() = assertCompile {
+        kotlin(
+            """
+            @file:Suppress(
+                "INVISIBLE_MEMBER",
+                "INVISIBLE_REFERENCE",
+                "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
+                "EXTERNAL_DELEGATED_CONSTRUCTOR_CALL" // TODO: Fix in analyzer
+            )
+
+            abstract external class Hobbit {
+                @DartExtension
+                abstract fun isProudfoot(): Boolean
+            }
+
+            external class Proudfoot : Hobbit() {
+                override fun isProudfoot(): Boolean = true
+            }
+
+            fun main() {
+                Proudfoot().isProudfoot()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              Proudfoot().isProudfoot();
+            }
+
+            extension ${'$'}ProudfootExtensions on Proudfoot {
+              bool isProudfoot() {
+                return true;
+              }
+            }
+            """
+        )
+    }
+
+    @Test
     fun `@DartImportAlias`() = assertCompile {
         kotlin(
             """
