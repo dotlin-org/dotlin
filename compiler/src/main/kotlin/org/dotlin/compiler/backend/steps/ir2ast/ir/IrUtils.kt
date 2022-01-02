@@ -266,6 +266,7 @@ fun IrType.isNullableChar() = isNullableType(IdSignatureValues._char)
 // - String
 fun IrType.isDartCorePrimitive() =
     isBoolean() || isNullableBoolean() ||
+            isByte() || isNullableByte() ||
             isShort() || isNullableShort() ||
             isInt() || isNullableInt() ||
             isLong() || isNullableLong() ||
