@@ -30,13 +30,17 @@ import kotlin.internal.PureReifiable
  * Returns a string representation of the object. Can be called with a null receiver, in which case
  * it returns the string "null".
  */
-fun Any?.toString(): String
+@DartName("safeToString")
+fun Any?.toString(): String {
+    if (this == null) return "null"
+    return toString()
+}
 
 /**
  * Concatenates this string with the string representation of the given [other] object. If either the receiver
  * or the [other] object are null, they are represented as the string "null".
  */
-operator fun String?.plus(other: Any?): String
+operator fun String?.plus(other: Any?): String = toString() + other.toString()
 
 /**
  * Returns an array of objects of the given type with the given [size], initialized with null values.
