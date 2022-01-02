@@ -93,6 +93,7 @@ external class Char private constructor() : Comparable<Char> {
     @DeprecatedSinceKotlin(warningSince = "1.5")
     fun toDouble(): Double
 
+    @DartName("Char\$Companion")
     companion object {
         /**
          * The minimum value of a character code unit.
