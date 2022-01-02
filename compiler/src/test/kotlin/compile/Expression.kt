@@ -892,4 +892,25 @@ class Expression : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `not-null assertion`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                null!!
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              null!;
+            }
+            """
+        )
+    }
 }

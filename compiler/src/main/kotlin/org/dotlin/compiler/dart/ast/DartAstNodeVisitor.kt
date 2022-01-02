@@ -133,6 +133,9 @@ interface DartAstNodeVisitor<R, C> {
     fun visitNegatedExpressionExpression(negatedExpression: DartNegatedExpression, context: C): R =
         visitAstNode(negatedExpression, context)
 
+    fun visitNotNullAssertion(notNullAssertion: DartNotNullAssertionExpression, context: C): R =
+        visitAstNode(notNullAssertion, context)
+
     fun visitInstanceCreationExpression(instanceCreation: DartInstanceCreationExpression, context: C): R =
         visitAstNode(instanceCreation, context)
 

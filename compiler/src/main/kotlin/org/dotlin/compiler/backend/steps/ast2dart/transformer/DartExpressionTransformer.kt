@@ -114,6 +114,11 @@ object DartExpressionTransformer : DartAstNodeTransformer {
         context: DartGenerationContext
     ) = negatedExpression.let { "!${it.expression.accept(context)}" }
 
+    override fun visitNotNullAssertion(
+        notNullAssertion: DartNotNullAssertionExpression,
+        context: DartGenerationContext
+    ) = notNullAssertion.expression.accept(context) + "!"
+
     override fun visitConditionalExpression(
         conditional: DartConditionalExpression,
         context: DartGenerationContext,
