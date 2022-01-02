@@ -1110,4 +1110,151 @@ class Expression : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `shl on primitive number`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                0 shl 1
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              0 << 1;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `shr on primitive number`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                0 shr 1
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              0 >> 1;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `ushr on primitive number`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                0 ushr 1
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              0 >>> 1;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `and on primitive number`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                0 and 1
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              0 & 1;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `or on primitive number`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                0 or 1
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              0 | 1;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `xor on primitive number`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                0 xor 1
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              0 ^ 1;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `inv on primitive number`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                1.inv()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              ~1;
+            }
+            """
+        )
+    }
 }

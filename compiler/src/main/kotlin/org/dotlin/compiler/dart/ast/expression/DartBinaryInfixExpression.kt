@@ -134,6 +134,47 @@ data class DartDisjunctionExpression(
     override val operator = DartBinaryInfixOperator("||")
 }
 
+data class DartBitwiseShiftLeftExpression(
+    override val left: DartExpression,
+    override val right: DartExpression,
+) : DartBinaryInfixExpression {
+    override val operator = DartBinaryInfixOperator("<<")
+}
+
+data class DartBitwiseShiftRightExpression(
+    override val left: DartExpression,
+    override val right: DartExpression,
+) : DartBinaryInfixExpression {
+    override val operator = DartBinaryInfixOperator(">>")
+}
+
+data class DartBitwiseUnsignedShiftRightExpression(
+    override val left: DartExpression,
+    override val right: DartExpression,
+) : DartBinaryInfixExpression {
+    override val operator = DartBinaryInfixOperator(">>>")
+}
+
+data class DartBitwiseAndExpression(
+    override val left: DartExpression,
+    override val right: DartExpression,
+) : DartBinaryInfixExpression {
+    override val operator = DartBinaryInfixOperator("&")
+}
+
+data class DartBitwiseOrExpression(
+    override val left: DartExpression,
+    override val right: DartExpression,
+) : DartBinaryInfixExpression {
+    override val operator = DartBinaryInfixOperator("|")
+}
+
+data class DartBitwiseExclusiveOrExpression(
+    override val left: DartExpression,
+    override val right: DartExpression,
+) : DartBinaryInfixExpression {
+    override val operator = DartBinaryInfixOperator("^")
+}
 
 
 

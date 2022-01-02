@@ -25,6 +25,8 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.ObjectLowering
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.*
+import org.dotlin.compiler.backend.util.component6
+import org.dotlin.compiler.backend.util.component7
 import org.dotlin.compiler.backend.util.toPair
 import org.dotlin.compiler.dart.ast.collection.DartCollectionElementList
 import org.dotlin.compiler.dart.ast.expression.*
@@ -44,6 +46,8 @@ import org.jetbrains.kotlin.ir.types.isBoolean
 import org.jetbrains.kotlin.ir.types.isChar
 import org.jetbrains.kotlin.ir.types.isInt
 import org.jetbrains.kotlin.ir.types.isString
+import org.jetbrains.kotlin.ir.util.defaultType
+import org.jetbrains.kotlin.ir.util.parentClassOrNull
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
@@ -167,7 +171,11 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                 receiver.possiblyParenthesize(isReceiver = true)
             )
             else -> {
-                val hasDartGetterAnnotation = irCallLike.symbol.owner.hasDartGetterAnnotation()
+                val irFunction = irCallLike.symbol.owner
+                val hasDartGetterAnnotation = irFunction.hasDartGetterAnnotation()
+
+                val primitiveNumberOperatorNames = listOf("shl", "shr", "ushr", "and", "or", "xor", "inv")
+                val (shl, shr, ushr, and, or, xor, inv) = primitiveNumberOperatorNames
 
                 when {
                     irCallLike.origin == IrStatementOrigin.EXCL && irReceiver!!.type.isBoolean() -> {
@@ -175,7 +183,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                     }
                     origin == IrStatementOrigin.GET_PROPERTY || origin == IrStatementOrigin.GET_LOCAL_PROPERTY
                             || hasDartGetterAnnotation -> {
-                        val irSimpleFunction = irCallLike.symbol.owner as IrSimpleFunction
+                        val irSimpleFunction = irFunction as IrSimpleFunction
                         val irAccessed = when {
                             hasDartGetterAnnotation -> irSimpleFunction
                             else -> irSimpleFunction.correspondingProperty!!
@@ -184,6 +192,24 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                         when (irReceiver) {
                             null -> irAccessed.dartName
                             else -> DartPropertyAccessExpression(infixReceiver, irAccessed.dartNameAsSimple)
+                        }
+                    }
+                    // Some non-operator methods on primitive integers (Short, Int, etc.) are operators in Dart,
+                    // such as `xor` or `ushr`.
+                    irCallLike.symbol.owner.parentClassOrNull?.defaultType?.isPrimitiveInteger() == true &&
+                            irFunction.name.identifier in primitiveNumberOperatorNames -> {
+                        val left by lazy { infixReceiver }
+                        val right by lazy { infixSingleArgument }
+
+                        when (irFunction.name.identifier) {
+                            shl -> DartBitwiseShiftLeftExpression(left, right)
+                            shr -> DartBitwiseShiftRightExpression(left, right)
+                            ushr -> DartBitwiseUnsignedShiftRightExpression(left, right)
+                            and -> DartBitwiseAndExpression(left, right)
+                            or -> DartBitwiseOrExpression(left, right)
+                            xor -> DartBitwiseExclusiveOrExpression(left, right)
+                            inv -> DartBitwiseNegationExpression(left)
+                            else -> throw IllegalStateException("Impossible identifier")
                         }
                     }
                     else -> {

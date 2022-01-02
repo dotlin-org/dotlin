@@ -60,3 +60,9 @@ data class DartUnaryMinusExpression(
 ) : DartPrefixExpression {
     override val operator = DartUnaryOperator("-")
 }
+
+data class DartBitwiseNegationExpression(
+    override val expression: DartExpression,
+) : DartPrefixExpression {
+    override val operator = DartUnaryOperator("~")
+}
