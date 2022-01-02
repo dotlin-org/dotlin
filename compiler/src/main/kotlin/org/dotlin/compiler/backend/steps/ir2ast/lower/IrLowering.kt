@@ -21,7 +21,6 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementVisitorVoid
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionWithParentTransformer
 import org.dotlin.compiler.backend.util.replace
 import org.jetbrains.kotlin.ir.IrElement
@@ -29,12 +28,13 @@ import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.declarations.buildFun
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.expressions.IrCall
+import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockBodyImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionExpressionImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrReturnImpl
-import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.name.Name
 
 typealias Transformations<E> = Sequence<Transformation<E>>
@@ -167,67 +167,6 @@ interface IrExpressionLowering : IrSingleLowering<IrExpression> {
                 value = it
             )
         }
-}
-
-interface IrStatementLowering : IrMultipleLowering<IrStatement> {
-    override fun lower(irFile: IrFile) {
-        irFile.acceptChildrenVoid(
-            object : IrCustomElementVisitorVoid {
-                override fun visitBlockBody(body: IrBlockBody) {
-                    super.visitBlockBody(body)
-                    body.statements.transformBy({ context.transform(it, body) })
-                }
-
-                override fun visitBlock(expression: IrBlock) {
-                    super.visitBlock(expression)
-                    expression.statements.transformBy({ context.transform(it, expression) })
-                }
-
-                override fun visitScript(declaration: IrScript) {
-                    super.visitScript(declaration)
-                    declaration.statements.transformBy({ context.transform(it, declaration) })
-                }
-
-                override fun visitElement(element: IrElement) = element.acceptChildrenVoid(this)
-            }
-        )
-    }
-
-    override fun DartLoweringContext.transform(statement: IrStatement) = noChange()
-    fun DartLoweringContext.transform(
-        statement: IrStatement,
-        container: IrStatementContainer
-    ): Transformations<IrStatement> = transform(statement)
-}
-
-interface IrBodyExpressionLowering : IrSingleLowering<IrExpression> {
-    override fun lower(irFile: IrFile) {
-        irFile.acceptChildrenVoid(
-            object : IrCustomElementVisitorVoid {
-                override fun visitExpressionBody(body: IrExpressionBody) {
-                    super.visitExpressionBody(body)
-
-                    body.expression = body.expression.transformBy { context.transform(it, body) }
-                }
-
-                override fun visitElement(element: IrElement) = element.acceptChildrenVoid(this)
-            }
-        )
-    }
-
-    override fun DartLoweringContext.transform(expression: IrExpression) = noChange()
-
-    fun DartLoweringContext.transform(expression: IrExpression, body: IrExpressionBody) = transform(expression)
-}
-
-interface IrStatementAndBodyExpressionLowering : IrLowering {
-    val statementTransformer: IrStatementLowering
-    val bodyExpressionTransformer: IrBodyExpressionLowering
-
-    override fun lower(irFile: IrFile) {
-        statementTransformer.lower(irFile)
-        bodyExpressionTransformer.lower(irFile)
-    }
 }
 
 fun <E : IrElement> MutableList<E>.transformBy(

@@ -20,16 +20,14 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementTransformerVoid
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartStatementOrigin
+import org.dotlin.compiler.backend.steps.ir2ast.ir.isStatementIn
 import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.builders.irCall
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.*
-import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
 import org.jetbrains.kotlin.ir.types.makeNotNull
 
 /**
@@ -90,39 +88,16 @@ class WhensWithSubjectCastToNonNullLowering(override val context: DartLoweringCo
     }
 }
 
-/**
- * Changes the origin so that [WhensWithSubjectExpressionsLowering] doesn't change anything.
- */
-class WhensWithSubjectStatementsLowering(override val context: DartLoweringContext) : IrStatementLowering {
-    override fun DartLoweringContext.transform(
-        statement: IrStatement,
-        container: IrStatementContainer
-    ): Transformations<IrStatement> {
-        if (statement !is IrBlock || statement.origin != IrStatementOrigin.WHEN) return noChange()
-
-        return just {
-            statement.let { irBlock ->
-                replaceWith(
-                    IrBlockImpl(
-                        startOffset = irBlock.startOffset,
-                        endOffset = irBlock.endOffset,
-                        type = irBlock.type,
-                        statements = irBlock.statements,
-                        origin = IrDartStatementOrigin.WHEN_STATEMENT
-                    )
-                )
-            }
-        }
-    }
-}
-
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 class WhensWithSubjectExpressionsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
     override fun <D> DartLoweringContext.transform(
         expression: IrExpression,
         container: D
     ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
-        if (expression !is IrBlock || expression.origin != IrStatementOrigin.WHEN) return noChange()
+        if (expression !is IrBlock || expression.origin != IrStatementOrigin.WHEN ||
+            expression.isStatementIn(container)) {
+            return noChange()
+        }
 
         val whenExpression = expression.statements.last() as IrWhen
 
