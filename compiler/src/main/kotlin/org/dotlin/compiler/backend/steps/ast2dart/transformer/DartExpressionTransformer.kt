@@ -109,15 +109,11 @@ object DartExpressionTransformer : DartAstNodeTransformer {
         context: DartGenerationContext
     ) = parenthesizedExpression.let { "(${it.expression.accept(context)})" }
 
-    override fun visitNegatedExpressionExpression(
-        negatedExpression: DartNegatedExpression,
-        context: DartGenerationContext
-    ) = negatedExpression.let { "!${it.expression.accept(context)}" }
+    override fun visitPrefixExpression(prefixExpression: DartPrefixExpression, context: DartGenerationContext) =
+        prefixExpression.let { it.operator.token + it.expression.accept(context) }
 
-    override fun visitNotNullAssertion(
-        notNullAssertion: DartNotNullAssertionExpression,
-        context: DartGenerationContext
-    ) = notNullAssertion.expression.accept(context) + "!"
+    override fun visitPostfixExpression(postfixExpression: DartPostfixExpression, context: DartGenerationContext) =
+        postfixExpression.let { it.expression.accept(context) + it.operator.token }
 
     override fun visitConditionalExpression(
         conditional: DartConditionalExpression,
