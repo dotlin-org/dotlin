@@ -276,14 +276,14 @@ external class Byte private constructor() : Number(), Comparable<Byte> {
      * The resulting `Float` value represents the same numerical value as this `Byte`.
      */
     @DartExtension
-    override fun toFloat(): Float = dartIntToFloat()
+    override fun toFloat(): Float = intToFloat()
     /**
      * Converts this [Byte] value to [Double].
      *
      * The resulting `Double` value represents the same numerical value as this `Byte`.
      */
     @DartExtension
-    override fun toDouble(): Double = dartIntToDouble()
+    override fun toDouble(): Double = intToDouble()
 }
 
 /**
@@ -532,14 +532,14 @@ external class Short private constructor() : Number(), Comparable<Short> {
      * The resulting `Float` value represents the same numerical value as this `Short`.
      */
     @DartExtension
-    override fun toFloat(): Float = dartIntToFloat()
+    override fun toFloat(): Float = intToFloat()
     /**
      * Converts this [Short] value to [Double].
      *
      * The resulting `Double` value represents the same numerical value as this `Short`.
      */
     @DartExtension
-    override fun toDouble(): Double = dartIntToDouble()
+    override fun toDouble(): Double = intToDouble()
 }
 
 /**
@@ -823,14 +823,14 @@ external class Int private constructor() : Number(), Comparable<Int> {
      * the one with zero at least significant bit of mantissa is selected.
      */
     @DartExtension
-    override fun toFloat(): Float = dartIntToFloat()
+    override fun toFloat(): Float = intToFloat()
     /**
      * Converts this [Int] value to [Double].
      *
      * The resulting `Double` value represents the same numerical value as this `Int`.
      */
     @DartExtension
-    override fun toDouble(): Double = dartIntToDouble()
+    override fun toDouble(): Double = intToDouble()
 }
 
 /**
@@ -1116,7 +1116,7 @@ external class Long private constructor() : Number(), Comparable<Long> {
      * the one with zero at least significant bit of mantissa is selected.
      */
     @DartExtension
-    override fun toFloat(): Float = dartIntToFloat()
+    override fun toFloat(): Float = intToDouble()
     /**
      * Converts this [Long] value to [Double].
      *
@@ -1125,7 +1125,7 @@ external class Long private constructor() : Number(), Comparable<Long> {
      * the one with zero at least significant bit of mantissa is selected.
      */
     @DartExtension
-    override fun toDouble(): Double = dartIntToDouble()
+    override fun toDouble(): Double = intToDouble()
 }
 
 /**
@@ -1645,7 +1645,7 @@ external class Double private constructor() : Number(), Comparable<Double> {
      * the one with zero at least significant bit of mantissa is selected.
      */
     @DartExtension
-    override fun toFloat(): Float = this as Float
+    override fun toFloat(): Float = clampToFloat()
     /** Returns this value. */
     @DartExtension
     override fun toDouble(): Double = this
@@ -1673,10 +1673,15 @@ private fun <T> T.clampToLong(): Long where T : Comparable<T>, T : Number =
     clamp(Long.MIN_VALUE as T, Long.MAX_VALUE as T) as Long
 
 @Suppress("UNCHECKED_CAST")
-private fun <T> T.dartIntToFloat(): Float where T : Comparable<T>, T : Number = dartIntToDouble() as Float
+private fun Double.clampToFloat(): Float =
+    clamp(-Float.MIN_VALUE as T, Float.MAX_VALUE as T) as Float
 
 @Suppress("UNCHECKED_CAST")
-private fun <T> T.dartIntToDouble(): Double where T : Comparable<T>, T : Number = dart("(this as int).toDouble()")
+private fun <T> T.intToFloat(): Float where T : Comparable<T>, T : Number =
+    intToDouble() as Float
+
+@Suppress("UNCHECKED_CAST")
+private fun <T> T.intToDouble(): Double where T : Comparable<T>, T : Number = dart("(this as int).toDouble()")
 
 private fun <T> T.clamp(min: T, max: T): T where T : Comparable<T>, T : Number {
     val clamped = when {
