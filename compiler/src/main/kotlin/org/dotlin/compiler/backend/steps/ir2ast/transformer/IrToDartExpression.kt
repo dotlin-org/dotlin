@@ -105,7 +105,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                 when {
                     // Dart's int divide operator returns a double, while Kotlin's Int divide operator returns an
                     // Int. So, we use the ~/ Dart operator, which returns an int.
-                    irReceiver!!.type.isInt() && irSingleArgument.type.isInt() -> DartIntegerDivideExpression(
+                    irReceiver!!.type.isDartInt() && irSingleArgument.type.isDartInt() -> DartIntegerDivideExpression(
                         infixReceiver,
                         infixSingleArgument
                     )
