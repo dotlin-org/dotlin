@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Wilko Manger
+ * Copyright 2021-2022 Wilko Manger
  *
  * This file is part of Dotlin.
  *
