@@ -22,7 +22,8 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
-import org.dotlin.compiler.backend.steps.ir2ast.ir.isDartExtension
+import org.dotlin.compiler.backend.steps.ir2ast.ir.extensionTypeOrNull
+import org.dotlin.compiler.backend.steps.ir2ast.ir.isDartExtensionContainer
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.*
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnitMember
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartClassDeclaration
@@ -60,7 +61,7 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
 
     override fun visitClass(irClass: IrClass, context: DartTransformContext): DartCompilationUnitMember {
         // Extensions are handled differently.
-        if (irClass.isDartExtension) {
+        if (irClass.isDartExtensionContainer) {
             return visitExtension(irClass, context)
         }
 
@@ -149,21 +150,15 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
     }
 
     private fun visitExtension(irClass: IrClass, context: DartTransformContext): DartCompilationUnitMember {
-        val type = irClass.declarations
-            .mapNotNull {
-                when (it) {
-                    is IrFunction -> it.extensionReceiverParameter!!.type
-                    is IrProperty -> it.getter!!.extensionReceiverParameter!!.type
-                    else -> null
-                }
-            }.first()
-            .accept(context)
-
         return DartExtensionDeclaration(
             name = irClass.simpleDartName,
-            extendedType = type,
+            extendedType = irClass.extensionTypeOrNull!!.accept(context),
             typeParameters = irClass.typeParameters.accept(context),
-            members = irClass.declarations.mapNotNull { it.acceptAsClassMember(context) },
+            members = irClass.declarations
+                // A constructor is added in the IR, which is used when an extension has a conflicting overload
+                // with another one. We don't want to add the constructor to the extension container in Dart.
+                .filter { it !is IrConstructor }
+                .mapNotNull { it.acceptAsClassMember(context) },
             annotations = irClass.dartAnnotations
         )
     }

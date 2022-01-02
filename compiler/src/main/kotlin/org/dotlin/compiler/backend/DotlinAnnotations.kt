@@ -20,7 +20,6 @@
 package org.dotlin.compiler.backend
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
-import org.dotlin.compiler.backend.util.falseIfNull
 import org.dotlin.compiler.backend.util.getSingleAnnotationStringArgumentOf
 import org.dotlin.compiler.backend.util.getSingleAnnotationTypeArgumentOf
 import org.dotlin.compiler.backend.util.hasOverriddenAnnotation
@@ -38,13 +37,15 @@ object DotlinAnnotations {
 
     // Internal annotations.
     const val dartGetter = "dotlin.DartGetter"
+    const val dartExtension = "dotlin.DartExtension"
     const val dartImportAlias = "dotlin.DartImportAlias"
     const val dartHideImport = "dotlin.DartHideImport"
     const val dartCatchAs = "dotlin.DartCatchAs"
 }
 
-fun IrDeclaration.hasDartGetterAnnotation() =
-    (this as? IrOverridableDeclaration<*>?)?.hasOverriddenAnnotation(DotlinAnnotations.dartGetter).falseIfNull()
+fun IrDeclaration.hasDartGetterAnnotation() = hasOverriddenAnnotation(DotlinAnnotations.dartGetter)
+
+fun IrDeclaration.hasDartExtensionAnnotation() = hasOverriddenAnnotation(DotlinAnnotations.dartExtension)
 
 val IrDeclaration.dartAnnotatedName: String?
     get() = when (this) {

@@ -41,6 +41,9 @@ fun IrAnnotationContainer.getAnnotation(name: String) = getAnnotation(FqName(nam
 
 fun IrAnnotationContainer.hasAnnotation(name: String) = hasAnnotation(FqName(name))
 
+fun IrDeclaration.hasOverriddenAnnotation(name: String): Boolean =
+    (this as? IrOverridableDeclaration<*>)?.hasOverriddenAnnotation(name) == true
+
 fun IrOverridableDeclaration<*>.hasOverriddenAnnotation(name: String): Boolean =
     hasAnnotation(name) || overriddenSymbols.any {
         val owner = it.owner

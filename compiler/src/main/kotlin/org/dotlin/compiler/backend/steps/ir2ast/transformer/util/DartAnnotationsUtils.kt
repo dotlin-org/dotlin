@@ -19,8 +19,9 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer.util
 
+import org.dotlin.compiler.backend.hasDartExtensionAnnotation
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
-import org.dotlin.compiler.backend.steps.ir2ast.ir.isDartExtension
+import org.dotlin.compiler.backend.steps.ir2ast.ir.isDartExtensionContainer
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isOverride
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isStatic
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
@@ -40,7 +41,7 @@ val IrDeclaration.dartAnnotations: List<DartAnnotation>
         }
 
         val override = when {
-            (this is IrOverridableDeclaration<*> && isOverride) || (this is IrField && isOverride) -> {
+            (!hasDartExtensionAnnotation() && this is IrOverridableDeclaration<*> && isOverride) || (this is IrField && isOverride) -> {
                 DartAnnotation.OVERRIDE
             }
             else -> null
@@ -58,7 +59,7 @@ val IrDeclaration.dartAnnotations: List<DartAnnotation>
         val modality = when (modality) {
             SEALED, FINAL -> when {
                 // Sealed as well as final classes get marked @sealed.
-                this is IrClass && !isDartExtension -> DartAnnotation.SEALED
+                this is IrClass && !isDartExtensionContainer -> DartAnnotation.SEALED
                 // Non-static, non-top-level final declarations get marked @nonVirtual.
                 parent !is IrFile && !isStatic -> DartAnnotation.NON_VIRTUAL
                 else -> null

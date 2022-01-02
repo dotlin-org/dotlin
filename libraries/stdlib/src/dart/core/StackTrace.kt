@@ -17,8 +17,8 @@
 @file:Suppress(
     "NON_ABSTRACT_FUNCTION_WITH_NO_BODY",
     "MUST_BE_INITIALIZED_OR_BE_ABSTRACT",
-    "NESTED_CLASS_IN_EXTERNAL_INTERFACE", // TODO: JS error: Remove when using our own errors.
-    "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: JS error
+    "NESTED_CLASS_IN_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
+    "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
 )
 
 package dart.core
