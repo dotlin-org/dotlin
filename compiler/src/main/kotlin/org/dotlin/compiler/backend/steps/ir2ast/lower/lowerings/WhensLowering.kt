@@ -19,13 +19,76 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementTransformerVoid
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartStatementOrigin
+import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.IrStatement
+import org.jetbrains.kotlin.ir.builders.irCall
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
+import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
+import org.jetbrains.kotlin.ir.types.makeNotNull
+
+/**
+ * Since a temporary subject is used, smart cast does not work, so explicit casts are added.
+ */
+class WhensWithSubjectCastToNonNullLowering(override val context: DartLoweringContext) : IrExpressionLowering {
+    override fun <D> DartLoweringContext.transform(
+        expression: IrExpression,
+        container: D
+    ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
+        if (expression !is IrBlock || expression.origin != IrStatementOrigin.WHEN) return noChange()
+
+        val originalSubject = (expression.statements.first() as IrVariable).initializer as? IrGetValue
+            ?: return noChange()
+
+        val whenExpression = expression.statements.last() as IrWhen
+
+        var mustAssertNotNull = false
+        for (branch in whenExpression.branches) {
+            if (branch.condition.isEqualsNull()) {
+                mustAssertNotNull = true
+                continue
+            }
+
+            if (mustAssertNotNull) {
+                branch.result = branch.result.transform(
+                    object : IrCustomElementTransformerVoid() {
+                        override fun visitExpression(expression: IrExpression): IrExpression {
+                            expression.transformChildrenVoid()
+                            if (expression !is IrGetValue || expression.symbol != originalSubject.symbol) {
+                                return expression
+                            }
+
+                            return buildStatement(container.symbol) {
+                                irCall(
+                                    irBuiltIns.checkNotNullSymbol.owner,
+                                    origin = IrStatementOrigin.EXCLEXCL
+                                ).apply {
+                                    type = expression.type.makeNotNull()
+                                    putValueArgument(0, expression)
+                                }
+                            }
+                        }
+                    },
+                    data = null
+                )
+            }
+        }
+
+        return noChange()
+    }
+
+    private fun IrExpression.isEqualsNull(): Boolean {
+        if (this !is IrCall || origin != IrStatementOrigin.EQEQ) return false
+
+        val argument = valueArguments.lastOrNull() ?: return false
+        return argument is IrConst<*> && argument.kind == IrConstKind.Null
+    }
+}
 
 /**
  * Changes the origin so that [WhensWithSubjectExpressionsLowering] doesn't change anything.

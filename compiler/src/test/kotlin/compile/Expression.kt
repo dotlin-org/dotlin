@@ -864,7 +864,6 @@ class Expression : BaseTest {
         )
     }
 
-    @Disabled
     @Test
     fun `return in when`() = assertCompile {
         kotlin(
@@ -889,6 +888,139 @@ class Expression : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              test(null, 3);
+            }
+
+            int test(
+              int? x,
+              int fallback,
+            ) {
+              try {
+                final int y = () {
+                  final int? tmp0_subject = x;
+                  return tmp0_subject == null
+                      ? throw ${'$'}Return<int>(fallback)
+                      : tmp0_subject == 1
+                          ? x! * x!
+                          : tmp0_subject == 2
+                              ? x! ~/ x!
+                              : tmp0_subject == 3
+                                  ? x! + x!
+                                  : x!;
+                }.call();
+                return y;
+              } on ${'$'}Return<int> catch (r) {
+                return r.value;
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `when with subject not-null smart-cast`() = assertCompile {
+        kotlin(
+            """
+            fun test(y: Int?) {
+                val x = when (y) {
+                        null -> y
+                        else -> y * y
+                    }
+            }
+
+            fun main() {
+                test(0)
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void test(int? y) {
+              final int? x = () {
+                final int? tmp0_subject = y;
+                return tmp0_subject == null ? y : y! * y!;
+              }.call();
+            }
+
+            void main() {
+              test(0);
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `when with subject type smart-cast`() = assertCompile {
+        kotlin(
+            """
+            fun test(y: Any) {
+                val x = when (y) {
+                        is Int -> y + y
+                        else -> -1
+                    }
+            }
+
+            fun main() {
+                test(0)
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void test(Object y) {
+              final int x = () {
+                final Object tmp0_subject = y;
+                return tmp0_subject is int ? (y as int) + (y as int) : -1;
+              }.call();
+            }
+
+            void main() {
+              test(0);
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `when with subject type smart-cast using subject as-is`() = assertCompile {
+        kotlin(
+            """
+            fun test(y: Any) {
+                val x = when (y) {
+                        is Int -> y
+                        else -> -1
+                    }
+            }
+
+            fun main() {
+                test(0)
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void test(Object y) {
+              final int x = () {
+                final Object tmp0_subject = y;
+                return tmp0_subject is int ? y as int : -1;
+              }.call();
+            }
+
+            void main() {
+              test(0);
+            }
             """
         )
     }
