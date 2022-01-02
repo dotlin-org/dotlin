@@ -286,4 +286,30 @@ class Statement : BaseTest {
             """
         )
     }
+
+
+    @Test
+    fun `return in if`() = assertCompile {
+        kotlin(
+            """
+            fun doIt(x: Int?): String {
+                if (x == null) return "null"
+                return x.toString()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            String doIt(int? x) {
+              if (x == null) {
+                return 'null';
+              }
+              return x.toString();
+            }
+            """
+        )
+    }
 }
