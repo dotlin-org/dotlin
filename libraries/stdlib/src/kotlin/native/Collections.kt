@@ -338,10 +338,7 @@ interface Map<K, out V> {
      */
     @SinceKotlin("1.1")
     @PlatformDependent
-    fun getOrDefault(key: K, defaultValue: @UnsafeVariance V): V {
-        // See default implementation in JDK sources
-        throw NotImplementedError()
-    }
+    fun getOrDefault(key: K, defaultValue: @UnsafeVariance V): V
 
     // Views
     /**
