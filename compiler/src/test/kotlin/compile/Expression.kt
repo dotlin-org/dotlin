@@ -1089,4 +1089,25 @@ class Expression : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `not equals`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                0 != 1
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              0 != 1;
+            }
+            """
+        )
+    }
 }
