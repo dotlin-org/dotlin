@@ -55,6 +55,7 @@ external class Boolean private constructor() : Comparable<Boolean> {
 
     override fun compareTo(other: Boolean): Int
 
+    @DartName("Boolean\$Companion")
     @SinceKotlin("1.3")
     companion object {}
 }
