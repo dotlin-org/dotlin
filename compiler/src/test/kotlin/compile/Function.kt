@@ -288,21 +288,21 @@ class Function : BaseTest {
         )
     }
 
-    @Disabled
     @Test
     fun `function with vararg parameter`() = assertCompile {
         kotlin("fun test(vararg args: String) {}")
 
         dart(
             """
+            import 'dart:core' hide List;
+            import 'dart:core' as core;
             import 'package:meta/meta.dart';
 
-            void test(List<String> args) {}
+            void test(core.List<String> args) {}
             """
         )
     }
 
-    @Disabled
     @Test
     fun `calling a function with vararg parameter`() = assertCompile {
         kotlin(
@@ -317,10 +317,11 @@ class Function : BaseTest {
 
         dart(
             """
+            import 'dart:core' hide List;
+            import 'dart:core' as core;
             import 'package:meta/meta.dart';
 
-            void test(List<String> args) {}
-            
+            void test(core.List<String> args) {}
             void main() {
               test(<String>['abc', 'def', 'ghi']);
             }
@@ -328,7 +329,6 @@ class Function : BaseTest {
         )
     }
 
-    @Disabled
     @Test
     fun `calling a function with vararg parameter and normal parameter`() = assertCompile {
         kotlin(
@@ -343,10 +343,12 @@ class Function : BaseTest {
 
         dart(
             """
+            import 'dart:core' hide List;
+            import 'dart:core' as core;
             import 'package:meta/meta.dart';
 
             void test(
-              List<String> args,
+              core.List<String> args,
               int x,
             ) {}
             void main() {
