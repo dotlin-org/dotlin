@@ -36,11 +36,6 @@ sealed class IrDartStatementOrigin(private val name: String) : IrStatementOrigin
     object COMPLEX_PARAM_INIT_NULLABLE : IrDartStatementOrigin("COMPLEX_PARAM_INIT_NULLABLE")
 
     /**
-     * Constructors for objects are always const.
-     */
-    object OBJECT_CONSTRUCTOR : IrDartStatementOrigin("OBJECT_CONSTRUCTOR")
-
-    /**
      * A block for a when is meant as a Dart statement, not a Dart expression.
      */
     object WHEN_STATEMENT : IrDartStatementOrigin("WHEN_STATEMENT")

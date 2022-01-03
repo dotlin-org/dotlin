@@ -206,7 +206,7 @@ class Dotlin : BaseTest {
 
             @sealed
             class Kot {
-              static final Lin ${'$'}companion = Lin.${'$'}instance;
+              static const Lin ${'$'}companion = Lin.${'$'}instance;
             }
 
             void main() {
@@ -215,8 +215,8 @@ class Dotlin : BaseTest {
 
             @sealed
             class Lin {
-              Lin._() : super();
-              static final Lin ${'$'}instance = Lin._();
+              const Lin._() : super();
+              static const Lin ${'$'}instance = const Lin._();
             }
             """
         )
@@ -244,7 +244,7 @@ class Dotlin : BaseTest {
 
             @sealed
             class Dot {
-              static final Lin ${'$'}companion = Lin.${'$'}instance;
+              static const Lin ${'$'}companion = Lin.${'$'}instance;
             }
 
             void main() {
@@ -253,8 +253,8 @@ class Dotlin : BaseTest {
 
             @sealed
             class Lin {
-              Lin._() : super();
-              static final Lin ${'$'}instance = Lin._();
+              const Lin._() : super();
+              static const Lin ${'$'}instance = const Lin._();
             }
             """
         )

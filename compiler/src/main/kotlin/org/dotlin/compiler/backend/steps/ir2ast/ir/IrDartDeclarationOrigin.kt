@@ -40,9 +40,9 @@ sealed class IrDartDeclarationOrigin(private val name: String) : IrDeclarationOr
 
     object EXTENSION : IrDartDeclarationOrigin("EXTENSION")
 
-    object OBJECT : IrDartDeclarationOrigin("OBJECT")
+    object STATIC_OBJECT_MEMBER : IrDartDeclarationOrigin("STATIC_OBJECT_MEMBER")
 
-    object OBJECT_INSTANCE_FIELD : IrDartDeclarationOrigin("OBJECT_INSTANCE_FIELD")
+    object WAS_CONST_OBJECT_MEMBER : IrDartDeclarationOrigin("WAS_CONST_OBJECT_MEMBER")
 
     /**
      * The constructor was made a factory in Dart, as to initialize complex parameters in its body,

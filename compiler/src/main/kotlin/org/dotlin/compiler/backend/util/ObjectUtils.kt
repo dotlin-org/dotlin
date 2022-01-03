@@ -30,5 +30,5 @@ val IrDeclaration.isFromObjectAndStaticallyAvailable
     get() = (this is IrProperty || (this is IrField && !isStatic) || (this is IrSimpleFunction && !isStatic)) &&
             this !is IrConstructor &&
             !isFakeOverride &&
-            origin != IrDartDeclarationOrigin.OBJECT_INSTANCE_FIELD &&
-            (parentClassOrNull?.origin == IrDartDeclarationOrigin.OBJECT || parentClassOrNull?.isObject == true)
+            origin != IrDeclarationOrigin.FIELD_FOR_OBJECT_INSTANCE &&
+            parentClassOrNull?.isObject == true
