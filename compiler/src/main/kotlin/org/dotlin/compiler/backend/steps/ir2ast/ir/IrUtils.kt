@@ -32,7 +32,6 @@ import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.builders.declarations.*
-import org.jetbrains.kotlin.ir.builders.irCall
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
@@ -414,9 +413,10 @@ val IrType.owner: IrDeclarationWithName
 fun IrBuilderWithScope.irCall(
     callee: IrFunction,
     receiver: IrExpression? = null,
-    vararg valueArguments: IrExpression
+    vararg valueArguments: IrExpression,
+    origin: IrStatementOrigin? = null,
 ): IrFunctionAccessExpression =
-    irCall(callee).apply {
+    irCall(callee, origin).apply {
         this@apply.dispatchReceiver = receiver
 
         if (valueArguments.size > callee.valueParameters.size) {
