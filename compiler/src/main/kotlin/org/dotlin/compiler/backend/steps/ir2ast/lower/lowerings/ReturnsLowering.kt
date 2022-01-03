@@ -147,11 +147,9 @@ class ReturnsLowering(override val context: DartLoweringContext) : IrDeclaration
                                         else -> irReturn(
                                             irCall(
                                                 returnClass.propertyWithName("value").getter!!,
+                                                receiver = irGet(catchVar),
                                                 origin = IrStatementOrigin.GET_PROPERTY
-                                            ).apply {
-                                                type = catchVar.type
-                                                dispatchReceiver = irGet(catchVar)
-                                            }
+                                            )
                                         )
                                     }
                                 )

@@ -20,10 +20,10 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementTransformerVoid
+import org.dotlin.compiler.backend.steps.ir2ast.ir.irCall
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isStatementIn
 import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.jetbrains.kotlin.ir.builders.irCall
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
 import org.jetbrains.kotlin.ir.declarations.IrVariable
@@ -64,10 +64,11 @@ class WhensWithSubjectCastToNonNullLowering(override val context: DartLoweringCo
                             return buildStatement(container.symbol) {
                                 irCall(
                                     irBuiltIns.checkNotNullSymbol.owner,
+                                    receiver = null,
+                                    valueArguments = arrayOf(expression),
                                     origin = IrStatementOrigin.EXCLEXCL
                                 ).apply {
                                     type = expression.type.makeNotNull()
-                                    putValueArgument(0, expression)
                                 }
                             }
                         }

@@ -411,11 +411,11 @@ val IrType.owner: IrDeclarationWithName
     get() = classifierOrFail.owner as IrDeclarationWithName
 
 fun IrBuilderWithScope.irCall(
-    callee: IrFunction,
+    callee: IrSimpleFunction,
     receiver: IrExpression? = null,
     vararg valueArguments: IrExpression,
     origin: IrStatementOrigin? = null,
-): IrFunctionAccessExpression =
+): IrCall =
     irCall(callee, origin).apply {
         this@apply.dispatchReceiver = receiver
 
