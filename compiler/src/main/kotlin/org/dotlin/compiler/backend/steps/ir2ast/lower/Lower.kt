@@ -29,6 +29,7 @@ import org.jetbrains.kotlin.resolve.BindingContext
 import kotlin.reflect.KFunction1
 
 private val lowerings: List<KFunction1<DartLoweringContext, IrLowering>> = listOf(
+    ::UnrepresentableDecimalConstsLowering,
     Comparable::PreOperatorsLowering,
     ::DartBuiltInImportsLowering,
     ::DartExtensionsLowering,

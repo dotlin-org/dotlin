@@ -1257,4 +1257,106 @@ class Expression : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `const Float Infinity`() = assertCompile {
+        kotlin(
+            """
+            const val x = 1.0f / 0.0f
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            const double x = 1.0 / 0.0;
+            """
+        )
+    }
+
+    @Test
+    fun `const Float -Infinity`() = assertCompile {
+        kotlin(
+            """
+            const val x = -(1.0f / 0.0f)
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            const double x = -(1.0 / 0.0);
+            """
+        )
+    }
+
+    @Test
+    fun `const Float NaN`() = assertCompile {
+        kotlin(
+            """
+            const val x = -(0.0f / 0.0f)
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            const double x = -(0.0 / 0.0);
+            """
+        )
+    }
+
+    @Test
+    fun `const Double Infinity`() = assertCompile {
+        kotlin(
+            """
+            const val x = 1.0 / 0.0
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            const double x = 1.0 / 0.0;
+            """
+        )
+    }
+
+    @Test
+    fun `const Double -Infinity`() = assertCompile {
+        kotlin(
+            """
+            const val x = -(1.0 / 0.0)
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            const double x = -(1.0 / 0.0);
+            """
+        )
+    }
+
+    @Test
+    fun `const Double NaN`() = assertCompile {
+        kotlin(
+            """
+            const val x = -(0.0 / 0.0)
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            const double x = -(0.0 / 0.0);
+            """
+        )
+    }
 }
