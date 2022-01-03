@@ -28,7 +28,6 @@ import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.declarations.buildField
-import org.jetbrains.kotlin.ir.builders.irCall
 import org.jetbrains.kotlin.ir.builders.irGet
 import org.jetbrains.kotlin.ir.builders.irGetField
 import org.jetbrains.kotlin.ir.builders.irGetObject
@@ -123,21 +122,14 @@ class ObjectLowering(override val context: DartLoweringContext) : IrDeclarationL
             expression = context.buildStatement(symbol) {
                 irCall(
                     original,
+                    receiver = irGetField(receiver = null, instanceField),
+                    valueArguments = valueParameters.map { irGet(it) }.toTypedArray(),
                     origin = when {
                         original.isGetter -> IrStatementOrigin.GET_PROPERTY
                         original.isSetter -> IrStatementOrigin.EQ
                         else -> null
                     },
-                ).apply {
-                    dispatchReceiver = irGetField(receiver = null, instanceField)
-
-                    valueParameters.forEach {
-                        putValueArgument(
-                            index = it.index,
-                            valueArgument = irGet(it)
-                        )
-                    }
-                }
+                )
             }
         )
 

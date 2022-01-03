@@ -20,6 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.extensionReceiverOrNull
+import org.dotlin.compiler.backend.steps.ir2ast.ir.irCall
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrimitiveNumber
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.builders.irCall
@@ -47,11 +48,13 @@ class ConflictingExtensionCallsLowering(override val context: DartLoweringContex
 
         return replaceWith(
             buildStatement(container.symbol) {
-                irCall(function, origin = expression.origin).apply {
-                    dispatchReceiver = irCall(extensionContainer.primaryConstructor!!).apply {
+                irCall(
+                    function,
+                    receiver = irCall(extensionContainer.primaryConstructor!!).apply {
                         putValueArgument(0, receiver)
-                    }
-                }.copyAttributes(expression)
+                    },
+                    origin = expression.origin
+                ).copyAttributes(expression)
             }
         )
     }
