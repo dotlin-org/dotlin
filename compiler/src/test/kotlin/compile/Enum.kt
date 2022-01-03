@@ -50,8 +50,8 @@ class Enum : BaseTest {
                 String name,
                 int ordinal,
               ) : super(name, ordinal);
-              static const Test ALPHA = Test._('ALPHA', 0);
-              static const Test BETA = Test._('BETA', 1);
+              static const Test ALPHA = const Test._('ALPHA', 0);
+              static const Test BETA = const Test._('BETA', 1);
               static core.List<Test> values() {
                 return <Test>[Test.ALPHA, Test.BETA];
               }
@@ -90,8 +90,8 @@ class Enum : BaseTest {
               ) : super(name, ordinal);
               @nonVirtual
               final String lowercase;
-              static const Test ALPHA = Test._('ALPHA', 0, 'α');
-              static const Test BETA = Test._('BETA', 1, 'β');
+              static const Test ALPHA = const Test._('ALPHA', 0, 'α');
+              static const Test BETA = const Test._('BETA', 1, 'β');
               static core.List<Test> values() {
                 return <Test>[Test.ALPHA, Test.BETA];
               }
@@ -133,8 +133,8 @@ class Enum : BaseTest {
               final String lowercase;
               @nonVirtual
               final String uppercase;
-              static const Test ALPHA = Test._('ALPHA', 0, 'α', 'Α');
-              static const Test BETA = Test._('BETA', 1, 'β', 'Β');
+              static const Test ALPHA = const Test._('ALPHA', 0, 'α', 'Α');
+              static const Test BETA = const Test._('BETA', 1, 'β', 'Β');
               static core.List<Test> values() {
                 return <Test>[Test.ALPHA, Test.BETA];
               }
@@ -174,8 +174,8 @@ class Enum : BaseTest {
                 String name,
                 int ordinal,
               ) : super(name, ordinal);
-              static const Test ALPHA = Test._('ALPHA', 0);
-              static const Test BETA = Test._('BETA', 1);
+              static const Test ALPHA = const Test._('ALPHA', 0);
+              static const Test BETA = const Test._('BETA', 1);
               static core.List<Test> values() {
                 return <Test>[Test.ALPHA, Test.BETA];
               }

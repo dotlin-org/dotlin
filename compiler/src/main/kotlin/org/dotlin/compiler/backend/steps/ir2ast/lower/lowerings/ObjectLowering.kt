@@ -51,11 +51,7 @@ class ObjectLowering(override val context: DartLoweringContext) : IrDeclarationL
         val staticContainer: IrClass
         val transformations: Transformations<IrDeclaration>
 
-        val obj = declaration.apply {
-            val newObj = this
-
-            origin = IrDartDeclarationOrigin.OBJECT
-
+        val obj = declaration.apply obj@ {
             primaryConstructor!!.visibility = DescriptorVisibilities.PRIVATE
 
             addChild(
@@ -63,9 +59,9 @@ class ObjectLowering(override val context: DartLoweringContext) : IrDeclarationL
                     isStatic = true
                     type = defaultType
                     name = Name.identifier(INSTANCE_FIELD_NAME)
-                    origin = IrDartDeclarationOrigin.OBJECT_INSTANCE_FIELD
+                    origin = IrDeclarationOrigin.FIELD_FOR_OBJECT_INSTANCE
                 }.apply {
-                    parent = newObj
+                    parent = this@obj
 
                     initializer = IrExpressionBodyImpl(
                         buildStatement(symbol) {
@@ -76,7 +72,6 @@ class ObjectLowering(override val context: DartLoweringContext) : IrDeclarationL
                                 typeArgumentsCount = 0,
                                 constructorTypeArgumentsCount = 0,
                                 valueArgumentsCount = 0,
-                                origin = IrDartStatementOrigin.OBJECT_CONSTRUCTOR
                             )
                         }
                     )
@@ -98,7 +93,7 @@ class ObjectLowering(override val context: DartLoweringContext) : IrDeclarationL
                         isStatic = true
                         type = obj.defaultType
                         name = Name.identifier(COMPANION_FIELD_NAME)
-                        origin = IrDartDeclarationOrigin.OBJECT_INSTANCE_FIELD
+                        origin = IrDeclarationOrigin.FIELD_FOR_OBJECT_INSTANCE
                     }.apply {
                         parent = obj
 
@@ -141,41 +136,70 @@ class ObjectLowering(override val context: DartLoweringContext) : IrDeclarationL
                     is IrSimpleFunction -> original.deepCopy(remapReferences = false).apply {
                         dispatchReceiverParameter = null
                         body = redirectCall(original)
+                        origin = IrDartDeclarationOrigin.STATIC_OBJECT_MEMBER
                     }
                     is IrProperty -> original.deepCopy(remapReferences = false).apply {
-                        getter = getter?.deepCopy()?.apply {
-                            dispatchReceiverParameter = null
-                            body = redirectCall(original.getter!!)
-                        }
-                        setter = setter?.deepCopy()?.apply {
-                            dispatchReceiverParameter = null
-                            body = redirectCall(original.setter!!)
-                        }
-                        // We never need a static backing field. If there's a backing field it will be an instance
-                        // member of the object class.
-                        //
-                        // However, if the property is simple, we add the redirecting initializer here, so it will be
-                        // taken over in the [PropertySimplifyingLowering].
-                        backingField = when {
-                            isSimple -> backingField?.deepCopyWith {
-                                isStatic = true
-                            }?.apply {
-                                initializer = IrExpressionBodyImpl(
-                                    expression = buildStatement(symbol) {
-                                        irGetField(
-                                            receiver = irGetField(receiver = null, instanceField),
-                                            original.backingField!!,
+                        origin = IrDartDeclarationOrigin.STATIC_OBJECT_MEMBER
+
+                        when {
+                            original.isConst -> {
+                                // We copy the value as-is to keep the value const in Dart. We can't redirect it
+                                // to the instance member, since using instance members as const is not allowed
+                                // (even on objects created with const).
+                                backingField = backingField!!.deepCopyWith {
+                                    isStatic = true
+                                }.apply {
+                                    initializer = original.backingField!!.initializer!!
+                                }
+                            }
+                            else -> {
+                                getter = getter?.apply {
+                                    dispatchReceiverParameter = null
+                                    body = redirectCall(original.getter!!)
+                                }
+                                setter = setter?.apply {
+                                    dispatchReceiverParameter = null
+                                    body = redirectCall(original.setter!!)
+                                }
+                                // We never need a static backing field. If there's a backing field it will be an instance
+                                // member of the object class.
+                                //
+                                // However, if the property is simple, we add the redirecting initializer here, so it will be
+                                // taken over in the [PropertySimplifyingLowering].
+                                backingField = when {
+                                    isSimple -> backingField?.deepCopyWith {
+                                        isStatic = true
+                                    }?.apply {
+                                        initializer = IrExpressionBodyImpl(
+                                            expression = buildStatement(symbol) {
+                                                irGetField(
+                                                    receiver = irGetField(receiver = null, instanceField),
+                                                    original.backingField!!,
+                                                )
+                                            }
                                         )
                                     }
-                                )
+                                    else -> null
+                                }
                             }
-                            else -> null
                         }
                     }
                     else -> throw UnsupportedOperationException("Unsupported object member: $original")
                 }
             }
             .forEach { staticContainer.addChild(it) }
+
+        obj.declarations.transformInPlace {
+            when {
+                it.origin != IrDartDeclarationOrigin.STATIC_OBJECT_MEMBER && it is IrProperty && it.isConst ->
+                    it.deepCopyWith {
+                        // Instance members can never be const.
+                        isConst = false
+                        origin = IrDartDeclarationOrigin.WAS_CONST_OBJECT_MEMBER
+                    }
+                else -> it
+            }
+        }
 
         return transformations
     }

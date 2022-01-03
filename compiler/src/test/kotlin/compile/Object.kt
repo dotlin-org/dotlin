@@ -40,8 +40,8 @@ class Object : BaseTest {
 
             @sealed
             class Test {
-              Test._() : super();
-              static final Test ${'$'}instance = Test._();
+              const Test._() : super();
+              static const Test ${'$'}instance = const Test._();
             }
             """
         )
@@ -65,7 +65,7 @@ class Object : BaseTest {
 
             @sealed
             class Test {
-              Test._() : super();
+              const Test._() : super();
               @nonVirtual
               int ${'$'}compute(
                 int x,
@@ -74,7 +74,7 @@ class Object : BaseTest {
                 return 343;
               }
             
-              static final Test ${'$'}instance = Test._();
+              static const Test ${'$'}instance = const Test._();
               static int compute(
                 int x,
                 double y,
@@ -101,13 +101,13 @@ class Object : BaseTest {
 
             @sealed
             class Test {
-              static final Test${'$'}Companion ${'$'}companion = Test${'$'}Companion.${'$'}instance;
+              static const Test${'$'}Companion ${'$'}companion = Test${'$'}Companion.${'$'}instance;
             }
             
             @sealed
             class Test${'$'}Companion {
-              Test${'$'}Companion._() : super();
-              static final Test${'$'}Companion ${'$'}instance = Test${'$'}Companion._();
+              const Test${'$'}Companion._() : super();
+              static const Test${'$'}Companion ${'$'}instance = const Test${'$'}Companion._();
             }
             """
         )
@@ -135,7 +135,7 @@ class Object : BaseTest {
 
             @sealed
             class Test {
-              static final Test${'$'}Companion ${'$'}companion = Test${'$'}Companion.${'$'}instance;
+              static const Test${'$'}Companion ${'$'}companion = Test${'$'}Companion.${'$'}instance;
               static int compute() => Test${'$'}Companion.${'$'}instance.${'$'}compute();
             }
 
@@ -145,13 +145,13 @@ class Object : BaseTest {
 
             @sealed
             class Test${'$'}Companion {
-              Test${'$'}Companion._() : super();
+              const Test${'$'}Companion._() : super();
               @nonVirtual
               int ${'$'}compute() {
                 return 343;
               }
 
-              static final Test${'$'}Companion ${'$'}instance = Test${'$'}Companion._();
+              static const Test${'$'}Companion ${'$'}instance = const Test${'$'}Companion._();
             }
             """
         )
@@ -200,13 +200,13 @@ class Object : BaseTest {
 
             @sealed
             class Test {
-              Test._() : super();
+              const Test._() : super();
               @nonVirtual
               int get ${'$'}property {
                 return 42;
               }
 
-              static final Test ${'$'}instance = Test._();
+              static const Test ${'$'}instance = const Test._();
               static int get property => Test.${'$'}instance.${'$'}property;
             }
             """
@@ -231,7 +231,7 @@ class Object : BaseTest {
 
             @sealed
             class Test {
-              Test._() : super();
+              const Test._() : super();
               @nonVirtual
               int get ${'$'}property {
                 return 42;
@@ -239,7 +239,7 @@ class Object : BaseTest {
 
               @nonVirtual
               void set ${'$'}property(int value) {}
-              static final Test ${'$'}instance = Test._();
+              static const Test ${'$'}instance = const Test._();
               static int get property => Test.${'$'}instance.${'$'}property;
               static void set property(int value) => Test.${'$'}instance.${'$'}property = value;
             }
@@ -320,6 +320,74 @@ class Object : BaseTest {
               static final Test ${'$'}instance = Test._();
               static int get _property => Test.${'$'}instance._${'$'}property;
               static void set _property(int value) => Test.${'$'}instance._${'$'}property = value;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `const object`() = assertCompile {
+        kotlin(
+            """
+            object Test {
+                const val x = 0
+                const val y = 1
+                const val z = 2
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {
+              const Test._() : super();
+              @nonVirtual
+              final int ${'$'}x = 0;
+              @nonVirtual
+              final int ${'$'}y = 1;
+              @nonVirtual
+              final int ${'$'}z = 2;
+              static const Test ${'$'}instance = const Test._();
+              static const int x = 0;
+              static const int y = 1;
+              static const int z = 2;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `object with some const but not all`() = assertCompile {
+        kotlin(
+            """
+            object Test {
+                val x = 0
+                const val y = 1
+                const val z = 2
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {
+              Test._() : super();
+              @nonVirtual
+              final int ${'$'}x = 0;
+              @nonVirtual
+              final int ${'$'}y = 1;
+              @nonVirtual
+              final int ${'$'}z = 2;
+              static final Test ${'$'}instance = Test._();
+              static final int x = Test.${'$'}instance.${'$'}x;
+              static const int y = 1;
+              static const int z = 2;
             }
             """
         )
