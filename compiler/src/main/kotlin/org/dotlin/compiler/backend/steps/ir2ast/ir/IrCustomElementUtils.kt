@@ -33,7 +33,6 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
  */
 interface IrCustomElementVisitorHelper<out R, in D> {
     fun visitDartCodeExpression(expression: IrDartCodeExpression, data: D): R
-    fun visitAnnotatedExpression(expression: IrAnnotatedExpression, data: D): R
     fun visitNullAwareExpression(expression: IrNullAwareExpression, data: D): R
     fun visitIfNullExpression(expression: IrIfNullExpression, data: D): R
     fun visitConjunctionExpression(expression: IrConjunctionExpression, data: D): R
@@ -47,7 +46,6 @@ fun <R, D> IrCustomElementVisitorHelper<R, D>.visitCustomExpression(
     fallback: () -> R
 ) = when (expression) {
     is IrDartCodeExpression -> visitDartCodeExpression(expression, data)
-    is IrAnnotatedExpression -> visitAnnotatedExpression(expression, data)
     is IrNullAwareExpression -> visitNullAwareExpression(expression, data)
     is IrIfNullExpression -> visitIfNullExpression(expression, data)
     is IrConjunctionExpression -> visitConjunctionExpression(expression, data)
@@ -72,9 +70,6 @@ interface IrCustomElementVisitor<out R, in D> : IrElementVisitor<R, D>, IrCustom
         visitCustomBody(body, data, fallback = { super.visitBody(body, data) })
 
     override fun visitDartCodeExpression(expression: IrDartCodeExpression, data: D) =
-        super.visitExpression(expression, data)
-
-    override fun visitAnnotatedExpression(expression: IrAnnotatedExpression, data: D) =
         super.visitExpression(expression, data)
 
     override fun visitNullAwareExpression(expression: IrNullAwareExpression, data: D) =
@@ -102,9 +97,6 @@ interface IrCustomElementTransformerHelper<in D> : IrElementTransformer<D>, IrCu
     override fun visitDartCodeExpression(expression: IrDartCodeExpression, data: D) =
         super.visitExpression(expression, data)
 
-    override fun visitAnnotatedExpression(expression: IrAnnotatedExpression, data: D) =
-        super.visitExpression(expression, data)
-
     override fun visitNullAwareExpression(expression: IrNullAwareExpression, data: D) =
         super.visitExpression(expression, data)
 
@@ -123,12 +115,6 @@ interface IrCustomElementTransformerHelper<in D> : IrElementTransformer<D>, IrCu
 interface IrCustomElementTransformerHelperVoid : IrCustomElementTransformerHelper<Nothing?> {
     fun visitDartCodeExpression(expression: IrDartCodeExpression): IrExpression =
         super.visitDartCodeExpression(expression, null)
-
-    override fun visitAnnotatedExpression(expression: IrAnnotatedExpression, data: Nothing?) =
-        visitAnnotatedExpression(expression)
-
-    fun visitAnnotatedExpression(expression: IrAnnotatedExpression): IrExpression =
-        super.visitAnnotatedExpression(expression, null)
 
     override fun visitNullAwareExpression(expression: IrNullAwareExpression, data: Nothing?) =
         visitNullAwareExpression(expression)

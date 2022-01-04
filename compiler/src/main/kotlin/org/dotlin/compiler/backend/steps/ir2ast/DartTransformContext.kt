@@ -20,17 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast
 
 import org.dotlin.compiler.backend.steps.ir2ast.attributes.ExtraIrAttributes
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrAnnotatedExpression
-import org.jetbrains.kotlin.ir.expressions.IrExpression
 
 class DartTransformContext(
     val extraIrAttributes: ExtraIrAttributes,
-    val annotatedExpressions: MutableMap<IrExpression, IrAnnotatedExpression> = mutableMapOf()
-) : ExtraIrAttributes by extraIrAttributes {
-    fun <T> withAnnotatedExpression(from: IrAnnotatedExpression, block: () -> T): T {
-        annotatedExpressions[from.expression] = from
-        val result = block()
-        annotatedExpressions.remove(from.expression)
-        return result
-    }
-}
+) : ExtraIrAttributes by extraIrAttributes

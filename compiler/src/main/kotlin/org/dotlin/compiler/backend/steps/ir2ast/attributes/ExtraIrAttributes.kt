@@ -19,8 +19,16 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.attributes
 
+import org.dotlin.compiler.backend.DotlinAnnotations
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementVisitor
+import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrIfNullExpression
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartConst
+import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.expressions.IrGetValue
+import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.util.hasEqualFqName
+import org.jetbrains.kotlin.ir.util.parentAsClass
+import org.jetbrains.kotlin.name.FqName
 
 /**
  * All [IrElement]s referenced must be the `attributeOwnerId`s.
@@ -31,6 +39,23 @@ interface ExtraIrAttributes {
             override val propertiesInitializedInConstructorBody = mutableSetOf<IrProperty>()
             override val propertiesInitializedInFieldInitializerList = mutableSetOf<IrProperty>()
             override val parameterPropertyReferencesInParameterDefaultValue = mutableSetOf<IrGetValue>()
+            private val annotatedExpressions = mutableMapOf<IrExpression, MutableList<IrConstructorCall>>()
+
+            override fun IrExpression.annotate(annotations: Iterable<IrConstructorCall>) {
+                annotatedExpressions.compute(this) { _, currentAnnotations ->
+                    (currentAnnotations ?: mutableListOf()).apply {
+                        addAll(annotations)
+                    }
+                }
+            }
+
+            override val IrExpression.annotations: List<IrConstructorCall>
+                get() = annotatedExpressions[attributeOwner()] ?: emptyList()
+
+
+            override fun IrExpression.hasAnnotation(name: String) = annotations.any {
+                it.symbol.owner.parentAsClass.hasEqualFqName(FqName(name))
+            }
         }
     }
 
@@ -60,6 +85,43 @@ interface ExtraIrAttributes {
      * parameter itself (since the value of the parameter might be outdated, because of how Dart syntax works).
      */
     val parameterPropertyReferencesInParameterDefaultValue: MutableSet<IrGetValue>
+
+    fun IrExpression.annotate(buildAnnotation: () -> IrConstructorCall) = annotate(buildAnnotation())
+    fun IrExpression.annotate(annotation: IrConstructorCall) = annotate(listOf(annotation))
+    fun IrExpression.annotate(annotations: Iterable<IrConstructorCall>)
+
+    val IrExpression.annotations: List<IrConstructorCall>
+
+    fun IrExpression.isDartConst(): Boolean = when (this) {
+        // Enums are always constructed as const.
+        is IrEnumConstructorCall -> true
+        is IrConst<*> -> true
+        is IrWhen, is IrIfNullExpression -> {
+            var isConst = true
+
+            acceptChildren(
+                object : IrCustomElementVisitor<Unit, Nothing?> {
+                    override fun visitElement(element: IrElement, data: Nothing?) {
+                        if (element is IrExpression) {
+                            isConst = isConst && element.isDartConst()
+                        }
+
+                        element.acceptChildren(this, null)
+                    }
+
+                },
+                data = null
+            )
+
+            isConst
+        }
+        else -> when {
+            this is IrConstructorCall && symbol.owner.parentAsClass.isDartConst() -> true
+            else -> hasAnnotation(DotlinAnnotations.dartConst)
+        }
+    }
+
+    fun IrExpression.hasAnnotation(name: String): Boolean
 }
 
 /**

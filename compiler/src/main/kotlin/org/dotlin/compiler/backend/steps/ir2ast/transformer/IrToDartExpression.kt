@@ -57,7 +57,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
     override fun visitFunctionAccess(
         irCallLike: IrFunctionAccessExpression,
         context: DartTransformContext,
-    ): DartExpression {
+    ) = context.run {
         val irReceiver = irCallLike.extensionReceiver ?: irCallLike.dispatchReceiver
         val irSingleArgument by lazy { irCallLike.getValueArgument(0)!! }
         val optionalReceiver by lazy {
@@ -80,7 +80,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
             )
         }
 
-        return when (val origin = irCallLike.origin) {
+        when (val origin = irCallLike.origin) {
             IrStatementOrigin.PLUS -> {
                 val irLeftType = irReceiver!!.type
                 val irRightType = irSingleArgument.type
@@ -224,7 +224,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                                     type = type,
                                     constructorName = name,
                                     arguments = arguments,
-                                    isConst = irCallLike.isDartConst(context)
+                                    isConst = irCallLike.isDartConst()
                                 )
                             }
                             else -> {
@@ -415,16 +415,6 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                 parameters = parameters,
                 body = expression.function.body.accept(context)
             )
-        }
-
-    override fun visitAnnotatedExpression(
-        irAnnotated: IrAnnotatedExpression,
-        context: DartTransformContext
-    ): DartExpression =
-        // Dart doesn't support annotated expressions, so the annotations are not outputted. But they are passed
-        // down so annotations can still be checked in child expressions.
-        context.withAnnotatedExpression(from = irAnnotated) {
-            irAnnotated.expression.accept(context)
         }
 
     override fun visitNullAwareExpression(

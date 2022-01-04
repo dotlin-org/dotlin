@@ -19,21 +19,20 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementTransformerVoid
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrAnnotatedExpression
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementVisitorVoid
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
 import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartConst
+import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.builders.irCall
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
-import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.util.primaryConstructor
-import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
+import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 
 /**
  * Adds a `@DartConst` annotation to all expressions in const constructors.
@@ -50,20 +49,19 @@ class DartConstExpressionsInConstConstructorsLowering(override val context: Dart
         val defaultValue = declaration.defaultValue ?: return noChange()
         val dartConst = dartBuiltIns.dotlin.dartConst.owner.primaryConstructor!!.symbol
 
-        defaultValue.transformChildrenVoid(
-            object : IrCustomElementTransformerVoid() {
-                override fun visitConstructorCall(expression: IrConstructorCall): IrExpression {
-                    expression.transformChildrenVoid()
+        defaultValue.acceptChildrenVoid(
+            object : IrCustomElementVisitorVoid {
+                override fun visitConstructorCall(expression: IrConstructorCall) {
+                    expression.acceptChildrenVoid(this)
 
-                    return IrAnnotatedExpression(
-                        expression = expression,
-                        annotations = listOf(
-                            buildStatement(parent.symbol) {
-                                irCall(dartConst)
-                            }
-                        )
-                    )
+                    expression.annotate {
+                        buildStatement(parent.symbol) {
+                            irCall(dartConst)
+                        }
+                    }
                 }
+
+                override fun visitElement(element: IrElement) = element.acceptChildrenVoid(this)
             }
         )
 
