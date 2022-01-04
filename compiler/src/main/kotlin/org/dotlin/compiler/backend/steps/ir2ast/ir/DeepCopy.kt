@@ -365,12 +365,6 @@ class DeepCopier(
             expression.type.remapType()
         ).copyAttributes(expression)
 
-    override fun visitAnnotatedExpression(expression: IrAnnotatedExpression): IrAnnotatedExpression =
-        IrAnnotatedExpression(
-            expression.expression.transform(),
-            expression.annotations.transform()
-        ).copyAttributes(expression)
-
     override fun visitNullAwareExpression(expression: IrNullAwareExpression): IrNullAwareExpression =
         IrNullAwareExpression(expression.expression.transform())
             .copyAttributes(expression)

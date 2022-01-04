@@ -20,8 +20,10 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import com.intellij.psi.PsiElement
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrAnnotatedExpression
-import org.dotlin.compiler.backend.steps.ir2ast.lower.*
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.lower.IrExpressionLowering
+import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformation
+import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
 import org.jetbrains.kotlin.backend.jvm.codegen.psiElement
 import org.jetbrains.kotlin.cfg.getElementParentDeclaration
 import org.jetbrains.kotlin.descriptors.findClassAcrossModuleDependencies
@@ -73,9 +75,9 @@ class AnnotatedExpressionsLowering(override val context: DartLoweringContext) : 
 
         if (annotations.isEmpty()) return noChange()
 
-        return replaceWith(
-            IrAnnotatedExpression(expression, annotations)
-        )
+        expression.annotate(annotations)
+
+        return noChange()
     }
 
 }

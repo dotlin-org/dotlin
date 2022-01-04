@@ -21,9 +21,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.IrVoidType
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrAnnotatedExpression
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartConst
 import org.jetbrains.kotlin.backend.common.lower.irCatch
 import org.jetbrains.kotlin.backend.common.lower.irThrow
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -72,20 +70,17 @@ class ReturnsLowering(override val context: DartLoweringContext) : IrDeclaration
 
         val isVoidReturn = returnType is IrVoidType
 
-        fun IrExpression.makeConstIf(condition: Boolean) = when (condition) {
-            true -> IrAnnotatedExpression(
-                this,
-                annotations = listOf(
+        fun IrExpression.makeConstIf(condition: Boolean) = apply {
+            if (condition) {
+                annotate {
                     buildStatement(declaration.symbol) {
                         irCallConstructor(
                             dartBuiltIns.dotlin.dartConst.owner.primaryConstructor!!.symbol,
                             typeArguments = emptyList()
                         )
-
                     }
-                )
-            )
-            false -> this
+                }
+            }
         }
 
         body.transformExpressions(initialParent = declaration) { expression, parent ->

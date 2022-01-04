@@ -20,18 +20,14 @@
 package org.dotlin.compiler.backend.steps.ir2ast.transformer.util
 
 import org.dotlin.compiler.backend.DotlinAnnotations
-import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementVisitor
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrAnnotatedExpression
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrIfNullExpression
 import org.dotlin.compiler.backend.steps.ir2ast.ir.hasExplicitBackingField
 import org.dotlin.compiler.backend.util.hasAnnotation
 import org.dotlin.compiler.backend.util.isSimple
-import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
+import org.jetbrains.kotlin.ir.expressions.IrGetObjectValue
 import org.jetbrains.kotlin.ir.util.isAnnotationClass
 import org.jetbrains.kotlin.ir.util.isEnumClass
 import org.jetbrains.kotlin.ir.util.isObject
@@ -65,40 +61,6 @@ fun IrDeclaration.isDartConst(): Boolean = when (this) {
         }
         // Annotations, enums and _$DefaultValue classes are always const.
         else -> isEnumClass || isAnnotationClass || origin == IrDartDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE
-    }
-    else -> false
-}
-
-/**
- * **NOTE**: Always pass `context` when calling in a [IrDartTransformer].
- */
-fun IrExpression.isDartConst(context: DartTransformContext? = null): Boolean = when (this) {
-    // Enums are always constructed as const.
-    is IrEnumConstructorCall -> true
-    is IrConst<*> -> true
-    is IrAnnotatedExpression -> hasAnnotation(DotlinAnnotations.dartConst)
-    is IrConstructorCall -> when {
-        symbol.owner.parentAsClass.isDartConst() -> true
-        else -> context?.annotatedExpressions?.get(this)?.hasAnnotation(DotlinAnnotations.dartConst) ?: false
-    }
-    is IrWhen, is IrIfNullExpression -> {
-        var isConst = true
-
-        acceptChildren(
-            object : IrCustomElementVisitor<Unit, Nothing?> {
-                override fun visitElement(element: IrElement, data: Nothing?) {
-                    if (element is IrExpression) {
-                        isConst = isConst && element.isDartConst(context)
-                    }
-
-                    element.acceptChildren(this, null)
-                }
-
-            },
-            data = null
-        )
-
-        isConst
     }
     else -> false
 }
