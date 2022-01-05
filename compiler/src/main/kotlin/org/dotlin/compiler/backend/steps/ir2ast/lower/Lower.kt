@@ -44,6 +44,7 @@ private val lowerings: List<KFunction1<DartLoweringContext, IrLowering>> = listO
     ::ComplexParametersLowering,
     ::PropertiesReferencingThisLowering,
     ::PropertiesReferencingParametersLowering,
+    ::PrivateParameterPropertyWithDefaultValuesLowering,
     ::OverriddenParametersLowering,
     ::DefaultInterfaceImplementationsLowering,
     ::OperatorsLowering,

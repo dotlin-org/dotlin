@@ -799,17 +799,15 @@ class Class : BaseTest {
                 """
             )
         }
-    }
 
-    @Test
-    fun `class with property initialized by parameter`() =
-        assertCompile {
+        @Test
+        fun `class with property initialized by parameter`() = assertCompile {
             kotlin(
                 """
-                    class Vector(x: Int) {
-                        val y = x
-                    }
-                    """
+                class Vector(x: Int) {
+                    val y = x
+                }
+                """
             )
 
             dart(
@@ -828,15 +826,38 @@ class Class : BaseTest {
             )
         }
 
-    @Test
-    fun `class with property initialized by parameter or if null other value`() =
-        assertCompile {
+        @Test
+        fun `class with property initialized by parameter or if null other value`() = assertCompile {
             kotlin(
                 """
-                    class Vector(x: Int?) {
-                        val y = x ?: 3
-                    }
-                    """
+                class Vector(x: Int?) {
+                    val y = x ?: 3
+                }
+                """
+            )
+
+            dart(
+                """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Vector {
+              Vector(int? x)
+                  : y = x ?? 3,
+                    super();
+              @nonVirtual
+              final int y;
+            }
+            """
+            )
+        }
+
+        @Test
+        fun `class with private constructor property`() = assertCompile {
+            kotlin(
+                """
+                class Vector(private val x: Int?)
+                """
             )
 
             dart(
@@ -845,15 +866,38 @@ class Class : BaseTest {
 
                 @sealed
                 class Vector {
-                  Vector(int? x)
-                      : y = x ?? 3,
-                        super();
+                  Vector(this._x) : super();
                   @nonVirtual
-                  final int y;
+                  final int? _x;
                 }
                 """
             )
         }
+
+        @Test
+        fun `class with private constructor property with default value`() = assertCompile {
+            kotlin(
+                """
+                class Vector(private val x: Int = 3)
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                @sealed
+                class Vector {
+                  Vector({int x = 3})
+                      : _x = x,
+                        super();
+                  @nonVirtual
+                  final int _x;
+                }
+                """
+            )
+        }
+    }
 
     @Nested
     inner class Inheritance {

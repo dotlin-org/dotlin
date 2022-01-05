@@ -20,33 +20,50 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.attributes.attributeOwner
-import org.dotlin.compiler.backend.steps.ir2ast.ir.hasReferenceToThis
+import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
+import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrivate
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
 import org.jetbrains.kotlin.ir.builders.irGet
 import org.jetbrains.kotlin.ir.builders.irSetField
+import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrProperty
+import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.expressions.IrBlockBody
 import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.ir.util.primaryConstructor
 
+/**
+ * If the property is private and has a default value in the constructor, Dart gives an error since
+ * Dart does not allow named parameters starting with an underscore. We fix that by initializing the property
+ * in the field initializer list.
+ */
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-class PropertiesReferencingThisLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
+class PrivateParameterPropertyWithDefaultValuesLowering(override val context: DartLoweringContext) :
+    IrDeclarationLowering {
     override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
-        if (declaration !is IrProperty || !declaration.hasReferenceToThis()) return noChange()
+        if (declaration !is IrValueParameter ||
+            declaration.parent !is IrConstructor
+            || declaration.defaultValue == null) {
+            return noChange()
+        }
 
-        val primaryConstructor = declaration.parentAsClass.primaryConstructor ?: return noChange()
-        val primaryConstructorBody = primaryConstructor.body as IrBlockBody
+        val property = declaration.correspondingProperty
 
-        // If we have a reference to this in the initializer, backingField is guaranteed to not be null.
-        val backingField = declaration.backingField!!
+        if (property == null || !property.isPrivate || property.isInitializedSomewhereElse) {
+            return noChange()
+        }
 
-        propertiesInitializedInConstructorBody.add(declaration.attributeOwner())
+        val backingField = property.backingField!!
+        val constructor = declaration.parent as? IrConstructor ?: return noChange()
+        val constructorBody = constructor.body as IrBlockBody
 
-        primaryConstructorBody.statements.add(
-            buildStatement(primaryConstructor.symbol) {
+        propertiesInitializedInFieldInitializerList.add(property.attributeOwner())
+
+        constructorBody.statements.add(
+            buildStatement(constructor.symbol) {
                 irSetField(
-                    receiver = irGet(declaration.parentAsClass.thisReceiver!!),
+                    receiver = irGet(constructor.parentAsClass.thisReceiver!!),
                     field = backingField,
                     value = backingField.initializer!!.expression,
                 )
