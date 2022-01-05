@@ -22,9 +22,11 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower
 import org.dotlin.compiler.backend.steps.ir2ast.DartIrBuiltIns
 import org.dotlin.compiler.backend.steps.ir2ast.attributes.ExtraIrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartNameAsSimple
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartNameWith
 import org.dotlin.compiler.backend.util.sentenceCase
+import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.DefaultMapping
 import org.jetbrains.kotlin.backend.common.ir.*
@@ -165,7 +167,7 @@ class DartLoweringContext(
                     is IrClass -> classifier.file to classifier.defaultType.let {
                         when {
                             it.isPrimitiveNumber() -> classifier.name.identifier
-                            else -> classifier.dartNameAsSimple
+                            else -> classifier.dartName.escapedValue()
                         }
                     }
                     is IrTypeParameter -> classifier.file to classifier.dartNameWith(superTypes = true)
@@ -180,7 +182,7 @@ class DartLoweringContext(
                 }
                 val typeArguments = when (receiverType) {
                     is IrSimpleType -> receiverType.arguments
-                        .mapNotNull { it.typeOrNull?.classOrNull?.owner?.dartNameAsSimple?.value }
+                        .mapNotNull { it.typeOrNull?.classOrNull?.owner?.dartName?.escapedValue() }
                         .joinToString { it.sentenceCase() }
                     else -> ""
                 }
@@ -233,4 +235,6 @@ class DartLoweringContext(
                     }
                 }
         }
+
+    fun DartIdentifier.escapedValue() = value.replace(".", "").sentenceCase()
 }

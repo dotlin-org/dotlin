@@ -19,11 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer.util
 
-import org.dotlin.compiler.backend.hasDartExtensionAnnotation
-import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
-import org.dotlin.compiler.backend.steps.ir2ast.ir.isDartExtensionContainer
-import org.dotlin.compiler.backend.steps.ir2ast.ir.isOverride
-import org.dotlin.compiler.backend.steps.ir2ast.ir.isStatic
+import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities.INTERNAL
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities.PROTECTED
@@ -34,6 +30,8 @@ import org.jetbrains.kotlin.ir.declarations.*
 
 val IrDeclaration.dartAnnotations: List<DartAnnotation>
     get() {
+        val isExtension = isExtension
+
         val isStatic = when (this) {
             is IrField -> isStatic
             is IrFunction -> isStatic
@@ -41,7 +39,7 @@ val IrDeclaration.dartAnnotations: List<DartAnnotation>
         }
 
         val override = when {
-            (!hasDartExtensionAnnotation() && this is IrOverridableDeclaration<*> && isOverride) || (this is IrField && isOverride) -> {
+            !isExtension && (this is IrOverridableDeclaration<*> && isOverride) || (this is IrField && isOverride) -> {
                 DartAnnotation.OVERRIDE
             }
             else -> null
@@ -50,18 +48,26 @@ val IrDeclaration.dartAnnotations: List<DartAnnotation>
         val visibility = when (this) {
             is IrDeclarationWithVisibility -> when (visibility) {
                 INTERNAL -> DartAnnotation.INTERNAL
-                PROTECTED -> DartAnnotation.PROTECTED
-                else -> null
+                else -> when {
+                    !isExtension -> when (visibility) {
+                        PROTECTED -> DartAnnotation.PROTECTED
+                        else -> null
+                    }
+                    else -> null
+                }
             }
             else -> null
         }
 
-        val modality = when (modality) {
-            SEALED, FINAL -> when {
-                // Sealed as well as final classes get marked @sealed.
-                this is IrClass && !isDartExtensionContainer -> DartAnnotation.SEALED
-                // Non-static, non-top-level final declarations get marked @nonVirtual.
-                parent !is IrFile && !isStatic -> DartAnnotation.NON_VIRTUAL
+        val modality = when {
+            !isExtension -> when (modality) {
+                SEALED, FINAL -> when {
+                    // Sealed as well as final classes get marked @sealed.
+                    this is IrClass && !isDartExtensionContainer -> DartAnnotation.SEALED
+                    // Non-static, non-top-level final declarations get marked @nonVirtual.
+                    parent !is IrFile && !isStatic -> DartAnnotation.NON_VIRTUAL
+                    else -> null
+                }
                 else -> null
             }
             else -> null

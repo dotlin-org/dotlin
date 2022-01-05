@@ -43,7 +43,10 @@ class ExtensionsLowering(override val context: DartLoweringContext) : IrDeclarat
             }
         }
 
-        extensionContainer.declarations.add(declaration)
+        extensionContainer.apply {
+            declaration.file.declarations.remove(declaration)
+            addChild(declaration)
+        }
 
         val oldReceiverTypeParameters = declaration.extensionReceiverOrNull!!.type.typeParametersOrSelf
         if (oldReceiverTypeParameters.isNotEmpty()) {
