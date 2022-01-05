@@ -44,29 +44,31 @@ class DartExtensionsLowering(override val context: DartLoweringContext) : IrDecl
 
         if (!declaration.hasDartExtensionAnnotation()) return noChange()
 
-        declaration.also {
-            when (it) {
-                is IrSimpleFunction -> it.toExtension()
-                is IrProperty -> {
-                    it.getter = it.getter?.toExtension()
-                    it.setter = it.setter?.toExtension()
-                }
-            }
-        }
-
-        return noChange()
-    }
-
-    private fun IrSimpleFunction.toExtension(): IrSimpleFunction {
-        parentAsClass.declarations.remove(this)
-
-        return deepCopyWith {
+        fun IrSimpleFunction.toExtension(): IrSimpleFunction = deepCopyWith {
             isExternal = false
         }.apply {
             extensionReceiverParameter = dispatchReceiverParameter
             dispatchReceiverParameter = null
-            file.addChild(this)
         }
+
+        declaration.also {
+            it.parentAsClass.declarations.remove(it)
+
+            val newDeclaration = when (it) {
+                is IrSimpleFunction -> it.toExtension()
+                is IrProperty ->  it.deepCopyWith {
+                    isExternal = false
+                }.apply {
+                    getter = getter?.toExtension()
+                    setter = setter?.toExtension()
+                }
+                else -> throw IllegalStateException("Impossible situation")
+            }
+
+            it.file.addChild(newDeclaration)
+        }
+
+        return noChange()
     }
 }
 

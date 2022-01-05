@@ -569,6 +569,9 @@ val IrDeclaration.extensionReceiverOrNull: IrValueParameter?
         else -> null
     }
 
+val IrDeclaration.isExtension: Boolean
+    get() = extensionReceiverOrNull != null
+
 /**
  * Accounts for the `@DartExtension` annotation.
  */
