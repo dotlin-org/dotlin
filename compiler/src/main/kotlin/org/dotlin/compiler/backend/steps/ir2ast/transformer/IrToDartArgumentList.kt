@@ -35,34 +35,20 @@ object IrToDartArgumentListTransformer : IrDartAstTransformer<DartArgumentList> 
     override fun visitFunctionAccess(
         irCallLike: IrFunctionAccessExpression,
         context: DartTransformContext
-    ): DartArgumentList {
-        val irParameters = irCallLike.symbol.owner.valueParameters
-
-        val dartParameters = irParameters.accept(context)
-
-        val arguments = mutableListOf<DartExpression>()
-        for (i in 0 until irCallLike.valueArgumentsCount) {
-            val argument = irCallLike.getValueArgument(i) ?: continue
-
-            // Find the param with the given name or parameter at our position.
-            val irParameter = irParameters[i]
-            val dartParameter = dartParameters.first {
-                it.identifier == irParameter.dartName
+    ) = DartArgumentList(
+        irCallLike.symbol.owner.valueParameters
+            .associateWith { it.accept(context) }
+            .entries
+            .mapNotNull map@{ (irParameter, dartParameter) ->
+                val irArgument = irCallLike.getValueArgument(irParameter.index) ?: return@map null
+                when {
+                    dartParameter.isDefault() && dartParameter.isNamed -> DartNamedExpression(
+                        label = DartLabel(dartParameter.identifier as DartSimpleIdentifier),
+                        expression = irArgument.accept(context)
+                    )
+                    else -> irArgument.accept(context)
+                }
             }
-
-            val dartArgument = when {
-                dartParameter.isDefault() && dartParameter.isNamed -> DartNamedExpression(
-                    label = DartLabel(dartParameter.identifier as DartSimpleIdentifier),
-                    expression = argument.accept(context)
-                )
-                else -> argument.accept(context)
-            }
-
-            arguments.add(dartArgument)
-        }
-
-        arguments.sortBy { it is DartNamedExpression }
-
-        return DartArgumentList(arguments)
-    }
+            .sortedBy { it is DartNamedExpression }
+    )
 }
