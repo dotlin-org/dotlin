@@ -66,3 +66,29 @@ data class DartBitwiseNegationExpression(
 ) : DartPrefixExpression {
     override val operator = DartUnaryOperator("~")
 }
+
+sealed interface DartIncrementExpression : DartUnaryExpression {
+    override val operator: DartUnaryOperator
+        get() = DartUnaryOperator("++")
+}
+
+sealed interface DartDecrementExpression : DartUnaryExpression {
+    override val operator: DartUnaryOperator
+        get() = DartUnaryOperator("--")
+}
+
+data class DartPrefixIncrementExpression(
+    override val expression: DartExpression,
+) : DartPrefixExpression, DartIncrementExpression
+
+data class DartPrefixDecrementExpression(
+    override val expression: DartExpression,
+) : DartPrefixExpression, DartDecrementExpression
+
+data class DartPostfixIncrementExpression(
+    override val expression: DartExpression,
+) : DartPostfixExpression, DartIncrementExpression
+
+data class DartPostfixDecrementExpression(
+    override val expression: DartExpression,
+) : DartPostfixExpression, DartDecrementExpression

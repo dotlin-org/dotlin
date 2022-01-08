@@ -40,7 +40,9 @@ import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
 import org.jetbrains.kotlin.ir.declarations.IrField
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin.*
 import org.jetbrains.kotlin.ir.expressions.IrTypeOperator.*
 import org.jetbrains.kotlin.ir.types.isBoolean
 import org.jetbrains.kotlin.ir.types.isChar
@@ -81,7 +83,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         }
 
         when (val origin = irCallLike.origin) {
-            IrStatementOrigin.PLUS -> {
+            PLUS -> {
                 val irLeftType = irReceiver!!.type
                 val irRightType = irSingleArgument.type
 
@@ -97,15 +99,15 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                     else -> DartPlusExpression(infixReceiver, infixSingleArgument)
                 }
             }
-            IrStatementOrigin.MINUS -> when {
+            MINUS -> when {
                 // Built-in: String - int will use the Dart extension.
                 irReceiver!!.type.isChar() && irSingleArgument.type.isInt() -> {
                     methodInvocation(irCallLike.symbol.owner.dartNameAsSimple)
                 }
                 else -> DartMinusExpression(infixReceiver, infixSingleArgument)
             }
-            IrStatementOrigin.MUL -> DartMultiplyExpression(infixReceiver, infixSingleArgument)
-            IrStatementOrigin.DIV -> {
+            MUL -> DartMultiplyExpression(infixReceiver, infixSingleArgument)
+            DIV -> {
                 when {
                     // Dart's int divide operator returns a double, while Kotlin's Int divide operator returns an
                     // Int. So, we use the ~/ Dart operator, which returns an int.
@@ -116,8 +118,8 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                     else -> DartDivideExpression(infixReceiver, infixSingleArgument)
                 }
             }
-            IrStatementOrigin.PERC -> DartModuloExpression(infixReceiver, infixSingleArgument)
-            IrStatementOrigin.GT, IrStatementOrigin.GTEQ, IrStatementOrigin.LT, IrStatementOrigin.LTEQ -> {
+            PERC -> DartModuloExpression(infixReceiver, infixSingleArgument)
+            GT, GTEQ, LT, LTEQ -> {
                 val (actualLeft, actualRight) = if (irCallLike.valueArgumentsCount == 1) {
                     infixReceiver to infixSingleArgument
                 } else {
@@ -129,17 +131,17 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                 return DartComparisonExpression(
                     left = actualLeft,
                     operator = when (origin) {
-                        IrStatementOrigin.GT -> DartComparisonExpression.Operators.GREATER
-                        IrStatementOrigin.LT -> DartComparisonExpression.Operators.LESS
-                        IrStatementOrigin.GTEQ -> DartComparisonExpression.Operators.GREATER_OR_EQUAL
-                        IrStatementOrigin.LTEQ -> DartComparisonExpression.Operators.LESS_OR_EQUAL
+                        GT -> DartComparisonExpression.Operators.GREATER
+                        LT -> DartComparisonExpression.Operators.LESS
+                        GTEQ -> DartComparisonExpression.Operators.GREATER_OR_EQUAL
+                        LTEQ -> DartComparisonExpression.Operators.LESS_OR_EQUAL
                         else -> throw UnsupportedOperationException()
                     },
                     right = actualRight,
                 )
             }
-            IrStatementOrigin.EQEQ, IrStatementOrigin.EXCLEQ -> {
-                val isNegated = origin == IrStatementOrigin.EXCLEQ
+            EQEQ, EXCLEQ -> {
+                val isNegated = origin == EXCLEQ
 
                 fun IrExpression.accept() = accept(context).possiblyParenthesize(inEquals = true)
 
@@ -155,7 +157,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                     else -> DartEqualsExpression(left, right)
                 }
             }
-            IrStatementOrigin.EQ ->
+            EQ ->
                 DartAssignmentExpression(
                     left = DartPropertyAccessExpression(
                         target = infixReceiver,
@@ -164,10 +166,10 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                     ),
                     right = singleArgument,
                 )
-            IrStatementOrigin.EXCLEXCL -> DartNotNullAssertionExpression(
+            EXCLEXCL -> DartNotNullAssertionExpression(
                 singleArgument.possiblyParenthesize(isReceiver = true)
             )
-            IrStatementOrigin.UMINUS -> DartUnaryMinusExpression(
+            UMINUS -> DartUnaryMinusExpression(
                 receiver.possiblyParenthesize(isReceiver = true)
             )
             else -> {
@@ -178,10 +180,10 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                 val (shl, shr, ushr, and, or, xor, inv) = primitiveNumberOperatorNames
 
                 when {
-                    irCallLike.origin == IrStatementOrigin.EXCL && irReceiver!!.type.isBoolean() -> {
+                    irCallLike.origin == EXCL && irReceiver!!.type.isBoolean() -> {
                         DartNegatedExpression(receiver.possiblyParenthesize(isReceiver = true))
                     }
-                    origin == IrStatementOrigin.GET_PROPERTY || origin == IrStatementOrigin.GET_LOCAL_PROPERTY
+                    origin == GET_PROPERTY || origin == GET_LOCAL_PROPERTY
                             || hasDartGetterAnnotation -> {
                         val irSimpleFunction = irFunction as IrSimpleFunction
                         val irAccessed = when {
@@ -480,6 +482,37 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
             else -> this
         }
     }
+
+    override fun visitBlock(expression: IrBlock, context: DartTransformContext) =
+        when (val origin = expression.origin) {
+            PREFIX_INCR, PREFIX_DECR -> {
+                val irSetValue = expression.statements.first() as IrSetValue
+                val variable = irSetValue.symbol.owner.dartName
+
+                when {
+                    expression.type.isPrimitiveNumber() -> when (origin) {
+                        PREFIX_INCR -> DartPrefixIncrementExpression(variable)
+                        else -> DartPrefixDecrementExpression(variable)
+                    }
+                    // If it's not called on a primitive number, we invoke inc() or dec() directly.
+                    else -> DartAssignmentExpression(
+                        left = variable,
+                        right = irSetValue.value.accept(context)
+                    )
+                }
+            }
+            POSTFIX_INCR, POSTFIX_DECR -> {
+                // Non-primitive number types are handled in a lowering.
+                require(expression.type.isPrimitiveNumber())
+                val receiver = (expression.statements.first() as IrVariable).initializer!!.accept(context)
+
+                when (origin) {
+                    POSTFIX_INCR -> DartPostfixIncrementExpression(receiver)
+                    else -> DartPostfixDecrementExpression(receiver)
+                }
+            }
+            else -> todo(expression)
+        }
 }
 
 fun IrExpression.accept(context: DartTransformContext) = accept(IrToDartExpressionTransformer, context)

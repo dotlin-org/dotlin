@@ -98,13 +98,13 @@
   - [x] Additions
   - [x] Multiplications
   - [x] Cast expressions
-  - [ ] Prefix increment expressions
-  - [ ] Prefix decrement expressions
+  - [x] Prefix increment expressions
+  - [x] Prefix decrement expressions
   - [x] Unary minus expressions
   - [ ] Unary plus expressions
   - [ ] Logical not expressions
-  - [ ] Postfix increment expressions
-  - [ ] Postfix decrement expressions
+  - [x] Postfix increment expressions
+  - [x] Postfix decrement expressions
   - [x] Not-null assertions
   - [ ] Indexing expressions
   - [x] Function calls
