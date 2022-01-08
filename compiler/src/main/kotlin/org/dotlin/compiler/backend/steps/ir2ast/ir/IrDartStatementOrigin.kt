@@ -36,9 +36,10 @@ sealed class IrDartStatementOrigin(private val name: String) : IrStatementOrigin
     object COMPLEX_PARAM_INIT_NULLABLE : IrDartStatementOrigin("COMPLEX_PARAM_INIT_NULLABLE")
 
     /**
-     * A block for a when is meant as a Dart statement, not a Dart expression.
+     * The call with this origin was created to call the original operator method for a synthetic operator, e.g.
+     * `[]` redirecting to `get`.
      */
-    object WHEN_STATEMENT : IrDartStatementOrigin("WHEN_STATEMENT")
+    object OPERATOR_REDIRECT : IrDartStatementOrigin("OPERATOR_REDIRECT")
 
     override fun toString() = name
 }

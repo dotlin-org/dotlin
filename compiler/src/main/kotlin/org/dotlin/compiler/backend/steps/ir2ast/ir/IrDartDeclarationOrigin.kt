@@ -38,6 +38,8 @@ sealed class IrDartDeclarationOrigin(private val name: String) : IrDeclarationOr
 
     object SYNTHETIC_OPERATOR : IrDartDeclarationOrigin("SYNTHETIC_OPERATOR")
 
+    object WAS_OPERATOR : IrDartDeclarationOrigin("WAS_OPERATOR")
+
     object EXTENSION : IrDartDeclarationOrigin("EXTENSION")
 
     object STATIC_OBJECT_MEMBER : IrDartDeclarationOrigin("STATIC_OBJECT_MEMBER")

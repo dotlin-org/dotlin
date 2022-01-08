@@ -127,6 +127,9 @@ interface DartAstNodeVisitor<R, C> {
     fun visitNamedExpression(namedExpression: DartNamedExpression, context: C): R =
         visitAstNode(namedExpression, context)
 
+    fun visitIndexExpression(indexExpression: DartIndexExpression, context: C): R =
+        visitAstNode(indexExpression, context)
+
     fun visitParenthesizedExpression(parenthesizedExpression: DartParenthesizedExpression, context: C): R =
         visitAstNode(parenthesizedExpression, context)
 

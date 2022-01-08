@@ -1604,4 +1604,161 @@ class Expression : BaseTest {
             )
         }
     }
+
+    @Nested
+    @DisplayName("Indexed Access")
+    inner class IndexedAccess {
+        @Test
+        fun `indexed get`() = assertCompile {
+            kotlin(
+                """
+                class Test {
+                    operator fun get(index: Int): Int {
+                        return index
+                    }
+                }
+
+                fun main() {
+                    val t = Test()
+                    t[0]
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                @sealed
+                class Test {
+                  @nonVirtual
+                  int get(int index) {
+                    return index;
+                  }
+
+                  @nonVirtual
+                  int operator [](int index) => this.get(index);
+                }
+
+                void main() {
+                  final Test t = Test();
+                  t[0];
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `index get with multiple parameters`() = assertCompile {
+            kotlin(
+                """
+                class Test {
+                    operator fun get(index: Int, index2: Int): Int {
+                        return index + index2
+                    }
+                }
+
+                fun main() {
+                    Test()[1, 2]
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                @sealed
+                class Test {
+                  @nonVirtual
+                  int get(
+                    int index,
+                    int index2,
+                  ) {
+                    return index + index2;
+                  }
+                }
+
+                void main() {
+                  Test().get(1, 2);
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `indexed set`() = assertCompile {
+            kotlin(
+                """
+                class Test {
+                    operator fun set(index: Int, value: Boolean) {}
+                }
+
+                fun main() {
+                    Test()[4] = true
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                @sealed
+                class Test {
+                  @nonVirtual
+                  void set(
+                    int index,
+                    bool value,
+                  ) {}
+                  @nonVirtual
+                  void operator []=(
+                    int index,
+                    bool value,
+                  ) =>
+                      this.set(index, value);
+                }
+
+                void main() {
+                  Test()[true] = 4;
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `indexed set with multiple parameters`() = assertCompile {
+            kotlin(
+                """
+                class Test {
+                    operator fun set(index: Int, index2: Int, value: Boolean) {}
+                }
+
+                fun main() {
+                    Test()[3, 4] = true
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                @sealed
+                class Test {
+                  @nonVirtual
+                  void set(
+                    int index,
+                    int index2,
+                    bool value,
+                  ) {}
+                }
+
+                void main() {
+                  Test().set(3, 4, true);
+                }
+                """
+            )
+        }
+    }
 }

@@ -50,6 +50,7 @@ import org.jetbrains.kotlin.ir.types.isInt
 import org.jetbrains.kotlin.ir.types.isString
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
+import org.jetbrains.kotlin.name.Name
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
@@ -157,15 +158,6 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                     else -> DartEqualsExpression(left, right)
                 }
             }
-            EQ ->
-                DartAssignmentExpression(
-                    left = DartPropertyAccessExpression(
-                        target = infixReceiver,
-                        propertyName = (irCallLike.symbol.owner as IrSimpleFunction)
-                            .correspondingProperty!!.dartNameAsSimple
-                    ),
-                    right = singleArgument,
-                )
             EXCLEXCL -> DartNotNullAssertionExpression(
                 singleArgument.possiblyParenthesize(isReceiver = true)
             )
@@ -180,7 +172,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                 val (shl, shr, ushr, and, or, xor, inv) = primitiveNumberOperatorNames
 
                 when {
-                    irCallLike.origin == EXCL && irReceiver!!.type.isBoolean() -> {
+                    origin == EXCL && irReceiver!!.type.isBoolean() -> {
                         DartNegatedExpression(receiver.possiblyParenthesize(isReceiver = true))
                     }
                     origin == GET_PROPERTY || origin == GET_LOCAL_PROPERTY
@@ -196,6 +188,22 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
                             else -> DartPropertyAccessExpression(infixReceiver, irAccessed.dartNameAsSimple)
                         }
                     }
+                    irCallLike.isDartIndexedGet() -> DartIndexExpression(receiver, singleArgument)
+                    irCallLike.isDartIndexedSet() -> DartAssignmentExpression(
+                        left = DartIndexExpression(
+                            target = receiver,
+                            index = irCallLike.valueArguments.last()!!.accept(context)
+                        ),
+                        right = irCallLike.valueArguments.first()!!.accept(context)
+                    )
+                    origin == EQ && !irCallLike.isSet() -> DartAssignmentExpression(
+                        left = DartPropertyAccessExpression(
+                            target = infixReceiver,
+                            propertyName = (irCallLike.symbol.owner as IrSimpleFunction)
+                                .correspondingProperty!!.dartNameAsSimple
+                        ),
+                        right = singleArgument,
+                    )
                     // Some non-operator methods on primitive integers (Short, Int, etc.) are operators in Dart,
                     // such as `xor` or `ushr`.
                     irCallLike.symbol.owner.parentClassOrNull?.defaultType?.isPrimitiveInteger() == true &&
@@ -517,3 +525,28 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
 
 fun IrExpression.accept(context: DartTransformContext) = accept(IrToDartExpressionTransformer, context)
 fun IrExpressionBody.accept(context: DartTransformContext) = accept(IrToDartExpressionTransformer, context)
+
+private fun IrFunctionAccessExpression.isDartIndexed(get: Boolean): Boolean {
+    val (name, syntheticName, parametersCount) = when (get) {
+        true -> Triple("get", "[]", 1)
+        false -> Triple("set", "[]=", 2)
+    }
+
+    val owner = symbol.owner as? IrSimpleFunction ?: return false
+
+    return owner.let {
+        origin != IrDartStatementOrigin.OPERATOR_REDIRECT &&
+                (it.name == Name.identifier(name) ||
+                        (it.name == Name.identifier(syntheticName) && it.valueParameters.size == parametersCount))
+                && it.isOperator
+    }
+}
+
+private fun IrFunctionAccessExpression.isDartIndexedGet() = isDartIndexed(get = true)
+private fun IrFunctionAccessExpression.isDartIndexedSet() = isDartIndexed(get = false)
+
+private fun IrFunctionAccessExpression.isSet() =
+    (symbol.owner as IrSimpleFunction?)?.let {
+        (it.isOperator || it.origin == IrDartDeclarationOrigin.WAS_OPERATOR) &&
+                it.name == Name.identifier("set")
+    } == true
