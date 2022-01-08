@@ -25,13 +25,13 @@
   - [ ] Library
   - [x] Nothing
   - [x] Number
-  - [ ] Primitives
-    - [ ] Byte
-    - [ ] Short
-    - [ ] Int
-    - [ ] Long
-    - [ ] Float
-    - [ ] Double
+  - [x] Primitives
+    - [x] Byte
+    - [x] Short
+    - [x] Int
+    - [x] Long
+    - [x] Float
+    - [x] Double
   - [x] String
   - [x] Throwable
 - [ ] Classes
@@ -42,7 +42,7 @@
   - [ ] Inline (value) classes
   - [ ] Data classes
   - [ ] Sealed classes
-  - [ ] Enum classes
+  - [x] Enum classes
   - [ ] Annotation classes
   - [ ] Interfaces
     - [x] Regular interfaces
@@ -106,7 +106,7 @@
   - [x] Postfix increment expressions
   - [x] Postfix decrement expressions
   - [x] Not-null assertions
-  - [ ] Indexing expressions
+  - [x] Indexing expressions
   - [x] Function calls
   - [x] Constructor calls
   - [x] Property access expressions
