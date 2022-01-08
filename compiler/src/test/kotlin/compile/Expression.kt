@@ -1794,4 +1794,100 @@ class Expression : BaseTest {
             )
         }
     }
+
+    @Test
+    fun `call infix method`() = assertCompile {
+        kotlin(
+            """
+            class Test {
+                infix fun add(other: Test) = Test()
+            }
+
+            fun main() {
+                Test() add Test()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {
+              @nonVirtual
+              Test add(Test other) {
+                return Test();
+              }
+            }
+
+            void main() {
+              Test().add(Test());
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call infix extension method`() = assertCompile {
+        kotlin(
+            """
+            class Test
+
+            infix fun Test.add(other: Test) = Test()
+
+            fun main() {
+                Test() add Test()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {}
+
+            void main() {
+              Test().add(Test());
+            }
+
+            extension ${'$'}TestExtensions on Test {
+              Test add(Test other) {
+                return Test();
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call extension method on Int`() = assertCompile {
+        kotlin(
+            """
+            fun Int.add(other: Int) = this + other
+
+            fun main() {
+                1.add(2)
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              ${'$'}KotlinIntExtensions(1).add(2);
+            }
+
+            extension ${'$'}KotlinIntExtensions on int {
+              int add(int other) {
+                return this + other;
+              }
+            }
+            """
+        )
+    }
 }

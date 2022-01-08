@@ -20,13 +20,14 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.extensionReceiverOrNull
-import org.dotlin.compiler.backend.steps.ir2ast.ir.irCall
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrimitiveNumber
-import org.dotlin.compiler.backend.steps.ir2ast.lower.*
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.lower.IrExpressionLowering
+import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformation
+import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
 import org.jetbrains.kotlin.ir.builders.irCall
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
-import org.jetbrains.kotlin.ir.declarations.copyAttributes
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.util.primaryConstructor
@@ -44,18 +45,17 @@ class ConflictingExtensionCallsLowering(override val context: DartLoweringContex
         val function = expression.symbol.owner
         val extensionContainer = function.extensionContainer ?: return noChange()
 
-        if (!function.extensionReceiverOrNull!!.type.isPrimitiveNumber()) return noChange()
+        if (!receiver.type.isPrimitiveNumber()) return noChange()
 
-        return replaceWith(
-            buildStatement(container.symbol) {
-                irCall(
-                    function,
-                    receiver = irCall(extensionContainer.primaryConstructor!!).apply {
-                        putValueArgument(0, receiver)
-                    },
-                    origin = expression.origin
-                ).copyAttributes(expression)
+        expression.apply {
+            dispatchReceiver = buildStatement(container.symbol) {
+                irCall(extensionContainer.primaryConstructor!!).apply {
+                    putValueArgument(0, receiver)
+                }
             }
-        )
+            extensionReceiver = null
+        }
+
+        return noChange()
     }
 }
