@@ -652,7 +652,7 @@ class Expression : BaseTest {
     }
 
     @Test
-    fun `Boolean !`() = assertCompile {
+    fun `Boolean not`() = assertCompile {
         kotlin(
             """
             fun main() {
@@ -667,6 +667,39 @@ class Expression : BaseTest {
 
             void main() {
               !(1 == 0);
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `overloaded not`() = assertCompile {
+        kotlin(
+            """
+            class Test {
+                operator fun not() = Test()
+            }
+
+            fun main() {
+                !Test()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {
+              @nonVirtual
+              Test not() {
+                return Test();
+              }
+            }
+
+            void main() {
+              Test().not();
             }
             """
         )

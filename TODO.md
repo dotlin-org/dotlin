@@ -102,7 +102,7 @@
   - [x] Prefix decrement expressions
   - [x] Unary minus expressions
   - [ ] Unary plus expressions
-  - [ ] Logical not expressions
+  - [x] Logical not expressions
   - [x] Postfix increment expressions
   - [x] Postfix decrement expressions
   - [x] Not-null assertions
