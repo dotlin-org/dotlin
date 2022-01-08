@@ -23,6 +23,7 @@ import BaseTest
 import assertCompile
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 @DisplayName("Compile: Expression")
@@ -1358,5 +1359,249 @@ class Expression : BaseTest {
             const double x = -(0.0 / 0.0);
             """
         )
+    }
+
+    @Nested
+    @DisplayName("Increment & Decrement")
+    inner class IncrementDecrement {
+        @Test
+        fun `prefix increment`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    var x = 1
+                    ++x
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                void main() {
+                  int x = 1;
+                  ++x;
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `prefix decrement`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    var x = 1
+                    --x
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                void main() {
+                  int x = 1;
+                  --x;
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `postfix increment`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    var x = 1
+                    x++
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                void main() {
+                  int x = 1;
+                  x++;
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `postfix decrement`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    var x = 1
+                    x--
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                void main() {
+                  int x = 1;
+                  x--;
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `overloaded prefix increment`() = assertCompile {
+            kotlin(
+                """
+                class Test {
+                    operator fun inc() = Test()
+                }
+
+                fun main() {
+                    var x = Test()
+                    ++x
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                @sealed
+                class Test {
+                  @nonVirtual
+                  Test inc() {
+                    return Test();
+                  }
+                }
+
+                void main() {
+                  Test x = Test();
+                  x = x.inc();
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `overloaded prefix decrement`() = assertCompile {
+            kotlin(
+                """
+                class Test {
+                    operator fun dec() = Test()
+                }
+
+                fun main() {
+                    var x = Test()
+                    --x
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                @sealed
+                class Test {
+                  @nonVirtual
+                  Test dec() {
+                    return Test();
+                  }
+                }
+
+                void main() {
+                  Test x = Test();
+                  x = x.dec();
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `overloaded postfix increment`() = assertCompile {
+            kotlin(
+                """
+                class Test {
+                    operator fun inc() = Test()
+                }
+
+                fun main() {
+                    var x = Test()
+                    x++
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                @sealed
+                class Test {
+                  @nonVirtual
+                  Test inc() {
+                    return Test();
+                  }
+                }
+
+                void main() {
+                  Test x = Test();
+                  () {
+                    final Test tmp0 = x;
+                    x = tmp0.inc();
+                    return tmp0;
+                  }.call();
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `overloaded postfix decrement`() = assertCompile {
+            kotlin(
+                """
+                class Test {
+                    operator fun dec() = Test()
+                }
+
+                fun main() {
+                    var x = Test()
+                    x--
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                @sealed
+                class Test {
+                  @nonVirtual
+                  Test dec() {
+                    return Test();
+                  }
+                }
+
+                void main() {
+                  Test x = Test();
+                  () {
+                    final Test tmp0 = x;
+                    x = tmp0.dec();
+                    return tmp0;
+                  }.call();
+                }
+                """
+            )
+        }
     }
 }
