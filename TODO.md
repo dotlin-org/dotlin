@@ -125,11 +125,11 @@
     - [x] Return expressions
     - [ ] Continue expressions
     - [ ] Break expressions
-- [ ] Statements
+- [x] Statements
   - [x] Assignments
-  - [ ] Loops
-    - [ ] For loop
-    - [ ] While loop
+  - [x] Loops
+    - [x] For loop
+    - [x] While loop
 - [x] Visibility
   - [x] Private
   - [x] Protected

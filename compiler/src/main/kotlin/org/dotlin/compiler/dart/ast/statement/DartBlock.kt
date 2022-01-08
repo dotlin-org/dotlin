@@ -33,4 +33,4 @@ class DartBlock(
     }
 }
 
-fun DartStatement.wrapInBlock(): DartBlock = DartBlock(statements = mutableListOf(this))
+fun DartStatement.wrapInBlock(): DartBlock = DartBlock(statements = listOf(this))
