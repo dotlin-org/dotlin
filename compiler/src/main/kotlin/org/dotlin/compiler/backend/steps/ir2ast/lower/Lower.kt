@@ -77,6 +77,7 @@ private val lowerings: List<KFunction1<DartLoweringContext, IrLowering>> = listO
     ::TryExpressionsLowering,
     ::DartCatchAsLowering,
     ::InvokeCallsLowering,
+    ::IrCompositesToIrBlocksLowering,
     ::DartCodeLowering
 )
 

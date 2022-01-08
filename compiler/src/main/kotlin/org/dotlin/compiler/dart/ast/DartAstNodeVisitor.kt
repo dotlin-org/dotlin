@@ -196,9 +196,15 @@ interface DartAstNodeVisitor<R, C> {
     fun visitReturnStatement(statement: DartReturnStatement, context: C): R = visitAstNode(statement, context)
     fun visitIfStatement(statement: DartIfStatement, context: C): R = visitAstNode(statement, context)
     fun visitTryStatement(statement: DartTryStatement, context: C): R = visitAstNode(statement, context)
+    fun visitWhileStatement(statement: DartWhileStatement, context: C): R = visitAstNode(statement, context)
+    fun visitForStatement(statement: DartForStatement, context: C): R = visitAstNode(statement, context)
+    fun visitForPartsWithDeclarations(forParts: DartForPartsWithDeclarations, context: C): R =
+        visitAstNode(forParts, context)
+
+    fun visitForEachPartsWithDeclarations(forParts: DartForEachPartsWithDeclarations, context: C): R =
+        visitAstNode(forParts, context)
 
     // Type
-
     fun visitTypeArgumentList(typeArguments: DartTypeArgumentList, context: C): R = throwUnsupported()
     fun visitNamedType(type: DartNamedType, context: C): R = throwUnsupported()
     fun visitTypeParameterList(typeParameters: DartTypeParameterList, context: C): R = throwUnsupported()

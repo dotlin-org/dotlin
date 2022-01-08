@@ -85,7 +85,46 @@ object DartStatementTransformer : DartAstNodeTransformer {
 
         "$onPart $catchPart$body"
     }
+
+    override fun visitWhileStatement(statement: DartWhileStatement, context: DartGenerationContext) = statement.let {
+        val condition = it.condition.accept(context)
+        val body = it.body.accept(context)
+
+        when {
+            it.isDoWhile() -> "do $body while ($condition);"
+            else -> "while ($condition) $body"
+        }
+    }
+
+    override fun visitForStatement(statement: DartForStatement, context: DartGenerationContext) = statement.let {
+        val parts = it.loopParts.accept(context)
+        val body = it.body.accept(context)
+
+        "for ($parts) $body"
+    }
+
+    override fun visitForPartsWithDeclarations(
+        forParts: DartForPartsWithDeclarations,
+        context: DartGenerationContext
+    ) = forParts.let {
+        val variables = it.variables.accept(context)
+        val condition = it.condition.accept(context)
+        val updaters = it.updaters.joinToString(";") { u -> u.accept(context) }
+
+        "$variables; $condition; $updaters"
+    }
+
+    override fun visitForEachPartsWithDeclarations(
+        forParts: DartForEachPartsWithDeclarations,
+        context: DartGenerationContext
+    ) = forParts.let {
+        val variables = it.variables.accept(context)
+        val iterable = it.iterable.accept(context)
+
+        "$variables in $iterable"
+    }
 }
 
 fun DartStatement.accept(context: DartGenerationContext) = accept(DartStatementTransformer, context)
 fun DartCatchClause.accept(context: DartGenerationContext) = accept(DartStatementTransformer, context)
+fun DartForLoopParts.accept(context: DartGenerationContext) = accept(DartStatementTransformer, context)

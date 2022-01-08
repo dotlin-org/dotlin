@@ -21,15 +21,29 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.IrVoidType
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartStatementOrigin.*
+import org.dotlin.compiler.backend.steps.ir2ast.ir.extensionReceiverOrNull
+import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrimitiveInteger
+import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
+import org.dotlin.compiler.dart.ast.expression.*
+import org.dotlin.compiler.dart.ast.expression.DartComparisonExpression.*
+import org.dotlin.compiler.dart.ast.expression.literal.DartIntegerLiteral
 import org.dotlin.compiler.dart.ast.statement.*
 import org.dotlin.compiler.dart.ast.statement.trycatch.DartCatchClause
 import org.dotlin.compiler.dart.ast.statement.trycatch.DartTryStatement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.types.*
+import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
+import org.jetbrains.kotlin.ir.util.superTypes
+import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.Name
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement> {
@@ -99,20 +113,195 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement> {
         )
     }
 
-    override fun visitBlock(irBlock: IrBlock, context: DartTransformContext) = irBlock.run {
-        // If there's only a single statement in the block, we remove the block.
-        statements.singleOrNull()?.accept(context) ?: DartBlock(
-            statements = irBlock.statements.accept(context)
-        )
+    override fun visitLoop(loop: IrLoop, context: DartTransformContext): DartStatement {
+        val condition = loop.condition.accept(context)
+        val body = loop.body!!.acceptAsStatement(context)
+
+        return when (loop) {
+            is IrWhileLoop -> DartSimpleWhileStatement(condition, body)
+            is IrDoWhileLoop -> DartDoWhileStatement(condition, body)
+            else -> throw UnsupportedOperationException("Unsupported loop: ${loop::class.simpleName}")
+        }
+    }
+
+    override fun visitBlock(irBlock: IrBlock, context: DartTransformContext): DartStatement {
+        if (irBlock.origin == IrStatementOrigin.FOR_LOOP) {
+            val irPossibleSubject = ((irBlock.statements.first() as IrVariable).initializer as IrCall).dispatchReceiver
+
+            val irWhileLoop = irBlock.statements.last() as IrWhileLoop
+            val irBody = irWhileLoop.body as IrBlock
+
+            /**
+             * Note: Removes the variable from the loop block.
+             */
+            val loopVariables by lazy {
+                (irBody.statements.first() as IrVariable)
+                    .acceptAsStatement(context)
+                    .variables.copy(isFinal = false)
+                    .also {
+                        irBody.statements.removeAt(0)
+                    }
+            }
+
+            /**
+             * Should be accessed after [loopVariables].
+             */
+            val body by lazy { irBody.acceptAsStatement(context) }
+
+            when {
+                // `x until y`, `x..y` and `x downTo y` calls are translated as traditional for-loops.
+                irPossibleSubject.hasOrIsUntilCall() ||
+                        irPossibleSubject.hasOrIsPrimitiveNumberRangeToCall() ||
+                        irPossibleSubject.hasOrIsDownToCall() -> {
+                    irPossibleSubject as IrCall
+
+                    val irSubject: IrCall
+                    val step: DartExpression
+
+                    if (irPossibleSubject.isStepCall()) {
+                        irSubject = irPossibleSubject.let {
+                            it.untilCall() ?: it.primitiveNumberRangeToCall() ?: it.downToCall()
+                        }!!
+                        step = irPossibleSubject.valueArguments[0]!!.accept(context)
+                    } else {
+                        irSubject = irPossibleSubject
+                        step = DartIntegerLiteral(1)
+                    }
+
+                    val from = (irSubject.dispatchReceiver ?: irSubject.extensionReceiverOrNull)!!.let {
+                        when {
+                            it is IrConstructorCall && it.origin == EXTENSION_CONSTRUCTOR_CALL -> {
+                                it.valueArguments[0]!!
+                            }
+                            else -> it
+                        }.accept(context)
+                    }
+                    val to = irSubject.valueArguments[0]!!.accept(context)
+
+                    val isInclusive = !irSubject.hasOrIsUntilCall()
+                    val isReversed = irSubject.hasOrIsDownToCall()
+
+                    val variables = loopVariables.let {
+                        it.copy(variables = listOf(it[0].copy(expression = from)))
+                    }
+                    val variable = variables[0]
+
+                    return DartForStatement(
+                        loopParts = DartForPartsWithDeclarations(
+                            variables = variables,
+                            condition = DartComparisonExpression(
+                                left = variable.name,
+                                operator = when {
+                                    isReversed -> when {
+                                        isInclusive -> Operators.GREATER_OR_EQUAL
+                                        else -> Operators.GREATER
+                                    }
+                                    else -> when {
+                                        isInclusive -> Operators.LESS_OR_EQUAL
+                                        else -> Operators.LESS
+                                    }
+                                },
+                                right = to,
+                            ),
+                            updaters = listOf(
+                                DartAssignmentExpression(
+                                    left = variable.name,
+                                    operator = when {
+                                        isReversed -> DartAssignmentOperator.SUBTRACT
+                                        else -> DartAssignmentOperator.ADD
+                                    },
+                                    right = step
+                                )
+                            )
+                        ),
+                        body = body
+                    )
+                }
+                irPossibleSubject?.type?.isDartIterable() == true -> {
+                    val subject = irPossibleSubject.accept(context)
+
+                    return DartForStatement(
+                        loopParts = DartForEachPartsWithDeclarations(
+                            variables = loopVariables.let {
+                                it.copy(variables = listOf(it[0].copy(expression = null)))
+                            },
+                            iterable = subject
+                        ),
+                        body = body
+                    )
+                }
+            }
+        }
+
+        // A regular block. If there's only a single statement in the block, we remove the block.
+        return irBlock.run {
+            statements.singleOrNull()?.accept(context) ?: DartBlock(
+                statements = statements.accept(context)
+            )
+        }
     }
 
     override fun visitExpression(expression: IrExpression, context: DartTransformContext) =
         expression.accept(context).asStatement()
+
+    private fun IrExpression?.findCallInReceivers(block: (IrExpression?) -> IrCall?): IrCall? =
+        block(this).let {
+            when {
+                it != null -> return it
+                isStepCall() -> return (this as? IrCall)?.let { thisCall ->
+                    thisCall.dispatchReceiver ?: thisCall.extensionReceiverOrNull
+                }.findCallInReceivers(block)
+                else -> null
+            }
+        }
+
+    private fun IrExpression?.findCallWithNameInReceivers(fqName: String): IrCall? =
+        findCallInReceivers { if (it.callsWithName(fqName)) it as IrCall else null }
+
+    @OptIn(ExperimentalContracts::class)
+    private fun IrExpression?.callsWithName(fqName: String): Boolean {
+        contract {
+            returns(true) implies (this@callsWithName is IrCall)
+        }
+
+        return (this as? IrCall)?.symbol?.owner?.fqNameWhenAvailable == FqName(fqName)
+    }
+
+    private fun IrType.isDartIterable(): Boolean =
+        classFqName == FqName("dart.core.Iterable") ||
+                isArray() || isByteArray() || isShortArray() || isIntArray() || isLongArray() ||
+                superTypes().any { it.isDartIterable() }
+
+    private fun IrExpression?.isStepCall() =
+        callsWithName("kotlin.ranges.step")
+
+    private fun IrExpression?.untilCall(): IrCall? =
+        findCallWithNameInReceivers("kotlin.ranges.until")
+
+    private fun IrExpression?.hasOrIsUntilCall(): Boolean = untilCall() != null
+
+    private fun IrExpression?.downToCall(): IrCall? =
+        findCallWithNameInReceivers("kotlin.ranges.downTo")
+
+    private fun IrExpression?.hasOrIsDownToCall(): Boolean = downToCall() != null
+
+    private fun IrExpression?.primitiveNumberRangeToCall() =
+        findCallInReceivers {
+            when {
+                it !is IrCall -> null
+                it.dispatchReceiver?.type?.isPrimitiveInteger() == true && it.symbol.owner.name == Name.identifier("rangeTo") -> it
+                else -> null
+            }
+        }
+
+    private fun IrExpression?.hasOrIsPrimitiveNumberRangeToCall() = primitiveNumberRangeToCall() != null
 }
 
 fun IrStatement.accept(context: DartTransformContext) = accept(IrToDartStatementTransformer, context)
 fun Iterable<IrStatement>.accept(context: DartTransformContext) = map { it.accept(context) }
 fun IrExpression.acceptAsStatement(context: DartTransformContext) = accept(IrToDartStatementTransformer, context)
+fun IrVariable.acceptAsStatement(context: DartTransformContext) =
+    accept(IrToDartStatementTransformer, context) as DartVariableDeclarationStatement
 
 
 

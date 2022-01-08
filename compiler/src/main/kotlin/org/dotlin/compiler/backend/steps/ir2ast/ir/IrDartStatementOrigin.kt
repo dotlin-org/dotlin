@@ -41,5 +41,11 @@ sealed class IrDartStatementOrigin(private val name: String) : IrStatementOrigin
      */
     object OPERATOR_REDIRECT : IrDartStatementOrigin("OPERATOR_REDIRECT")
 
+    /**
+     * The constructor of the relevant extension container is called, with the original receiver as the single argument,
+     * to prevent extension conflicts in Dart.
+     */
+    object EXTENSION_CONSTRUCTOR_CALL : IrDartStatementOrigin("EXTENSION_CONSTRUCTOR")
+
     override fun toString() = name
 }
