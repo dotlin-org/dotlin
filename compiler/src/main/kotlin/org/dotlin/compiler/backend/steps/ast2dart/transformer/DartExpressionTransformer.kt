@@ -104,6 +104,14 @@ object DartExpressionTransformer : DartAstNodeTransformer {
         return "$name$expression"
     }
 
+    override fun visitIndexExpression(indexExpression: DartIndexExpression, context: DartGenerationContext) =
+        indexExpression.let {
+            val target = it.target.accept(context)
+            val index = it.index.accept(context)
+
+            "$target[$index]"
+        }
+
     override fun visitParenthesizedExpression(
         parenthesizedExpression: DartParenthesizedExpression,
         context: DartGenerationContext

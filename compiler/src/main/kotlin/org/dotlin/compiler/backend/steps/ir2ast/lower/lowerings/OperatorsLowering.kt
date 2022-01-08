@@ -139,13 +139,15 @@ class OperatorsLowering(override val context: DartLoweringContext) : IrDeclarati
             }?.let { operatorIdentifier ->
                 val parameters: List<IrValueParameter>
 
+                val redirectOrigin = IrDartStatementOrigin.OPERATOR_REDIRECT
+
                 val body: (DeclarationIrBuilder) -> IrExpression = when (irIdentifier) {
                     "plus", "minus", "times", "div", "rem", "equals", "get" -> {
                         val otherParam = irFunction.valueParameters.first().copy()
                         parameters = listOf(otherParam)
 
                         fun(irBuilder: DeclarationIrBuilder) = irBuilder.buildStatement {
-                            irCall(irFunction).apply {
+                            irCall(irFunction, origin = redirectOrigin).apply {
                                 setReceiverFrom(irFunction)
                                 putValueArgument(index = 0, irGet(otherParam))
                             }
@@ -157,7 +159,7 @@ class OperatorsLowering(override val context: DartLoweringContext) : IrDeclarati
                         parameters = irFunction.valueParameters.take(2).map { it.copy() }
 
                         fun(irBuilder: DeclarationIrBuilder) = irBuilder.buildStatement {
-                            irCall(irFunction).apply {
+                            irCall(irFunction, origin = redirectOrigin).apply {
                                 setReceiverFrom(irFunction)
                                 parameters.forEach { putValueArgument(it.index, irGet(it)) }
                             }
@@ -186,6 +188,7 @@ class OperatorsLowering(override val context: DartLoweringContext) : IrDeclarati
                 // This function should not marked as an operator anymore, since only the newly added operator method
                 // will be the actual Dart operator, if it's added.
                 isOperator = false
+                origin = IrDartDeclarationOrigin.WAS_OPERATOR
             }.apply {
                 // The equals method itself is not an override in Dart, only the actual '==' operator method is.
                 if (irIdentifier == "equals" && irFunction.isMethodOfAny()) {
