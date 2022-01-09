@@ -472,9 +472,11 @@ fun IrElement.replaceExpressions(block: (IrExpression) -> IrExpression) {
 val IrClass.isDartExtensionContainer: Boolean
     get() = origin == IrDartDeclarationOrigin.EXTENSION
 
+fun IrDeclaration.isFakeOverride() = isFakeOverride || origin == IrDeclarationOrigin.FAKE_OVERRIDE
+
 @Suppress("UNCHECKED_CAST")
 fun <D : IrOverridableDeclaration<*>> D.firstNonFakeOverrideOrSelf(): D = when {
-    !isFakeOverride -> this
+    !isFakeOverride() -> this
     else -> (overriddenSymbols.firstOrNull()?.owner as? D)?.firstNonFakeOverrideOrSelf() ?: this
 }
 

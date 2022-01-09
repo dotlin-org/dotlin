@@ -71,5 +71,11 @@ sealed class IrDartDeclarationOrigin(private val name: String) : IrDeclarationOr
      */
     object COMPARABLE_TEMPORARY_COMPARE_TO : IrDartDeclarationOrigin("COMPARABLE_TEMPORARY_COMPARE_TO")
 
+    /**
+     * Default implementations from interfaces are copied over to the class that implements in the interface, since
+     * in Dart no super implementations are available when `implements` is used.
+     */
+    object COPIED_OVERRIDE : IrDartDeclarationOrigin("COPIED_OVERRIDE")
+
     override fun toString() = name
 }
