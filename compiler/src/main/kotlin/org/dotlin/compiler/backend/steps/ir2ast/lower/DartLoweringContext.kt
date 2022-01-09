@@ -23,7 +23,6 @@ import org.dotlin.compiler.backend.steps.ir2ast.DartIrBuiltIns
 import org.dotlin.compiler.backend.steps.ir2ast.attributes.ExtraIrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartNameAsSimple
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartNameWith
 import org.dotlin.compiler.backend.util.sentenceCase
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
@@ -62,7 +61,7 @@ class DartLoweringContext(
     val symbolTable: SymbolTable,
     val bindingContext: BindingContext,
     val irModuleFragment: IrModuleFragment,
-    private val extraIrAttributes: ExtraIrAttributes = ExtraIrAttributes.DEFAULT,
+    private val extraIrAttributes: ExtraIrAttributes = ExtraIrAttributes.default(),
 ) : CommonBackendContext, ExtraIrAttributes by extraIrAttributes {
     override val builtIns = irModuleFragment.descriptor.builtIns
     override var inVerbosePhase = false
