@@ -177,13 +177,13 @@ class DartLoweringContext(
                 val packagePrefix = when {
                     file != this.file -> file.fqName.pathSegments()
                         .map { it.identifier }
-                        .joinToString { it.sentenceCase() }
+                        .joinToString("") { it.sentenceCase() }
                     else -> ""
                 }
                 val typeArguments = when (receiverType) {
                     is IrSimpleType -> receiverType.arguments
                         .mapNotNull { it.typeOrNull?.classOrNull?.owner?.dartName?.escapedValue() }
-                        .joinToString { it.sentenceCase() }
+                        .joinToString("") { it.sentenceCase() }
                     else -> ""
                 }
                 val suffix = "Extensions"
