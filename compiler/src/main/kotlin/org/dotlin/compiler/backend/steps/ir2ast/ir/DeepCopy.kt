@@ -100,7 +100,7 @@ inline fun <reified T : IrFunction> T.deepCopyWith(
     }
 
     if (remapReferences) {
-        relevantUpperParent.remapReferences(
+        it.remapReferences(
             valueParameters.zip(it.valueParameters)
                 .map { (old, new) -> old.symbol to new.symbol }
                 .toMap()
@@ -186,8 +186,8 @@ inline fun <reified D : IrDeclaration, B : IrDeclarationBuilder> D.deepCopyWith(
         }
     }.also {
         if (remapReferences) {
-            relevantUpperParent.remapReferences(symbol to it.symbol)
-            relevantUpperParent.remapTypes(
+            it.remapReferencesEverywhere(symbol to it.symbol)
+            it.remapTypesEverywhere(
                 DeepCopyTypeRemapper(SymbolReferenceRemapper(symbol to it.symbol)).also { remapper ->
                     remapper.deepCopy = deepCopier
                 }
@@ -195,15 +195,6 @@ inline fun <reified D : IrDeclaration, B : IrDeclarationBuilder> D.deepCopyWith(
         }
     }
 }
-
-val IrDeclaration.relevantUpperParent: IrDeclarationParent
-    get() = when (val parent = parent) {
-        is IrFile -> parent
-        is IrExternalPackageFragment -> this as IrDeclarationParent
-        is IrDeclaration -> parent.relevantUpperParent
-        else -> throw NotImplementedError("Unknown parent: $parent")
-    }
-
 
 interface DeclarationRebuilder {
     fun getClassBuilder(symbol: IrClassSymbol): IrClassBuilder? = null
@@ -243,6 +234,15 @@ class SingleSymbolRenamer(private val symbol: IrSymbol, private val name: Name) 
     override fun getValueParameterName(symbol: IrValueParameterSymbol) = newNameIfMatch(symbol) { symbol.owner.name }
     override fun getTypeAliasName(symbol: IrTypeAliasSymbol) = newNameIfMatch(symbol) { symbol.owner.name }
 }
+
+private fun IrDeclaration.remapAtRelevantParents(block: (IrElement) -> Unit) =
+    fileOrNull?.module?.files?.forEach { block(it) } ?: block(getPackageFragment()!!)
+
+fun IrDeclaration.remapReferencesEverywhere(mapping: Pair<IrSymbol, IrSymbol>) =
+    remapAtRelevantParents { it.remapReferences(mapOf(mapping)) }
+
+fun IrDeclaration.remapTypesEverywhere(typeRemapper: TypeRemapper) =
+    remapAtRelevantParents { it.remapTypes(typeRemapper) }
 
 fun IrElement.remapReferences(mapping: Pair<IrSymbol, IrSymbol>) = remapReferences(mapOf(mapping))
 
