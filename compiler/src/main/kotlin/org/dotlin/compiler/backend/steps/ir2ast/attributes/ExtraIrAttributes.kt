@@ -35,11 +35,12 @@ import org.jetbrains.kotlin.name.FqName
  */
 interface ExtraIrAttributes {
     companion object {
-        val DEFAULT = object : ExtraIrAttributes {
+        fun default() = object : ExtraIrAttributes {
             override val propertiesInitializedInConstructorBody = mutableSetOf<IrProperty>()
             override val propertiesInitializedInFieldInitializerList = mutableSetOf<IrProperty>()
             override val parameterPropertyReferencesInParameterDefaultValue = mutableSetOf<IrGetValue>()
             private val annotatedExpressions = mutableMapOf<IrExpression, MutableList<IrConstructorCall>>()
+            private val dartImportsPerFile = mutableMapOf<IrFile, MutableSet<DartImport>>()
 
             override fun IrExpression.annotate(annotations: Iterable<IrConstructorCall>) {
                 annotatedExpressions.compute(this) { _, currentAnnotations ->
@@ -55,6 +56,17 @@ interface ExtraIrAttributes {
 
             override fun IrExpression.hasAnnotation(name: String) = annotations.any {
                 it.symbol.owner.parentAsClass.hasEqualFqName(FqName(name))
+            }
+
+            override val IrFile.dartImports: Set<DartImport>
+                get() = dartImportsPerFile[this] ?: emptySet()
+
+            override fun IrFile.addDartImports(imports: Iterable<DartImport>) {
+                dartImportsPerFile.compute(this) { _, currentDartImports ->
+                    (currentDartImports ?: mutableSetOf()).apply {
+                        addAll(imports)
+                    }
+                }
             }
         }
     }
@@ -122,9 +134,21 @@ interface ExtraIrAttributes {
     }
 
     fun IrExpression.hasAnnotation(name: String): Boolean
+
+
+    val IrFile.dartImports: Set<DartImport>
+
+    fun IrFile.addDartImport(import: DartImport) = addDartImports(listOf(import))
+    fun IrFile.addDartImports(imports: Iterable<DartImport>)
 }
 
 /**
  * Assumes that [attributeOwnerId] is the same type as `this`.
  */
 inline fun <reified T : IrAttributeContainer> T.attributeOwner(): T = attributeOwnerId as T
+
+data class DartImport(
+    val library: String,
+    val alias: String? = null,
+    val hide: String? = null
+)

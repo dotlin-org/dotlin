@@ -19,9 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
-import org.dotlin.compiler.backend.DotlinAnnotations
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
-import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.optimizeImports
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
 import org.dotlin.compiler.dart.ast.directive.DartHideCombinator
@@ -29,65 +27,47 @@ import org.dotlin.compiler.dart.ast.directive.DartImportDirective
 import org.dotlin.compiler.dart.ast.expression.identifier.toDartSimpleIdentifier
 import org.dotlin.compiler.dart.ast.expression.literal.DartSimpleStringLiteral
 import org.jetbrains.kotlin.ir.declarations.IrFile
-import org.jetbrains.kotlin.ir.expressions.IrConst
-import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
-import org.jetbrains.kotlin.ir.util.isAnnotation
-import org.jetbrains.kotlin.name.FqName
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UNCHECKED_CAST")
 object IrToDartCompilationUnitTransformer : IrDartAstTransformer<DartCompilationUnit> {
-    override fun visitFile(irFile: IrFile, context: DartTransformContext) = DartCompilationUnit(
-        declarations = irFile.declarations
-            .map { it.accept(context) },
-        // Add import alias directives against Kotlin/Dart built-ins name clashes.
-        directives = irFile.annotations
-            .asSequence()
-            .filter { it.isDartImportAlias() || it.isDartHideImport() }
-            .map {
-                val importLibrary = (it.valueArguments[0] as IrConst<String>).value
-                val hiddenName = (it.valueArguments[1] as IrConst<String>).value
-                val aliasName = when {
-                    it.isDartImportAlias() -> importLibrary.split(':')[1]
-                    else -> null
-                }
-
-                Triple(importLibrary, hiddenName, aliasName)
-            }
-            .map { (importLibrary, hiddenName, aliasName) ->
-                listOfNotNull(
-                    // E.g. import 'dart:core' hide List;
-                    DartImportDirective(
-                        name = DartSimpleStringLiteral(importLibrary),
-                        combinators = listOf(
-                            DartHideCombinator(
-                                names = listOf(hiddenName.toDartSimpleIdentifier())
-                            )
-                        )
-                    ),
-                    aliasName?.let {
-                        // E.g. import 'dart:core' as core;
+    override fun visitFile(irFile: IrFile, context: DartTransformContext) = context.run {
+        DartCompilationUnit(
+            declarations = irFile.declarations.map { it.accept(context) },
+            // Add import alias directives against Kotlin/Dart built-ins name clashes.
+            directives = irFile.dartImports
+                .asSequence()
+                .flatMap { import ->
+                    listOfNotNull(
+                        // E.g. import 'dart:core' hide List;
                         DartImportDirective(
-                            name = DartSimpleStringLiteral(importLibrary),
-                            alias = aliasName.toDartSimpleIdentifier()
-                        )
-                    }
+                            name = DartSimpleStringLiteral(import.library),
+                            combinators = listOfNotNull(
+                                import.hide?.let {
+                                    DartHideCombinator(
+                                        names = listOf(it.toDartSimpleIdentifier())
+                                    )
+                                }
+                            )
+                        ),
+                        import.alias?.let {
+                            // E.g. import 'dart:core' as core;
+                            DartImportDirective(
+                                name = DartSimpleStringLiteral(import.library),
+                                alias = it.toDartSimpleIdentifier()
+                            )
+                        }
+                    )
+                }
+                // Always import the meta package for extra annotations.
+                .plus(
+                    DartImportDirective(
+                        name = DartSimpleStringLiteral("package:meta/meta.dart")
+                    )
                 )
-            }
-            .flatten()
-            // Always import the meta package for extra annotations.
-            .plus(
-                DartImportDirective(
-                    name = DartSimpleStringLiteral("package:meta/meta.dart")
-                )
-            )
-            .optimizeImports()
-    )
-
-    private fun IrConstructorCall.isDartImportAlias() =
-        isAnnotation(FqName(DotlinAnnotations.dartImportAlias))
-
-    private fun IrConstructorCall.isDartHideImport() =
-        isAnnotation(FqName(DotlinAnnotations.dartHideImport))
+                .optimizeImports()
+                .toList()
+        )
+    }
 }
 
 fun IrFile.accept(context: DartTransformContext) = accept(IrToDartCompilationUnitTransformer, context)
