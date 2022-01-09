@@ -39,6 +39,7 @@ import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.util.TypeRemapper
+import org.jetbrains.kotlin.ir.util.getPackageFragment
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.ir.util.remapTypes
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
@@ -46,11 +47,15 @@ import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 /**
  * Dart import directives are added for Kotlin classes that would name clash with Dart built-ins.
  */
-class DartBuiltInImportsLowering(override val context: DartLoweringContext) : IrFileLowering {
+class DartImportsLowering(override val context: DartLoweringContext) : IrFileLowering {
+    private val dartSdkImports = mapOf(
+        "dart.typeddata" to "dart:typed_data"
+    )
+
     override fun DartLoweringContext.transform(file: IrFile) {
         val imports = mutableSetOf<DartImport>()
 
-        fun possiblyAddImportAliasOrHide(declaration: IrDeclarationWithName) {
+        fun maybeAddDartImports(declaration: IrDeclarationWithName) {
             val dartName = declaration.simpleDartNameOrNull?.value ?: return
 
             declaration.let {
@@ -71,7 +76,12 @@ class DartBuiltInImportsLowering(override val context: DartLoweringContext) : Ir
                     else -> null
                 }
 
-                imports.addAll(listOfNotNull(dartImportAlias, dartImportHide))
+                val packageImport = dartSdkImports[declaration.getPackageFragment()?.fqName?.asString()]
+                    ?.let { dartSdkLibrary ->
+                        DartImport(dartSdkLibrary)
+                    }
+
+                imports.addAll(listOfNotNull(dartImportAlias, dartImportHide, packageImport))
             }
         }
 
@@ -85,7 +95,7 @@ class DartBuiltInImportsLowering(override val context: DartLoweringContext) : Ir
                         else -> owner as? IrDeclarationWithName
                     } ?: return
 
-                    possiblyAddImportAliasOrHide(referenced)
+                    maybeAddDartImports(referenced)
                 }
 
                 override fun visitMemberAccess(expression: IrMemberAccessExpression<*>) =
@@ -98,7 +108,7 @@ class DartBuiltInImportsLowering(override val context: DartLoweringContext) : Ir
         file.remapTypes(
             object : TypeRemapper {
                 override fun remapType(type: IrType): IrType {
-                    type.classOrNull?.owner?.also { possiblyAddImportAliasOrHide(it) }
+                    type.classOrNull?.owner?.also { maybeAddDartImports(it) }
                     return type
                 }
 

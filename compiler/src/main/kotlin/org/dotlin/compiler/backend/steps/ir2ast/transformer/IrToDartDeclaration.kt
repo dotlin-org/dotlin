@@ -20,10 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
-import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
-import org.dotlin.compiler.backend.steps.ir2ast.ir.extensionTypeOrNull
-import org.dotlin.compiler.backend.steps.ir2ast.ir.isDartExtensionContainer
+import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.*
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnitMember
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartClassDeclaration
@@ -40,7 +37,9 @@ import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.types.*
-import org.jetbrains.kotlin.ir.util.*
+import org.jetbrains.kotlin.ir.util.isClass
+import org.jetbrains.kotlin.ir.util.isInterface
+import org.jetbrains.kotlin.ir.util.parentAsClass
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnitMember> {
@@ -103,7 +102,7 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
                         .asSequence()
                         // We handle fake overrides only from interfaces and if this itself is not an interface.
                         .filter {
-                            if (!it.isFakeOverride) {
+                            if (!it.isFakeOverride()) {
                                 return@filter true
                             }
 
@@ -117,7 +116,7 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
 
                                 // If somewhere in a super type it is not fake overridden, there's
                                 // already an implementation there and we don't have to include it.
-                                if (!overridable.isFakeOverride) return false
+                                if (!overridable.isFakeOverride()) return false
 
                                 return overridable.overriddenSymbols.all { symbol ->
                                     val owner = symbol.owner as IrOverridableDeclaration<*>

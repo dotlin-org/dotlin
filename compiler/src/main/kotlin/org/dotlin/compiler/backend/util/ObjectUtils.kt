@@ -20,15 +20,15 @@
 package org.dotlin.compiler.backend.util
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
+import org.dotlin.compiler.backend.steps.ir2ast.ir.isFakeOverride
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isStatic
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.util.isFakeOverride
 import org.jetbrains.kotlin.ir.util.isObject
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 
 val IrDeclaration.isFromObjectAndStaticallyAvailable
     get() = (this is IrProperty || (this is IrField && !isStatic) || (this is IrSimpleFunction && !isStatic)) &&
             this !is IrConstructor &&
-            !isFakeOverride &&
+            !isFakeOverride() &&
             origin != IrDeclarationOrigin.FIELD_FOR_OBJECT_INSTANCE &&
             parentClassOrNull?.isObject == true
