@@ -383,18 +383,6 @@ private val IrFunction.hasSameVisibilityAsCorrespondingProperty: Boolean
 val IrProperty.hasExplicitBackingField: Boolean
     get() = backingField?.isExplicitBackingField == true
 
-fun IrField.setInitializerOriginTo(
-    origin: IrStatementOrigin,
-    expression: IrExpression? = initializer?.expression
-) {
-    if (initializer == null) return
-
-    initializer = IrExpressionBodyWithOrigin(
-        expression = initializer!!.expression,
-        origin = origin
-    )
-}
-
 val IrField.isOverride: Boolean
     get() = correspondingProperty?.isOverride.falseIfNull()
 
