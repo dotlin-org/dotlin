@@ -135,7 +135,6 @@ interface ExtraIrAttributes {
 
     fun IrExpression.hasAnnotation(name: String): Boolean
 
-
     val IrFile.dartImports: Set<DartImport>
 
     fun IrFile.addDartImport(import: DartImport) = addDartImports(listOf(import))

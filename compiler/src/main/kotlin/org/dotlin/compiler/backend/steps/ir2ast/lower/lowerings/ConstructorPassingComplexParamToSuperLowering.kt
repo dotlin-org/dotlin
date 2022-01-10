@@ -35,6 +35,10 @@ import org.jetbrains.kotlin.ir.util.statements
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.Name
 
+/**
+ * The constructor is made a factory in Dart, as to initialize complex parameters in its body,
+ * to then pass the correctly initialized parameters to the real constructor.
+ */
 @Suppress("UnnecessaryVariable")
 class ConstructorPassingComplexParamToSuperLowering(override val context: DartLoweringContext) :
     IrDeclarationLowering {
@@ -60,28 +64,36 @@ class ConstructorPassingComplexParamToSuperLowering(override val context: DartLo
 
         val originalByActualParams: Map<IrValueParameter, IrValueParameter>
 
+        val complexParametersFromActual = mutableListOf<IrValueParameter>()
+
         val actualConstructor = originalConstructor.deepCopyWith(remapReferences = false) {
             name = Name.identifier("$")
             visibility = DescriptorVisibilities.PRIVATE
-            origin = IrDartDeclarationOrigin.FACTORY_REDIRECT
         }.apply {
-            origin = IrDartDeclarationOrigin.FACTORY_REDIRECT_ACTUAL
             originalByActualParams = originalConstructor.valueParameters
-                .associateWith {
-                    it.deepCopyWith {
-                        when (val itsOrigin = it.origin) {
+                .associateWith { old ->
+                    old.deepCopyWith {
+                        when (val itsOrigin = old.origin) {
                             is IrDartDeclarationOrigin.WAS_COMPLEX_PARAM -> {
-                                this.origin = IrDartDeclarationOrigin.FACTORY_REDIRECT_ACTUAL_PARAM
+                                origin = IrDeclarationOrigin.DEFINED
                                 type = itsOrigin.originalType
                             }
                             else -> {
                                 origin = itsOrigin
-                                type = it.type
+                                type = old.type
                             }
                         }
                     }.apply {
-                        if (it.wasComplex) {
+                        if (old.wasComplex) {
                             defaultValue = null
+
+                            // Unmark property parameters as to be initialized in the field initializer list,
+                            // since a factory doesn't support that.
+                            correspondingProperty?.let { prop ->
+                                if (prop.isInitializedInFieldInitializerList) {
+                                    propertiesInitializedInFieldInitializerList.remove(prop.attributeOwner())
+                                }
+                            }
                         }
                     }
                 }
@@ -93,54 +105,41 @@ class ConstructorPassingComplexParamToSuperLowering(override val context: DartLo
                     removeAll(initializersForComplexParams)
 
                     replaceAll {
-                        if (it is IrDelegatingConstructorCall) {
-                            superCall.also {
-                                transformChildrenVoid(
-                                    object : IrCustomElementTransformerVoid() {
-                                        override fun visitExpression(expression: IrExpression): IrExpression {
-                                            expression.transformChildrenVoid()
+                        when (it) {
+                            is IrDelegatingConstructorCall -> {
+                                superCall.also {
+                                    transformChildrenVoid(
+                                        object : IrCustomElementTransformerVoid() {
+                                            override fun visitExpression(expression: IrExpression): IrExpression {
+                                                expression.transformChildrenVoid()
 
-                                            if (expression is IrGetValue) {
-                                                return originalByActualParams[expression.symbol.owner]
-                                                    ?.symbol
-                                                    ?.let { newSymbol ->
-                                                        IrGetValueImpl(
-                                                            UNDEFINED_OFFSET,
-                                                            UNDEFINED_OFFSET,
-                                                            symbol = newSymbol,
-                                                        ).copyAttributes(expression)
-                                                    } ?: expression
+                                                if (expression is IrGetValue) {
+                                                    return originalByActualParams[expression.symbol.owner]
+                                                        ?.symbol
+                                                        ?.let { newSymbol ->
+                                                            IrGetValueImpl(
+                                                                UNDEFINED_OFFSET,
+                                                                UNDEFINED_OFFSET,
+                                                                symbol = newSymbol,
+                                                            ).copyAttributes(expression)
+                                                        } ?: expression
+                                                }
+
+                                                return expression
                                             }
-
-                                            return expression
                                         }
-                                    }
-                                )
+                                    )
+                                }
                             }
-                        } else {
-                            it
+                            else -> it
                         }
                     }
                 }
             }
-
-            // Unmark property parameters as to be initialized in the field initializer list, since a factory
-            // doesn't support that.
-            valueParameters
-                .filter { it.origin == IrDartDeclarationOrigin.FACTORY_REDIRECT_ACTUAL_PARAM }
-                .forEach { param ->
-                    param.correspondingProperty?.let { prop ->
-                        if (prop.isInitializedInFieldInitializerList) {
-                            propertiesInitializedInFieldInitializerList.remove(prop.attributeOwner())
-                        }
-                    }
-                }
         }
 
-
-        val factoryConstructor = originalConstructor.deepCopyWith {
-            origin = IrDartDeclarationOrigin.FACTORY_REDIRECT
-        }.apply {
+        val factoryConstructor = originalConstructor.deepCopy().apply {
+            origin = IrDartDeclarationOrigin.FACTORY
             valueParameters = originalConstructor.valueParameters.copy(parent = this@apply)
 
             body = irFactory.createBlockBody(

@@ -116,7 +116,7 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
                 isConst = irConstructor.isDartConst(),
                 annotations = annotations,
                 documentationComment = documentationComment,
-                isFactory = irConstructor.origin == IrDartDeclarationOrigin.FACTORY_REDIRECT,
+                isFactory = irConstructor.isDartFactory,
                 initializers = initializers,
                 function = DartFunctionExpression(
                     parameters = parameters,

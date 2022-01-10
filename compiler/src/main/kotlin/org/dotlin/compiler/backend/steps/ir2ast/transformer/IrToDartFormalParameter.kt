@@ -21,9 +21,9 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.isDartPositional
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartFactory
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.simpleDartName
 import org.dotlin.compiler.dart.ast.parameter.*
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
@@ -33,8 +33,7 @@ fun IrValueParameter.accept(context: DartTransformContext): DartFormalParameter 
     val irValueParameter = this@accept
 
     val correspondingIrProperty = irValueParameter.correspondingProperty
-    val isInFactoryConstructor =
-        (irValueParameter.parent as? IrConstructor)?.origin == IrDartDeclarationOrigin.FACTORY_REDIRECT
+    val isInFactoryConstructor = (irValueParameter.parent as? IrConstructor)?.isDartFactory == true
 
     val isFieldInitializer = correspondingIrProperty != null
 

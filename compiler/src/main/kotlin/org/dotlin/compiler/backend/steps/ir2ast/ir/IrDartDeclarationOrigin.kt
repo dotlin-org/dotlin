@@ -47,22 +47,9 @@ sealed class IrDartDeclarationOrigin(private val name: String) : IrDeclarationOr
     object WAS_CONST_OBJECT_MEMBER : IrDartDeclarationOrigin("WAS_CONST_OBJECT_MEMBER")
 
     /**
-     * The constructor was made a factory in Dart, as to initialize complex parameters in its body,
-     * to then pass the correctly initialized parameters to the real constructor.
+     * The constructor should be a `factory` in Dart.
      */
-    object FACTORY_REDIRECT : IrDartDeclarationOrigin("FACTORY_REDIRECT")
-
-    /**
-     * The actual constructor used in a factory redirect. See [FACTORY_REDIRECT].
-     */
-    object FACTORY_REDIRECT_ACTUAL : IrDartDeclarationOrigin("FACTORY_REDIRECT_ACTUAL")
-
-    /**
-     * A parameter that is used in a constructor where a complex parameter was passed to a super constructor call.
-     * The parameter is now in the actual constructor of the factory redirect.
-     * See [FACTORY_REDIRECT] and [FACTORY_REDIRECT_ACTUAL].
-     */
-    object FACTORY_REDIRECT_ACTUAL_PARAM : IrDartDeclarationOrigin("FACTORY_REDIRECT_ACTUAL_PARAM")
+    object FACTORY : IrDartDeclarationOrigin("FACTORY")
 
     /**
      * Used by the `Comparable` lowerings. A temporary `compareTo` extension to `kotlin.Comparable` is added so that
