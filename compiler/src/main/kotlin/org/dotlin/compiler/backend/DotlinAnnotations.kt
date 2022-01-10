@@ -23,9 +23,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.backend.util.getSingleAnnotationStringArgumentOf
 import org.dotlin.compiler.backend.util.getSingleAnnotationTypeArgumentOf
 import org.dotlin.compiler.backend.util.hasOverriddenAnnotation
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrField
-import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.isGetter
 import org.jetbrains.kotlin.ir.util.isSetter
@@ -33,6 +31,7 @@ import org.jetbrains.kotlin.ir.util.isSetter
 object DotlinAnnotations {
     const val dartName = "dotlin.DartName"
     const val dartConst = "dotlin.DartConst"
+    const val dartPositional = "dotlin.DartPositional"
 
     // Internal annotations.
     const val dartGetter = "dotlin.DartGetter"
@@ -43,8 +42,8 @@ object DotlinAnnotations {
 }
 
 fun IrDeclaration.hasDartGetterAnnotation() = hasOverriddenAnnotation(DotlinAnnotations.dartGetter)
-
 fun IrDeclaration.hasDartExtensionAnnotation() = hasOverriddenAnnotation(DotlinAnnotations.dartExtension)
+fun IrFunction.hasDartPositionalAnnotation() = hasOverriddenAnnotation(DotlinAnnotations.dartPositional)
 
 val IrDeclaration.dartAnnotatedName: String?
     get() = when (this) {
@@ -68,3 +67,6 @@ val IrDeclaration.dartImportAliasPrefix: String?
 
 val IrDeclaration.dartCatchAsType: IrType?
     get() = getSingleAnnotationTypeArgumentOf(DotlinAnnotations.dartCatchAs)
+
+val IrValueParameter.isDartPositional: Boolean
+    get() = (parent as? IrFunction)?.hasDartPositionalAnnotation() == true

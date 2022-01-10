@@ -857,4 +857,93 @@ class Dotlin : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `@DartPositional`() = assertCompile {
+        kotlin(
+            """
+            @DartPositional
+            fun test(x: Int = 0, y: Int? = null, z: Long) {}
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void test(
+              int z, [
+              int x = 0,
+              int? y = null,
+            ]) {}
+            """
+        )
+    }
+
+    @Test
+    fun `@DartPositional on constructor`() = assertCompile {
+        kotlin(
+            """
+            class Test @DartPositional constructor(val x: Int, val y: Int? = null)
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {
+              Test(
+                this.x, [
+                this.y = null,
+              ]) : super();
+              @nonVirtual
+              final int x;
+              @nonVirtual
+              final int? y;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartPositional on method with override`() = assertCompile {
+        kotlin(
+            """
+            open class A {
+                @DartPositional
+                open fun doTest(x: Int, y: Int?, z: Int = -1) {}
+            }
+
+            class B : A() {
+                override fun doTest(x: Int, y: Int?, z: Int) {}
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            class A {
+              void doTest(
+                int x,
+                int? y, [
+                int z = -1,
+              ]) {}
+            }
+
+            @sealed
+            class B extends A {
+              @override
+              void doTest(
+                int x,
+                int? y, [
+                int z = -1,
+              ]) {}
+            }
+            """
+        )
+    }
 }
