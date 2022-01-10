@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
+import org.dotlin.compiler.backend.isDartPositional
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
@@ -65,9 +66,9 @@ fun IrValueParameter.accept(context: DartTransformContext): DartFormalParameter 
     }
 
     return DartDefaultFormalParameter(
-        // We make all parameters with default values named on the Dart side,
-        // to lessen the complexity.
-        isNamed = true,
+        // By default, parameters with default values will be named in Dart. This is overridden if
+        // the containing function is annotated with @DartPositional.
+        isNamed = !irValueParameter.isDartPositional,
         defaultValue = defaultValue,
         parameter = normalParameter,
     )

@@ -30,8 +30,18 @@ package dotlin
 annotation class DartName(val name: String)
 
 /**
- * Specifies that the constructor or constructor call should be `const`.
+ * Specifies that the constructor or constructor call should be `const` in Dart.
  */
 @Target(AnnotationTarget.CONSTRUCTOR, AnnotationTarget.EXPRESSION)
 @Retention(AnnotationRetention.SOURCE)
 annotation class DartConst()
+
+/**
+ * Specifies that the parameters with default values of this function (or constructor)
+ * are positional instead of named in Dart.
+ *
+ * Also applies to methods that override this method.
+ */
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR)
+@Retention(AnnotationRetention.SOURCE)
+annotation class DartPositional()

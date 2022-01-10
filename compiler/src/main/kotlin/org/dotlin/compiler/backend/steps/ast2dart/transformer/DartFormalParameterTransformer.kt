@@ -26,11 +26,15 @@ object DartFormalParameterTransformer : DartAstNodeTransformer {
     override fun visitFormalParameterList(parameters: DartFormalParameterList, context: DartGenerationContext): String {
         var output = "("
 
+        val (defaultBlockOpen, defaultBlockClose) = when {
+            parameters.any { it.isDefault() && it.isNamed } -> '{' to '}'
+            else -> '[' to ']'
+        }
         var startedWithDefaultParameters = false
         parameters.forEachIndexed { index, param ->
             if (!startedWithDefaultParameters && param.isDefault()) {
                 startedWithDefaultParameters = true
-                output += "{"
+                output += defaultBlockOpen
             }
 
             output += param.accept(context)
@@ -42,7 +46,7 @@ object DartFormalParameterTransformer : DartAstNodeTransformer {
         }
 
         if (startedWithDefaultParameters) {
-            output += "}"
+            output += defaultBlockClose
         }
 
         output += ")"
