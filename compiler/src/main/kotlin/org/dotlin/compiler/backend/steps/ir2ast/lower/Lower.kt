@@ -31,7 +31,7 @@ import kotlin.reflect.KFunction1
 private val lowerings: List<KFunction1<DartLoweringContext, IrLowering>> = listOf(
     ::UnrepresentableDecimalConstsLowering,
     Comparable::PreOperatorsLowering,
-    ::DartBuiltInImportsLowering,
+    ::DartImportsLowering,
     ::DartExtensionsLowering,
     ::ExternalDeclarationsLowering,
     ::EnumLowering,
