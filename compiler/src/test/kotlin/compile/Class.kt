@@ -2852,6 +2852,41 @@ class Class : BaseTest {
     }
 
     @Test
+    fun `class with redirecting constructor that has a body`() = assertCompile {
+        kotlin(
+            """
+            class Test(val property: Int?) {
+                constructor() : this(null) {
+                    initialize()
+                }
+
+                private fun initialize() {}
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {
+              Test(this.property) : super();
+              @nonVirtual
+              final int? property;
+              factory Test.${'$'}constructor${'$'}1() {
+                final Test tmp0_instance = Test(null);
+                tmp0_instance._initialize();
+                return tmp0_instance;
+              }
+              @nonVirtual
+              void _initialize() {}
+            }
+            """
+        )
+    }
+
+    @Test
     fun `nested class`() = assertCompile {
         kotlin(
             """
