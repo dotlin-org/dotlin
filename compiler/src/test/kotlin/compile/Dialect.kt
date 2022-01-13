@@ -17,18 +17,33 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.dart.ast.expression.literal
+package compile
 
-import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
+import BaseTest
+import assertCompile
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
 
-@JvmInline
-value class DartIntegerLiteral(val value: Long) : DartLiteral {
-    constructor(value: Byte) : this(value.toLong())
-    constructor(value: Short) : this(value.toLong())
-    constructor(value: Int) : this(value.toLong())
+@DisplayName("Compile: Dialect")
+class Dialect : BaseTest {
+    @Test
+    fun `using Long literal on Int`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                val x: Int = 9223372036854775807
+            }
+            """
+        )
 
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
-        visitor.visitIntegerLiteral(this, data)
+        dart(
+            """
+            import 'package:meta/meta.dart';
 
-    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {}
+            void main() {
+              final int x = 9223372036854775807;
+            }
+            """
+        )
+    }
 }

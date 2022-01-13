@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2021 JetBrains s.r.o.
  * Copyright 2021-2022 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,21 +15,21 @@
  * limitations under the License.
  */
 
-package kotlin
+package kotlin.collections
 
-/**
- * Superclass for all platform classes representing numeric values.
- */
-@DartName("num")
-external abstract class Number {
-    /**
-     * Returns the value of this number as a [Double], which may involve rounding.
-     */
-    abstract fun toDouble(): Double
+internal interface ByteIterator : Iterator<Byte>
 
-    /**
-     * Returns the value of this number as an [Int], which may involve rounding or truncation.
-     */
-    abstract fun toInt(): Int
-}
+internal interface CharIterator : Iterator<Char>
+
+internal interface ShortIterator : Iterator<Short>
+
+internal interface IntIterator : Iterator<Int>
+
+internal interface LongIterator : Iterator<Long>
+
+internal interface FloatIterator : Iterator<Float>
+
+internal interface DoubleIterator : Iterator<Double>
+
+internal interface BooleanIterator : Iterator<Boolean>
 

@@ -28,7 +28,7 @@ package kotlin
  * The `String` class represents character strings. All string literals in Kotlin programs, such as `"abc"`, are
  * implemented as instances of this class.
  */
-external class String : Comparable<String>, CharSequence {
+external class String : Comparable<String> {
     companion object {}
     
     /**
@@ -36,7 +36,7 @@ external class String : Comparable<String>, CharSequence {
      */
     operator fun plus(other: Any?): String
 
-    override val length: Int
+    val length: Int
 
     /**
      * Returns the character of this string at the specified [index].
@@ -44,9 +44,9 @@ external class String : Comparable<String>, CharSequence {
      * If the [index] is out of bounds of this string, throws an [IndexOutOfBoundsException] except in Kotlin/JS
      * where the behavior is unspecified.
      */
-    override fun get(index: Int): Char
+    fun get(index: Int): String
 
-    override fun subSequence(startIndex: Int, endIndex: Int): CharSequence
+    fun subSequence(startIndex: Int, endIndex: Int): String
 
     override fun compareTo(other: String): Int
 }

@@ -20,7 +20,7 @@ package kotlin
 /**
  * Represents a readable sequence of [Char] values.
  */
-interface CharSequence {
+internal external interface CharSequence {
     /**
      * Returns the length of this character sequence.
      */

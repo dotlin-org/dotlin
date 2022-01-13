@@ -28,7 +28,7 @@ package kotlin
  * An array of bytes. When targeting the JVM, instances of this class are represented as `byte[]`.
  * @constructor Creates a new array of the specified [size], with all elements initialized to zero.
  */
-class ByteArray(size: Int) {
+internal external class ByteArray(size: Int) {
     /**
      * Creates a new array of the specified [size], where each element is calculated by calling the specified
      * [init] function.
@@ -58,14 +58,14 @@ class ByteArray(size: Int) {
     val size: Int
 
     /** Creates an iterator over the elements of the array. */
-    operator fun iterator(): ByteIterator
+    operator fun iterator(): Iterator<Byte>
 }
 
 /**
  * An array of chars. When targeting the JVM, instances of this class are represented as `char[]`.
  * @constructor Creates a new array of the specified [size], with all elements initialized to null char (`\u0000').
  */
-class CharArray(size: Int) {
+internal external class CharArray(size: Int) {
     /**
      * Creates a new array of the specified [size], where each element is calculated by calling the specified
      * [init] function.
@@ -95,14 +95,14 @@ class CharArray(size: Int) {
     val size: Int
 
     /** Creates an iterator over the elements of the array. */
-    operator fun iterator(): CharIterator
+    operator fun iterator(): Iterator<Char>
 }
 
 /**
  * An array of shorts. When targeting the JVM, instances of this class are represented as `short[]`.
  * @constructor Creates a new array of the specified [size], with all elements initialized to zero.
  */
-class ShortArray(size: Int) {
+internal external class ShortArray(size: Int) {
     /**
      * Creates a new array of the specified [size], where each element is calculated by calling the specified
      * [init] function.
@@ -132,14 +132,14 @@ class ShortArray(size: Int) {
     val size: Int
 
     /** Creates an iterator over the elements of the array. */
-    operator fun iterator(): ShortIterator
+    operator fun iterator(): Iterator<Short>
 }
 
 /**
  * An array of ints. When targeting the JVM, instances of this class are represented as `int[]`.
  * @constructor Creates a new array of the specified [size], with all elements initialized to zero.
  */
-class IntArray(size: Int) {
+internal external class IntArray(size: Int) {
     /**
      * Creates a new array of the specified [size], where each element is calculated by calling the specified
      * [init] function.
@@ -169,14 +169,14 @@ class IntArray(size: Int) {
     val size: Int
 
     /** Creates an iterator over the elements of the array. */
-    operator fun iterator(): IntIterator
+    operator fun iterator(): Iterator<Int>
 }
 
 /**
  * An array of longs. When targeting the JVM, instances of this class are represented as `long[]`.
  * @constructor Creates a new array of the specified [size], with all elements initialized to zero.
  */
-class LongArray(size: Int) {
+internal external class LongArray(size: Int) {
     /**
      * Creates a new array of the specified [size], where each element is calculated by calling the specified
      * [init] function.
@@ -206,14 +206,14 @@ class LongArray(size: Int) {
     val size: Int
 
     /** Creates an iterator over the elements of the array. */
-    operator fun iterator(): LongIterator
+    operator fun iterator(): Iterator<Long>
 }
 
 /**
  * An array of floats. When targeting the JVM, instances of this class are represented as `float[]`.
  * @constructor Creates a new array of the specified [size], with all elements initialized to zero.
  */
-class FloatArray(size: Int) {
+internal external class FloatArray(size: Int) {
     /**
      * Creates a new array of the specified [size], where each element is calculated by calling the specified
      * [init] function.
@@ -243,14 +243,14 @@ class FloatArray(size: Int) {
     val size: Int
 
     /** Creates an iterator over the elements of the array. */
-    operator fun iterator(): FloatIterator
+    operator fun iterator(): Iterator<Float>
 }
 
 /**
  * An array of doubles. When targeting the JVM, instances of this class are represented as `double[]`.
  * @constructor Creates a new array of the specified [size], with all elements initialized to zero.
  */
-class DoubleArray(size: Int) {
+internal external class DoubleArray(size: Int) {
     /**
      * Creates a new array of the specified [size], where each element is calculated by calling the specified
      * [init] function.
@@ -280,14 +280,14 @@ class DoubleArray(size: Int) {
     val size: Int
 
     /** Creates an iterator over the elements of the array. */
-    operator fun iterator(): DoubleIterator
+    operator fun iterator(): Iterator<Double>
 }
 
 /**
  * An array of booleans. When targeting the JVM, instances of this class are represented as `boolean[]`.
  * @constructor Creates a new array of the specified [size], with all elements initialized to `false`.
  */
-class BooleanArray(size: Int) {
+internal external class BooleanArray(size: Int) {
     /**
      * Creates a new array of the specified [size], where each element is calculated by calling the specified
      * [init] function.
@@ -317,6 +317,6 @@ class BooleanArray(size: Int) {
     val size: Int
 
     /** Creates an iterator over the elements of the array. */
-    operator fun iterator(): BooleanIterator
+    operator fun iterator(): Iterator<Boolean>
 }
 

@@ -941,7 +941,7 @@ class Function : BaseTest {
                 """
                 fun compare(a: Int, b: Int) {}
                 fun compare(a: String, b: String) {}
-                fun compare(a: Float, b: Float) {}
+                fun compare(a: Double, b: Double) {}
                 """
             )
 
@@ -957,7 +957,7 @@ class Function : BaseTest {
                   String a,
                   String b,
                 ) {}
-                void compareFloat(
+                void compareDouble(
                   double a,
                   double b,
                 ) {}
@@ -965,6 +965,7 @@ class Function : BaseTest {
             )
         }
 
+        @Disabled // TODO: Do this test for Dart interface and its Impl
         @Test
         fun `function with overload that have same amount of parameters, same names and same Dart types`() =
             assertCompile {
@@ -996,6 +997,7 @@ class Function : BaseTest {
                 )
         }
 
+        @Disabled // TODO: Do this test for Dart interface and its Impl
         @Test
         fun `function with overload that have same amount of parameters, but not the same names but same Dart types`() =
             assertCompile {
@@ -1027,6 +1029,7 @@ class Function : BaseTest {
                 )
             }
 
+        @Disabled // TODO: Do this test for Dart interface and its Impl
         @Test
         fun `function with overload that are equivalent in Dart but not in Kotlin`() = assertCompile {
             kotlin(
@@ -1063,7 +1066,7 @@ class Function : BaseTest {
 
                 fun giveCookie(message: String, wrapping: String) {}
 
-                fun giveCookie(message: String, wrapping: Long) {}
+                fun giveCookie(message: String, wrapping: Int) {}
                 """
             )
 
@@ -1077,7 +1080,7 @@ class Function : BaseTest {
                   String message,
                   String wrapping,
                 ) {}
-                void giveCookieWithMessageAndWrappingLong(
+                void giveCookieWithMessageAndWrappingInt(
                   String message,
                   int wrapping,
                 ) {}
@@ -1176,6 +1179,7 @@ class Function : BaseTest {
             )
         }
 
+        @Disabled // TODO: Do this test but with Dart interface and its Impl
         @Test
         fun `function with two overloads that have the same parameters and are generic`() = assertCompile {
             kotlin(

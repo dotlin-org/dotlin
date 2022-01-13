@@ -58,46 +58,6 @@ inline fun <reified @PureReifiable T> arrayOf(vararg elements: T): Array<T> = da
 inline fun <reified @PureReifiable T> emptyArray(): Array<T> = dart("<T>[]")
 
 /**
- * Returns an array containing the specified [Double] numbers.
- */
-fun doubleArrayOf(vararg elements: Double): DoubleArray
-
-/**
- * Returns an array containing the specified [Float] numbers.
- */
-fun floatArrayOf(vararg elements: Float): FloatArray
-
-/**
- * Returns an array containing the specified [Long] numbers.
- */
-fun longArrayOf(vararg elements: Long): LongArray
-
-/**
- * Returns an array containing the specified [Int] numbers.
- */
-fun intArrayOf(vararg elements: Int): IntArray
-
-/**
- * Returns an array containing the specified characters.
- */
-fun charArrayOf(vararg elements: Char): CharArray
-
-/**
- * Returns an array containing the specified [Short] numbers.
- */
-fun shortArrayOf(vararg elements: Short): ShortArray
-
-/**
- * Returns an array containing the specified [Byte] numbers.
- */
-fun byteArrayOf(vararg elements: Byte): ByteArray
-
-/**
- * Returns an array containing the specified boolean values.
- */
-fun booleanArrayOf(vararg elements: Boolean): BooleanArray
-
-/**
  * Returns an array containing enum T entries.
  */
 @SinceKotlin("1.1")

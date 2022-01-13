@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2021 JetBrains s.r.o.
  * Copyright 2021-2022 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,21 +15,17 @@
  * limitations under the License.
  */
 
-package kotlin
+package kotlin.ranges
+
+import kotlin.internal.getProgressionLastElement
 
 /**
- * Superclass for all platform classes representing numeric values.
+ * A progression of values of type `Char`.
  */
-@DartName("num")
-external abstract class Number {
-    /**
-     * Returns the value of this number as a [Double], which may involve rounding.
-     */
-    abstract fun toDouble(): Double
+internal external interface CharProgression : Iterable<Char>
 
-    /**
-     * Returns the value of this number as an [Int], which may involve rounding or truncation.
-     */
-    abstract fun toInt(): Int
-}
+/**
+ * A progression of values of type `Long`.
+ */
+internal external interface LongProgression : Iterable<Long>
 

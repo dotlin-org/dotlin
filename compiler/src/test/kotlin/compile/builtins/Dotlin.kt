@@ -863,7 +863,7 @@ class Dotlin : BaseTest {
         kotlin(
             """
             @DartPositional
-            fun test(x: Int = 0, y: Int? = null, z: Long) {}
+            fun test(x: Int = 0, y: Int? = null, z: Int) {}
             """
         )
 
