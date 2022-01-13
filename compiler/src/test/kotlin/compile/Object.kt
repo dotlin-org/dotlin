@@ -52,7 +52,7 @@ class Object : BaseTest {
         kotlin(
             """
             object Test {
-                fun compute(x: Int, y: Float): Int {
+                fun compute(x: Int, y: Double): Int {
                     return 343
                 }
             }

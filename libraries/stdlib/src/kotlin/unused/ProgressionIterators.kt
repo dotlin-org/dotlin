@@ -18,25 +18,13 @@
 package kotlin.ranges
 
 /**
- * An iterator over a progression of values of type `Int`.
+ * An iterator over a progression of values of type `Char`.
  * @property step the number by which the value is incremented on each step.
  */
-internal class IntProgressionIterator(first: Int, last: Int, val step: Int) : Iterator<Int> {
-    private val finalElement: Int = last
-    private var hasNext: Boolean = if (step > 0) first <= last else first >= last
-    private var next: Int = if (hasNext) first else finalElement
+internal interface CharProgressionIterator : CharIterator
 
-    override fun hasNext(): Boolean = hasNext
-
-    override fun next(): Int {
-        val value = next
-        if (value == finalElement) {
-            if (!hasNext) throw kotlin.NoSuchElementException()
-            hasNext = false
-        }
-        else {
-            next += step
-        }
-        return value
-    }
-}
+/**
+ * An iterator over a progression of values of type `Long`.
+ * @property step the number by which the value is incremented on each step.
+ */
+internal interface LongProgressionIterator : LongIterator

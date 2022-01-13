@@ -19,6 +19,9 @@
 
 package org.dotlin.compiler.backend.steps.src2ir.analyze
 
+import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.extensions.ExtensionPointName
 import org.dotlin.compiler.backend.DartKotlinBuiltIns
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
@@ -33,6 +36,7 @@ import org.jetbrains.kotlin.context.ContextForNewModule
 import org.jetbrains.kotlin.context.ProjectContext
 import org.jetbrains.kotlin.descriptors.impl.CompositePackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
+import org.jetbrains.kotlin.diagnostics.Severity
 import org.jetbrains.kotlin.frontend.di.configureModule
 import org.jetbrains.kotlin.frontend.di.configureStandardResolveComponents
 import org.jetbrains.kotlin.incremental.components.ExpectActualTracker
@@ -40,6 +44,7 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.platform.js.JsPlatforms
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.*
+import org.jetbrains.kotlin.resolve.diagnostics.DiagnosticSuppressor
 import org.jetbrains.kotlin.resolve.lazy.KotlinCodeAnalyzer
 import org.jetbrains.kotlin.resolve.lazy.declarations.FileBasedDeclarationProviderFactory
 
@@ -80,6 +85,11 @@ class DartKotlinAnalyzer(
             (setOf(thisModule) + modules + builtIns.builtInsModule).toList()
         )
 
+        DiagnosticSuppressor.EP_NAME.registerExtension(
+            DartDiagnosticSuppressor,
+            disposable = env.projectEnvironment.parentDisposable
+        )
+
         val trace = BindingTraceContext()
 
         val container = createContainer(
@@ -117,6 +127,22 @@ class DartKotlinAnalyzer(
             files,
         )
 
-        return AnalysisResult.success(trace.bindingContext, thisModule)
+        return when {
+            trace.bindingContext.diagnostics.any { it.severity == Severity.ERROR } -> {
+                AnalysisResult.compilationError(trace.bindingContext)
+            }
+            else -> AnalysisResult.success(trace.bindingContext, thisModule)
+        }
     }
+}
+
+private fun <T : Any> ExtensionPointName<T>.registerExtension(ext: T, disposable: Disposable) {
+    ApplicationManager.getApplication()
+        .extensionArea
+        .getExtensionPoint(this)
+        .let { ep ->
+            if (!ep.extensions.any { it == ext }) {
+                ep.registerExtension(ext, disposable)
+            }
+        }
 }

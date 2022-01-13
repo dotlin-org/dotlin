@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2021 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Copyright 2021-2022 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,21 +15,16 @@
  * limitations under the License.
  */
 
-package kotlin
+@file:Suppress("EXTERNAL_TYPE_EXTENDS_NON_EXTERNAL_TYPE")
+
+package kotlin.ranges
 
 /**
- * Superclass for all platform classes representing numeric values.
+ * A range of values of type `Char`.
  */
-@DartName("num")
-external abstract class Number {
-    /**
-     * Returns the value of this number as a [Double], which may involve rounding.
-     */
-    abstract fun toDouble(): Double
+internal external interface CharRange : CharProgression, ClosedRange<Char>
 
-    /**
-     * Returns the value of this number as an [Int], which may involve rounding or truncation.
-     */
-    abstract fun toInt(): Int
-}
-
+/**
+ * A range of values of type `Long`.
+ */
+internal external interface LongRange : LongProgression, ClosedRange<Long>

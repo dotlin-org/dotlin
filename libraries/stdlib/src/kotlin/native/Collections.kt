@@ -24,7 +24,7 @@ import kotlin.internal.PlatformDependent
  * be iterated over.
  * @param T the type of element being iterated over. The iterator is covariant in its element type.
  */
-interface Iterable<out T> {
+external interface Iterable<out T> {
     /**
      * Returns an iterator over the elements of this object.
      */

@@ -33,6 +33,7 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.descriptors.konan.kotlinLibrary
+import org.jetbrains.kotlin.diagnostics.Severity
 import org.jetbrains.kotlin.ir.backend.js.isBuiltIns
 import org.jetbrains.kotlin.ir.builders.TranslationPluginContext
 import org.jetbrains.kotlin.ir.declarations.IrFactory
@@ -118,7 +119,11 @@ private fun loadIr(
     val analysisResult = analyzer.analysisResult
 
     if (analyzer.hasErrors() || analysisResult.isError()) {
-        throw DotlinCompilerError()
+        throw DotlinCompilerError(
+            analysisResult.bindingContext.diagnostics
+                .filter { it.severity == Severity.ERROR }
+                .map { it.factory.name }
+        )
     }
 
     val mainModule = analysisResult.moduleDescriptor.also {

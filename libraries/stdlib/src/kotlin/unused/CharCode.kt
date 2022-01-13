@@ -35,12 +35,7 @@ package kotlin
  */
 @SinceKotlin("1.5")
 //@kotlin.internal.InlineOnly
-inline fun Char(code: Int): Char {
-    if (code < Char.MIN_VALUE.code || code > Char.MAX_VALUE.code) {
-        throw IllegalArgumentException("Invalid Char code: $code")
-    }
-    return code.toChar()
-}
+internal inline fun Char(code: Int): Char = '\u0000'
 
 /**
  * Creates a Char with the specified [code].
@@ -60,4 +55,4 @@ inline fun Char(code: Int): Char {
 @SinceKotlin("1.5")
 //@kotlin.internal.InlineOnly
 @Suppress("DEPRECATION")
-inline val Char.code: Int get() = this.toInt()
+internal inline val Char.code: Int get() = this.toInt()

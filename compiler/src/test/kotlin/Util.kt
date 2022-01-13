@@ -18,12 +18,14 @@
  */
 
 import org.dotlin.compiler.KotlinToDartCompiler
+import org.dotlin.compiler.backend.DotlinCompilerError
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.*
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
 
 abstract class CompilerAssertion<I, O> {
@@ -66,7 +68,14 @@ class AssertCompileFiles : AssertCompile<List<String>, String>() {
         get() = dart
 }
 
-class AssertCompileThrows : CompilerAssertion<String, Nothing?>() {
+class AssertCompilesWithErrors : CompilerAssertion<String, Nothing?>() {
+    override val input
+        get() = kotlin
+
+    override val output: Nothing? = null
+}
+
+class AssertCanCompile : CompilerAssertion<String, Nothing?>() {
     override val input
         get() = kotlin
 
@@ -109,14 +118,39 @@ inline fun assertCompileFiles(block: AssertCompileFiles.() -> Unit) {
     assertEquals(args.output, compiledDart)
 }
 
-inline fun <reified E : Throwable> assertCompileThrows(block: AssertCompileThrows.() -> Unit) {
-    val args = AssertCompileThrows()
+inline fun assertCanCompile(block: AssertCanCompile.() -> Unit) {
+    val args = AssertCanCompile()
+    block(args)
+
+    assertDoesNotThrow {
+        KotlinToDartCompiler.compile(
+            args.input,
+            dependencies = setOf(stdlibKlib),
+            format = true
+        )
+    }
+}
+
+inline fun assertCompilesWithError(name: String, block: AssertCompilesWithErrors.() -> Unit) =
+    assertCompilesWithErrors(name, block = block)
+
+inline fun assertCompilesWithErrors(vararg names: String, block: AssertCompilesWithErrors.() -> Unit) {
+    require(names.isNotEmpty())
+
+    val args = AssertCompilesWithErrors()
     block(args)
 
     val kotlin = args.input
 
-    assertThrows<E> {
-        KotlinToDartCompiler.compile(kotlin)
+    val error = assertThrows<DotlinCompilerError> {
+        KotlinToDartCompiler.compile(
+            kotlin,
+            dependencies = setOf(stdlibKlib)
+        )
+    }
+
+    names.forEach { name ->
+        assertContains(error.diagnosticNames, name)
     }
 }
 

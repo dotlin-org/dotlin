@@ -369,103 +369,18 @@ class Extension : BaseTest {
     fun `extension on Kotlin number primitive`() = assertCompile {
         kotlin(
             """
-            fun Byte.shift(): Byte = 0
+            fun Int.shift(): Int = 0
             """
         )
 
         dart(
             """
             import 'package:meta/meta.dart';
-
-            extension ${'$'}KotlinByteExtensions on int {
-              int shift() {
-                return 0;
-              }
-            }
-            """
-        )
-    }
-
-    @Test
-    fun `same extension on Kotlin number primitives`() = assertCompile {
-        kotlin(
-            """
-            fun Byte.shift(): Byte = 0
-            fun Short.shift(): Short = 1
-            """
-        )
-
-        dart(
-            """
-            import 'package:meta/meta.dart';
-
-            extension ${'$'}KotlinByteExtensions on int {
-              int shift() {
-                return 0;
-              }
-            }
-
-            extension ${'$'}KotlinShortExtensions on int {
-              int shift() {
-                return 1;
-              }
-            }
-            """
-        )
-    }
-
-    @Test
-    fun `calling extension that exists on multiple Kotlin number primitives`() = assertCompile {
-        kotlin(
-            """
-            fun Byte.shift(): Byte = 0
-            fun Int.shift(): Int = 1
-
-            fun main() {
-                0.shift()
-            }
-            """
-        )
-
-        dart(
-            """
-            import 'package:meta/meta.dart';
-
-            void main() {
-              ${'$'}KotlinIntExtensions(0).shift();
-            }
-
-            extension ${'$'}KotlinByteExtensions on int {
-              int shift() {
-                return 0;
-              }
-            }
 
             extension ${'$'}KotlinIntExtensions on int {
               int shift() {
-                return 1;
+                return 0;
               }
-            }
-            """
-        )
-    }
-
-    @Test
-    fun `calling extension that exists on multiple Kotlin number primitives from stdlib`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                0.toChar()
-            }
-            """
-        )
-
-        dart(
-            """
-            import 'package:meta/meta.dart';
-
-            void main() {
-              ${'$'}IntExtensions(0).toChar();
             }
             """
         )

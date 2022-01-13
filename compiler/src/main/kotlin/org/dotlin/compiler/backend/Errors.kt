@@ -19,4 +19,6 @@
 
 package org.dotlin.compiler.backend
 
-open class DotlinCompilerError(override val message: String? = null) : Error(message)
+open class DotlinError(override val message: String? = null) : Error(message)
+
+class DotlinCompilerError(val diagnosticNames: List<String>) : DotlinError()

@@ -31,8 +31,7 @@ package kotlin
  *
  * In Dart, values of this type are represented as values of the primitive type `int`.
  */
-@DartName("int")
-external class Char private constructor() : Comparable<Char> {
+internal external class Char private constructor() : Comparable<Char> {
     /**
      * Compares this value with the specified value for order.
      *
@@ -63,9 +62,6 @@ external class Char private constructor() : Comparable<Char> {
      */
     operator fun dec(): Char
 
-    /** Creates a range from this value to the specified [other] value. */
-    operator fun rangeTo(other: Char): CharRange
-
     /** Returns the value of this character as a `Byte`. */
     @Deprecated("Conversion of Char to Number is deprecated. Use Char.code property instead.", ReplaceWith("this.code.toByte()"))
     @DeprecatedSinceKotlin(warningSince = "1.5")
@@ -75,7 +71,7 @@ external class Char private constructor() : Comparable<Char> {
     /** Returns the value of this character as a `Short`. */
     @Deprecated("Conversion of Char to Number is deprecated. Use Char.code property instead.", ReplaceWith("this.code.toShort()"))
     @DeprecatedSinceKotlin(warningSince = "1.5")
-    fun toShort(): Short
+    internal fun toShort(): Short
     /** Returns the value of this character as a `Int`. */
     @Deprecated("Conversion of Char to Number is deprecated. Use Char.code property instead.", ReplaceWith("this.code"))
     @DeprecatedSinceKotlin(warningSince = "1.5")
