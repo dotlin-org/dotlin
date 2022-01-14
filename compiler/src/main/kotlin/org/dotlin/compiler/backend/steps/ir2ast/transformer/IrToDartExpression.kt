@@ -24,7 +24,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.ObjectLowering
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.*
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartInt
 import org.dotlin.compiler.backend.util.component6
 import org.dotlin.compiler.backend.util.component7
 import org.dotlin.compiler.backend.util.toPair
@@ -53,11 +53,11 @@ import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.name.Name
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
-    override fun visitExpressionBody(irBody: IrExpressionBody, data: DartTransformContext) =
+object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
+    override fun DartTransformContext.visitExpressionBody(irBody: IrExpressionBody, data: DartTransformContext) =
         irBody.expression.accept(data)
 
-    override fun visitFunctionAccess(
+    override fun DartTransformContext.visitFunctionAccess(
         irCallLike: IrFunctionAccessExpression,
         context: DartTransformContext,
     ) = context.run {
@@ -260,7 +260,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         }
     }
 
-    override fun <T> visitConst(irConst: IrConst<T>, data: DartTransformContext): DartExpression {
+    override fun <T> DartTransformContext.visitConst(irConst: IrConst<T>, data: DartTransformContext): DartExpression {
         return when (irConst.kind) {
             is IrConstKind.Null -> DartNullLiteral
             is IrConstKind.Boolean -> DartBooleanLiteral(irConst.value as Boolean)
@@ -291,24 +291,28 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         }
     }
 
-    override fun visitWhen(irWhen: IrWhen, context: DartTransformContext) = irWhen.branches.reversed().toList().run {
-        drop(1).fold(
-            initial = first().let {
-                require(it is IrElseBranch) { "Last branch in if/when expression must be else" }
+    override fun DartTransformContext.visitWhen(irWhen: IrWhen, context: DartTransformContext) =
+        irWhen.branches.reversed().toList().run {
+            drop(1).fold(
+                initial = first().let {
+                    require(it is IrElseBranch) { "Last branch in if/when expression must be else" }
 
-                it.result.accept(context)
-            },
-            operation = { expression, irBranch ->
-                DartConditionalExpression(
-                    condition = irBranch.condition.accept(context),
-                    thenExpression = irBranch.result.accept(context),
+                    it.result.accept(context)
+                },
+                operation = { expression, irBranch ->
+                    DartConditionalExpression(
+                        condition = irBranch.condition.accept(context),
+                        thenExpression = irBranch.result.accept(context),
                     elseExpression = expression
                 )
             }
         )
     }
 
-    override fun visitGetValue(irGetValue: IrGetValue, context: DartTransformContext): DartExpression {
+    override fun DartTransformContext.visitGetValue(
+        irGetValue: IrGetValue,
+        context: DartTransformContext
+    ): DartExpression {
         if (irGetValue.isThisReference()) {
             return DartThisExpression
         }
@@ -316,12 +320,15 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         return irGetValue.symbol.owner.dartName
     }
 
-    override fun visitGetField(irGetField: IrGetField, context: DartTransformContext): DartExpression {
+    override fun DartTransformContext.visitGetField(
+        irGetField: IrGetField,
+        context: DartTransformContext
+    ): DartExpression {
         val receiver = when (irGetField.symbol.owner.parent) {
             is IrFile -> null
             else -> irGetField.receiver?.accept(context) ?: irGetField.type.owner.dartName
         }
-        val name = irGetField.symbol.owner.relevantDartName
+        val name = relevantDartNameOf(irGetField.symbol.owner)
 
         return when (receiver) {
             null -> name
@@ -332,23 +339,31 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         }
     }
 
-    override fun visitGetObjectValue(irGetObjectValue: IrGetObjectValue, data: DartTransformContext) =
+    override fun DartTransformContext.visitGetObjectValue(
+        irGetObjectValue: IrGetObjectValue,
+        data: DartTransformContext
+    ) =
         DartPropertyAccessExpression(
             target = irGetObjectValue.symbol.owner.dartName,
             propertyName = ObjectLowering.INSTANCE_FIELD_NAME.toDartSimpleIdentifier()
         )
 
-    override fun visitSetValue(irSetValue: IrSetValue, context: DartTransformContext): DartExpression {
+    override fun DartTransformContext.visitSetValue(
+        irSetValue: IrSetValue,
+        context: DartTransformContext
+    ): DartExpression {
         return DartAssignmentExpression(
             left = irSetValue.symbol.owner.dartName,
             right = irSetValue.value.accept(context)
         )
     }
 
-    override fun visitSetField(irSetField: IrSetField, context: DartTransformContext): DartExpression {
+    override fun DartTransformContext.visitSetField(
+        irSetField: IrSetField,
+        context: DartTransformContext
+    ): DartExpression {
         val receiver = irSetField.receiver?.accept(context)
-        val name = irSetField.symbol.owner.relevantDartName
-
+        val name = relevantDartNameOf(irSetField.symbol.owner)
         val assignee = if (receiver != null)
             DartPropertyAccessExpression(
                 target = receiver.possiblyParenthesize(isReceiver = true),
@@ -363,7 +378,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         )
     }
 
-    override fun visitTypeOperator(
+    override fun DartTransformContext.visitTypeOperator(
         irTypeOperatorCall: IrTypeOperatorCall,
         context: DartTransformContext
     ): DartExpression {
@@ -389,13 +404,13 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         }
     }
 
-    override fun visitThrow(irThrow: IrThrow, context: DartTransformContext): DartExpression {
+    override fun DartTransformContext.visitThrow(irThrow: IrThrow, context: DartTransformContext): DartExpression {
         // TODO: Rethrow
 
         return DartThrowExpression(irThrow.value.accept(context))
     }
 
-    override fun visitVararg(irVararg: IrVararg, context: DartTransformContext): DartExpression {
+    override fun DartTransformContext.visitVararg(irVararg: IrVararg, context: DartTransformContext): DartExpression {
         return DartListLiteral(
             elements = DartCollectionElementList(
                 irVararg.elements.map {
@@ -409,13 +424,14 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         )
     }
 
-    private val IrField.relevantDartName: DartSimpleIdentifier
-        get() = when {
-            !isExplicitBackingField -> correspondingProperty?.simpleDartName ?: dartName
-            else -> dartName
+    private fun DartTransformContext.relevantDartNameOf(irField: IrField): DartSimpleIdentifier = irField.let {
+        when {
+            !it.isExplicitBackingField -> it.correspondingProperty?.simpleDartName ?: it.dartName
+            else -> it.dartName
         }
+    }
 
-    override fun visitFunctionExpression(
+    override fun DartTransformContext.visitFunctionExpression(
         expression: IrFunctionExpression,
         context: DartTransformContext
     ): DartExpression =
@@ -427,12 +443,12 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
             )
         }
 
-    override fun visitNullAwareExpression(
+    override fun DartTransformContext.visitNullAwareExpression(
         irNullAware: IrNullAwareExpression,
         context: DartTransformContext
     ): DartExpression = (irNullAware.expression.accept(context) as DartPossiblyNullAwareExpression).asNullAware()
 
-    override fun visitStringConcatenation(
+    override fun DartTransformContext.visitStringConcatenation(
         expression: IrStringConcatenation,
         context: DartTransformContext
     ): DartExpression {
@@ -446,7 +462,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         )
     }
 
-    override fun visitBinaryInfixExpression(
+    override fun DartTransformContext.visitBinaryInfixExpression(
         binaryInfix: IrBinaryInfixExpression,
         context: DartTransformContext
     ): DartExpression {
@@ -460,7 +476,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         }
     }
 
-    override fun visitDartCodeExpression(
+    override fun DartTransformContext.visitDartCodeExpression(
         irCode: IrDartCodeExpression,
         context: DartTransformContext
     ): DartExpression = DartCode(irCode.code)
@@ -491,7 +507,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression> {
         }
     }
 
-    override fun visitBlock(expression: IrBlock, context: DartTransformContext) =
+    override fun DartTransformContext.visitBlock(expression: IrBlock, context: DartTransformContext) =
         when (val origin = expression.origin) {
             PREFIX_INCR, PREFIX_DECR -> {
                 val irSetValue = expression.statements.first() as IrSetValue

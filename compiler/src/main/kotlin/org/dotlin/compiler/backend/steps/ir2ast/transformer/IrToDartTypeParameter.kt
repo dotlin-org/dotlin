@@ -20,13 +20,12 @@
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.simpleDartName
 import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameter
 import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameterList
 import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.types.isNullableAny
 
-fun IrTypeParameter.accept(context: DartTransformContext): DartTypeParameter =
+fun IrTypeParameter.accept(context: DartTransformContext): DartTypeParameter = context.run {
     DartTypeParameter(
         name = simpleDartName,
         bound = superTypes.single().let {
@@ -37,5 +36,6 @@ fun IrTypeParameter.accept(context: DartTransformContext): DartTypeParameter =
             }
         }
     )
+}
 
 fun List<IrTypeParameter>.accept(context: DartTransformContext) = DartTypeParameterList(map { it.accept(context) })

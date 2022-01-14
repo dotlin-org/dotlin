@@ -19,16 +19,11 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.DotlinAnnotations
-import org.dotlin.compiler.backend.dartHideImportLibrary
-import org.dotlin.compiler.backend.dartImportAliasLibrary
-import org.dotlin.compiler.backend.dartImportAliasPrefix
+import org.dotlin.compiler.backend.dartUnresolvedImport
 import org.dotlin.compiler.backend.steps.ir2ast.attributes.DartImport
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementVisitorVoid
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrFileLowering
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.simpleDartNameOrNull
-import org.dotlin.compiler.backend.util.hasAnnotation
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationWithName
@@ -39,7 +34,6 @@ import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.util.TypeRemapper
-import org.jetbrains.kotlin.ir.util.getPackageFragment
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.ir.util.remapTypes
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
@@ -56,33 +50,32 @@ class DartImportsLowering(override val context: DartLoweringContext) : IrFileLow
         val imports = mutableSetOf<DartImport>()
 
         fun maybeAddDartImports(declaration: IrDeclarationWithName) {
-            val dartName = declaration.simpleDartNameOrNull?.value ?: return
+            val unresolvedImport = declaration.dartUnresolvedImport
+            val hiddenNameFromCore = declaration.dartHiddenNameFromCore
 
-            declaration.let {
-                val dartImportAlias = when {
-                    it.hasAnnotation(DotlinAnnotations.dartImportAlias) -> DartImport(
-                        library = it.dartImportAliasLibrary!!,
-                        alias = it.dartImportAliasPrefix,
-                        hide = dartName
-                    )
-                    else -> null
-                }
+            val hiddenName by lazy { declaration.simpleDartNameOrNull?.value }
 
-                val dartImportHide = when {
-                    it.hasAnnotation(DotlinAnnotations.dartHideImport) -> DartImport(
-                        library = it.dartHideImportLibrary!!,
-                        hide = dartName
-                    )
-                    else -> null
-                }
-
-                val packageImport = dartSdkImports[declaration.getPackageFragment()?.fqName?.asString()]
-                    ?.let { dartSdkLibrary ->
-                        DartImport(dartSdkLibrary)
+            imports.addAll(
+                listOfNotNull(
+                    unresolvedImport?.let {
+                        DartImport(
+                            library = it.library,
+                            alias = it.alias,
+                            hide = when {
+                                it.hidden -> hiddenName
+                                else -> null
+                            }
+                        )
+                    },
+                    hiddenNameFromCore?.let {
+                        DartImport(
+                            library = "dart:core",
+                            alias = null,
+                            hide = hiddenName
+                        )
                     }
-
-                imports.addAll(listOfNotNull(dartImportAlias, dartImportHide, packageImport))
-            }
+                )
+            )
         }
 
         file.acceptChildrenVoid(

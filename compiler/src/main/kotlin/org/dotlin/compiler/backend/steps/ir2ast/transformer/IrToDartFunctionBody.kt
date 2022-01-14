@@ -31,10 +31,13 @@ import org.jetbrains.kotlin.ir.expressions.IrExpressionBody
 import org.jetbrains.kotlin.ir.expressions.IrSyntheticBody
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-class IrToDartFunctionBodyTransformer(private val allowEmpty: Boolean) : IrDartAstTransformer<DartFunctionBody> {
+class IrToDartFunctionBodyTransformer(private val allowEmpty: Boolean) : IrDartAstTransformer<DartFunctionBody>() {
     // TODO: isAsync, isGenerator
 
-    override fun visitBlockBody(irBody: IrBlockBody, context: DartTransformContext): DartFunctionBody {
+    override fun DartTransformContext.visitBlockBody(
+        irBody: IrBlockBody,
+        context: DartTransformContext
+    ): DartFunctionBody {
         if (allowEmpty && irBody.statements.isEmpty()) return DartEmptyFunctionBody()
 
         return DartBlockFunctionBody(
@@ -44,12 +47,13 @@ class IrToDartFunctionBodyTransformer(private val allowEmpty: Boolean) : IrDartA
         )
     }
 
-    override fun visitExpressionBody(irBody: IrExpressionBody, context: DartTransformContext) =
+    override fun DartTransformContext.visitExpressionBody(irBody: IrExpressionBody, context: DartTransformContext) =
         DartExpressionFunctionBody(
             expression = irBody.expression.accept(context)
         )
 
-    override fun visitSyntheticBody(body: IrSyntheticBody, data: DartTransformContext) = DartEmptyFunctionBody()
+    override fun DartTransformContext.visitSyntheticBody(body: IrSyntheticBody, data: DartTransformContext) =
+        DartEmptyFunctionBody()
 }
 
 fun IrBody?.accept(context: DartTransformContext, allowEmpty: Boolean = false) = when (this) {

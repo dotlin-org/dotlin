@@ -39,3 +39,5 @@ operator fun <E> List<E>.component7(): E = this[6]
 operator fun <E> List<E>.component8(): E = this[7]
 operator fun <E> List<E>.component9(): E = this[8]
 operator fun <E> List<E>.component10(): E = this[9]
+
+fun <T, V, R> T.runWith(value: V, block: T.(V) -> R): R = block(this, value)

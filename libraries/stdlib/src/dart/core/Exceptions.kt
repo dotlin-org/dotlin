@@ -18,7 +18,7 @@
 
 package dart.core
 
-@DartImportAlias("dart:core")
+@DartLibrary("dart:core", aliased = true)
 external sealed interface Exception
 
 /**

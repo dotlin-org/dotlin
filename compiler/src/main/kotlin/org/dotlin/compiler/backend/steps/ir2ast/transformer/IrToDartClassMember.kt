@@ -22,7 +22,9 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer
 import org.dotlin.compiler.backend.hasDartGetterAnnotation
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.*
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartAnnotations
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartConst
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartFactory
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartClassMember
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartMethodDeclaration
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.*
@@ -41,8 +43,8 @@ import org.jetbrains.kotlin.ir.util.isSetter
 import org.jetbrains.kotlin.ir.util.parentAsClass
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
-    override fun visitSimpleFunction(irFunction: IrSimpleFunction, context: DartTransformContext) =
+object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?>() {
+    override fun DartTransformContext.visitSimpleFunction(irFunction: IrSimpleFunction, context: DartTransformContext) =
         irFunction.transformBy(context) {
             DartMethodDeclaration(
                 name!!,
@@ -61,27 +63,28 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
             )
         }
 
-    override fun visitConstructor(irConstructor: IrConstructor, context: DartTransformContext) = context.run {
-        irConstructor.transformBy(context) {
-            val initializers = (irConstructor.body as? IrBlockBody)?.run {
-                // Constructor parameters with complex default values are initialized in the body. We move them to the
-                // Dart field initializer list, if possible.
-                statements
-                    .filter { it.propertyItAssignsTo?.isInitializedInFieldInitializerList == true }
-                    .also { statements.removeAll(it) }
-                    .map {
-                        DartConstructorFieldInitializer(
-                            fieldName = it.propertyItAssignsTo!!.simpleDartName,
-                            expression = it.rightHandOfSet!!.accept(context)
-                        )
-                    }
-                    // Handle super/this constructor call.
-                    .plus(
-                        statements
-                            .filterIsInstance<IrDelegatingConstructorCall>()
-                            .singleOrNull()
-                            ?.let { irDelegatingConstructorCall ->
-                                val delegateIrConstructor = irDelegatingConstructorCall.symbol.owner
+    override fun DartTransformContext.visitConstructor(irConstructor: IrConstructor, context: DartTransformContext) =
+        context.run {
+            irConstructor.transformBy(context) {
+                val initializers = (irConstructor.body as? IrBlockBody)?.run {
+                    // Constructor parameters with complex default values are initialized in the body. We move them to the
+                    // Dart field initializer list, if possible.
+                    statements
+                        .filter { it.propertyItAssignsTo?.isInitializedInFieldInitializerList == true }
+                        .also { statements.removeAll(it) }
+                        .map {
+                            DartConstructorFieldInitializer(
+                                fieldName = it.propertyItAssignsTo!!.simpleDartName,
+                                expression = it.rightHandOfSet!!.accept(context)
+                            )
+                        }
+                        // Handle super/this constructor call.
+                        .plus(
+                            statements
+                                .filterIsInstance<IrDelegatingConstructorCall>()
+                                .singleOrNull()
+                                ?.let { irDelegatingConstructorCall ->
+                                    val delegateIrConstructor = irDelegatingConstructorCall.symbol.owner
 
                                 val name = delegateIrConstructor.dartNameOrNull
                                 val arguments =
@@ -123,10 +126,13 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?> {
                     body = irConstructor.body.accept(context, allowEmpty = true)
                 )
             )
+            }
         }
-    }
 
-    override fun visitField(irField: IrField, context: DartTransformContext): DartFieldDeclaration = context.run {
+    override fun DartTransformContext.visitField(
+        irField: IrField,
+        context: DartTransformContext
+    ): DartFieldDeclaration = context.run {
         val fieldName = irField.dartName
         val fieldType = irField.type.accept(context)
 

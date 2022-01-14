@@ -22,20 +22,20 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.IrVoidType
 import org.dotlin.compiler.backend.steps.ir2ast.ir.owner
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
+import org.dotlin.compiler.backend.util.runWith
 import org.dotlin.compiler.dart.ast.type.DartNamedType
 import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
 import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
 import org.jetbrains.kotlin.ir.types.*
 
-fun IrType.accept(context: DartTransformContext): DartTypeAnnotation {
+fun IrType.accept(context: DartTransformContext): DartTypeAnnotation = context.runWith(this) {
     // TODO: Check for function type
 
-    return when (this) {
+    when (it) {
         is IrSimpleType -> DartNamedType(
-            name = owner.dartName,
-            isNullable = hasQuestionMark,
-            typeArguments = DartTypeArgumentList(arguments.map { it.accept(context) }.toMutableList()),
+            name = it.owner.dartName,
+            isNullable = it.hasQuestionMark,
+            typeArguments = DartTypeArgumentList(it.arguments.map { arg -> arg.accept(context) }.toMutableList()),
         )
         is IrDynamicType -> DartTypeAnnotation.DYNAMIC
         is IrVoidType -> DartTypeAnnotation.VOID

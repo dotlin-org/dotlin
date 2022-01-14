@@ -817,7 +817,7 @@ class Expression : BaseTest {
             void main() {
               try {
                 null ?? (throw const ${'$'}Return<void>(null));
-              } on ${'$'}Return<void> catch (r) {
+              } on ${'$'}Return<void> catch (tmp0_return) {
                 return;
               }
             }
@@ -852,8 +852,8 @@ class Expression : BaseTest {
               try {
                 final int y = x ?? (throw const ${'$'}Return<int>(-1));
                 return y;
-              } on ${'$'}Return<int> catch (r) {
-                return r.value;
+              } on ${'$'}Return<int> catch (tmp0_return) {
+                return tmp0_return.value;
               }
             }
             """
@@ -890,8 +890,8 @@ class Expression : BaseTest {
               try {
                 final int y = x ?? (throw ${'$'}Return<int>(fallback));
                 return y;
-              } on ${'$'}Return<int> catch (r) {
-                return r.value;
+              } on ${'$'}Return<int> catch (tmp0_return) {
+                return tmp0_return.value;
               }
             }
             """
@@ -946,8 +946,8 @@ class Expression : BaseTest {
                                   : x!;
                 }.call();
                 return y;
-              } on ${'$'}Return<int> catch (r) {
-                return r.value;
+              } on ${'$'}Return<int> catch (tmp0_return) {
+                return tmp0_return.value;
               }
             }
             """

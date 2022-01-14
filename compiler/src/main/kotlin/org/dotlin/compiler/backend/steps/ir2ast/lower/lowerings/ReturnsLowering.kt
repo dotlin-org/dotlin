@@ -26,7 +26,6 @@ import org.jetbrains.kotlin.backend.common.lower.irCatch
 import org.jetbrains.kotlin.backend.common.lower.irThrow
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.*
-import org.jetbrains.kotlin.ir.builders.declarations.buildVariable
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
@@ -36,7 +35,6 @@ import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.types.impl.originalKotlinType
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.primaryConstructor
-import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.Variance
 
 /**
@@ -124,15 +122,10 @@ class ReturnsLowering(override val context: DartLoweringContext) : IrDeclaration
                                 statements = allStatements,
                             ),
                             catches = buildList {
-                                val catchVar = buildVariable(
-                                    parent = null,
-                                    UNDEFINED_OFFSET, UNDEFINED_OFFSET,
-                                    origin = IrDeclarationOrigin.DEFINED, // TODO
-                                    name = Name.identifier("r"),
-                                    type = returnClassType,
-                                    isVar = false,
-                                    isConst = false,
-                                    isLateinit = false,
+                                val catchVar = scope.createTemporaryVariableDeclaration(
+                                    irType = returnClassType,
+                                    nameHint = "return",
+                                    isMutable = false,
                                 )
 
                                 this += irCatch(

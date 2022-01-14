@@ -567,12 +567,31 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartImportAlias`() = assertCompile {
+    fun `@DartLibrary`() = assertCompile {
         kotlin(
             """
-            @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+            @DartLibrary("dart:typed_data")
+            external class Something
 
-            @DartImportAlias("dart:core")
+            fun test(s: Something) {}
+            """
+        )
+
+        dart(
+            """
+            import 'dart:typed_data';
+            import 'package:meta/meta.dart';
+
+            void test(Something s) {}
+            """
+        )
+    }
+
+    @Test
+    fun `@DartLibrary aliased`() = assertCompile {
+        kotlin(
+            """
+            @DartLibrary("dart:core", aliased = true)
             external class List
 
             fun main() {
@@ -595,22 +614,18 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartImportAlias separate input files`() = assertCompileFiles {
+    fun `@DartLibrary aliased separate input files`() = assertCompileFiles {
         kotlin(
             """
-            @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
-
             package test
 
-            @DartImportAlias("dart:core")
+            @DartLibrary("dart:core", aliased = true)
             external class List
             """
         )
 
         kotlin(
             """
-            @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
-
             package test
 
             fun main() {
@@ -633,12 +648,10 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartImportAlias type reference only`() = assertCompile {
+    fun `@DartLibrary aliased type reference only`() = assertCompile {
         kotlin(
             """
-            @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
-
-            @DartImportAlias("dart:core")
+            @DartLibrary("dart:core", aliased = true)
             external class List
 
             fun test(list: List) {}
@@ -657,12 +670,12 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartHideImport`() = assertCompile {
+    fun `@DartHideNameFromCore`() = assertCompile {
         kotlin(
             """
             @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
-            @DartHideImport("dart:core")
+            @DartHideNameFromCore
             class Enum
 
             fun main() {
@@ -687,15 +700,15 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartHideImport twice`() = assertCompile {
+    fun `@DartHideNameFromCore twice`() = assertCompile {
         kotlin(
             """
             @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
-            @DartHideImport("dart:core")
+            @DartHideNameFromCore
             class Enum
 
-            @DartHideImport("dart:core")
+            @DartHideNameFromCore
             class List
 
             fun main() {
@@ -723,17 +736,17 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartHideImport twice, multiple files`() = assertCompileFiles {
+    fun `@DartHideNameFromCore twice, multiple files`() = assertCompileFiles {
         kotlin(
             """
             @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
             package test
 
-            @DartHideImport("dart:core")
+            @DartHideNameFromCore
             class Something
 
-            @DartHideImport("dart:core")
+            @DartHideNameFromCore
             class SomethingElse
             """
         )
@@ -943,6 +956,45 @@ class Dotlin : BaseTest {
                 int z = -1,
               ]) {}
             }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartImplementationOf`() = assertCompileFiles {
+        kotlin(
+            """
+            @file:Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE") // TODO: Fix in analyzer
+
+            package test
+
+            external interface DateTime {
+                @DartImplementationOf("test.DateTime")
+                open class Impl : DateTime
+            }
+            """
+        )
+
+        kotlin(
+            """
+            import test.DateTime
+            import test.DateTime.Impl
+
+            class DateTimeImplementer : DateTime
+
+            class DateTimeExtender : DateTime.Impl()
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class DateTimeImplementer implements DateTime {}
+
+            @sealed
+            class DateTimeExtender extends DateTime {}
             """
         )
     }

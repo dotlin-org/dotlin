@@ -19,8 +19,43 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast
 
+import org.dotlin.compiler.backend.DartIrTranslationContext
 import org.dotlin.compiler.backend.steps.ir2ast.attributes.ExtraIrAttributes
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.accept
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartAnnotations
+import org.dotlin.compiler.dart.ast.DartAstNode
+import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
+import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
+import org.dotlin.compiler.dart.ast.parameter.DartFormalParameterList
+import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
+import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameterList
+import org.jetbrains.kotlin.ir.declarations.IrFunction
 
 class DartTransformContext(
-    val extraIrAttributes: ExtraIrAttributes,
-) : ExtraIrAttributes by extraIrAttributes
+    loweringContext: DartLoweringContext,
+) : DartIrTranslationContext by loweringContext, ExtraIrAttributes by loweringContext {
+    fun <N : DartAstNode> IrFunction.transformBy(
+        context: DartTransformContext,
+        block: DartFunctionDeclarationDefaults.() -> N
+    ): N {
+        return block(
+            DartFunctionDeclarationDefaults(
+                name = simpleDartNameOrNull,
+                returnType = returnType.accept(context),
+                typeParameters = typeParameters.accept(context),
+                parameters = valueParameters.accept(context),
+                annotations = dartAnnotations
+            )
+        )
+    }
+}
+
+data class DartFunctionDeclarationDefaults(
+    val name: DartSimpleIdentifier?,
+    val returnType: DartTypeAnnotation,
+    val parameters: DartFormalParameterList,
+    val typeParameters: DartTypeParameterList,
+    val annotations: List<DartAnnotation> = listOf(),
+    val documentationComment: String? = null,
+)

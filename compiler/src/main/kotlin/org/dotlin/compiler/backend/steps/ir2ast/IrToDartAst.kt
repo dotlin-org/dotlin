@@ -31,7 +31,7 @@ fun irToDartAst(
 ): List<DartCompilationUnit> {
     val loweringContext = ir.module.lower(configuration, ir.symbolTable, ir.bindingContext)
 
-    val context = DartTransformContext(extraIrAttributes = loweringContext)
+    val context = DartTransformContext(loweringContext)
     val units = mutableListOf<DartCompilationUnit>()
     for (file in ir.module.files) {
         units.add(file.accept(IrToDartCompilationUnitTransformer, context))

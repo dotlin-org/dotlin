@@ -20,11 +20,10 @@
 package org.dotlin.compiler.backend
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
-import org.dotlin.compiler.backend.util.getSingleAnnotationStringArgumentOf
-import org.dotlin.compiler.backend.util.getSingleAnnotationTypeArgumentOf
-import org.dotlin.compiler.backend.util.hasOverriddenAnnotation
+import org.dotlin.compiler.backend.util.*
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.util.fileOrNull
 import org.jetbrains.kotlin.ir.util.isGetter
 import org.jetbrains.kotlin.ir.util.isSetter
 
@@ -32,18 +31,21 @@ object DotlinAnnotations {
     const val dartName = "dotlin.DartName"
     const val dartConst = "dotlin.DartConst"
     const val dartPositional = "dotlin.DartPositional"
+    const val dartLibrary = "dotlin.DartLibrary"
+    const val dartImplementationOf = "dotlin.DartImplementationOf"
 
     // Internal annotations.
     const val dartGetter = "dotlin.DartGetter"
     const val dartExtension = "dotlin.DartExtension"
-    const val dartImportAlias = "dotlin.DartImportAlias"
-    const val dartHideImport = "dotlin.DartHideImport"
+    const val dartHideNameFromCore = "dotlin.DartHideNameFromCore"
     const val dartCatchAs = "dotlin.DartCatchAs"
 }
 
 fun IrDeclaration.hasDartGetterAnnotation() = hasOverriddenAnnotation(DotlinAnnotations.dartGetter)
 fun IrDeclaration.hasDartExtensionAnnotation() = hasOverriddenAnnotation(DotlinAnnotations.dartExtension)
 fun IrFunction.hasDartPositionalAnnotation() = hasOverriddenAnnotation(DotlinAnnotations.dartPositional)
+fun IrDeclaration.hasDartHideNameFromCoreAnnotation() = hasAnnotation(DotlinAnnotations.dartHideNameFromCore)
+fun IrDeclaration.hasDartImplementationOfAnnotation() = hasAnnotation(DotlinAnnotations.dartImplementationOf)
 
 val IrDeclaration.dartAnnotatedName: String?
     get() = when (this) {
@@ -56,17 +58,40 @@ val IrDeclaration.dartAnnotatedName: String?
         else -> this
     }.run { getSingleAnnotationStringArgumentOf(DotlinAnnotations.dartName) }
 
-val IrDeclaration.dartImportAliasLibrary: String?
-    get() = getSingleAnnotationStringArgumentOf(DotlinAnnotations.dartImportAlias)
+data class DartUnresolvedImport(val library: String, val alias: String?, val hidden: Boolean)
 
-val IrDeclaration.dartHideImportLibrary: String?
-    get() = getSingleAnnotationStringArgumentOf(DotlinAnnotations.dartHideImport)
+private fun IrAnnotationContainer.dartLibraryImportOf(declaration: IrDeclarationWithName): DartUnresolvedImport? {
+    return getTwoAnnotationArgumentsOf<String, Boolean>(DotlinAnnotations.dartLibrary)
+        ?.let { (library, aliased) ->
+            DartUnresolvedImport(
+                library,
+                alias = when {
+                    aliased -> library.split(':')[1] // TODO: Improve for non Dart SDK imports.
+                    else -> null
+                },
+                hidden = aliased
+            )
+        } ?: when (this) {
+        // Try to see if the file has a @DartLibrary annotation.
+        !is IrFile -> declaration.fileOrNull?.dartLibraryImportOf(declaration)
+        else -> null
+    }
+}
 
-val IrDeclaration.dartImportAliasPrefix: String?
-    get() = dartImportAliasLibrary?.let { it.split(':')[1] }
+val IrDeclaration.dartUnresolvedImport: DartUnresolvedImport?
+    get() = (this as? IrDeclarationWithName)?.dartLibraryImportOf(this)
+
+val IrDeclaration.dartLibrary: String?
+    get() = dartUnresolvedImport?.library
+
+val IrDeclaration.dartLibraryAlias: String?
+    get() = dartUnresolvedImport?.alias
 
 val IrDeclaration.dartCatchAsType: IrType?
     get() = getSingleAnnotationTypeArgumentOf(DotlinAnnotations.dartCatchAs)
 
 val IrValueParameter.isDartPositional: Boolean
     get() = (parent as? IrFunction)?.hasDartPositionalAnnotation() == true
+
+val IrDeclaration.dartImplementationFqName: String?
+    get() = getSingleAnnotationStringArgumentOf(DotlinAnnotations.dartImplementationOf)

@@ -29,11 +29,10 @@ import org.dotlin.compiler.dart.ast.expression.literal.DartSimpleStringLiteral
 import org.jetbrains.kotlin.ir.declarations.IrFile
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UNCHECKED_CAST")
-object IrToDartCompilationUnitTransformer : IrDartAstTransformer<DartCompilationUnit> {
-    override fun visitFile(irFile: IrFile, context: DartTransformContext) = context.run {
+object IrToDartCompilationUnitTransformer : IrDartAstTransformer<DartCompilationUnit>() {
+    override fun DartTransformContext.visitFile(irFile: IrFile, context: DartTransformContext) = context.run {
         DartCompilationUnit(
             declarations = irFile.declarations.map { it.accept(context) },
-            // Add import alias directives against Kotlin/Dart built-ins name clashes.
             directives = irFile.dartImports
                 .asSequence()
                 .flatMap { import ->
