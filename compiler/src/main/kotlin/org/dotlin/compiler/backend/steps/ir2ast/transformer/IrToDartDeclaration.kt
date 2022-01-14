@@ -42,8 +42,8 @@ import org.jetbrains.kotlin.ir.util.isInterface
 import org.jetbrains.kotlin.ir.util.parentAsClass
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnitMember> {
-    override fun visitFunction(irFunction: IrFunction, context: DartTransformContext) =
+object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnitMember>() {
+    override fun DartTransformContext.visitFunction(irFunction: IrFunction, context: DartTransformContext) =
         irFunction.transformBy(context) {
             DartTopLevelFunctionDeclaration(
                 name = name!!,
@@ -58,7 +58,10 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
             )
         }
 
-    override fun visitClass(irClass: IrClass, context: DartTransformContext): DartCompilationUnitMember {
+    override fun DartTransformContext.visitClass(
+        irClass: IrClass,
+        context: DartTransformContext
+    ): DartCompilationUnitMember {
         // Extensions are handled differently.
         if (irClass.isDartExtensionContainer) {
             return visitExtension(irClass, context)
@@ -148,7 +151,10 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
         }
     }
 
-    private fun visitExtension(irClass: IrClass, context: DartTransformContext): DartCompilationUnitMember {
+    private fun DartTransformContext.visitExtension(
+        irClass: IrClass,
+        context: DartTransformContext
+    ): DartCompilationUnitMember {
         return DartExtensionDeclaration(
             name = irClass.simpleDartName,
             extendedType = irClass.extensionTypeOrNull!!.accept(context),
@@ -162,21 +168,22 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
         )
     }
 
-    override fun visitField(irField: IrField, context: DartTransformContext) = DartTopLevelVariableDeclaration(
-        variables = DartVariableDeclarationList(
-            listOf(
-                DartVariableDeclaration(
-                    name = irField.dartName,
-                    expression = irField.initializer?.expression?.accept(context),
+    override fun DartTransformContext.visitField(irField: IrField, context: DartTransformContext) =
+        DartTopLevelVariableDeclaration(
+            variables = DartVariableDeclarationList(
+                listOf(
+                    DartVariableDeclaration(
+                        name = irField.dartName,
+                        expression = irField.initializer?.expression?.accept(context),
+                    ),
                 ),
+                isConst = irField.isDartConst(),
+                isFinal = irField.isFinal,
+                isLate = irField.correspondingProperty?.isLateinit == true,
+                type = irField.type.accept(context)
             ),
-            isConst = irField.isDartConst(),
-            isFinal = irField.isFinal,
-            isLate = irField.correspondingProperty?.isLateinit == true,
-            type = irField.type.accept(context)
-        ),
-        annotations = irField.dartAnnotations,
-    )
+            annotations = irField.dartAnnotations,
+        )
 }
 
 fun IrDeclaration.accept(context: DartTransformContext) = accept(IrToDartDeclarationTransformer, context)

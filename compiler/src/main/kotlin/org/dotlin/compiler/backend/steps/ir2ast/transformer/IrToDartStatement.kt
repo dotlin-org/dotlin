@@ -25,7 +25,6 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartStatementOrigin.*
 import org.dotlin.compiler.backend.steps.ir2ast.ir.extensionReceiverOrNull
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrimitiveInteger
 import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
 import org.dotlin.compiler.dart.ast.expression.*
@@ -46,8 +45,8 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement> {
-    override fun visitReturn(expression: IrReturn, context: DartTransformContext) =
+object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
+    override fun DartTransformContext.visitReturn(expression: IrReturn, context: DartTransformContext) =
         DartReturnStatement(
             expression = expression.value.let {
                 when (it.type) {
@@ -57,45 +56,47 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement> {
             }
         )
 
-    override fun visitWhen(irWhen: IrWhen, context: DartTransformContext) = irWhen.branches.reversed().toList().run {
-        drop(1).fold(
-            initial = first().let {
-                val thenStatement = it.result.acceptAsStatement(context).wrapInBlock()
+    override fun DartTransformContext.visitWhen(irWhen: IrWhen, context: DartTransformContext) =
+        irWhen.branches.reversed().toList().run {
+            drop(1).fold(
+                initial = first().let {
+                    val thenStatement = it.result.acceptAsStatement(context).wrapInBlock()
 
-                when (it) {
-                    is IrElseBranch -> thenStatement
-                    else -> DartIfStatement(
-                        condition = it.condition.accept(context),
-                        thenStatement = thenStatement
+                    when (it) {
+                        is IrElseBranch -> thenStatement
+                        else -> DartIfStatement(
+                            condition = it.condition.accept(context),
+                            thenStatement = thenStatement
+                        )
+                    }
+                },
+                operation = { statement, irBranch ->
+                    DartIfStatement(
+                        condition = irBranch.condition.accept(context),
+                        thenStatement = irBranch.result.acceptAsStatement(context).wrapInBlock(),
+                        elseStatement = statement
                     )
                 }
-            },
-            operation = { statement, irBranch ->
-                DartIfStatement(
-                    condition = irBranch.condition.accept(context),
-                    thenStatement = irBranch.result.acceptAsStatement(context).wrapInBlock(),
-                    elseStatement = statement
-                )
-            }
-        )
-    }
-
-    override fun visitVariable(irVariable: IrVariable, context: DartTransformContext) = irVariable.let {
-        DartVariableDeclarationStatement(
-            variables = DartVariableDeclarationList(
-                DartVariableDeclaration(
-                    name = it.dartName,
-                    expression = it.initializer?.accept(context)
-                ),
-                type = irVariable.type.accept(context),
-                isConst = it.isConst,
-                isFinal = !it.isVar,
-                isLate = false
             )
-        )
-    }
+        }
 
-    override fun visitTry(irTry: IrTry, context: DartTransformContext) = irTry.let {
+    override fun DartTransformContext.visitVariable(irVariable: IrVariable, context: DartTransformContext) =
+        irVariable.let {
+            DartVariableDeclarationStatement(
+                variables = DartVariableDeclarationList(
+                    DartVariableDeclaration(
+                        name = it.dartName,
+                        expression = it.initializer?.accept(context)
+                    ),
+                    type = irVariable.type.accept(context),
+                    isConst = it.isConst,
+                    isFinal = !it.isVar,
+                    isLate = false
+                )
+            )
+        }
+
+    override fun DartTransformContext.visitTry(irTry: IrTry, context: DartTransformContext) = irTry.let {
         fun IrExpression.acceptAsBlock() = DartBlock(
             statements = (this as IrBlock).statements.accept(context)
         )
@@ -113,7 +114,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement> {
         )
     }
 
-    override fun visitLoop(loop: IrLoop, context: DartTransformContext): DartStatement {
+    override fun DartTransformContext.visitLoop(loop: IrLoop, context: DartTransformContext): DartStatement {
         val condition = loop.condition.accept(context)
         val body = loop.body!!.acceptAsStatement(context)
 
@@ -124,7 +125,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement> {
         }
     }
 
-    override fun visitBlock(irBlock: IrBlock, context: DartTransformContext): DartStatement {
+    override fun DartTransformContext.visitBlock(irBlock: IrBlock, context: DartTransformContext): DartStatement {
         if (irBlock.origin == IrStatementOrigin.FOR_LOOP) {
             val irPossibleSubject = ((irBlock.statements.first() as IrVariable).initializer as IrCall).dispatchReceiver
 
@@ -241,7 +242,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement> {
         }
     }
 
-    override fun visitExpression(expression: IrExpression, context: DartTransformContext) =
+    override fun DartTransformContext.visitExpression(expression: IrExpression, context: DartTransformContext) =
         expression.accept(context).asStatement()
 
     private fun IrExpression?.findCallInReceivers(block: (IrExpression?) -> IrCall?): IrCall? =

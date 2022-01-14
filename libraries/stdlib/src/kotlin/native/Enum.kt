@@ -24,7 +24,7 @@ package kotlin
  * See the [Kotlin language documentation](https://kotlinlang.org/docs/reference/enum-classes.html) for more
  * information on enum classes.
  */
-@DartHideImport("dart:core")
+@DartHideNameFromCore
 abstract class Enum<E : Enum<E>> @DartConst constructor(
     /**
      * Returns the name of this enum constant, exactly as declared in its enum declaration.

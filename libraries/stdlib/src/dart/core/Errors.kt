@@ -63,7 +63,7 @@ package dart.core
  * occurrence, but being an [Exception] has no other effect
  * than documentation.
  */
-@DartImportAlias("dart:core")
+@DartLibrary("dart:core", aliased = true)
 external sealed interface Error {
     /**
      * The stack trace at the point where this error was first thrown.
@@ -74,7 +74,7 @@ external sealed interface Error {
 /**
  * Error thrown by the runtime system when an assert statement fails.
  */
-@DartImportAlias("dart:core")
+@DartLibrary("dart:core", aliased = true)
 external sealed interface AssertionError : Error {
     /**
      * Message describing the assertion error.

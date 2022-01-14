@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.util
 
+import org.dotlin.compiler.backend.steps.ir2ast.ir.getValueArgumentOrDefault
 import org.jetbrains.kotlin.ir.declarations.IrAnnotationContainer
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrOverridableDeclaration
@@ -28,10 +29,28 @@ import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.name.FqName
 
 @Suppress("UNCHECKED_CAST")
-fun IrAnnotationContainer.getSingleAnnotationStringArgumentOf(name: String) = getAnnotation(name)
-    ?.getValueArgument(0)
-    ?.let { it as? IrConst<String> }
-    ?.value
+fun <T> IrAnnotationContainer.getAnnotationArgumentOf(name: String): T? =
+    getAnnotation(name)
+        ?.getValueArgumentOrDefault(0)
+        ?.let { it as IrConst<T> }
+        ?.value
+
+@Suppress("UNCHECKED_CAST")
+fun <T0, T1> IrAnnotationContainer.getTwoAnnotationArgumentsOf(name: String): Pair<T0, T1>? =
+    getAnnotation(name)
+        ?.let { (0..1).map { i -> it.getValueArgumentOrDefault(i) } }
+        ?.let { listOf(it[0] as IrConst<T0>, it[1] as IrConst<T1>) }
+        ?.let { Pair(it[0].value as T0, it[1].value as T1) }
+
+@Suppress("UNCHECKED_CAST")
+fun <T0, T1, T2> IrAnnotationContainer.getThreeAnnotationArgumentsOf(name: String): Triple<T0, T1, T2>? =
+    getAnnotation(name)
+        ?.let { (0..2).map { i -> it.getValueArgumentOrDefault(i) } }
+        ?.let { listOf(it[0] as IrConst<T0>, it[1] as IrConst<T1>, it[2] as IrConst<T2>) }
+        ?.let { Triple(it[0].value as T0, it[1].value as T1, it[2].value as T2) }
+
+@Suppress("UNCHECKED_CAST")
+fun IrAnnotationContainer.getSingleAnnotationStringArgumentOf(name: String) = getAnnotationArgumentOf<String>(name)
 
 @Suppress("UNCHECKED_CAST")
 fun IrAnnotationContainer.getSingleAnnotationTypeArgumentOf(name: String) =

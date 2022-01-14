@@ -42,34 +42,13 @@ internal annotation class DartGetter
 internal annotation class DartExtension
 
 /**
- * Specifies that whenever this declaration is referenced it should do so with a certain alias. This can be used
- * to circumvent name conflicts with existing Dart names.
- *
- * @param library The library the declaration should be imported from.
- * Should be a full import string, e.g. `dart:core`.
+ * Specifies that whenever this declaration is referenced, `dart:core` will be imported with a `hide` with the same
+ * name as this declaration. For example, if this annotation is used on a class named `Foo`, the generated import
+ * will be `import 'dart:core' hide Foo;`. This can be used to prevent name clashes.
  */
-@Target(
-    AnnotationTarget.CLASS,
-    AnnotationTarget.FUNCTION,
-)
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.SOURCE)
-internal annotation class DartImportAlias(val library: String)
-
-/**
- * Specifies that whenever this declaration is referenced a declaration from [library] should be hidden. This can
- * be used to circumvent name conflicts with existing Dart names.
- *
- * Cannot be used together with [ImportAlias].
- *
- * @param library The library the declaration should be hidden from.
- * Should be a full import string, e.g. `dart:core`.
- */
-@Target(
-    AnnotationTarget.CLASS,
-    AnnotationTarget.FUNCTION,
-)
-@Retention(AnnotationRetention.SOURCE)
-internal annotation class DartHideImport(val library: String)
+annotation class DartHideNameFromCore()
 
 /**
  * Specifies that whenever this type is used in a catch clause, it should be caught as the type [T] instead.

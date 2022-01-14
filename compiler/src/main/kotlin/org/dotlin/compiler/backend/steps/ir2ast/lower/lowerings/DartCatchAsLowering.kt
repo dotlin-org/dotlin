@@ -25,7 +25,6 @@ import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrExpressionLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformation
 import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartNameOrNull
 import org.jetbrains.kotlin.ir.builders.irCallConstructor
 import org.jetbrains.kotlin.ir.builders.irGet
 import org.jetbrains.kotlin.ir.builders.irIfThenElse

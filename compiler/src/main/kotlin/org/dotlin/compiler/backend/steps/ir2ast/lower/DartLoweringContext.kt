@@ -19,11 +19,10 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
+import org.dotlin.compiler.backend.DartIrTranslationContext
 import org.dotlin.compiler.backend.steps.ir2ast.DartIrBuiltIns
 import org.dotlin.compiler.backend.steps.ir2ast.attributes.ExtraIrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartNameWith
 import org.dotlin.compiler.backend.util.sentenceCase
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
@@ -48,9 +47,7 @@ import org.jetbrains.kotlin.ir.symbols.IrVariableSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.types.impl.IrDynamicTypeImpl
-import org.jetbrains.kotlin.ir.util.SymbolTable
-import org.jetbrains.kotlin.ir.util.defaultType
-import org.jetbrains.kotlin.ir.util.file
+import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.BindingContext
@@ -58,11 +55,11 @@ import org.jetbrains.kotlin.types.Variance
 
 class DartLoweringContext(
     override val configuration: CompilerConfiguration,
-    val symbolTable: SymbolTable,
+    override val symbolTable: SymbolTable,
     val bindingContext: BindingContext,
     val irModuleFragment: IrModuleFragment,
     private val extraIrAttributes: ExtraIrAttributes = ExtraIrAttributes.default(),
-) : CommonBackendContext, ExtraIrAttributes by extraIrAttributes {
+) : DartIrTranslationContext, CommonBackendContext, ExtraIrAttributes by extraIrAttributes {
     override val builtIns = irModuleFragment.descriptor.builtIns
     override var inVerbosePhase = false
     override val internalPackageFqn = FqName("kotlin.dart")
@@ -235,5 +232,5 @@ class DartLoweringContext(
                 }
         }
 
-    fun DartIdentifier.escapedValue() = value.replace(".", "").sentenceCase()
+    private fun DartIdentifier.escapedValue() = value.replace(".", "").sentenceCase()
 }

@@ -20,10 +20,8 @@
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartName
 import org.dotlin.compiler.dart.ast.DartLabel
 import org.dotlin.compiler.dart.ast.expression.DartArgumentList
-import org.dotlin.compiler.dart.ast.expression.DartExpression
 import org.dotlin.compiler.dart.ast.expression.DartNamedExpression
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.dotlin.compiler.dart.ast.parameter.identifier
@@ -31,8 +29,8 @@ import org.dotlin.compiler.dart.ast.parameter.isDefault
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-object IrToDartArgumentListTransformer : IrDartAstTransformer<DartArgumentList> {
-    override fun visitFunctionAccess(
+object IrToDartArgumentListTransformer : IrDartAstTransformer<DartArgumentList>() {
+    override fun DartTransformContext.visitFunctionAccess(
         irCallLike: IrFunctionAccessExpression,
         context: DartTransformContext
     ) = DartArgumentList(

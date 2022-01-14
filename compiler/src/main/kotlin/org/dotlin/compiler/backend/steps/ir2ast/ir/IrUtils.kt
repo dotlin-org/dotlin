@@ -21,7 +21,6 @@ package org.dotlin.compiler.backend.steps.ir2ast.ir
 
 import org.dotlin.compiler.backend.hasDartExtensionAnnotation
 import org.dotlin.compiler.backend.steps.ir2ast.IrVoidType
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrExpressionBodyWithOrigin
 import org.dotlin.compiler.backend.util.falseIfNull
 import org.jetbrains.kotlin.backend.common.ir.*
 import org.jetbrains.kotlin.backend.common.ir.isStatic
@@ -594,3 +593,6 @@ val IrType.typeParametersOrSelf: List<IrTypeParameter>
         }
         else -> listOf(typeParameter)
     }
+
+fun IrFunctionAccessExpression.getValueArgumentOrDefault(index: Int) =
+    getValueArgument(index) ?: symbol.owner.valueParameters[index].defaultValue!!.expression
