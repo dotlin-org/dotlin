@@ -34,7 +34,7 @@ annotation class DartName(val name: String)
  */
 @Target(AnnotationTarget.CONSTRUCTOR, AnnotationTarget.EXPRESSION)
 @Retention(AnnotationRetention.SOURCE)
-annotation class DartConst()
+annotation class DartConst
 
 /**
  * Specifies that the parameters with default values of this function (or constructor)
@@ -44,7 +44,7 @@ annotation class DartConst()
  */
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR)
 @Retention(AnnotationRetention.SOURCE)
-annotation class DartPositional()
+annotation class DartPositional
 
 /**
  * Specifies that the class is the implementation of the corresponding interface in Dart.

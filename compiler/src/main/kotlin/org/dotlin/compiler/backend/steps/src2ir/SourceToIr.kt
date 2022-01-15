@@ -165,7 +165,7 @@ private fun loadIr(
                 kotlinLibrary = it,
                 // TODO: Optimize?
                 // For built-ins, we want everything.
-                deserializationStrategy = DeserializationStrategy.ALL
+                deserializationStrategy = DeserializationStrategy.ONLY_REFERENCED
             )
         }
     }
