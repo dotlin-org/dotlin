@@ -68,7 +68,7 @@ class DartLoweringContext(
     override val mapping = DefaultMapping()
     override val scriptMode = false
 
-    val dartBuiltIns = DartIrBuiltIns(irModuleFragment.descriptor.builtIns.builtInsModule, symbolTable)
+    val dartBuiltIns = DartIrBuiltIns(this)
 
     val dynamicType: IrDynamicType = IrDynamicTypeImpl(null, emptyList(), Variance.INVARIANT)
 
