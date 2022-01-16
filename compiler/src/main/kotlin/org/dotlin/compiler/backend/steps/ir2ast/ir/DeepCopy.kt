@@ -31,6 +31,7 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.Name
+import kotlin.reflect.KClass
 
 /**
  * Deep-copies the given class and remaps all references to it (if [remapReferences] is true).
@@ -311,6 +312,41 @@ class SymbolReferenceRemapper(
     private val mapping: Map<out IrSymbol, IrSymbol>
 ) : DeepCopySymbolRemapper() {
     constructor(mapping: Pair<IrSymbol, IrSymbol>) : this(mapOf(mapping))
+
+    private fun Map.Entry<IrSymbol, IrSymbol>.hasEquivalentTypes(validTypes: Iterable<KClass<*>>): Boolean {
+        return validTypes.any {
+            it.isInstance(key) && it.isInstance(value)
+        }
+    }
+
+    init {
+        require(
+            mapping.all {
+                it.hasEquivalentTypes(
+                    listOf(
+                        IrFileSymbol::class,
+                        IrExternalPackageFragmentSymbol::class,
+                        IrEnumEntrySymbol::class,
+                        IrFieldSymbol::class,
+                        IrClassSymbol::class,
+                        IrScriptSymbol::class,
+                        IrTypeParameterSymbol::class,
+                        IrValueParameterSymbol::class,
+                        IrVariableSymbol::class,
+                        IrReturnTargetSymbol::class,
+                        IrConstructorSymbol::class,
+                        IrReturnableBlockSymbol::class,
+                        IrPropertySymbol::class,
+                        IrLocalDelegatedPropertySymbol::class,
+                        IrTypeAliasSymbol::class
+                    )
+                )
+            }
+        ) {
+            "The new symbol does not have the equivalent type of the old symbol. " +
+                    "Or the symbol type has not been added to check."
+        }
+    }
 
     init {
         classes.putRelevant()
