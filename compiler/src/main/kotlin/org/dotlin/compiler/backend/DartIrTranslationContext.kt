@@ -1,5 +1,6 @@
 package org.dotlin.compiler.backend
 
+import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isExplicitBackingField
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrivate
 import org.dotlin.compiler.backend.util.*
@@ -11,10 +12,7 @@ import org.jetbrains.kotlin.backend.common.lower.parents
 import org.jetbrains.kotlin.descriptors.findClassAcrossModuleDependencies
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.types.*
-import org.jetbrains.kotlin.ir.util.SymbolTable
-import org.jetbrains.kotlin.ir.util.companionObject
-import org.jetbrains.kotlin.ir.util.fileOrNull
-import org.jetbrains.kotlin.ir.util.parentClassOrNull
+import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -90,6 +88,10 @@ interface DartIrTranslationContext {
                     !isPrimary -> DartSimpleIdentifier("\$constructor$${constructors.indexOf(this)}")
                     else -> null
                 }
+            }
+            isSetter -> when {
+                name.isSpecial -> (this as IrSimpleFunction).correspondingProperty!!.simpleDartName
+                else -> dartNameAsSimple
             }
             else -> null
         }
