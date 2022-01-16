@@ -383,7 +383,7 @@ val IrProperty.hasExplicitBackingField: Boolean
     get() = backingField?.isExplicitBackingField == true
 
 val IrField.isOverride: Boolean
-    get() = correspondingProperty?.isOverride.falseIfNull()
+    get() = !isExplicitBackingField && correspondingProperty?.isOverride == true
 
 val IrField.correspondingProperty: IrProperty?
     get() = correspondingPropertySymbol?.owner
