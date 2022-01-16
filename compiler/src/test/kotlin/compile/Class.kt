@@ -245,7 +245,7 @@ class Class : BaseTest {
 
                   @nonVirtual
                   void doIt() {
-                    this.property = 3;
+                    this._property = 3;
                   }
                 }
 

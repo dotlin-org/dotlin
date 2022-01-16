@@ -199,12 +199,11 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                     origin == EQ && !irCallLike.isSet() -> DartAssignmentExpression(
                         left = DartPropertyAccessExpression(
                             target = infixReceiver,
-                            propertyName = (irCallLike.symbol.owner as IrSimpleFunction)
-                                .correspondingProperty!!.dartNameAsSimple
+                            propertyName = (irCallLike.symbol.owner as IrSimpleFunction).dartNameAsSimple
                         ),
                         right = singleArgument,
                     )
-                    // Some non-operator methods on primitive integers (Short, Int, etc.) are operators in Dart,
+                    // Some non-operator methods on primitive integers (Int, Long) are operators in Dart,
                     // such as `xor` or `ushr`.
                     irCallLike.symbol.owner.parentClassOrNull?.defaultType?.isPrimitiveInteger() == true &&
                             irFunction.name.identifier in primitiveNumberOperatorNames -> {
@@ -240,8 +239,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                             else -> {
                                 val functionName = irCallLike.symbol.owner.dartName
 
-                                @Suppress("UnnecessaryVariable")
-                                when (val receiver = optionalReceiver) {
+                                when (optionalReceiver) {
                                     null -> DartFunctionExpressionInvocation(
                                         function = functionName,
                                         arguments = arguments
