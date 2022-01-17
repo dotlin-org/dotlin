@@ -801,6 +801,50 @@ class Expression : BaseTest {
     }
 
     @Test
+    fun `try-catch in getter`() = assertCompile {
+        kotlin(
+            """
+            class Test {
+                val x: Int
+                    get() = try {
+                        thisThrows()
+                    } catch (e: RuntimeException) {
+                        thisThrows()
+                    }
+            }
+
+            fun thisThrows(): Int {
+                throw RuntimeException("You done did it now")
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {
+              @nonVirtual
+              int get x {
+                return () {
+                  try {
+                    return thisThrows();
+                  } on RuntimeException catch (e) {
+                    return thisThrows();
+                  }
+                }.call();
+              }
+            }
+
+            int thisThrows() {
+              throw RuntimeException.message('You done did it now');
+            }
+            """
+        )
+    }
+
+    @Test
     fun `return`() = assertCompile {
         kotlin(
             """

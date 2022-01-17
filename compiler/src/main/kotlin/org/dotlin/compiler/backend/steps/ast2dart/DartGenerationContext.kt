@@ -20,13 +20,23 @@
 package org.dotlin.compiler.backend.steps.ast2dart
 
 class DartGenerationContext {
-    var isGetter: Boolean = false
-        private set
+    private val flags = mutableSetOf<Flag>()
 
-    fun <T> getter(block: () -> T): T {
-        isGetter = true
+    fun <T> withFlag(flag: Flag, block: () -> T): T {
+        flags.add(flag)
         val result = block()
-        isGetter = false
+        flags.remove(flag)
         return result
+    }
+
+    /**
+     * Returns true if the flag was present. Consumes the flag, meaning that a next
+     * call of [consume] (without an additional [withFlag] in between) would return
+     * false for the same flag.
+     */
+    fun consume(flag: Flag): Boolean = flags.remove(flag)
+
+    enum class Flag {
+        GETTER
     }
 }

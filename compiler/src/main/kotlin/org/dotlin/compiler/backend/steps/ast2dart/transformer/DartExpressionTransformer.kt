@@ -20,6 +20,7 @@
 package org.dotlin.compiler.backend.steps.ast2dart.transformer
 
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
+import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext.Flag.*
 import org.dotlin.compiler.dart.ast.expression.*
 import org.dotlin.compiler.dart.ast.expression.DartAssignmentOperator.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
@@ -35,8 +36,9 @@ object DartExpressionTransformer : DartAstNodeTransformer {
         functionExpression: DartFunctionExpression,
         context: DartGenerationContext,
     ): String {
-        val parameters = if (!context.isGetter) functionExpression.parameters.accept(context) else ""
-        val typeParameters = if (!context.isGetter) functionExpression.typeParameters.accept(context) else ""
+        val isGetter = context.consume(GETTER)
+        val parameters = if (!isGetter) functionExpression.parameters.accept(context) else ""
+        val typeParameters = if (!isGetter) functionExpression.typeParameters.accept(context) else ""
         val body = functionExpression.body.accept(context)
 
         return "$typeParameters$parameters$body"
