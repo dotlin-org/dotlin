@@ -20,6 +20,7 @@
 package org.dotlin.compiler.backend.steps.ast2dart.transformer
 
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
+import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext.Flag.GETTER
 import org.dotlin.compiler.dart.ast.accept
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartClassMember
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartMethodDeclaration
@@ -39,7 +40,7 @@ object DartClassMemberTransformer : DartAstNodeTransformer {
         val getOrSet =
             when {
                 it.isGetter -> {
-                    function = context.getter {
+                    function = context.withFlag(GETTER) {
                         it.function.accept(context)
                     }
                     "get "
@@ -56,7 +57,7 @@ object DartClassMemberTransformer : DartAstNodeTransformer {
         val operator = if (it.isOperator) "operator " else ""
         val static = if (it.isStatic) "static " else ""
 
-        return@let "$annotations$static$returnType $operator$getOrSet$name$function"
+        "$annotations$static$returnType $operator$getOrSet$name$function"
     }
 
     override fun visitConstructorDeclaration(
