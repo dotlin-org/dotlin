@@ -29,12 +29,12 @@
 
 package kotlin
 
-external internal abstract class Byte private constructor() : Number(), Comparable<Byte>
+internal external abstract class Byte private constructor() : Number(), Comparable<Byte>
 
-external internal abstract class Short private constructor() : Number(), Comparable<Short>
+internal external abstract class Short private constructor() : Number(), Comparable<Short>
 
 // Only has its members so they can be called on Long literals.
-external internal class Long private constructor() : Number(), Comparable<Long> {
+internal external class Long private constructor() : Number(), Comparable<Long> {
     /**
      * Compares this value with the specified value for order.
      * Returns zero if this value is equal to the specified other value, a negative number if it's less than other,
@@ -183,4 +183,4 @@ external internal class Long private constructor() : Number(), Comparable<Long> 
     override fun toDouble(): Double
 }
 
-external internal abstract class Float private constructor() : Number(), Comparable<Float>
+internal external abstract class Float private constructor() : Number(), Comparable<Float>

@@ -15,20 +15,25 @@
  * limitations under the License.
  */
 
-@file:Suppress("NON_ABSTRACT_FUNCTION_WITH_NO_BODY", "MUST_BE_INITIALIZED_OR_BE_ABSTRACT", "UNUSED_PARAMETER")
+@file:Suppress(
+    "NON_ABSTRACT_FUNCTION_WITH_NO_BODY",
+    "MUST_BE_INITIALIZED_OR_BE_ABSTRACT",
+    "UNUSED_PARAMETER",
+    "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
+)
 
 package kotlin
 
+import dart.core.IArray
+
 /**
- * Represents an array (specifically, a Dart `List`).
+ * Represents an array (specifically, a growable Dart `List`).
  * Array instances can be created using the [arrayOf], [arrayOfNulls] and [emptyArray]
  * standard library functions.
- * See [Kotlin language documentation](https://kotlinlang.org/docs/reference/basic-types.html#arrays)
- * for more information on arrays.
  */
-@DartLibrary("dart:core", aliased = true)
-@DartName("List")
-external class Array<T> {
+@DartLibrary("dart:core", aliased = true) // TODO: Find through @DartImplementationOf
+@DartImplementationOf("dart.core.IArray")
+external class Array<T> : IArray<T> {
     /**
      * Creates a new array with the specified [size], where each element is calculated by calling the specified
      * [init] function.
@@ -36,6 +41,7 @@ external class Array<T> {
      * The function [init] is called for each array element sequentially starting from the first one.
      * It should return the value for an array element given its index.
      */
+    @DartName("generate")
     constructor(size: Int, init: (Int) -> T)
 
     /**
@@ -48,7 +54,7 @@ external class Array<T> {
      * If the [index] is out of bounds of this array, throws an [IndexOutOfBoundsException] except in Kotlin/JS
      * where the behavior is unspecified.
      */
-    operator fun get(index: Int): T
+    override operator fun get(index: Int): T
 
     /**
      * Sets the array element at the specified [index] to the specified [value]. This method can
@@ -60,15 +66,18 @@ external class Array<T> {
      * If the [index] is out of bounds of this array, throws an [IndexOutOfBoundsException] except in Kotlin/JS
      * where the behavior is unspecified.
      */
-    operator fun set(index: Int, value: T): Unit
+    override operator fun set(index: Int, value: T): Unit
 
     /**
      * Returns the number of elements in the array.
      */
-    val size: Int
+    override val size: Int
 
     /**
      * Creates an [Iterator] for iterating over the elements of the array.
      */
-    operator fun iterator(): Iterator<T>
+    @DartExtension
+    /*inline*/ override operator fun iterator(): Iterator<T>
+
+    override fun subArray(start: Int, end: Int?): IArray<T>
 }

@@ -236,8 +236,19 @@ class SingleSymbolRenamer(private val symbol: IrSymbol, private val name: Name) 
     override fun getTypeAliasName(symbol: IrTypeAliasSymbol) = newNameIfMatch(symbol) { symbol.owner.name }
 }
 
+private fun IrFile?.remapAtRelevantParents(block: (IrElement) -> Unit) =
+    this?.module?.files?.forEach { block(it) } ?: this?.let { block(it.getPackageFragment()!!) }
+
 private fun IrDeclaration.remapAtRelevantParents(block: (IrElement) -> Unit) =
-    fileOrNull?.module?.files?.forEach { block(it) } ?: block(getPackageFragment()!!)
+    fileOrNull.remapAtRelevantParents(block)
+
+fun IrDeclaration.transformExpressionsEverywhere(
+    block: IrExpressionWithParentTransformer.(IrExpression, IrDeclaration) -> IrExpression
+) = fileOrNull?.transformExpressionsEverywhere(block)
+
+fun IrFile?.transformExpressionsEverywhere(
+    block: IrExpressionWithParentTransformer.(IrExpression, IrDeclaration) -> IrExpression
+) = remapAtRelevantParents { it.transformExpressions(block) }
 
 fun IrDeclaration.remapReferencesEverywhere(mapping: Pair<IrSymbol, IrSymbol>) =
     remapAtRelevantParents { it.remapReferences(mapOf(mapping)) }

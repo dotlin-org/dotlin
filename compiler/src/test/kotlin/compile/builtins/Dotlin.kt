@@ -636,9 +636,9 @@ class Dotlin : BaseTest {
 
         dart(
             """
+            import 'package:meta/meta.dart';
             import 'dart:core' hide List;
             import 'dart:core' as core;
-            import 'package:meta/meta.dart';
 
             void main() {
               core.List();
@@ -995,6 +995,46 @@ class Dotlin : BaseTest {
 
             @sealed
             class DateTimeExtender extends DateTime {}
+            """
+        )
+    }
+
+    @Test
+    fun `@DartImplementationOf and @DartName`() = assertCompileFiles {
+        kotlin(
+            """
+            @file:Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE") // TODO: Fix in analyzer
+
+            package test
+
+            @DartName("TimeDate")
+            external interface DateTime {
+                @DartImplementationOf("test.DateTime")
+                open class Impl : DateTime
+            }
+            """
+        )
+
+        kotlin(
+            """
+            import test.DateTime
+            import test.DateTime.Impl
+
+            class DateTimeImplementer : DateTime
+
+            class DateTimeExtender : DateTime.Impl()
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class DateTimeImplementer implements TimeDate {}
+
+            @sealed
+            class DateTimeExtender extends TimeDate {}
             """
         )
     }

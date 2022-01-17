@@ -46,16 +46,18 @@ class Iterator : BaseTest {
 
         dart(
             """
+            import 'dart:core' hide Iterator;
+            import 'dart:core' as core;
             import 'package:meta/meta.dart';
 
             @sealed
-            class TestIterator implements Iterator<int> {
+            class TestIterator implements Iterator<int>, core.Iterator<int> {
               @nonVirtual
               void doImportantThing() {}
               @override
               int next() {
                 this.doImportantThing();
-                return this.current = 3;
+                return this._current = 3;
               }
 
               @override
@@ -64,23 +66,20 @@ class Iterator : BaseTest {
               }
 
               @nonVirtual
-              @override
               late int _${'$'}currentBackingField;
               @nonVirtual
               @override
               int get current => this._${'$'}currentBackingField;
-              @protected
               @nonVirtual
-              @override
-              void set current(int value) => this._${'$'}currentBackingField = value;
+              void set _current(int value) => this._${'$'}currentBackingField = value;
               @nonVirtual
               @override
               bool moveNext() {
-                final bool hasNext = this.hasNext();
-                if (hasNext) {
-                  this.current = this.next();
+                final bool tmp0_hasNext = this.hasNext();
+                if (tmp0_hasNext) {
+                  this._current = this.next();
                 }
-                return hasNext;
+                return tmp0_hasNext;
               }
             }
             """
@@ -115,23 +114,26 @@ class Iterator : BaseTest {
 
         dart(
             """
+            import 'dart:core' hide BidirectionalIterator;
+            import 'dart:core' as core;
             import 'package:meta/meta.dart';
 
             @sealed
-            class TestIterator implements ListIterator<int> {
+            class TestIterator
+                implements ListIterator<int>, core.BidirectionalIterator<int> {
               @nonVirtual
               void doImportantThing() {}
               @override
               int previous() {
                 this.doImportantThing();
-                return this.current = 123;
+                return this._current = 123;
               }
 
               @override
               bool hasPrevious() {
                 return true;
               }
-            
+
               @override
               int previousIndex() {
                 return 0;
@@ -140,7 +142,7 @@ class Iterator : BaseTest {
               @override
               int next() {
                 this.doImportantThing();
-                return this.current = 3;
+                return this._current = 3;
               }
 
               @override
@@ -154,33 +156,189 @@ class Iterator : BaseTest {
               }
 
               @nonVirtual
-              @override
               late int _${'$'}currentBackingField;
               @nonVirtual
               @override
               int get current => this._${'$'}currentBackingField;
-              @protected
               @nonVirtual
-              @override
-              void set current(int value) => this._${'$'}currentBackingField = value;
+              void set _current(int value) => this._${'$'}currentBackingField = value;
               @nonVirtual
               @override
               bool moveNext() {
-                final bool hasNext = this.hasNext();
-                if (hasNext) {
-                  this.current = this.next();
+                final bool tmp0_hasNext = this.hasNext();
+                if (tmp0_hasNext) {
+                  this._current = this.next();
                 }
-                return hasNext;
+                return tmp0_hasNext;
               }
 
               @nonVirtual
               @override
               bool movePrevious() {
-                final bool hasPrevious = this.hasPrevious();
-                if (hasPrevious) {
-                  this.current = this.previous();
+                final bool tmp0_hasPrevious = this.hasPrevious();
+                if (tmp0_hasPrevious) {
+                  this._current = this.previous();
                 }
-                return hasPrevious;
+                return tmp0_hasPrevious;
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `Iterator subtype with middle interface`() = assertCompile {
+        kotlin(
+            """
+            interface IntIterator : Iterator<Int> {
+                override fun next(): Int = nextInt()
+                fun nextInt(): Int
+            }
+
+            class TestIterator : IntIterator {
+                override fun nextInt(): Int = 0
+
+                override fun hasNext() = true
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'dart:core' hide Iterator;
+            import 'dart:core' as core;
+            import 'package:meta/meta.dart';
+
+            abstract class IntIterator implements Iterator<int>, core.Iterator<int> {
+              @override
+              int next() {
+                return this._current = this.nextInt();
+              }
+
+              int nextInt();
+              @nonVirtual
+              late int _${'$'}currentBackingField;
+              @nonVirtual
+              @override
+              int get current => this._${'$'}currentBackingField;
+              @nonVirtual
+              void set _current(int value) => this._${'$'}currentBackingField = value;
+              @nonVirtual
+              @override
+              bool moveNext() {
+                final bool tmp0_hasNext = this.hasNext();
+                if (tmp0_hasNext) {
+                  this._current = this.next();
+                }
+                return tmp0_hasNext;
+              }
+            }
+
+            @sealed
+            class TestIterator implements IntIterator, core.Iterator<int> {
+              @override
+              int nextInt() {
+                return 0;
+              }
+
+              @override
+              bool hasNext() {
+                return true;
+              }
+
+              @override
+              int next() {
+                return this._current = this.nextInt();
+              }
+
+              @nonVirtual
+              late int _${'$'}currentBackingField;
+              @nonVirtual
+              @override
+              int get current => this._${'$'}currentBackingField;
+              @nonVirtual
+              void set _current(int value) => this._${'$'}currentBackingField = value;
+              @nonVirtual
+              @override
+              bool moveNext() {
+                final bool tmp0_hasNext = this.hasNext();
+                if (tmp0_hasNext) {
+                  this._current = this.next();
+                }
+                return tmp0_hasNext;
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `Iterator subtype with middle open class`() = assertCompile {
+        kotlin(
+            """
+            open class IntIterator : Iterator<Int> {
+                override fun hasNext() = true
+                final override fun next(): Int = nextInt()
+                open fun nextInt(): Int = -1
+            }
+
+            class TestIterator : IntIterator() {
+                override fun hasNext() = true
+                override fun nextInt(): Int = 0
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'dart:core' hide Iterator;
+            import 'dart:core' as core;
+            import 'package:meta/meta.dart';
+
+            class IntIterator implements Iterator<int>, core.Iterator<int> {
+              @override
+              bool hasNext() {
+                return true;
+              }
+
+              @nonVirtual
+              @override
+              int next() {
+                return this._current = this.nextInt();
+              }
+
+              int nextInt() {
+                return -1;
+              }
+
+              @nonVirtual
+              late int _${'$'}currentBackingField;
+              @nonVirtual
+              @override
+              int get current => this._${'$'}currentBackingField;
+              @nonVirtual
+              void set _current(int value) => this._${'$'}currentBackingField = value;
+              @nonVirtual
+              @override
+              bool moveNext() {
+                final bool tmp0_hasNext = this.hasNext();
+                if (tmp0_hasNext) {
+                  this._current = this.next();
+                }
+                return tmp0_hasNext;
+              }
+            }
+
+            @sealed
+            class TestIterator extends IntIterator {
+              @override
+              bool hasNext() {
+                return true;
+              }
+
+              @override
+              int nextInt() {
+                return 0;
               }
             }
             """

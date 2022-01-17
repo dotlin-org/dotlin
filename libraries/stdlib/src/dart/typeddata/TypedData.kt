@@ -1,5 +1,4 @@
 /*
- * Copyright 2010-2021 JetBrains s.r.o.
  * Copyright 2021-2022 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,16 +14,27 @@
  * limitations under the License.
  */
 
-package kotlin.ranges
+package dart.typeddata
 
 /**
- * An iterator over a progression of values of type `Char`.
- * @property step the number by which the value is incremented on each step.
+ * A typed view of a sequence of bytes.
  */
-internal external interface CharProgressionIterator : CharIterator
+external interface TypedData {
+    /**
+     * Returns the number of bytes in the representation of each element in this
+     * array.
+     */
+    val elementSizeInBytes: Int
 
-/**
- * An iterator over a progression of values of type `Long`.
- * @property step the number by which the value is incremented on each step.
- */
-internal external interface LongProgressionIterator : LongIterator
+    /**
+     * Returns the offset in bytes into the underlying byte buffer of this view.
+     */
+    val offsetInBytes: Int
+
+    /**
+     * Returns the length of this view, in bytes.
+     */
+    val lengthInBytes: Int
+
+    // TODO: buffer
+}

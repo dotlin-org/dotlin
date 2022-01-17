@@ -15,22 +15,18 @@
  * limitations under the License.
  */
 
-@file:Suppress(
-    "TYPE_VARIANCE_CONFLICT",
-    "PRIVATE_SETTER_FOR_OPEN_PROPERTY",
-    "WRONG_MODIFIER_CONTAINING_DECLARATION",
-    "NO_RETURN_IN_FUNCTION_WITH_BLOCK_BODY",
-    "SEALED_INHERITOR_IN_DIFFERENT_PACKAGE",
-    "INAPPLICABLE_LATEINIT_MODIFIER",
-)
-
 package kotlin.collections
 
 /**
  * An iterator over a collection or another entity that can be represented as a sequence of elements.
  * Allows to sequentially access the elements.
+ *
+ * Equivalent to `dart:core`'s `Iterator`. Any subtypes of [kotlin.Iterator] will implement
+ * `dart:core`'s `Iterator` automatically.
+ *
+ * In Dart, `current` is updated everytime [next] (and in [BidirectionalIterator], [previous]) returns a value.
  */
-interface Iterator<out T> : dart.core.Iterator<T> {
+interface Iterator<out T> {
     /**
      * Returns the next element in the iteration.
      */
@@ -40,19 +36,6 @@ interface Iterator<out T> : dart.core.Iterator<T> {
      * Returns `true` if the iteration has more elements.
      */
     operator fun hasNext(): Boolean
-
-    // Dart Iterator implementations
-    final override fun moveNext(): Boolean {
-        val hasNext = hasNext()
-        if (hasNext) {
-            current = next()
-        }
-        return hasNext
-    }
-
-    final override lateinit var current: T
-        get() {}
-        protected set(value) {}
 }
 
 /**
@@ -67,11 +50,11 @@ interface MutableIterator<out T> : Iterator<T> {
 }
 
 /**
- * An iterator over a collection that supports indexed access.
- * @see List.listIterator
+ * An iterator over a collection that supports back-and-forth sequential access to elements.
+ *
+ * Any subtypes of [kotlin.BidirectionalIterator] will implement `dart:core`'s `BidirectionalIterator` automatically.
  */
-interface ListIterator<out T> : Iterator<T>, dart.core.BidirectionalIterator<T> {
-    // Query Operations
+interface BidirectionalIterator<out T> : Iterator<T> {
     override fun next(): T
     override fun hasNext(): Boolean
 
@@ -84,6 +67,20 @@ interface ListIterator<out T> : Iterator<T>, dart.core.BidirectionalIterator<T> 
      * Returns the previous element in the iteration and moves the cursor position backwards.
      */
     fun previous(): T
+}
+
+/**
+ * An iterator over a collection that supports indexed access.
+ *
+ * @see List.listIterator
+ */
+interface ListIterator<out T> : BidirectionalIterator<T> {
+    // Query Operations
+    override fun next(): T
+    override fun hasNext(): Boolean
+
+    override fun hasPrevious(): Boolean
+    override fun previous(): T
 
     /**
      * Returns the index of the element that would be returned by a subsequent call to [next].
@@ -94,15 +91,6 @@ interface ListIterator<out T> : Iterator<T>, dart.core.BidirectionalIterator<T> 
      * Returns the index of the element that would be returned by a subsequent call to [previous].
      */
     fun previousIndex(): Int
-
-    // Dart BidirectionalIterator implementation
-    final override fun movePrevious(): Boolean {
-        val hasPrevious = hasPrevious()
-        if (hasPrevious) {
-            current = previous()
-        }
-        return hasPrevious
-    }
 }
 
 /**

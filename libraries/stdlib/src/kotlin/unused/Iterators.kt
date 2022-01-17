@@ -15,21 +15,15 @@
  * limitations under the License.
  */
 
+@file:Suppress("EXTERNAL_TYPE_EXTENDS_NON_EXTERNAL_TYPE")
+
 package kotlin.collections
 
-internal interface ByteIterator : Iterator<Byte>
-
-internal interface CharIterator : Iterator<Char>
-
-internal interface ShortIterator : Iterator<Short>
-
-internal interface IntIterator : Iterator<Int>
-
-internal interface LongIterator : Iterator<Long>
-
-internal interface FloatIterator : Iterator<Float>
-
-internal interface DoubleIterator : Iterator<Double>
-
-internal interface BooleanIterator : Iterator<Boolean>
-
+internal external interface ByteIterator : Iterator<Byte>
+internal external interface CharIterator : Iterator<Char>
+internal external interface ShortIterator : Iterator<Short>
+internal external interface IntIterator : Iterator<Int>
+internal external interface LongIterator : Iterator<Long>
+internal external interface FloatIterator : Iterator<Float>
+internal external interface DoubleIterator : Iterator<Double>
+internal external interface BooleanIterator : Iterator<Boolean>

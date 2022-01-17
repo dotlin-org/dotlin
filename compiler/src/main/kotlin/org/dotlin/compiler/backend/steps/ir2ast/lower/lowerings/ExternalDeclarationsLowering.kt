@@ -21,33 +21,27 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.deepCopyWith
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.jetbrains.kotlin.backend.common.lower.parents
-import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.util.file
+import org.jetbrains.kotlin.ir.declarations.IrFile
+import org.jetbrains.kotlin.ir.util.companionObject
 import org.jetbrains.kotlin.ir.util.isEffectivelyExternal
-import kotlin.contracts.ExperimentalContracts
 
-class ExternalDeclarationsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
-        if (!declaration.isEffectivelyExternal()) return noChange()
+class ExternalDeclarationsLowering(override val context: DartLoweringContext) : IrFileLowering {
+    override fun DartLoweringContext.transform(file: IrFile) {
+        file.declarations.apply {
+            toList().forEach remove@{
+                if (!it.isEffectivelyExternal()) return@remove
 
-        // We don't want to remove companion objects.
-        if (declaration.isCompanion()) {
-            // We don't use addChild on purpose, we want to keep parent information of the companion object.
-            declaration.file.declarations.add(
-                (declaration as IrClass).deepCopyWith { isExternal = false }
-            )
+                // Don't remove companion objects, they are not considered external in Dotlin.
+                if (it is IrClass) {
+                    it.companionObject()?.let { obj ->
+                        // We don't use addChild on purpose, we want to keep the parent information.
+                        add(obj.deepCopyWith { isExternal = false })
+                    }
+                }
+
+                remove(it)
+            }
         }
-
-        if (declaration.parents.any { it.isCompanion() }) {
-            return noChange()
-        }
-
-        return just(remove())
     }
-
-    @OptIn(ExperimentalContracts::class)
-    private fun IrElement.isCompanion() = this is IrClass && isCompanion
 }

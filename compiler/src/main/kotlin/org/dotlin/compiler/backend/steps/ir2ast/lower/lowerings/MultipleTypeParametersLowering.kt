@@ -20,6 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementTransformerVoid
+import org.dotlin.compiler.backend.steps.ir2ast.ir.allSuperTypes
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrNullAwareExpression
 import org.dotlin.compiler.backend.steps.ir2ast.ir.firstNonFakeOverrideOrSelf
 import org.dotlin.compiler.backend.steps.ir2ast.ir.polymorphicallyIs
@@ -178,7 +179,4 @@ class MultipleTypeParametersLowering(override val context: DartLoweringContext) 
     }
 
     private fun IrTypeParameter.superSuperTypes() = superTypes.associateWith { it.allSuperTypes() }
-
-    private fun IrType.allSuperTypes(): Set<IrType> =
-        superTypes().map { listOf(it, *it.allSuperTypes().toTypedArray()) }.flatten().toSet()
 }

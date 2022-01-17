@@ -37,6 +37,8 @@ import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.IrSingleStatementBuilder
 import org.jetbrains.kotlin.ir.builders.declarations.buildClass
 import org.jetbrains.kotlin.ir.builders.declarations.buildConstructor
+import org.jetbrains.kotlin.ir.builders.declarations.buildFun
+import org.jetbrains.kotlin.ir.builders.declarations.buildValueParameter
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrFactoryImpl
 import org.jetbrains.kotlin.ir.expressions.*
@@ -67,6 +69,7 @@ class DartLoweringContext(
     override val irFactory = IrFactoryImpl
     override val mapping = DefaultMapping()
     override val scriptMode = false
+    override val typeSystem: IrTypeSystemContext = IrTypeSystemContextImpl(irBuiltIns)
 
     val dartBuiltIns = DartIrBuiltIns(this)
 
@@ -128,8 +131,6 @@ class DartLoweringContext(
         }
 
     }
-
-    override val typeSystem: IrTypeSystemContext = IrTypeSystemContextImpl(irBuiltIns)
 
     override fun log(message: () -> String) = print(message())
 
@@ -231,6 +232,48 @@ class DartLoweringContext(
                     }
                 }
         }
+
+    fun IrProperty.createDefaultGetter(type: IrType, initializeParentAndReceiver: Boolean = true): IrSimpleFunction {
+        val property = this
+        return irFactory.buildFun {
+            name = Name.special("<get-${property.name}>")
+            returnType = type
+            origin = IrDeclarationOrigin.DEFAULT_PROPERTY_ACCESSOR
+        }.apply {
+            correspondingPropertySymbol = property.symbol
+
+            if (initializeParentAndReceiver) {
+                parent = property.parentClassOrNull!!
+                createDispatchReceiverParameter()
+            }
+        }.also {
+            getter = it
+        }
+    }
+
+    fun IrProperty.createDefaultSetter(type: IrType, initializeParentAndReceiver: Boolean = true): IrSimpleFunction {
+        val property = this
+        return irFactory.buildFun {
+            name = Name.special("<set-${property.name}>")
+            returnType = irBuiltIns.unitType
+            origin = IrDeclarationOrigin.DEFAULT_PROPERTY_ACCESSOR
+        }.apply {
+            correspondingPropertySymbol = property.symbol
+            valueParameters = listOf(
+                buildValueParameter(this) {
+                    name = Name.identifier("value")
+                    this.type = type
+                }
+            )
+
+            if (initializeParentAndReceiver) {
+                parent = property.parentClassOrNull!!
+                createDispatchReceiverParameter()
+            }
+        }.also {
+            setter = it
+        }
+    }
 
     private fun DartIdentifier.escapedValue() = value.replace(".", "").sentenceCase()
 }

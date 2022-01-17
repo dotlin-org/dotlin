@@ -83,27 +83,38 @@ class ObjectLowering(override val context: DartLoweringContext) : IrDeclarationL
 
         when {
             obj.isCompanion -> {
-                staticContainer = obj.parentAsClass
+                staticContainer = obj.parentAsClass.let {
+                    when {
+                        // If this companion is for an external class, we add the static methods to the companion
+                        // object itself.
+                        it.isEffectivelyExternal() -> obj
+                        else -> it
+                    }
+                }
 
                 // We don't use addChild on purpose, we want to keep parent info.
                 declaration.file.declarations.add(obj)
 
-                staticContainer.addChild(
-                    irFactory.buildField {
-                        isStatic = true
-                        type = obj.defaultType
-                        name = Name.identifier(COMPANION_FIELD_NAME)
-                        origin = IrDeclarationOrigin.FIELD_FOR_OBJECT_INSTANCE
-                    }.apply {
-                        parent = obj
+                // We don't want to add the companion field to the companion itself, only add it if the static container
+                // is something else.
+                if (staticContainer != obj) {
+                    staticContainer.addChild(
+                        irFactory.buildField {
+                            isStatic = true
+                            type = obj.defaultType
+                            name = Name.identifier(COMPANION_FIELD_NAME)
+                            origin = IrDeclarationOrigin.FIELD_FOR_OBJECT_INSTANCE
+                        }.apply {
+                            parent = obj
 
-                        initializer = IrExpressionBodyImpl(
-                            createIrBuilder(symbol).buildStatement {
-                                irGetObject(obj.symbol)
-                            }
-                        )
-                    }
-                )
+                            initializer = IrExpressionBodyImpl(
+                                createIrBuilder(symbol).buildStatement {
+                                    irGetObject(obj.symbol)
+                                }
+                            )
+                        }
+                    )
+                }
 
                 transformations = just { remove() }
             }
