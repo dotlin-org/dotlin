@@ -48,6 +48,15 @@ import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 val IrSimpleFunction.correspondingProperty: IrProperty?
     get() = correspondingPropertySymbol?.owner
 
+inline fun <S : IrSymbol, reified D : IrOverridableDeclaration<S>> D.resolveRootOverride(): D? {
+    var override = resolveOverride() ?: return null
+    while (override.overriddenSymbols.isNotEmpty()) {
+        override = override.resolveOverride() ?: break
+    }
+
+    return override
+}
+
 inline fun <S : IrSymbol, reified D : IrOverridableDeclaration<S>> D.resolveOverride(): D? =
     overriddenSymbols.firstOrNull()?.owner as D?
 
@@ -276,7 +285,8 @@ val IrDeclarationWithVisibility.isPrivate
     get() = visibility == DescriptorVisibilities.PRIVATE
 
 inline fun <reified T : IrDeclarationWithName> List<IrDeclaration>.withName(name: String): T =
-    filterIsInstance<T>().first { it.name == Name.identifier(name) }
+    filterIsInstance<T>().firstOrNull { it.name == Name.identifier(name) }
+        ?: error("Declaration with name '$name' not found")
 
 fun List<IrDeclaration>.constructorWithName(name: String) = withName<IrConstructor>(name)
 fun List<IrDeclaration>.methodWithName(name: String) = withName<IrSimpleFunction>(name)
@@ -411,6 +421,16 @@ fun IrBuilderWithScope.irCall(
         }
 
         valueArguments.forEachIndexed { index, arg -> putValueArgument(index, arg) }
+    }
+
+fun IrBuilderWithScope.irCallSet(property: IrProperty, value: IrExpression): IrCall =
+    irCall(
+        property.setter!!,
+        receiver = property.parentClassOrNull?.thisReceiver?.let { irGet(it) },
+        value,
+        origin = IrStatementOrigin.EQ,
+    ).apply {
+        type = property.type
     }
 
 fun IrBuilderWithScope.irReturnVoid(
@@ -596,3 +616,15 @@ val IrType.typeParametersOrSelf: List<IrTypeParameter>
 
 fun IrFunctionAccessExpression.getValueArgumentOrDefault(index: Int) =
     getValueArgument(index) ?: symbol.owner.valueParameters[index].defaultValue!!.expression
+
+fun IrClass.allSuperInterfaces(): Set<IrType> = defaultType.allSuperInterfaces()
+
+fun IrType.allSuperInterfaces(): Set<IrType> =
+    allSuperTypes()
+        .filter { it.classOrNull?.owner?.isInterface == true }
+        .toSet()
+
+fun IrClass.allSuperTypes(): Set<IrType> = defaultType.allSuperTypes()
+
+fun IrType.allSuperTypes(): Set<IrType> =
+    superTypes().map { listOf(it, *it.allSuperTypes().toTypedArray()) }.flatten().toSet()

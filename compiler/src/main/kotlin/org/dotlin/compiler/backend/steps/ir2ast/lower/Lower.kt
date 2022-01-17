@@ -20,8 +20,10 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.*
-import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.Comparable
+import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.EnumLowering
+import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.IteratorSubtypeImplementationsLowering
+import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.IteratorSubtypeReturnsLowering
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.SymbolTable
@@ -31,7 +33,6 @@ import kotlin.reflect.KFunction1
 private val lowerings: List<KFunction1<DartLoweringContext, IrLowering>> = listOf(
     ::UnrepresentableDecimalConstsLowering,
     Comparable::PreOperatorsLowering,
-    ::DartImportsLowering,
     ::DartExtensionsLowering,
     ::ExternalDeclarationsLowering,
     ::EnumLowering,
@@ -56,9 +57,8 @@ private val lowerings: List<KFunction1<DartLoweringContext, IrLowering>> = listO
     ::CompareToCallsLowering,
     ::RemoveInstanceInitializersLowering,
     ::SecondaryRedirectingConstructorsWithBodiesLowering,
-    ::IteratorSubtypeBackingFieldsLowering,
+    ::IteratorSubtypeImplementationsLowering,
     ::IteratorSubtypeReturnsLowering,
-    ::IteratorLowering,
     ::ObjectLowering,
     ::NestedClassLowering,
     ::UnitReturnsLowering,
@@ -80,7 +80,8 @@ private val lowerings: List<KFunction1<DartLoweringContext, IrLowering>> = listO
     ::DartCatchAsLowering,
     ::InvokeCallsLowering,
     ::IrCompositesToIrBlocksLowering,
-    ::DartCodeLowering
+    ::DartCodeLowering,
+    ::DartImportsLowering
 )
 
 fun IrModuleFragment.lower(

@@ -35,7 +35,7 @@ package dart.core
  * or after a call to [moveNext] has returned false.
  */
 @DartLibrary("dart:core", aliased = true)
-external sealed interface Iterator<out E> {
+internal external interface Iterator<out E> {
     /**
      * Advances the iterator to the next element of the iteration.
      *
@@ -79,7 +79,8 @@ external sealed interface Iterator<out E> {
 /**
  * An [Iterator] that allows moving backwards as well as forwards.
  */
-external sealed interface BidirectionalIterator<out E> : Iterator<E> {
+@DartLibrary("dart:core", aliased = true)
+internal external interface BidirectionalIterator<out E> : Iterator<E> {
     /**
      * Move back to the previous element.
      *

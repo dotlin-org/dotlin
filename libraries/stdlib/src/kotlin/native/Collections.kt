@@ -20,30 +20,6 @@ package kotlin.collections
 import kotlin.internal.PlatformDependent
 
 /**
- * Classes that inherit from this interface can be represented as a sequence of elements that can
- * be iterated over.
- * @param T the type of element being iterated over. The iterator is covariant in its element type.
- */
-external interface Iterable<out T> {
-    /**
-     * Returns an iterator over the elements of this object.
-     */
-    operator fun iterator(): Iterator<T>
-}
-
-/**
- * Classes that inherit from this interface can be represented as a sequence of elements that can
- * be iterated over and that supports removing elements during iteration.
- * @param T the type of element being iterated over. The mutable iterator is invariant in its element type.
- */
-interface MutableIterable<out T> : Iterable<T> {
-    /**
-     * Returns an iterator over the elements of this sequence that supports removing elements during iteration.
-     */
-    override fun iterator(): MutableIterator<T>
-}
-
-/**
  * A generic collection of elements. Methods in this interface support only read-only access to the collection;
  * read/write access is supported through the [MutableCollection] interface.
  * @param E the type of elements contained in the collection. The collection is covariant in its element type.

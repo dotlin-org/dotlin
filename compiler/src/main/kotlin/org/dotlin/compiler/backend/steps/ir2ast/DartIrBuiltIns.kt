@@ -20,37 +20,48 @@
 package org.dotlin.compiler.backend.steps.ir2ast
 
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.jetbrains.kotlin.backend.common.ir.addFakeOverrides
+import org.jetbrains.kotlin.backend.common.ir.createDispatchReceiverParameter
 import org.jetbrains.kotlin.backend.common.ir.createParameterDeclarations
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.ClassKind
-import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.SourceElement
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.declarations.*
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
+import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
+import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
+import org.jetbrains.kotlin.ir.interpreter.toIrConst
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrConstructorSymbolImpl
+import org.jetbrains.kotlin.ir.symbols.impl.IrSimpleFunctionSymbolImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterSymbolImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.defaultType
+import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
 import org.jetbrains.kotlin.ir.types.impl.IrUninitializedType
+import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.types.makeNullable
 import org.jetbrains.kotlin.ir.util.defaultType
+import org.jetbrains.kotlin.ir.util.primaryConstructor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.types.Variance
 
 class DartIrBuiltIns(private val context: DartLoweringContext) {
     private val builtInsModule = context.irModuleFragment.descriptor.builtIns.builtInsModule
     private val symbolTable = context.symbolTable
     private val irFactory = context.irFactory
     private val irBuiltIns = context.irBuiltIns
+
+    val voidType = IrVoidType
+
+    val dotlin = Dotlin()
 
     val identical = functionSymbolAt("dart.core", "identical") { parameters, _ ->
         returnType = irBuiltIns.booleanType
@@ -67,11 +78,71 @@ class DartIrBuiltIns(private val context: DartLoweringContext) {
         }
     }
 
-    //val iterator = symbolAt<IrClassSymbol>("dart.core", "Iterator")
+    val iterator = classSymbolAt("dart.core", "Iterator") { typeParameters, members, annotations, _ ->
+        kind = ClassKind.INTERFACE
 
-    val voidType = IrVoidType
+        val typeParameter = typeParameters.add {
+            name = Name.identifier("E")
+        }
 
-    val dotlin = Dotlin()
+        members.apply {
+            addMethod { _, _ ->
+                name = Name.identifier("moveNext")
+                returnType = irBuiltIns.booleanType
+                modality = Modality.ABSTRACT
+            }
+
+            addProperty {
+                name = Name.identifier("current")
+                modality = Modality.ABSTRACT
+            }.apply {
+                createDefaultGetter(typeParameter.defaultType)
+            }
+        }
+
+        annotations.add(
+            dotlin.dartLibrary,
+            "dart:core".toIrConst(irBuiltIns.stringType), // library
+            true.toIrConst(irBuiltIns.booleanType) // aliased
+        )
+    }
+
+    val bidirectionalIterator =
+        classSymbolAt("dart.core", "BidirectionalIterator") { typeParameters, members, annotations, superTypes ->
+            kind = ClassKind.INTERFACE
+
+            val typeParameter = typeParameters.add {
+                name = Name.identifier("E")
+            }
+
+            superTypes.add(
+                IrSimpleTypeImpl(
+                    iterator,
+                    hasQuestionMark = false,
+                    arguments = listOf(
+                        makeTypeProjection(
+                            typeParameter.defaultType,
+                            Variance.INVARIANT
+                        )
+                    ),
+                    annotations = emptyList()
+                )
+            )
+
+            members.apply {
+                addMethod { _, _ ->
+                    name = Name.identifier("movePrevious")
+                    returnType = irBuiltIns.booleanType
+                    modality = Modality.ABSTRACT
+                }
+            }
+
+            annotations.add(
+                dotlin.dartLibrary,
+                "dart:core".toIrConst(irBuiltIns.stringType), // library
+                true.toIrConst(irBuiltIns.booleanType) // aliased
+            )
+        }
 
     inner class Dotlin {
         val dart = functionSymbolAt("dotlin", "dart") { parameters, _ ->
@@ -83,11 +154,39 @@ class DartIrBuiltIns(private val context: DartLoweringContext) {
             }
         }
 
-        val dartConst = classSymbolAt("dotlin", "DartConst") { _, _ ->
+        val dartConst = classSymbolAt("dotlin", "DartConst") { _, members, _, _ ->
             kind = ClassKind.ANNOTATION_CLASS
+
+            members.addConstructor { _, _ ->
+                isPrimary = true
+            }
         }
 
-        val returnClass = classSymbolAt("dotlin", "\$Return") { typeParameters, members ->
+        val dartLibrary = classSymbolAt("dotlin", "DartLibrary") { _, members, _, _ ->
+            kind = ClassKind.ANNOTATION_CLASS
+
+            members.addConstructor { parameters, _ ->
+                isPrimary = true
+
+                parameters.apply {
+                    add {
+                        name = Name.identifier("library")
+                        type = irBuiltIns.stringType
+                    }
+
+                    add {
+                        name = Name.identifier("aliased")
+                        type = irBuiltIns.booleanType
+                    }.apply {
+                        defaultValue = IrExpressionBodyImpl(
+                            false.toIrConst(irBuiltIns.booleanType)
+                        )
+                    }
+                }
+            }
+        }
+
+        val returnClass = classSymbolAt("dotlin", "\$Return") { typeParameters, members, _, _ ->
             val typeParameter = typeParameters.add {
                 name = Name.identifier("T")
             }
@@ -104,18 +203,10 @@ class DartIrBuiltIns(private val context: DartLoweringContext) {
                     }
                 }
 
-                add {
+                addProperty {
                     name = Name.identifier("value")
                 }.apply {
-                    val property = this
-
-                    getter = irFactory.buildFun {
-                        name = Name.special("<get-value>")
-                        returnType = typeParameter.defaultType
-                        origin = IrDeclarationOrigin.DEFAULT_PROPERTY_ACCESSOR
-                    }.apply {
-                        correspondingPropertySymbol = property.symbol
-                    }
+                    createDefaultGetter(typeParameter.defaultType)
 
                     backingField = irFactory.buildField {
                         name = Name.special("<field-value>")
@@ -136,10 +227,10 @@ class DartIrBuiltIns(private val context: DartLoweringContext) {
         }
     }
 
-    private inline fun <reified S : IrSymbol> symbolAt(
+    private inline fun <reified S : IrSymbol, O : IrSymbolOwner> symbolAt(
         packageName: String,
         memberName: String,
-        createStub: (S, packageFqName: FqName, identifier: Name) -> IrSymbolOwner
+        crossinline createStub: (S, packageFqName: FqName, identifier: Name) -> O
     ): S {
         val packageFqName = FqName(packageName)
         val memberIdentifier = Name.identifier(memberName)
@@ -149,16 +240,16 @@ class DartIrBuiltIns(private val context: DartLoweringContext) {
                 it == memberIdentifier
             }.firstOrNull() ?: error("Classifier not found: $packageName.$memberName")
 
-        return symbolTable.let {
+        return symbolTable.run {
             when (S::class) {
-                IrClassSymbol::class -> it.referenceClass(descriptor as ClassDescriptor) as S
-                IrSimpleFunctionSymbol::class -> it.referenceSimpleFunction(descriptor as FunctionDescriptor) as S
+                IrClassSymbol::class -> declareClassIfNotExists(descriptor as ClassDescriptor) {
+                    createStub(it as S, packageFqName, memberIdentifier) as IrClass
+                }
+                IrSimpleFunctionSymbol::class -> declareSimpleFunctionIfNotExists(descriptor as FunctionDescriptor) {
+                    createStub(it as S, packageFqName, memberIdentifier) as IrSimpleFunction
+                }
                 else -> error("Unsupported symbol type: ${S::class.simpleName}")
-            }
-        }.also {
-            if (!it.isBound) {
-                createStub(it, packageFqName, memberIdentifier)
-            }
+            }.symbol as S
         }
     }
 
@@ -245,12 +336,14 @@ class DartIrBuiltIns(private val context: DartLoweringContext) {
     ): IrClassSymbol = symbolAt(packageName, memberName) { symbol, packageFqName, identifier ->
         val typeParameters = mutableListOf<IrTypeParameter>()
         val members = mutableListOf<IrDeclaration>()
+        val annotations = mutableListOf<IrConstructorCall>()
+        val superTypes = mutableListOf<IrType>()
         val builder = IrClassBuilder().apply {
             applyDefaults()
             name = identifier
             isExternal = true
         }.also {
-            buildStub(it, typeParameters, members)
+            buildStub(it, typeParameters, members, annotations, superTypes)
         }
 
         irFactory.createClass(
@@ -270,29 +363,41 @@ class DartIrBuiltIns(private val context: DartLoweringContext) {
             builder.isFun,
             SourceElement.NO_SOURCE
         ).apply {
+            val parentClass = this
             setExternalParent(packageFqName)
             createParameterDeclarations()
 
-            typeParameters.addAll(
-                typeParameters.onEach {
-                    it.parent = this
-                }
-            )
+            this.typeParameters = typeParameters.onEach {
+                it.parent = parentClass
+            }
+
+            this.superTypes = superTypes
 
             declarations.addAll(
                 members.onEach {
-                    it.parent = this
+                    it.parent = parentClass
 
                     when (it) {
                         is IrProperty -> {
-                            it.backingField?.parent = this
-                            it.getter?.parent = this
-                            it.setter?.parent = this
+                            it.backingField?.parent = parentClass
+                            it.getter?.apply {
+                                parent = parentClass
+                                createDispatchReceiverParameter()
+                            }
+                            it.setter?.apply {
+                                parent = parentClass
+                                createDispatchReceiverParameter()
+                            }
                         }
                         is IrConstructor -> it.returnType = defaultType
+                        is IrSimpleFunction -> it.createDispatchReceiverParameter()
                     }
                 }
             )
+
+            addFakeOverrides(context.typeSystem)
+
+            this.annotations = annotations
         }
     }
 
@@ -320,7 +425,34 @@ class DartIrBuiltIns(private val context: DartLoweringContext) {
         add(it)
     }
 
-    private fun MutableList<IrDeclaration>.add(block: IrPropertyBuilder.() -> Unit): IrProperty {
+    private fun MutableList<IrDeclaration>.addMethod(block: IrFunctionStubBuilder): IrSimpleFunction =
+        buildFunStub(
+            init = block,
+            create = {
+                irFactory.createFunction(
+                    UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+                    origin,
+                    symbol = IrSimpleFunctionSymbolImpl(),
+                    name,
+                    visibility,
+                    modality,
+                    returnType,
+                    isInline,
+                    isExternal,
+                    isTailrec,
+                    isSuspend,
+                    isOperator,
+                    isInfix,
+                    isExpect,
+                    isFakeOverride,
+                    containerSource = null
+                )
+            }
+        ).also {
+            add(it)
+        }
+
+    private fun MutableList<IrDeclaration>.addProperty(block: IrPropertyBuilder.() -> Unit): IrProperty {
         return irFactory.buildProperty {
             applyDefaults()
             block(this)
@@ -328,6 +460,23 @@ class DartIrBuiltIns(private val context: DartLoweringContext) {
             add(it)
         }
     }
+
+    private fun MutableList<IrConstructorCall>.add(
+        annotationClass: IrClassSymbol,
+        vararg arguments: IrExpression
+    ): IrConstructorCall =
+        IrConstructorCallImpl(
+            UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+            type = annotationClass.defaultType,
+            symbol = annotationClass.owner.primaryConstructor!!.symbol,
+            typeArgumentsCount = 0,
+            constructorTypeArgumentsCount = 0,
+            valueArgumentsCount = arguments.size,
+        ).apply {
+            arguments.forEachIndexed { index, arg ->
+                putValueArgument(index, arg)
+            }
+        }.also { add(it) }
 
     private fun <T : IrDeclarationBuilder> T.applyDefaults() = apply {
         origin = IrDeclarationOrigin.IR_BUILTINS_STUB
@@ -375,6 +524,14 @@ class DartIrBuiltIns(private val context: DartLoweringContext) {
                     }
             )
     }
+
+    private fun IrProperty.createDefaultGetter(type: IrType): IrSimpleFunction = context.run {
+        createDefaultGetter(type, initializeParentAndReceiver = false)
+    }
+
+    private fun IrProperty.createDefaultSetter(type: IrType): IrSimpleFunction = context.run {
+        createDefaultSetter(type, initializeParentAndReceiver = false)
+    }
 }
 
 private typealias IrFunctionStubBuilder = IrFunctionBuilder.(
@@ -384,7 +541,9 @@ private typealias IrFunctionStubBuilder = IrFunctionBuilder.(
 
 private typealias IrClassStubBuilder = IrClassBuilder.(
     typeParameters: MutableList<IrTypeParameter>,
-    members: MutableList<IrDeclaration>
+    members: MutableList<IrDeclaration>,
+    annotations: MutableList<IrConstructorCall>,
+    superTypes: MutableList<IrType>
 ) -> Unit
 
 object IrVoidType : IrType {
