@@ -17,7 +17,9 @@
 @file:Suppress(
     "NESTED_CLASS_IN_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
     "WRONG_INITIALIZER_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "WRONG_BODY_OF_EXTERNAL_DECLARATION" // TODO: Fix in analyzer
+    "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
+    "NESTED_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
+    "CONST_VAL_WITHOUT_INITIALIZER" // TODO: Fix in analyzer
 )
 
 package dart.typeddata
@@ -54,7 +56,7 @@ external interface Int32Array : IArray<Int>, TypedData {
     override fun subArray(start: Int, end: Int?): Int32Array
 
     companion object {
-        @Suppress("CONST_VAL_WITH_NON_CONST_INITIALIZER") // TODO: Fix in analyzer. Allow `dart()` for const
-        const val bytesPerElement: Int = dart("Int32List.bytesPerElement")
+        @DartStatic
+        external const val bytesPerElement: Int
     }
 }

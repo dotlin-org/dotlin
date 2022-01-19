@@ -20,6 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.hasDartGetterAnnotation
+import org.dotlin.compiler.backend.isDartStatic
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.*
@@ -27,6 +28,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.ObjectLowering
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartInt
 import org.dotlin.compiler.backend.util.component6
 import org.dotlin.compiler.backend.util.component7
+import org.dotlin.compiler.backend.util.runWith
 import org.dotlin.compiler.backend.util.toPair
 import org.dotlin.compiler.dart.ast.collection.DartCollectionElementList
 import org.dotlin.compiler.dart.ast.expression.*
@@ -37,10 +39,7 @@ import org.dotlin.compiler.dart.ast.expression.invocation.DartMethodInvocation
 import org.dotlin.compiler.dart.ast.expression.literal.*
 import org.dotlin.compiler.dart.ast.type.DartNamedType
 import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
-import org.jetbrains.kotlin.ir.declarations.IrField
-import org.jetbrains.kotlin.ir.declarations.IrFile
-import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
-import org.jetbrains.kotlin.ir.declarations.IrVariable
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin.*
 import org.jetbrains.kotlin.ir.expressions.IrTypeOperator.*
@@ -66,7 +65,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
         val optionalReceiver by lazy {
             when {
                 irCallLike is IrCall && irCallLike.isSuperCall() -> DartSuperExpression
-                else -> irReceiver?.accept(context)
+                else -> irReceiver?.acceptAsReceiverOf(irCallLike, context)
             }
         }
         val receiver by lazy { optionalReceiver!! }
@@ -324,7 +323,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
     ): DartExpression {
         val receiver = when (irGetField.symbol.owner.parent) {
             is IrFile -> null
-            else -> irGetField.receiver?.accept(context) ?: irGetField.type.owner.dartName
+            else -> irGetField.receiver?.acceptAsReceiverOf(irGetField, context) ?: irGetField.type.owner.dartName
         }
         val name = relevantDartNameOf(irGetField.symbol.owner)
 
@@ -340,11 +339,10 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
     override fun DartTransformContext.visitGetObjectValue(
         irGetObjectValue: IrGetObjectValue,
         data: DartTransformContext
-    ) =
-        DartPropertyAccessExpression(
-            target = irGetObjectValue.symbol.owner.dartName,
-            propertyName = ObjectLowering.INSTANCE_FIELD_NAME.toDartSimpleIdentifier()
-        )
+    ) = DartPropertyAccessExpression(
+        target = irGetObjectValue.symbol.owner.dartName,
+        propertyName = ObjectLowering.INSTANCE_FIELD_NAME.toDartSimpleIdentifier()
+    )
 
     override fun DartTransformContext.visitSetValue(
         irSetValue: IrSetValue,
@@ -360,7 +358,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
         irSetField: IrSetField,
         context: DartTransformContext
     ): DartExpression {
-        val receiver = irSetField.receiver?.accept(context)
+        val receiver = irSetField.receiver?.acceptAsReceiverOf(irSetField, context)
         val name = relevantDartNameOf(irSetField.symbol.owner)
         val assignee = if (receiver != null)
             DartPropertyAccessExpression(
@@ -539,6 +537,22 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
 
 fun IrExpression.accept(context: DartTransformContext) = accept(IrToDartExpressionTransformer, context)
 fun IrExpressionBody.accept(context: DartTransformContext) = accept(IrToDartExpressionTransformer, context)
+
+private fun IrExpression.acceptAsReceiverOf(of: IrExpression, context: DartTransformContext) =
+    context.runWith(this) accept@{
+        if (it is IrGetObjectValue && of is IrDeclarationReference) {
+            val owner = of.symbol.owner
+            if (owner is IrDeclaration && owner.isDartStatic) {
+                val parentObj = owner.parentClassOrNull!!
+                return@accept when {
+                    parentObj.isCompanion -> parentObj.parentClassOrNull!!.dartName
+                    else -> parentObj.dartName
+                }
+            }
+        }
+
+        accept(context)
+    }
 
 private fun IrFunctionAccessExpression.isDartIndexed(get: Boolean): Boolean {
     val (name, syntheticName, parametersCount) = when (get) {

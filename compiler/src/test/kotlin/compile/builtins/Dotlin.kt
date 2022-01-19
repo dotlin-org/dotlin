@@ -1038,4 +1038,143 @@ class Dotlin : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `@DartStatic`() = assertCompile {
+        kotlin(
+            """
+            @file:Suppress(
+                "NESTED_CLASS_IN_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
+                "NESTED_EXTERNAL_DECLARATION" // TODO: Fix in analyzer
+            )
+
+            external interface DateTime {
+                @DartStatic
+                external companion object {
+                    fun now(): DateTime
+                }
+            }
+
+            fun main() {
+                DateTime.now()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              DateTime.now();
+            }
+            """
+        )
+    }
+
+    // TODO: Add analysis check that the parent object must be external.
+    @Test
+    fun `@DartStatic on method`() = assertCompile {
+        kotlin(
+            """
+            @file:Suppress(
+                "NESTED_CLASS_IN_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
+                "NESTED_EXTERNAL_DECLARATION" // TODO: Fix in analyzer
+            )
+
+            external interface DateTime {
+                external companion object {
+                    @DartStatic
+                    fun now(): DateTime
+                }
+            }
+
+            fun main() {
+                DateTime.now()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              DateTime.now();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartStatic on property`() = assertCompile {
+        kotlin(
+            """
+            @file:Suppress(
+                "NESTED_CLASS_IN_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
+                "NESTED_EXTERNAL_DECLARATION" // TODO: Fix in analyzer
+            )
+
+            external interface DateTime {
+                external companion object {
+                    @DartStatic
+                    val now: DateTime
+                }
+            }
+
+            fun main() {
+                DateTime.now
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              DateTime.now;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartStatic on method but in non-external companion object`() = assertCompile {
+        kotlin(
+            """
+            @file:Suppress(
+                "NESTED_CLASS_IN_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
+                "NESTED_EXTERNAL_DECLARATION" // TODO: Fix in analyzer
+            )
+
+            external interface DateTime {
+                companion object {
+                    @DartStatic
+                    external fun now(): DateTime
+                }
+            }
+
+            fun main() {
+                DateTime.now()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              DateTime.now();
+            }
+
+            @sealed
+            class DateTime${'$'}Companion {
+              const DateTime${'$'}Companion._();
+              static const DateTime${'$'}Companion ${'$'}instance = const DateTime${'$'}Companion._();
+            }
+            """
+        )
+    }
 }

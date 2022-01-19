@@ -67,6 +67,21 @@ inline fun <reified T : IrDeclarationWithName> T.deepCopyWith(
 /**
  * Deep-copies the given class and remaps all references to it (if [remapReferences] is true).
  */
+inline fun <reified T : IrPossiblyExternalDeclaration> T.deepCopyWith(
+    remapReferences: Boolean = true,
+    isExternal: Boolean,
+): T = when (this) {
+    is IrClass -> deepCopyWith(remapReferences) { this.isExternal = isExternal }
+    is IrConstructor -> deepCopyWith(remapReferences) { this.isExternal = isExternal }
+    is IrFunction -> deepCopyWith(remapReferences) { this.isExternal = isExternal }
+    is IrProperty -> deepCopyWith(remapReferences) { this.isExternal = isExternal }
+    is IrField -> deepCopyWith(remapReferences) { this.isExternal = isExternal }
+    else -> throw UnsupportedOperationException("Cannot deep-copy ${T::class.simpleName}")
+}
+
+/**
+ * Deep-copies the given class and remaps all references to it (if [remapReferences] is true).
+ */
 inline fun <reified T : IrClass> T.deepCopyWith(
     remapReferences: Boolean = true,
     block: IrClassBuilder.() -> Unit

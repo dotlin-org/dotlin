@@ -19,12 +19,18 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
+import org.dotlin.compiler.backend.steps.ir2ast.ir.deepCopy
 import org.dotlin.compiler.backend.steps.ir2ast.ir.deepCopyWith
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
+import org.jetbrains.kotlin.backend.jvm.codegen.psiElement
 import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrFile
+import org.jetbrains.kotlin.ir.declarations.IrPossiblyExternalDeclaration
 import org.jetbrains.kotlin.ir.util.companionObject
 import org.jetbrains.kotlin.ir.util.isEffectivelyExternal
+import org.jetbrains.kotlin.lexer.KtTokens
+import org.jetbrains.kotlin.psi.KtDeclaration
 
 class ExternalDeclarationsLowering(override val context: DartLoweringContext) : IrFileLowering {
     override fun DartLoweringContext.transform(file: IrFile) {
@@ -32,11 +38,23 @@ class ExternalDeclarationsLowering(override val context: DartLoweringContext) : 
             toList().forEach remove@{
                 if (!it.isEffectivelyExternal()) return@remove
 
-                // Don't remove companion objects, they are not considered external in Dotlin.
+                // Companion objects are considered non-external by default in Dotlin, even if they're inside an
+                // external class. Only if they are explicitly marked external are they consider external. The same
+                // goes for its members, if the companion object itself is not external.
                 if (it is IrClass) {
                     it.companionObject()?.let { obj ->
-                        // We don't use addChild on purpose, we want to keep the parent information.
-                        add(obj.deepCopyWith { isExternal = false })
+                        if (!obj.isExplicitlyExternal) {
+                            obj.declarations.apply {
+                                removeIf { child -> child.isExplicitlyExternal }
+
+                                replaceAll { child ->
+                                    (child as IrPossiblyExternalDeclaration).deepCopyWith(isExternal = false)
+                                }
+                            }
+
+                            // We don't use addChild on purpose, we want to keep the parent information.
+                            add(obj.deepCopyWith { isExternal = false })
+                        }
                     }
                 }
 
@@ -45,3 +63,6 @@ class ExternalDeclarationsLowering(override val context: DartLoweringContext) : 
         }
     }
 }
+
+private val IrDeclaration.isExplicitlyExternal: Boolean
+    get() = (psiElement as? KtDeclaration)?.hasModifier(KtTokens.EXTERNAL_KEYWORD) == true

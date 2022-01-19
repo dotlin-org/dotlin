@@ -17,7 +17,9 @@
 @file:Suppress(
     "NESTED_CLASS_IN_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
     "WRONG_INITIALIZER_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "WRONG_BODY_OF_EXTERNAL_DECLARATION" // TODO: Fix in analyzer
+    "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
+    "NESTED_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
+    "CONST_VAL_WITHOUT_INITIALIZER" // TODO: Fix in analyzer
 )
 
 package dart.typeddata
@@ -51,7 +53,7 @@ external interface Float64Array : IArray<Double>, TypedData {
     override fun subArray(start: Int, end: Int?): Float64Array
 
     companion object {
-        @Suppress("CONST_VAL_WITH_NON_CONST_INITIALIZER") // TODO: Fix in analyzer. Allow `dart()` for const
-        const val bytesPerElement: Int = dart("Float64List.bytesPerElement")
+        @DartStatic
+        external const val bytesPerElement: Int
     }
 }
