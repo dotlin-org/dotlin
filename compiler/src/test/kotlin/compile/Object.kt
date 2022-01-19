@@ -392,4 +392,27 @@ class Object : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `companion object in external class`() = assertCompile {
+        kotlin(
+            """
+            external class Test {
+                companion object
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test${'$'}Companion {
+              const Test${'$'}Companion._();
+              static const Test${'$'}Companion ${'$'}instance = const Test${'$'}Companion._();
+            }
+            """
+        )
+    }
 }

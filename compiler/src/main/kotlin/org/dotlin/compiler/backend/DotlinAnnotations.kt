@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.fileOrNull
 import org.jetbrains.kotlin.ir.util.isGetter
 import org.jetbrains.kotlin.ir.util.isSetter
+import org.jetbrains.kotlin.ir.util.parentClassOrNull
 
 object DotlinAnnotations {
     const val dartName = "dotlin.DartName"
@@ -33,6 +34,7 @@ object DotlinAnnotations {
     const val dartPositional = "dotlin.DartPositional"
     const val dartLibrary = "dotlin.DartLibrary"
     const val dartImplementationOf = "dotlin.DartImplementationOf"
+    const val dartStatic = "dotlin.DartStatic"
 
     // Internal annotations.
     const val dartGetter = "dotlin.DartGetter"
@@ -46,6 +48,7 @@ fun IrDeclaration.hasDartExtensionAnnotation() = hasOverriddenAnnotation(DotlinA
 fun IrFunction.hasDartPositionalAnnotation() = hasOverriddenAnnotation(DotlinAnnotations.dartPositional)
 fun IrDeclaration.hasDartHideNameFromCoreAnnotation() = hasAnnotation(DotlinAnnotations.dartHideNameFromCore)
 fun IrDeclaration.hasDartImplementationOfAnnotation() = hasAnnotation(DotlinAnnotations.dartImplementationOf)
+private fun IrDeclaration.hasDartStaticAnnotation() = hasAnnotation(DotlinAnnotations.dartStatic)
 
 val IrDeclaration.dartAnnotatedName: String?
     get() = when (this) {
@@ -95,3 +98,8 @@ val IrValueParameter.isDartPositional: Boolean
 
 val IrDeclaration.dartImplementationFqName: String?
     get() = getSingleAnnotationStringArgumentOf(DotlinAnnotations.dartImplementationOf)
+
+val IrDeclaration.isDartStatic: Boolean
+    get() = hasDartStaticAnnotation() ||
+            parentClassOrNull?.hasDartStaticAnnotation() == true ||
+            (this is IrSimpleFunction && correspondingProperty?.hasDartStaticAnnotation() == true)
