@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
+import org.dotlin.compiler.backend.DartNameGenerator
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.Comparable
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.EnumLowering
@@ -87,13 +88,15 @@ private val lowerings: List<KFunction1<DartLoweringContext, IrLowering>> = listO
 fun IrModuleFragment.lower(
     configuration: CompilerConfiguration,
     symbolTable: SymbolTable,
-    bindingContext: BindingContext
+    bindingContext: BindingContext,
+    dartNameGenerator: DartNameGenerator
 ): DartLoweringContext {
     val context = DartLoweringContext(
         configuration,
         irModuleFragment = this,
         symbolTable = symbolTable,
-        bindingContext = bindingContext
+        bindingContext = bindingContext,
+        dartNameGenerator = dartNameGenerator
     )
 
     lowerings.forEach { lowering ->

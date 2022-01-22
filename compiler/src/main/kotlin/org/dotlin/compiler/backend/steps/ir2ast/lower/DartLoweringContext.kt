@@ -61,6 +61,7 @@ class DartLoweringContext(
     override val symbolTable: SymbolTable,
     val bindingContext: BindingContext,
     val irModuleFragment: IrModuleFragment,
+    override val dartNameGenerator: DartNameGenerator,
     private val extraIrAttributes: ExtraIrAttributes = ExtraIrAttributes.default(),
 ) : IrContext, CommonBackendContext, ExtraIrAttributes by extraIrAttributes {
     override val builtIns = irModuleFragment.descriptor.builtIns
@@ -71,8 +72,6 @@ class DartLoweringContext(
     override val mapping = DefaultMapping()
     override val scriptMode = false
     override val typeSystem: IrTypeSystemContext = IrTypeSystemContextImpl(irBuiltIns)
-
-    override val dartNameGenerator = DartNameGenerator()
 
     val dartBuiltIns = DartIrBuiltIns(this)
 

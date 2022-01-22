@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Wilko Manger
+ * Copyright 2022 Wilko Manger
  *
  * This file is part of Dotlin.
  *
@@ -17,15 +17,27 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.backend
+package org.dotlin.compiler.backend.steps.src2ir
 
-import org.dotlin.compiler.backend.steps.src2ir.errors
+import org.dotlin.compiler.backend.DotlinCompilerError
+import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.diagnostics.Diagnostic
+import org.jetbrains.kotlin.diagnostics.Severity
 
-open class DotlinError(override val message: String? = null) : Error(message)
+val Iterable<Diagnostic>.warnings
+    get() = filter { it.severity == Severity.WARNING }
 
-class DotlinCompilerError private constructor(val diagnosticNames: List<String>) : DotlinError() {
-    constructor(diagnostics: Iterable<Diagnostic>) : this(
-        diagnostics.errors.map { it.factory.name }
-    )
+val Iterable<Diagnostic>.errors
+    get() = filter { it.severity == Severity.ERROR }
+
+val Iterable<Diagnostic>.hasWarnings
+    get() = warnings.isNotEmpty()
+
+val Iterable<Diagnostic>.hasErrors
+    get() = errors.isNotEmpty()
+
+fun AnalysisResult.throwIfIsError() {
+    if (isError()) {
+        throw DotlinCompilerError(bindingContext.diagnostics.errors)
+    }
 }
