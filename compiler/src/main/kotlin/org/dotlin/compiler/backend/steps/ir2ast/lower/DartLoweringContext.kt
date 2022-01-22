@@ -19,7 +19,8 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
-import org.dotlin.compiler.backend.DartIrTranslationContext
+import org.dotlin.compiler.backend.DartNameGenerator
+import org.dotlin.compiler.backend.IrContext
 import org.dotlin.compiler.backend.steps.ir2ast.DartIrBuiltIns
 import org.dotlin.compiler.backend.steps.ir2ast.attributes.ExtraIrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
@@ -61,7 +62,7 @@ class DartLoweringContext(
     val bindingContext: BindingContext,
     val irModuleFragment: IrModuleFragment,
     private val extraIrAttributes: ExtraIrAttributes = ExtraIrAttributes.default(),
-) : DartIrTranslationContext, CommonBackendContext, ExtraIrAttributes by extraIrAttributes {
+) : IrContext, CommonBackendContext, ExtraIrAttributes by extraIrAttributes {
     override val builtIns = irModuleFragment.descriptor.builtIns
     override var inVerbosePhase = false
     override val internalPackageFqn = FqName("kotlin.dart")
@@ -70,6 +71,8 @@ class DartLoweringContext(
     override val mapping = DefaultMapping()
     override val scriptMode = false
     override val typeSystem: IrTypeSystemContext = IrTypeSystemContextImpl(irBuiltIns)
+
+    override val dartNameGenerator = DartNameGenerator()
 
     val dartBuiltIns = DartIrBuiltIns(this)
 
@@ -167,7 +170,7 @@ class DartLoweringContext(
                             else -> classifier.dartName.escapedValue()
                         }
                     }
-                    is IrTypeParameter -> classifier.file to classifier.dartNameWith(superTypes = true)
+                    is IrTypeParameter -> classifier.file to classifier.dartNameValueWith(superTypes = true)
                     else -> throw UnsupportedOperationException("Cannot handle extension for $this yet")
                 }
                 val prefix = '$'

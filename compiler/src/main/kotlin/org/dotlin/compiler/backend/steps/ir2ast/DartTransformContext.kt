@@ -19,7 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast
 
-import org.dotlin.compiler.backend.DartIrTranslationContext
+import org.dotlin.compiler.backend.IrContext
 import org.dotlin.compiler.backend.steps.ir2ast.attributes.ExtraIrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.accept
@@ -34,7 +34,7 @@ import org.jetbrains.kotlin.ir.declarations.IrFunction
 
 class DartTransformContext(
     loweringContext: DartLoweringContext,
-) : DartIrTranslationContext by loweringContext, ExtraIrAttributes by loweringContext {
+) : IrContext by loweringContext, ExtraIrAttributes by loweringContext {
     fun <N : DartAstNode> IrFunction.transformBy(
         context: DartTransformContext,
         block: DartFunctionDeclarationDefaults.() -> N
