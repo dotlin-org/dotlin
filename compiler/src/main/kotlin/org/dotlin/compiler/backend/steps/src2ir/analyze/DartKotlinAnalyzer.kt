@@ -58,6 +58,7 @@ class DartKotlinAnalyzer(
         isBuiltInsModule: Boolean = false,
         builtInsModule: ModuleDescriptorImpl?,
         targetEnvironment: TargetEnvironment,
+        trace: BindingTrace,
     ): AnalysisResult {
         val builtIns: KotlinBuiltIns = when {
             isBuiltInsModule -> {
@@ -89,8 +90,6 @@ class DartKotlinAnalyzer(
             DartDiagnosticSuppressor,
             disposable = env.projectEnvironment.parentDisposable
         )
-
-        val trace = BindingTraceContext()
 
         val container = createContainer(
             id = "DartKotlinAnalyzer",

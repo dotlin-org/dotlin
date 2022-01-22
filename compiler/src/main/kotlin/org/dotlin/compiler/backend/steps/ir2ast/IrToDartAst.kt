@@ -22,14 +22,27 @@ package org.dotlin.compiler.backend.steps.ir2ast
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lower
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.IrToDartCompilationUnitTransformer
 import org.dotlin.compiler.backend.steps.src2ir.IrResult
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.DartIrAnalyzer
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.DartNameChecker
+import org.dotlin.compiler.backend.steps.src2ir.throwIfIsError
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
 import org.jetbrains.kotlin.config.CompilerConfiguration
 
 fun irToDartAst(
-    configuration: CompilerConfiguration,
+    config: CompilerConfiguration,
     ir: IrResult
 ): List<DartCompilationUnit> {
-    val loweringContext = ir.module.lower(configuration, ir.symbolTable, ir.bindingContext)
+    val loweringContext = ir.module.lower(config, ir.symbolTable, ir.bindingTrace.bindingContext, ir.dartNameGenerator)
+
+    // Dart names are checked after lowering.
+    DartIrAnalyzer(
+        ir.module, ir.bindingTrace,
+        ir.symbolTable, ir.dartNameGenerator,
+        config,
+        checkers = listOf(DartNameChecker())
+    ).analyzeAndReport().also {
+        it.throwIfIsError()
+    }
 
     val context = DartTransformContext(loweringContext)
     val units = mutableListOf<DartCompilationUnit>()
