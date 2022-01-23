@@ -20,7 +20,6 @@
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
-import org.dotlin.compiler.backend.steps.ir2ast.IrVoidType
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartStatementOrigin.*
 import org.dotlin.compiler.backend.steps.ir2ast.ir.extensionReceiverOrNull
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrimitiveInteger
@@ -49,8 +48,8 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
     override fun DartTransformContext.visitReturn(expression: IrReturn, context: DartTransformContext) =
         DartReturnStatement(
             expression = expression.value.let {
-                when (it.type) {
-                    is IrVoidType -> null
+                when {
+                    it is IrGetObjectValue && it.type.isUnit() -> null
                     else -> it.accept(context)
                 }
             }

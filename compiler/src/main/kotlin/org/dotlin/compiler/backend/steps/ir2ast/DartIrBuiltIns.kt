@@ -59,8 +59,6 @@ class DartIrBuiltIns(private val context: DartLoweringContext) {
     private val irFactory = context.irFactory
     private val irBuiltIns = context.irBuiltIns
 
-    val voidType = IrVoidType
-
     val dotlin = Dotlin()
 
     val identical = functionSymbolAt("dart.core", "identical") { parameters, _ ->
@@ -545,11 +543,3 @@ private typealias IrClassStubBuilder = IrClassBuilder.(
     annotations: MutableList<IrConstructorCall>,
     superTypes: MutableList<IrType>
 ) -> Unit
-
-object IrVoidType : IrType {
-    override val annotations = emptyList<IrConstructorCall>()
-
-    override fun equals(other: Any?) = this === other
-
-    override fun hashCode() = 0
-}

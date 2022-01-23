@@ -93,7 +93,7 @@ class ObjectLowering(override val context: DartLoweringContext) : IrDeclarationL
                 }
 
                 // We don't use addChild on purpose, we want to keep parent info.
-                declaration.file.declarations.add(obj)
+                obj.file.declarations.add(obj)
 
                 // We don't want to add the companion field to the companion itself, only add it if the static container
                 // is something else.

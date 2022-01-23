@@ -20,7 +20,6 @@
 package org.dotlin.compiler.backend.steps.ir2ast.ir
 
 import org.dotlin.compiler.backend.hasDartExtensionAnnotation
-import org.dotlin.compiler.backend.steps.ir2ast.IrVoidType
 import org.dotlin.compiler.backend.util.falseIfNull
 import org.jetbrains.kotlin.backend.common.ir.*
 import org.jetbrains.kotlin.backend.common.ir.isStatic
@@ -34,8 +33,6 @@ import org.jetbrains.kotlin.ir.builders.declarations.*
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrReturnImpl
-import org.jetbrains.kotlin.ir.symbols.IrReturnTargetSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
 import org.jetbrains.kotlin.ir.types.*
@@ -432,18 +429,6 @@ fun IrBuilderWithScope.irCallSet(property: IrProperty, value: IrExpression): IrC
     ).apply {
         type = property.type
     }
-
-fun IrBuilderWithScope.irReturnVoid(
-    returnTargetSymbol: IrReturnTargetSymbol = scope.scopeOwnerSymbol as IrReturnTargetSymbol
-): IrReturn =
-    IrReturnImpl(
-        UNDEFINED_OFFSET, UNDEFINED_OFFSET,
-        type = IrVoidType,
-        returnTargetSymbol = returnTargetSymbol,
-        value = irNull().apply {
-            type = IrVoidType
-        }
-    )
 
 fun IrValueParameter.copy(
     parent: IrFunction = this.parent as IrFunction,

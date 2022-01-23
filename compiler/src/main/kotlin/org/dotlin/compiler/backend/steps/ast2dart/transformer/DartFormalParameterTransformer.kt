@@ -74,9 +74,7 @@ object DartFormalParameterTransformer : DartAstNodeTransformer {
         context: DartGenerationContext,
     ): String {
         val type = parameter.type.accept(context)
-
-        // TODO: Handle null identifier
-        val identifier = parameter.identifier?.accept(context)
+        val identifier = parameter.identifier?.accept(context) ?: ""
 
         return "$type $identifier"
     }
@@ -85,8 +83,7 @@ object DartFormalParameterTransformer : DartAstNodeTransformer {
         parameter: DartFieldFormalParameter,
         context: DartGenerationContext
     ): String {
-        // TODO: Handle null identifier
-        val identifier = parameter.identifier?.accept(context)
+        val identifier = parameter.identifier.accept(context)
 
         return "this.$identifier"
     }

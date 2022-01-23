@@ -27,12 +27,12 @@ import org.dotlin.compiler.dart.ast.accept
  * Parameters are sorted based on whether they're [DartDefaultFormalParameter] or not.
  */
 class DartFormalParameterList private constructor(
-    private val parameters: List<DartFormalParameter> = listOf(),
+    private val parameters: List<DartFormalParameter> = emptyList(),
 ) : DartAstNode, List<DartFormalParameter> by parameters {
 
     companion object {
         // Have to use invoke instead of a constructor because the overloads would conflict.
-        operator fun invoke(parameters: List<DartFormalParameter> = listOf()) =
+        operator fun invoke(parameters: List<DartFormalParameter> = emptyList()) =
             DartFormalParameterList(parameters.sortedBy { it.isDefault() })
     }
 

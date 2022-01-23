@@ -19,7 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.IrVoidType
+
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.backend.common.lower.irCatch
@@ -33,6 +33,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrTryImpl
 import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
 import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.types.impl.originalKotlinType
+import org.jetbrains.kotlin.ir.types.isUnit
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.primaryConstructor
 import org.jetbrains.kotlin.types.Variance
@@ -66,8 +67,6 @@ class ReturnsLowering(override val context: DartLoweringContext) : IrDeclaration
             )
         }
 
-        val isVoidReturn = returnType is IrVoidType
-
         fun IrExpression.makeConstIf(condition: Boolean) = apply {
             if (condition) {
                 annotate {
@@ -88,8 +87,8 @@ class ReturnsLowering(override val context: DartLoweringContext) : IrDeclaration
             hasReturnAsExpression = true
 
             buildStatement(declaration.symbol) {
-                val value = when (returnType) {
-                    is IrVoidType -> irNull()
+                val value = when {
+                    returnType.isUnit() -> irNull()
                     else -> expression.value
                 }
 
@@ -130,16 +129,16 @@ class ReturnsLowering(override val context: DartLoweringContext) : IrDeclaration
 
                                 this += irCatch(
                                     catchVar,
-                                    result = when {
-                                        isVoidReturn -> irReturnVoid()
-                                        else -> irReturn(
-                                            irCall(
+                                    result = irReturn(
+                                        when {
+                                            returnType.isUnit() -> irGetObject(irBuiltIns.unitClass)
+                                            else -> irCall(
                                                 returnClass.propertyWithName("value").getter!!,
                                                 receiver = irGet(catchVar),
                                                 origin = IrStatementOrigin.GET_PROPERTY
                                             )
-                                        )
-                                    }
+                                        }
+                                    )
                                 )
                             },
                             finallyExpression = null

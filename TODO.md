@@ -64,7 +64,7 @@
   - [x] Inheritance
   - [x] Overrides
   - [ ] Delegation
-- [ ] Function types
+- [x] Function types
 - [ ] Inline
   - [ ] Inline functions
   - [ ] `noinline`

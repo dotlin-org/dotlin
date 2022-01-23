@@ -17,26 +17,25 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.dart.ast.parameter
-
+package org.dotlin.compiler.dart.ast.type
 
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
-import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
-import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
+import org.dotlin.compiler.dart.ast.accept
+import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
+import org.dotlin.compiler.dart.ast.parameter.DartFormalParameterList
+import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameterList
 
-// TODO: Handle function typed parameter
-data class DartFieldFormalParameter(
-    override val identifier: DartSimpleIdentifier,
-    override val isCovariant: Boolean = false,
-    override val isConst: Boolean = false,
-    override val isFinal: Boolean = false,
-    val type: DartTypeAnnotation,
-) : DartNormalFormalParameter {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
-        visitor.visitFieldFormalParameter(this, data)
+data class DartFunctionType(
+    val returnType: DartTypeAnnotation,
+    val typeParameters: DartTypeParameterList = DartTypeParameterList(),
+    val parameters: DartFormalParameterList = DartFormalParameterList(),
+    override val isNullable: Boolean = false,
+) : DartTypeAnnotation {
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R = visitor.visitFunctionType(this, data)
 
     override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
-        identifier.accept(visitor, data)
-        type.accept(visitor, data)
+        returnType.accept(visitor, data)
+        parameters.accept(visitor, data)
+        typeParameters.accept(visitor, data)
     }
 }
