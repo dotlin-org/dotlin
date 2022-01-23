@@ -19,7 +19,6 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.deepCopy
 import org.dotlin.compiler.backend.steps.ir2ast.ir.deepCopyWith
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.backend.jvm.codegen.psiElement
@@ -54,6 +53,7 @@ class ExternalDeclarationsLowering(override val context: DartLoweringContext) : 
 
                             // We don't use addChild on purpose, we want to keep the parent information.
                             add(obj.deepCopyWith { isExternal = false })
+                            it.declarations.remove(obj)
                         }
                     }
                 }

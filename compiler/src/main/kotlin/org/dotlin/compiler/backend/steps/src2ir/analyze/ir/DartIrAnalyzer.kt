@@ -6,15 +6,13 @@ import org.dotlin.compiler.backend.steps.src2ir.hasErrors
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.backend.jvm.codegen.psiElement
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
-import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.DefaultDiagnosticReporter
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import org.jetbrains.kotlin.diagnostics.Diagnostic
-import org.jetbrains.kotlin.diagnostics.Severity
 import org.jetbrains.kotlin.diagnostics.rendering.DefaultErrorMessages
 import org.jetbrains.kotlin.ir.IrElement
+import org.jetbrains.kotlin.ir.declarations.IrAttributeContainer
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationBase
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
@@ -23,6 +21,7 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.resolve.BindingTrace
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 /*
  * Copyright 2022 Wilko Manger
@@ -65,7 +64,7 @@ class DartIrAnalyzer(
 
                         checkers.forEach { checker ->
                             checker.run {
-                                val sourceElement = declaration.psiElement as? KtDeclaration ?: return
+                                val sourceElement = declaration.ktDeclaration ?: return
                                 context.check(sourceElement, declaration)
                             }
                         }
@@ -73,8 +72,6 @@ class DartIrAnalyzer(
                 }
             )
         }
-
-
 
         return context.trace.bindingContext.let {
             reportDiagnostics(it.diagnostics)
@@ -86,13 +83,18 @@ class DartIrAnalyzer(
         }
     }
 
+    private val IrDeclaration.ktDeclaration: KtDeclaration?
+        get() = psiElement as? KtDeclaration ?: when (this) {
+            is IrAttributeContainer -> attributeOwnerId.safeAs<IrDeclaration>()?.psiElement as? KtDeclaration
+            else -> null
+        }
+
     private fun reportDiagnostics(diagnostics: Iterable<Diagnostic>) {
         val reporter = DefaultDiagnosticReporter(messageCollector)
         diagnostics.forEach {
             reporter.report(it, it.psiFile, DefaultErrorMessages.render(it))
         }
     }
-
 }
 
 class IrAnalyzerContext(

@@ -20,6 +20,7 @@
 package org.dotlin.compiler.backend.steps.ast2dart.transformer
 
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
+import org.dotlin.compiler.dart.ast.type.DartFunctionType
 import org.dotlin.compiler.dart.ast.type.DartNamedType
 import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
 import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
@@ -40,6 +41,15 @@ object DartTypeAnnotationTransformer : DartAstNodeTransformer {
         val questionMark = if (type.isNullable) "?" else ""
 
         return "$name$typeArguments$questionMark"
+    }
+
+    override fun visitFunctionType(type: DartFunctionType, context: DartGenerationContext) = type.let {
+        val returnType = it.returnType.accept(context)
+        val typeParameters = it.typeParameters.accept(context)
+        val parameters = it.parameters.accept(context)
+        val questionMark = if (type.isNullable) "?" else ""
+
+        "$returnType Function$typeParameters$parameters$questionMark"
     }
 
     override fun visitTypeParameter(typeParameter: DartTypeParameter, context: DartGenerationContext) =

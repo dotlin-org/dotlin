@@ -19,14 +19,14 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.irReturnVoid
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrimitiveInteger
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
 import org.jetbrains.kotlin.ir.declarations.copyAttributes
-import org.jetbrains.kotlin.ir.expressions.*
-import org.jetbrains.kotlin.ir.types.isInt
+import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrTypeOperator
+import org.jetbrains.kotlin.ir.expressions.IrTypeOperatorCall
 
 /**
  * No casts are necessary between types of [Byte], [Char], [Short], [Int] or [Long]: They're all `int` in Dart.

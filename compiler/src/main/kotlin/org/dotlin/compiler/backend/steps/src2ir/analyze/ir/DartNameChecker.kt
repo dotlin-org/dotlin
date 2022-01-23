@@ -22,9 +22,7 @@ package org.dotlin.compiler.backend.steps.src2ir.analyze.ir
 import org.jetbrains.kotlin.backend.common.lower.parents
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.util.isGetter
 import org.jetbrains.kotlin.ir.util.isPropertyAccessor
-import org.jetbrains.kotlin.ir.util.isSetter
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.util.collectionUtils.filterIsInstanceAnd
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
@@ -54,7 +52,16 @@ class DartNameChecker : IrDeclarationChecker {
 
             // We ignore getters and setters that "clash" with their own property.
             if (declaration is IrSimpleFunction && declaration.isPropertyAccessor &&
-                clash is IrProperty && declaration.correspondingPropertySymbol == clash.symbol) {
+                clash is IrProperty && declaration.correspondingPropertySymbol == clash.symbol
+            ) {
+                continue
+            }
+
+            // We ignore getters and setters that "clash" with each other.
+            if (declaration is IrSimpleFunction && clash is IrSimpleFunction &&
+                declaration.isPropertyAccessor && clash.isPropertyAccessor &&
+                declaration.correspondingPropertySymbol == clash.correspondingPropertySymbol
+            ) {
                 continue
             }
 

@@ -51,6 +51,7 @@ import org.dotlin.compiler.dart.ast.parameter.DartSimpleFormalParameter
 import org.dotlin.compiler.dart.ast.statement.*
 import org.dotlin.compiler.dart.ast.statement.trycatch.DartCatchClause
 import org.dotlin.compiler.dart.ast.statement.trycatch.DartTryStatement
+import org.dotlin.compiler.dart.ast.type.DartFunctionType
 import org.dotlin.compiler.dart.ast.type.DartNamedType
 import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
 import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameter
@@ -207,6 +208,7 @@ interface DartAstNodeVisitor<R, C> {
     // Type
     fun visitTypeArgumentList(typeArguments: DartTypeArgumentList, context: C): R = throwUnsupported()
     fun visitNamedType(type: DartNamedType, context: C): R = throwUnsupported()
+    fun visitFunctionType(type: DartFunctionType, context: C): R = throwUnsupported()
     fun visitTypeParameterList(typeParameters: DartTypeParameterList, context: C): R = throwUnsupported()
     fun visitTypeParameter(typeParameter: DartTypeParameter, context: C): R = throwUnsupported()
 

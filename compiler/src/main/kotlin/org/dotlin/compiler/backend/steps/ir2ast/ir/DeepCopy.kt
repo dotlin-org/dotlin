@@ -27,7 +27,9 @@ import org.jetbrains.kotlin.ir.builders.declarations.*
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.symbols.*
+import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.*
+import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.Name
@@ -268,13 +270,38 @@ fun IrFile?.transformExpressionsEverywhere(
 fun IrDeclaration.remapReferencesEverywhere(mapping: Pair<IrSymbol, IrSymbol>) =
     remapAtRelevantParents { it.remapReferences(mapOf(mapping)) }
 
-fun IrDeclaration.remapTypesEverywhere(typeRemapper: TypeRemapper) =
-    remapAtRelevantParents { it.remapTypes(typeRemapper) }
-
 fun IrElement.remapReferences(mapping: Pair<IrSymbol, IrSymbol>) = remapReferences(mapOf(mapping))
 
 fun IrElement.remapReferences(mapping: Map<IrSymbol, IrSymbol>) =
     transformChildrenVoid(DeclarationReferenceRemapper(mapping))
+
+fun IrDeclaration.remapTypesEverywhere(typeRemapper: TypeRemapper) =
+    remapAtRelevantParents { it.remapTypes(typeRemapper) }
+
+fun IrDeclaration.remapTypesEverywhere(mapping: Pair<IrType, IrType>) =
+    remapAtRelevantParents { it.remapTypes(mapping) }
+
+fun IrDeclaration.remapTypesEverywhere(mapping: Map<IrType, IrType>) =
+    remapAtRelevantParents { it.remapTypes(mapping) }
+
+fun IrElement.remapTypes(block: (IrType) -> IrType) = remapTypes(
+    object : TypeRemapper {
+        override fun enterScope(irTypeParametersContainer: IrTypeParametersContainer) {}
+        override fun leaveScope() {}
+        override fun remapType(type: IrType): IrType = block(type)
+    }
+)
+
+fun IrElement.remapTypes(mapping: Pair<IrType, IrType>) = remapTypes(mapOf(mapping))
+
+fun IrElement.remapTypes(mapping: Map<IrType, IrType>) = remapTypes(
+    object : TypeRemapper {
+        override fun enterScope(irTypeParametersContainer: IrTypeParametersContainer) {}
+        override fun leaveScope() {}
+
+        override fun remapType(type: IrType) = mapping[type] ?: type
+    }
+)
 
 class DeclarationReferenceRemapper(
     private val mapping: Map<out IrSymbol, IrSymbol>
@@ -291,13 +318,6 @@ class DeclarationReferenceRemapper(
     override fun visitProperty(declaration: IrProperty) = declaration.apply {
         transformChildrenVoid()
         remapOverrides()
-    }
-
-    override fun visitValueAccess(expression: IrValueAccessExpression): IrExpression {
-        return when (mapping[expression.symbol]) {
-            null -> super.visitValueAccess(expression)
-            else -> expression.deepCopy()
-        }
     }
 
     override fun visitDeclarationReference(expression: IrDeclarationReference): IrExpression {
@@ -330,7 +350,27 @@ class DeclarationReferenceRemapper(
         return transform(
             DeepCopyIrTreeWithSymbols(symbolRemapper, DeepCopyTypeRemapper(symbolRemapper)),
             data = null
-        ) as E
+        ).also {
+            val old = this
+            // Functions of function expression still need their parents set.
+            it.acceptChildrenVoid(
+                object : IrCustomElementVisitorVoid {
+                    override fun visitElement(element: IrElement) = element.acceptChildrenVoid(this)
+
+                    override fun visitFunctionExpression(expression: IrFunctionExpression) {
+                        super.visitFunctionExpression(expression)
+
+                        // TODO (possibly): Make sure there's only a single match.
+
+                        val oldFunctionExpression = old.firstOrNullChild<IrFunctionExpression> { oldChild ->
+                            oldChild.attributeOwnerId === expression.attributeOwnerId
+                        } ?: error("Original IrFunctionExpression not found for $expression")
+
+                        expression.function.parent = oldFunctionExpression.function.parent
+                    }
+                }
+            )
+        } as E
     }
 }
 

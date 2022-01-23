@@ -94,7 +94,8 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
                                 else -> it
                             }
                         }
-                        .map { it.accept(context) as DartNamedType }
+                        // TODO: This should never be a DartFunctionType
+                        .mapNotNull { it.accept(context) as? DartNamedType }
                         .let {
                             when {
                                 it.isNotEmpty() -> DartImplementsClause(it)

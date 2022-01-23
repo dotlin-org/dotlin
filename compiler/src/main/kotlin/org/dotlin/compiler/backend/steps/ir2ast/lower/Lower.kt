@@ -62,8 +62,6 @@ private val lowerings: List<KFunction1<DartLoweringContext, IrLowering>> = listO
     ::IteratorSubtypeReturnsLowering,
     ::ObjectLowering,
     ::NestedClassLowering,
-    ::UnitReturnsLowering,
-    ::UnitTypesLowering,
     ::ReturnsLowering,
     ::PropertySimplifyingLowering,
     ::RemoveIntegerLiteralCastsLowering,
