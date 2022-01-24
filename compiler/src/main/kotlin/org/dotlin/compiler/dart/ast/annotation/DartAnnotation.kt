@@ -28,7 +28,7 @@ import org.dotlin.compiler.dart.ast.annotation.DartAnnotation.Companion.SEALED
 import org.dotlin.compiler.dart.ast.expression.DartArgumentList
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
-import org.dotlin.compiler.dart.ast.expression.identifier.toDartSimpleIdentifier
+import org.dotlin.compiler.dart.ast.expression.identifier.toDartIdentifier
 
 data class DartAnnotation(
     val name: DartIdentifier,
@@ -46,14 +46,14 @@ data class DartAnnotation(
     }
 
     companion object {
-        val OVERRIDE = DartAnnotation("override".toDartSimpleIdentifier())
-        val DEPRECATED = DartAnnotation("deprecated".toDartSimpleIdentifier())
+        val OVERRIDE = DartAnnotation("override".toDartIdentifier())
+        val DEPRECATED = DartAnnotation("deprecated".toDartIdentifier())
 
         // package:meta annotations
-        val INTERNAL = DartAnnotation("internal".toDartSimpleIdentifier())
-        val PROTECTED = DartAnnotation("protected".toDartSimpleIdentifier())
-        val NON_VIRTUAL = DartAnnotation("nonVirtual".toDartSimpleIdentifier())
-        val SEALED = DartAnnotation("sealed".toDartSimpleIdentifier())
+        val INTERNAL = DartAnnotation("internal".toDartIdentifier())
+        val PROTECTED = DartAnnotation("protected".toDartIdentifier())
+        val NON_VIRTUAL = DartAnnotation("nonVirtual".toDartIdentifier())
+        val SEALED = DartAnnotation("sealed".toDartIdentifier())
     }
 }
 

@@ -34,6 +34,7 @@ package kotlin
  *
  * In Dart, values of this type are represented as values of the primitive type `int`.
  */
+@DartLibrary("dart:core")
 @DartName("int")
 external class Int private constructor() : Number(), Comparable<Int> {
     @DartName("Int\$Companion")
@@ -205,6 +206,7 @@ external class Int private constructor() : Number(), Comparable<Int> {
  *
  * In Dart, values of this type are represented as values of the primitive type `double`.
  */
+@DartLibrary("dart:core")
 @DartName("double")
 external class Double private constructor() : Number(), Comparable<Double> {
     @DartName("Double\$Companion")

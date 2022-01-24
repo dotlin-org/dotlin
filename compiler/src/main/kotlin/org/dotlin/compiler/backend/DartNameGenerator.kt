@@ -26,7 +26,7 @@ import org.dotlin.compiler.backend.util.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartPrefixedIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
-import org.dotlin.compiler.dart.ast.expression.identifier.toDartSimpleIdentifier
+import org.dotlin.compiler.dart.ast.expression.identifier.toDartIdentifier
 import org.jetbrains.kotlin.backend.common.lower.parents
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.types.*
@@ -34,16 +34,24 @@ import org.jetbrains.kotlin.ir.util.isSetter
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 
 class DartNameGenerator {
-    private fun IrContext.dartNameOrNullOf(declaration: IrDeclarationWithName, allowNested: Boolean): DartIdentifier? =
+    private fun IrContext.dartNameOrNullOf(
+        declaration: IrDeclarationWithName,
+        currentFile: IrFile,
+        allowNested: Boolean,
+        useKotlinAlias: Boolean = true
+    ): DartIdentifier? =
         declaration.run {
-            val aliasPrefix = dartLibraryAlias?.toDartSimpleIdentifier()
-            val annotatedName = dartAnnotatedName?.toDartSimpleIdentifier()
+            val aliasPrefix = dartLibraryAlias?.toDartIdentifier() ?: when {
+                useKotlinAlias -> importAliasIn(currentFile)?.toDartIdentifier()
+                else -> null
+            }
+            val annotatedName = dartAnnotatedName?.toDartIdentifier()
 
             // If this declaration is the implementation of an external Dart interface, return the name of that interface.
             (this as? IrClass)?.correspondingDartInterface?.dartNameOrNull?.let { return it }
 
             var name = annotatedName ?: when {
-                !name.isSpecial -> name.identifier.toDartSimpleIdentifier()
+                !name.isSpecial -> name.identifier.toDartIdentifier()
                 this is IrConstructor -> {
                     val constructors = parentClassOrNull?.declarations?.filterIsInstance<IrConstructor>() ?: emptyList()
 
@@ -136,10 +144,10 @@ class DartNameGenerator {
                     .filterIsInstance<IrClass>()
                     .toList()
                     .reversed()
-                    .map { dartNameOrNullOf(it, allowNested = false)!! }
+                    .map { dartNameOrNullOf(it, currentFile, allowNested = false)!! }
                     .plus(name)
                     .joinToString(separator = "$")
-                    .toDartSimpleIdentifier()
+                    .toDartIdentifier()
             }
 
             // Instance methods from objects get prefixed with '$'.
@@ -204,31 +212,40 @@ class DartNameGenerator {
         }
     }
 
-    fun IrContext.dartNameOf(declaration: IrDeclarationWithName): DartIdentifier = dartNameOrNullOf(declaration).let {
-        require(it != null) { "Name (${declaration.name.asString()}) cannot be special" }
-        it
-    }
+    fun IrContext.dartNameOf(
+        declaration: IrDeclarationWithName,
+        inside: IrFile,
+        useKotlinAlias: Boolean = true
+    ): DartIdentifier =
+        dartNameOrNullOf(declaration, inside, allowNested = true, useKotlinAlias = useKotlinAlias).let {
+            require(it != null) { "Name (${declaration.name.asString()}) cannot be special" }
+            it
+        }
 
-    fun IrContext.dartNameOrNullOf(declaration: IrDeclarationWithName): DartIdentifier? =
-        dartNameOrNullOf(declaration, allowNested = true)
+    fun IrContext.dartNameOrNullOf(declaration: IrDeclarationWithName, inside: IrFile): DartIdentifier? =
+        dartNameOrNullOf(declaration, inside, allowNested = true)
 
-    fun IrContext.dartNameAsSimpleOf(declaration: IrDeclarationWithName): DartSimpleIdentifier =
-        dartNameOf(declaration) as DartSimpleIdentifier
+    fun IrContext.dartNameAsSimpleOf(declaration: IrDeclarationWithName, inside: IrFile): DartSimpleIdentifier =
+        dartNameOf(declaration, inside) as DartSimpleIdentifier
 
-    fun IrContext.dartNameAsSimpleOrNullOf(declaration: IrDeclarationWithName): DartSimpleIdentifier? =
-        dartNameOrNullOf(declaration) as DartSimpleIdentifier?
+    fun IrContext.dartNameAsSimpleOrNullOf(declaration: IrDeclarationWithName, inside: IrFile): DartSimpleIdentifier? =
+        dartNameOrNullOf(declaration, inside) as DartSimpleIdentifier?
 
     /**
      * The [dartName] for this declaration. If it's a [DartPrefixedIdentifier], the prefix is removed.
      */
-    fun IrContext.simpleDartNameOf(declaration: IrDeclarationWithName): DartSimpleIdentifier =
-        when (val dartName = dartNameOf(declaration)) {
+    fun IrContext.simpleDartNameOf(
+        declaration: IrDeclarationWithName,
+        inside: IrFile,
+        useKotlinAlias: Boolean = true
+    ): DartSimpleIdentifier =
+        when (val dartName = dartNameOf(declaration, inside, useKotlinAlias)) {
             is DartSimpleIdentifier -> dartName
             is DartPrefixedIdentifier -> dartName.identifier
         }
 
-    fun IrContext.simpleDartNameOrNullOf(declaration: IrDeclarationWithName): DartSimpleIdentifier? =
-        when (val dartName = dartNameOrNullOf(declaration)) {
+    fun IrContext.simpleDartNameOrNullOf(declaration: IrDeclarationWithName, inside: IrFile): DartSimpleIdentifier? =
+        when (val dartName = dartNameOrNullOf(declaration, inside)) {
             is DartSimpleIdentifier -> dartName
             is DartPrefixedIdentifier -> dartName.identifier
             else -> null

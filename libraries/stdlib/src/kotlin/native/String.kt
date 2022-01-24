@@ -28,6 +28,7 @@ package kotlin
  * The `String` class represents character strings. All string literals in Kotlin programs, such as `"abc"`, are
  * implemented as instances of this class.
  */
+@DartLibrary("dart:core")
 external class String : Comparable<String> {
     companion object {}
     

@@ -24,6 +24,7 @@ package kotlin
  *
  * In Dart, values of this type are represented as values of type `Object`.
  */
+@DartLibrary("dart:core")
 @DartName("Object")
 external open class Any {
     /**

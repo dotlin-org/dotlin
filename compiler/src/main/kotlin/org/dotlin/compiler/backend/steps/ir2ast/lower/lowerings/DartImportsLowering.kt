@@ -24,6 +24,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.attributes.DartImport
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementVisitorVoid
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrFileLowering
+import org.dotlin.compiler.backend.util.importAliasIn
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationWithName
@@ -39,43 +40,73 @@ import org.jetbrains.kotlin.ir.util.remapTypes
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 
 /**
- * Dart import directives are added for Kotlin classes that would name clash with Dart built-ins.
+ * Dart import directives are added, based on `@DartLibrary` or `@DartHideFromCore` annotations,
+ * or based on Kotlin import directives.
  */
 class DartImportsLowering(override val context: DartLoweringContext) : IrFileLowering {
-    private val dartSdkImports = mapOf(
-        "dart.typeddata" to "dart:typed_data"
-    )
-
     override fun DartLoweringContext.transform(file: IrFile) {
         val imports = mutableSetOf<DartImport>()
 
         fun maybeAddDartImports(declaration: IrDeclarationWithName) {
             val unresolvedImport = declaration.dartUnresolvedImport
             val hiddenNameFromCore = declaration.dartHiddenNameFromCore
+            val kotlinImportAlias = declaration.importAliasIn(currentFile)
+
+            // We don't need to import "dart:core" if there's no alias or hidden names.
+            if (kotlinImportAlias == null &&
+                unresolvedImport?.library == "dart:core" &&
+                unresolvedImport.alias == null &&
+                !unresolvedImport.hidden
+            ) {
+                return
+            }
 
             val hiddenName by lazy { declaration.simpleDartNameOrNull?.value }
 
-            imports.addAll(
-                listOfNotNull(
-                    unresolvedImport?.let {
-                        DartImport(
-                            library = it.library,
-                            alias = it.alias,
-                            hide = when {
-                                it.hidden -> hiddenName
+            unresolvedImport?.let {
+                when (kotlinImportAlias) {
+                    null -> imports.addAll(
+                        listOfNotNull(
+                            DartImport(
+                                library = it.library,
+                                alias = it.alias
+                            ),
+                            when {
+                                it.hidden -> DartImport(
+                                    it.library,
+                                    hide = hiddenName
+                                )
                                 else -> null
                             }
                         )
-                    },
-                    hiddenNameFromCore?.let {
-                        DartImport(
-                            library = "dart:core",
-                            alias = null,
-                            hide = hiddenName
+                    )
+                    else -> {
+                        val originalDartNameValue = declaration.simpleDartNameWithoutKotlinImportAlias.value
+
+                        imports.addAll(
+                            listOfNotNull(
+                                DartImport(
+                                    library = it.library,
+                                    alias = kotlinImportAlias,
+                                    show = originalDartNameValue
+                                ),
+                                DartImport(
+                                    library = it.library,
+                                    hide = originalDartNameValue
+                                )
+                            )
                         )
                     }
+                }
+            }
+
+            hiddenNameFromCore?.let {
+                imports += DartImport(
+                    library = "dart:core",
+                    alias = null,
+                    hide = hiddenName
                 )
-            )
+            }
         }
 
         file.acceptChildrenVoid(

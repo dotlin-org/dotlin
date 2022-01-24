@@ -34,7 +34,10 @@ import org.jetbrains.kotlin.ir.declarations.IrFunction
 
 class DartTransformContext(
     loweringContext: DartLoweringContext,
-) : IrContext by loweringContext, ExtraIrAttributes by loweringContext {
+) : IrContext(), ExtraIrAttributes by loweringContext {
+    override val symbolTable = loweringContext.symbolTable
+    override val dartNameGenerator = loweringContext.dartNameGenerator
+
     fun <N : DartAstNode> IrFunction.transformBy(
         context: DartTransformContext,
         block: DartFunctionDeclarationDefaults.() -> N

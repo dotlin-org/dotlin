@@ -63,7 +63,7 @@ class DartLoweringContext(
     val irModuleFragment: IrModuleFragment,
     override val dartNameGenerator: DartNameGenerator,
     private val extraIrAttributes: ExtraIrAttributes = ExtraIrAttributes.default(),
-) : IrContext, CommonBackendContext, ExtraIrAttributes by extraIrAttributes {
+) : IrContext(), CommonBackendContext, ExtraIrAttributes by extraIrAttributes {
     override val builtIns = irModuleFragment.descriptor.builtIns
     override var inVerbosePhase = false
     override val internalPackageFqn = FqName("kotlin.dart")

@@ -602,8 +602,8 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide List;
             import 'dart:core' as core;
+            import 'dart:core' hide List;
             import 'package:meta/meta.dart';
 
             void main() {
@@ -637,8 +637,8 @@ class Dotlin : BaseTest {
         dart(
             """
             import 'package:meta/meta.dart';
-            import 'dart:core' hide List;
             import 'dart:core' as core;
+            import 'dart:core' hide List;
 
             void main() {
               core.List();
@@ -660,8 +660,8 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide List;
             import 'dart:core' as core;
+            import 'dart:core' hide List;
             import 'package:meta/meta.dart';
 
             void test(core.List list) {}

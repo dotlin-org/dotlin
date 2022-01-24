@@ -27,5 +27,6 @@ package kotlin
  *
  * Corresponds to `Never` in Dart.
  */
+@DartLibrary("dart:core")
 @DartName("Never")
 external class Nothing private constructor()

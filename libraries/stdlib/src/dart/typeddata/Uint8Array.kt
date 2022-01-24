@@ -36,7 +36,6 @@ import dart.core.IArray
  * interpreted as an unsigned 8-bit integer with values in the
  * range 0 to 255.
  */
-@DartLibrary("dart:typed_data")
 @DartName("Uint8List")
 external interface Uint8Array : IArray<Int>, TypedData {
     /**

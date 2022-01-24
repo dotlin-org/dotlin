@@ -55,6 +55,7 @@ class DartIrAnalyzer(
         val context = IrAnalyzerContext(trace, symbolTable, dartNameGenerator)
 
         module.files.forEach {
+            context.enterFile(it)
             it.acceptChildrenVoid(
                 object : IrElementVisitorVoid {
                     override fun visitElement(element: IrElement) = element.acceptChildrenVoid(this)
@@ -101,7 +102,7 @@ class IrAnalyzerContext(
     val trace: BindingTrace,
     override val symbolTable: SymbolTable,
     override val dartNameGenerator: DartNameGenerator
-) : IrContext
+) : IrContext()
 
 interface IrDeclarationChecker {
     fun IrAnalyzerContext.check(source: KtDeclaration, declaration: IrDeclaration)

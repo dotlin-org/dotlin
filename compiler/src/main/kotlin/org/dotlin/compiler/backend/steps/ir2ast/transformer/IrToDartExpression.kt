@@ -33,7 +33,7 @@ import org.dotlin.compiler.backend.util.toPair
 import org.dotlin.compiler.dart.ast.collection.DartCollectionElementList
 import org.dotlin.compiler.dart.ast.expression.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
-import org.dotlin.compiler.dart.ast.expression.identifier.toDartSimpleIdentifier
+import org.dotlin.compiler.dart.ast.expression.identifier.toDartIdentifier
 import org.dotlin.compiler.dart.ast.expression.invocation.DartFunctionExpressionInvocation
 import org.dotlin.compiler.dart.ast.expression.invocation.DartMethodInvocation
 import org.dotlin.compiler.dart.ast.expression.literal.*
@@ -341,7 +341,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
         data: DartTransformContext
     ) = DartPropertyAccessExpression(
         target = irGetObjectValue.symbol.owner.dartName,
-        propertyName = ObjectLowering.INSTANCE_FIELD_NAME.toDartSimpleIdentifier()
+        propertyName = ObjectLowering.INSTANCE_FIELD_NAME.toDartIdentifier()
     )
 
     override fun DartTransformContext.visitSetValue(
