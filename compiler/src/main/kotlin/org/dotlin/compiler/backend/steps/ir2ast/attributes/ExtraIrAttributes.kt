@@ -141,7 +141,12 @@ interface ExtraIrAttributes {
     fun IrFile.addDartImports(imports: Iterable<DartImport>)
 }
 
-data class DartImport(val library: String, val alias: String? = null, val hide: String? = null)
+data class DartImport(
+    val library: String,
+    val alias: String? = null,
+    val hide: String? = null,
+    val show: String? = null
+)
 
 /**
  * Assumes that [attributeOwnerId] is the same type as `this`.

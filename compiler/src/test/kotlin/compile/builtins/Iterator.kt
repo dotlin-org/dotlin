@@ -46,8 +46,8 @@ class Iterator : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide Iterator;
             import 'dart:core' as core;
+            import 'dart:core' hide Iterator;
             import 'package:meta/meta.dart';
 
             @sealed
@@ -114,8 +114,8 @@ class Iterator : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide BidirectionalIterator;
             import 'dart:core' as core;
+            import 'dart:core' hide BidirectionalIterator;
             import 'package:meta/meta.dart';
 
             @sealed
@@ -205,8 +205,8 @@ class Iterator : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide Iterator;
             import 'dart:core' as core;
+            import 'dart:core' hide Iterator;
             import 'package:meta/meta.dart';
 
             abstract class IntIterator implements Iterator<int>, core.Iterator<int> {
@@ -291,8 +291,8 @@ class Iterator : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide Iterator;
             import 'dart:core' as core;
+            import 'dart:core' hide Iterator;
             import 'package:meta/meta.dart';
 
             class IntIterator implements Iterator<int>, core.Iterator<int> {

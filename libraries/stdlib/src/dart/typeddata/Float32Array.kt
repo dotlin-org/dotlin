@@ -38,7 +38,6 @@ import dart.core.IArray
  * single-precision value. Values read are converted to a double
  * value with the same value.
  */
-@DartLibrary("dart:typed_data")
 @DartName("Float32List")
 external interface Float32Array : IArray<Double>, TypedData {
     /**

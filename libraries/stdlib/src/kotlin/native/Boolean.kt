@@ -29,6 +29,7 @@ package kotlin
  *
  * In Dart, values of this type are represented as values of type `bool`.
  */
+@DartLibrary("dart:core")
 @DartName("bool")
 external class Boolean private constructor() : Comparable<Boolean> {
     /**

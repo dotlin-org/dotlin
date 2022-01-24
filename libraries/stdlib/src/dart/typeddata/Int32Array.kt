@@ -37,7 +37,6 @@ import dart.core.IArray
  * interpreted as a signed 32-bit two's complement integer with values in the
  * range -2147483648 to 2147483647.
  */
-@DartLibrary("dart:typed_data")
 @DartName("Int32List")
 external interface Int32Array : IArray<Int>, TypedData {
     /**

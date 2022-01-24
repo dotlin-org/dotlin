@@ -82,7 +82,7 @@ value class DartSimpleIdentifier(override val value: String) : DartIdentifier {
     override fun toString() = value
 }
 
-fun String.toDartSimpleIdentifier(): DartSimpleIdentifier = DartSimpleIdentifier(this)
+fun String.toDartIdentifier() = DartSimpleIdentifier(this)
 
 data class DartPrefixedIdentifier(
     val prefix: DartSimpleIdentifier,

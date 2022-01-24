@@ -34,7 +34,6 @@ import dart.core.IArray
  * implementation can be considerably more space- and time-efficient than
  * the default [array] implementation.
  */
-@DartLibrary("dart:typed_data")
 @DartName("Float64List")
 external interface Float64Array : IArray<Double>, TypedData {
     /**

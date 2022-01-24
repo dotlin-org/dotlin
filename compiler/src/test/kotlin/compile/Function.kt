@@ -294,8 +294,8 @@ class Function : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide List;
             import 'dart:core' as core;
+            import 'dart:core' hide List;
             import 'package:meta/meta.dart';
 
             void test(core.List<String> args) {}
@@ -317,8 +317,8 @@ class Function : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide List;
             import 'dart:core' as core;
+            import 'dart:core' hide List;
             import 'package:meta/meta.dart';
 
             void test(core.List<String> args) {}
@@ -343,8 +343,8 @@ class Function : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide List;
             import 'dart:core' as core;
+            import 'dart:core' hide List;
             import 'package:meta/meta.dart';
 
             void test(

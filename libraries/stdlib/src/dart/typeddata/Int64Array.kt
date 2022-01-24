@@ -37,7 +37,6 @@ import dart.core.IArray
  * interpreted as a signed 64-bit two's complement integer with values in the
  * range -9223372036854775808 to +9223372036854775807.
  */
-@DartLibrary("dart:typed_data")
 @DartName("Int64List")
 external interface Int64Array : IArray<Int>, TypedData {
     /**

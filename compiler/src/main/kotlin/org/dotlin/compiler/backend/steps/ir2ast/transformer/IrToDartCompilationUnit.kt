@@ -24,7 +24,8 @@ import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.optimizeImports
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
 import org.dotlin.compiler.dart.ast.directive.DartHideCombinator
 import org.dotlin.compiler.dart.ast.directive.DartImportDirective
-import org.dotlin.compiler.dart.ast.expression.identifier.toDartSimpleIdentifier
+import org.dotlin.compiler.dart.ast.directive.DartShowCombinator
+import org.dotlin.compiler.dart.ast.expression.identifier.toDartIdentifier
 import org.dotlin.compiler.dart.ast.expression.literal.DartSimpleStringLiteral
 import org.jetbrains.kotlin.ir.declarations.IrFile
 
@@ -35,26 +36,22 @@ object IrToDartCompilationUnitTransformer : IrDartAstTransformer<DartCompilation
             declarations = irFile.declarations.map { it.accept(context) },
             directives = irFile.dartImports
                 .asSequence()
-                .flatMap { import ->
-                    listOfNotNull(
-                        // E.g. import 'dart:core' hide List;
-                        DartImportDirective(
-                            name = DartSimpleStringLiteral(import.library),
-                            combinators = listOfNotNull(
-                                import.hide?.let {
-                                    DartHideCombinator(
-                                        names = listOf(it.toDartSimpleIdentifier())
-                                    )
-                                }
-                            )
+                .map { import ->
+                    DartImportDirective(
+                        name = DartSimpleStringLiteral(import.library),
+                        combinators = listOfNotNull(
+                            import.hide?.let {
+                                DartHideCombinator(
+                                    names = listOf(it.toDartIdentifier())
+                                )
+                            },
+                            import.show?.let {
+                                DartShowCombinator(
+                                    names = listOf(it.toDartIdentifier())
+                                )
+                            }
                         ),
-                        import.alias?.let {
-                            // E.g. import 'dart:core' as core;
-                            DartImportDirective(
-                                name = DartSimpleStringLiteral(import.library),
-                                alias = it.toDartSimpleIdentifier()
-                            )
-                        }
+                        alias = import.alias?.toDartIdentifier()
                     )
                 }
                 // Always import the meta package for extra annotations.

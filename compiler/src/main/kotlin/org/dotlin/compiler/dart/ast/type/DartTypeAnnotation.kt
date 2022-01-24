@@ -20,24 +20,24 @@
 package org.dotlin.compiler.dart.ast.type
 
 import org.dotlin.compiler.dart.ast.DartAstNode
-import org.dotlin.compiler.dart.ast.expression.identifier.toDartSimpleIdentifier
+import org.dotlin.compiler.dart.ast.expression.identifier.toDartIdentifier
 
 interface DartTypeAnnotation : DartAstNode {
     val isNullable: Boolean
 
     companion object {
-        val BOOL = DartNamedType("bool".toDartSimpleIdentifier())
-        val DOUBLE = DartNamedType("double".toDartSimpleIdentifier())
-        val INT = DartNamedType("int".toDartSimpleIdentifier())
-        val NUM = DartNamedType("num".toDartSimpleIdentifier())
-        val SET = DartNamedType("Set".toDartSimpleIdentifier())
-        val STRING = DartNamedType("String".toDartSimpleIdentifier())
-        val NULL = DartNamedType("Null".toDartSimpleIdentifier())
-        val VOID = DartNamedType("void".toDartSimpleIdentifier())
-        val DYNAMIC = DartNamedType("dynamic".toDartSimpleIdentifier())
-        val OBJECT = DartNamedType("Object".toDartSimpleIdentifier())
+        val BOOL = DartNamedType("bool".toDartIdentifier())
+        val DOUBLE = DartNamedType("double".toDartIdentifier())
+        val INT = DartNamedType("int".toDartIdentifier())
+        val NUM = DartNamedType("num".toDartIdentifier())
+        val SET = DartNamedType("Set".toDartIdentifier())
+        val STRING = DartNamedType("String".toDartIdentifier())
+        val NULL = DartNamedType("Null".toDartIdentifier())
+        val VOID = DartNamedType("void".toDartIdentifier())
+        val DYNAMIC = DartNamedType("dynamic".toDartIdentifier())
+        val OBJECT = DartNamedType("Object".toDartIdentifier())
         fun list(t: DartTypeAnnotation) = DartNamedType(
-            "List".toDartSimpleIdentifier(), typeArguments = DartTypeArgumentList(listOf(t))
+            "List".toDartIdentifier(), typeArguments = DartTypeArgumentList(listOf(t))
         )
     }
 }

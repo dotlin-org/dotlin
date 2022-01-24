@@ -13,9 +13,16 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 
-interface IrContext {
-    val symbolTable: SymbolTable
-    val dartNameGenerator: DartNameGenerator
+abstract class IrContext {
+    abstract val symbolTable: SymbolTable
+    abstract val dartNameGenerator: DartNameGenerator
+
+    lateinit var currentFile: IrFile
+        private set
+
+    fun enterFile(file: IrFile) {
+        currentFile = file
+    }
 
     /**
      * If this class has a `@DartImplementationOf` annotation, this will be the value of
@@ -61,25 +68,31 @@ interface IrContext {
         get() = correspondingDartInterfaceOrSelf.companionObject()
 
     val IrDeclarationWithName.dartName: DartIdentifier
-        get() = dartNameGenerator.runWith(this) { dartNameOf(it) }
+        get() = dartNameGenerator.runWith(this) { dartNameOf(it, currentFile) }
 
     val IrDeclarationWithName.dartNameOrNull: DartIdentifier?
-        get() = dartNameGenerator.runWith(this) { dartNameOrNullOf(it) }
+        get() = dartNameGenerator.runWith(this) { dartNameOrNullOf(it, currentFile) }
 
     val IrDeclarationWithName.dartNameAsSimple: DartSimpleIdentifier
-        get() = dartNameGenerator.runWith(this) { dartNameAsSimpleOf(it) }
+        get() = dartNameGenerator.runWith(this) { dartNameAsSimpleOf(it, currentFile) }
 
     val IrDeclarationWithName.dartNameAsSimpleOrNull: DartSimpleIdentifier?
-        get() = dartNameGenerator.runWith(this) { dartNameAsSimpleOrNullOf(it) }
+        get() = dartNameGenerator.runWith(this) { dartNameAsSimpleOrNullOf(it, currentFile) }
 
     /**
      * The [dartName] for this declaration. If it's a [DartPrefixedIdentifier], the prefix is removed.
      */
     val IrDeclarationWithName.simpleDartName: DartSimpleIdentifier
-        get() = dartNameGenerator.runWith(this) { simpleDartNameOf(it) }
+        get() = dartNameGenerator.runWith(this) { simpleDartNameOf(it, currentFile) }
 
     val IrDeclarationWithName.simpleDartNameOrNull: DartSimpleIdentifier?
-        get() = dartNameGenerator.runWith(this) { simpleDartNameOrNullOf(it) }
+        get() = dartNameGenerator.runWith(this) { simpleDartNameOrNullOf(it, currentFile) }
+
+    /**
+     * The [dartName] for this declaration. If it's a [DartPrefixedIdentifier], the prefix is removed.
+     */
+    val IrDeclarationWithName.simpleDartNameWithoutKotlinImportAlias: DartSimpleIdentifier
+        get() = dartNameGenerator.runWith(this) { simpleDartNameOf(it, currentFile, useKotlinAlias = false) }
 
     // Some IR elements can be asserted that they always have simple identifiers.
     val IrValueDeclaration.dartName: DartSimpleIdentifier
@@ -104,3 +117,32 @@ interface IrContext {
             else -> null
         }
 }
+/*
+    fun IrDeclarationWithName.dartNameIn(file: IrFile) =
+        dartNameGenerator.runWith(this) { dartNameOf(it, file) }
+
+    fun IrDeclarationWithName.dartNameOrNullIn(file: IrFile) =
+        dartNameGenerator.runWith(this) { dartNameOrNullOf(it, file) }
+
+    fun IrDeclarationWithName.dartNameAsSimpleIn(file: IrFile) =
+        dartNameGenerator.runWith(this) { dartNameAsSimpleOf(it, file) }
+
+    fun IrDeclarationWithName.dartNameAsSimpleOrNullIn(file: IrFile) =
+        dartNameGenerator.runWith(this) { dartNameAsSimpleOrNullOf(it, file) }
+
+    /**
+     * The [dartName] for this declaration. If it's a [DartPrefixedIdentifier], the prefix is removed.
+     */
+    fun IrDeclarationWithName.simpleDartNameIn(file: IrFile) =
+        dartNameGenerator.runWith(this) { simpleDartNameOf(it, file) }
+
+
+    fun IrDeclarationWithName.simpleDartNameOrNullIn(file: IrFile) =
+        dartNameGenerator.runWith(this) { simpleDartNameOrNullOf(it, file) }
+
+    // Some IR elements can be asserted that they always have simple identifiers.
+    fun IrValueDeclaration.dartNameIn(file: IrFile): DartSimpleIdentifier = dartNameAsSimpleIn(file)
+    fun IrField.dartNameIn(file: IrFile): DartSimpleIdentifier = dartNameAsSimpleIn(file)
+    fun IrConstructor.dartNameIn(file: IrFile): DartSimpleIdentifier = dartNameAsSimpleIn(file)
+    fun IrConstructor.dartNameOrNullIn(file: IrFile): DartSimpleIdentifier? = dartNameAsSimpleOrNullIn(file)
+ */

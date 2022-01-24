@@ -98,7 +98,10 @@ fun IrModuleFragment.lower(
     )
 
     lowerings.forEach { lowering ->
-        files.forEach { lowering(context).lower(it) }
+        files.forEach {
+            context.enterFile(it)
+            lowering(context).lower(it)
+        }
     }
 
     return context
