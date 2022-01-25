@@ -80,7 +80,7 @@ private fun IrAnnotationContainer.dartLibraryImportOf(declaration: IrDeclaration
         } ?: when (this) {
         // Try to see if the file has a @DartLibrary annotation.
         !is IrFile -> declaration.fileOrNull?.dartLibraryImportOf(declaration)
-            ?: declaration.fqNameWhenAvailable?.let { fqName ->
+            ?: declaration.getPackageFragment()?.fqName?.let { fqName ->
                 builtInImports[fqName.asString()]?.let {
                     DartUnresolvedImport(
                         library = it,
