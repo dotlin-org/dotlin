@@ -199,6 +199,192 @@ external class Int private constructor() : Number(), Comparable<Int> {
      * The resulting `Double` value represents the same numerical value as this `Int`.
      */
     override fun toDouble(): Double
+
+    // dart:core int members
+    /**
+     * Returns this integer to the power of [exponent] modulo [modulus].
+     *
+     * The [exponent] must be non-negative and [modulus] must be
+     * positive.
+     * int modPow(int exponent, int modulus);
+     *
+     * Returns the modular multiplicative inverse of this integer
+     * modulo [modulus].
+     *
+     * The [modulus] must be positive.
+     *
+     * It is an error if no modular inverse exists.
+     */
+    fun modInverse(modulus: Int): Int
+
+    /**
+     * Returns the greatest common divisor of this integer and [other].
+     *
+     * If either number is non-zero, the result is the numerically greatest
+     * integer dividing both `this` and `other`.
+     *
+     * The greatest common divisor is independent of the order,
+     * so `x.gcd(y)` is  always the same as `y.gcd(x)`.
+     *
+     * For any integer `x`, `x.gcd(x)` is `x.abs()`.
+     *
+     * If both `this` and `other` is zero, the result is also zero.
+     */
+    fun gcd(other: Int): Int
+
+    /**
+     * Returns true if and only if this integer is even.
+     */
+    val isEven: Int
+
+    /**
+     * Returns true if and only if this integer is odd.
+     */
+    val isOdd: Int
+
+    /**
+     * Returns the minimum number of bits required to store this integer.
+     *
+     * The number of bits excludes the sign bit, which gives the natural length
+     * for non-negative (unsigned) values.  Negative values are complemented to
+     * return the bit position of the first bit that differs from the sign bit.
+     *
+     * To find the number of bits needed to store the value as a signed value,
+     * add one, i.e. use `x.bitLength + 1`.
+     * ```dart
+     * x.bitLength == (-x-1).bitLength;
+     *
+     * 3.bitLength == 2;     // 00000011
+     * 2.bitLength == 2;     // 00000010
+     * 1.bitLength == 1;     // 00000001
+     * 0.bitLength == 0;     // 00000000
+     * (-1).bitLength == 0;  // 11111111
+     * (-2).bitLength == 1;  // 11111110
+     * (-3).bitLength == 2;  // 11111101
+     * (-4).bitLength == 2;  // 11111100
+     * ```
+     */
+    val bitLength: Int
+
+    /**
+     * Returns the least significant [width] bits of this integer as a
+     * non-negative number (i.e. unsigned representation).  The returned value has
+     * zeros in all bit positions higher than [width].
+     * ```dart
+     * (-1).toUnsigned(5) == 31   // 11111111  ->  00011111
+     * ```
+     * This operation can be used to simulate arithmetic from low level languages.
+     * For example, to increment an 8 bit quantity:
+     * ```dart
+     * q = (q + 1).toUnsigned(8);
+     * ```
+     * `q` will count from `0` up to `255` and then wrap around to `0`.
+     *
+     * If the input fits in [width] bits without truncation, the result is the
+     * same as the input.  The minimum width needed to avoid truncation of `x` is
+     * given by `x.bitLength`, i.e.
+     * ```dart
+     * x == x.toUnsigned(x.bitLength);
+     * ```
+     */
+    fun toUnsigned(width: Int): Int
+
+    /**
+     * Returns the least significant [width] bits of this integer, extending the
+     * highest retained bit to the sign.  This is the same as truncating the value
+     * to fit in [width] bits using an signed 2-s complement representation.  The
+     * returned value has the same bit value in all positions higher than [width].
+     *
+     * ```dart
+     * //     V--sign bit-V
+     * 16.toSigned(5) == -16;   //  00010000 -> 11110000
+     * 239.toSigned(5) == 15;   //  11101111 -> 00001111
+     * //     ^           ^
+     * ```
+     * This operation can be used to simulate arithmetic from low level languages.
+     * For example, to increment an 8 bit signed quantity:
+     * ```dart
+     * q = (q + 1).toSigned(8);
+     * ```
+     * `q` will count from `0` up to `127`, wrap to `-128` and count back up to
+     * `127`.
+     *
+     * If the input value fits in [width] bits without truncation, the result is
+     * the same as the input.  The minimum width needed to avoid truncation of `x`
+     * is `x.bitLength + 1`, i.e.
+     * ```dart
+     * x == x.toSigned(x.bitLength + 1);
+     * ```
+     */
+    fun toSigned(width: Int): Int
+
+    /**
+     * Returns the absolute value of this integer.
+     *
+     * For any integer `value`,
+     * the result is the same as `value < 0 ? -value : value`.
+     *
+     * Integer overflow may cause the result of `-value` to stay negative.
+     */
+    fun abs(): Int
+
+    /**
+     * Returns the sign of this integer.
+     *
+     * Returns 0 for zero, -1 for values less than zero and
+     * +1 for values greater than zero.
+     */
+    val sign: Int;
+
+    /**
+     * Returns `this`.
+     */
+    fun round(): Int
+
+    /**
+     * Returns `this`.
+     */
+    fun floor(): Int
+
+    /**
+     * Returns `this`.
+     */
+    fun ceil(): Int
+
+    /**
+     * Returns `this`.
+     */
+    fun truncate(): Int
+
+    /**
+     * Returns `this.toDouble()`.
+     */
+    fun roundToDouble(): Double
+
+    /**
+     * Returns `this.toDouble()`.
+     */
+    fun floorToDouble(): Double
+
+    /**
+     * Returns `this.toDouble()`.
+     */
+    fun ceilToDouble(): Double
+
+    /**
+     * Returns `this.toDouble()`.
+     */
+    fun truncateToDouble(): Double
+
+    /**
+     * Converts [this] to a string representation in the given [radix].
+     *
+     * In the string representation, lower-case letters are used for digits above
+     * '9', with 'a' being 10 an 'z' being 35.
+     *
+     * The [radix] argument must be an integer in the range 2 to 36.
+     */
+    fun toRadixString(radix: Int): String
 }
 
 /**
@@ -350,6 +536,110 @@ external class Double private constructor() : Number(), Comparable<Double> {
     override fun toInt(): Int
 
     /** Returns this value. */
-    @DartExtension
     override fun toDouble(): Double = this
+
+    // dart:core double members
+    fun abs(): Double
+
+    /**
+     * The sign of the double's numerical value.
+     *
+     * Returns -1.0 if the value is less than zero,
+     * +1.0 if the value is greater than zero,
+     * and the value itself if it is -0.0, 0.0 or NaN.
+     */
+    val sign: Double
+
+    /**
+     * Returns the integer closest to this number.
+     *
+     * Rounds away from zero when there is no closest integer:
+     * `(3.5).round() == 4` and `(-3.5).round() == -4`.
+     *
+     * Throws an [UnsupportedError] if this number is not finite
+     * (NaN or an infinity).
+     */
+    fun round(): Int
+
+    /**
+     * Returns the greatest integer no greater than this number.
+     *
+     * Rounds the number towards negative infinity.
+     *
+     * Throws an [UnsupportedError] if this number is not finite
+     * (NaN or infinity).
+     */
+    fun floor(): Int
+
+    /**
+     * Returns the least integer which is not smaller than this number.
+     *
+     * Rounds the number towards infinity.
+     *
+     * Throws an [UnsupportedError] if this number is not finite
+     * (NaN or an infinity), .
+     */
+    fun ceil(): Int
+
+    /**
+     * Returns the integer obtained by discarding any fractional
+     * part of this number.
+     *
+     * Rounds the number towards zero.
+     *
+     * Throws an [UnsupportedError] if this number is not finite
+     * (NaN or an infinity).
+     */
+    fun truncate(): Int
+
+    /**
+     * Returns the integer double value closest to `this`.
+     *
+     * Rounds away from zero when there is no closest integer:
+     * `(3.5).roundToDouble() == 4` and `(-3.5).roundToDouble() == -4`.
+     *
+     * If this is already an integer valued double, including `-0.0`, or it is not
+     * a finite value, the value is returned unmodified.
+     *
+     * For the purpose of rounding, `-0.0` is considered to be below `0.0`,
+     * and `-0.0` is therefore considered closer to negative numbers than `0.0`.
+     * This means that for a value, `d` in the range `-0.5 < d < 0.0`,
+     * the result is `-0.0`.
+     */
+    fun roundToDouble(): Double
+
+    /**
+     * Returns the greatest integer double value no greater than `this`.
+     *
+     * If this is already an integer valued double, including `-0.0`, or it is not
+     * a finite value, the value is returned unmodified.
+     *
+     * For the purpose of rounding, `-0.0` is considered to be below `0.0`.
+     * A number `d` in the range `0.0 < d < 1.0` will return `0.0`.
+     */
+    fun floorToDouble(): Double
+
+    /**
+     * Returns the least integer double value no smaller than `this`.
+     *
+     * If this is already an integer valued double, including `-0.0`, or it is not
+     * a finite value, the value is returned unmodified.
+     *
+     * For the purpose of rounding, `-0.0` is considered to be below `0.0`.
+     * A number `d` in the range `-1.0 < d < 0.0` will return `-0.0`.
+     */
+    fun ceilToDouble(): Double
+
+    /**
+     * Returns the integer double value obtained by discarding any fractional
+     * digits from `this`.
+     *
+     * If this is already an integer valued double, including `-0.0`, or it is not
+     * a finite value, the value is returned unmodified.
+     *
+     * For the purpose of rounding, `-0.0` is considered to be below `0.0`.
+     * A number `d` in the range `-1.0 < d < 0.0` will return `-0.0`, and
+     * in the range `0.0 < d < 1.0` it will return 0.0.
+     */
+    fun truncateToDouble(): Double
 }
