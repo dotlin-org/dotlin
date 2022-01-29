@@ -25,23 +25,36 @@ import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.dotlin.compiler.dart.ast.expression.literal.DartStringLiteral
 
-sealed interface DartNamespaceDirective : DartDirective {
+sealed interface DartNamespaceDirective : DartUriBasedDirective {
     val combinators: List<DartCombinator>
+
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
+        visitor.visitNamespaceDirective(this, data)
 }
 
 data class DartImportDirective(
-    val name: DartStringLiteral,
+    override val uri: DartStringLiteral,
     val alias: DartSimpleIdentifier? = null,
     override val annotations: List<DartAnnotation> = emptyList(),
     override val combinators: List<DartCombinator> = emptyList(),
     override val documentationComment: String? = null,
 ) : DartNamespaceDirective {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
-        visitor.visitImportDirective(this, data)
-
     override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
-        name.accept(visitor, data)
+        uri.accept(visitor, data)
         alias?.accept(visitor, data)
+        annotations.accept(visitor, data)
+        combinators.accept(visitor, data)
+    }
+}
+
+data class DartExportDirective(
+    override val uri: DartStringLiteral,
+    override val annotations: List<DartAnnotation> = emptyList(),
+    override val combinators: List<DartCombinator> = emptyList(),
+    override val documentationComment: String? = null,
+) : DartNamespaceDirective {
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        uri.accept(visitor, data)
         annotations.accept(visitor, data)
         combinators.accept(visitor, data)
     }

@@ -19,16 +19,13 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
-import org.dotlin.compiler.backend.DartNameGenerator
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.Comparable
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.EnumLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.IteratorSubtypeImplementationsLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.IteratorSubtypeReturnsLowering
+import org.dotlin.compiler.backend.steps.src2ir.IrResult
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.ir.util.SymbolTable
-import org.jetbrains.kotlin.resolve.BindingContext
 import kotlin.reflect.KFunction1
 
 private val lowerings: List<KFunction1<DartLoweringContext, IrLowering>> = listOf(
@@ -83,22 +80,18 @@ private val lowerings: List<KFunction1<DartLoweringContext, IrLowering>> = listO
     ::DartImportsLowering
 )
 
-fun IrModuleFragment.lower(
-    configuration: CompilerConfiguration,
-    symbolTable: SymbolTable,
-    bindingContext: BindingContext,
-    dartNameGenerator: DartNameGenerator
-): DartLoweringContext {
+fun IrResult.lower(configuration: CompilerConfiguration): DartLoweringContext {
     val context = DartLoweringContext(
         configuration,
-        irModuleFragment = this,
+        irModuleFragment = module,
         symbolTable = symbolTable,
-        bindingContext = bindingContext,
-        dartNameGenerator = dartNameGenerator
+        bindingContext = bindingTrace.bindingContext,
+        dartNameGenerator = dartNameGenerator,
+        sourceRoot = sourceRoot
     )
 
     lowerings.forEach { lowering ->
-        files.forEach {
+        module.files.forEach {
             context.enterFile(it)
             lowering(context).lower(it)
         }

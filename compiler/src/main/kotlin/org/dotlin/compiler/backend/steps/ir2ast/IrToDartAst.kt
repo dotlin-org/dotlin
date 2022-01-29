@@ -25,19 +25,27 @@ import org.dotlin.compiler.backend.steps.src2ir.IrResult
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.DartIrAnalyzer
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.DartNameChecker
 import org.dotlin.compiler.backend.steps.src2ir.throwIfIsError
+import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
+import org.dotlin.compiler.dart.ast.compilationunit.DartNamedCompilationUnitMember
+import org.dotlin.compiler.dart.ast.directive.DartExportDirective
+import org.dotlin.compiler.dart.ast.expression.literal.DartSimpleStringLiteral
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import java.nio.file.Path
+import kotlin.io.path.Path
 
 fun irToDartAst(
     config: CompilerConfiguration,
-    ir: IrResult
-): List<DartCompilationUnit> {
-    val loweringContext = ir.module.lower(config, ir.symbolTable, ir.bindingTrace.bindingContext, ir.dartNameGenerator)
+    ir: IrResult,
+    isPublicPackage: Boolean
+): Map<Path, DartCompilationUnit> {
+    val loweringContext = ir.lower(config)
 
     // Dart names are checked after lowering.
     DartIrAnalyzer(
         ir.module, ir.bindingTrace,
         ir.symbolTable, ir.dartNameGenerator,
+        ir.sourceRoot,
         config,
         checkers = listOf(DartNameChecker())
     ).analyzeAndReport().also {
@@ -45,10 +53,33 @@ fun irToDartAst(
     }
 
     val context = DartTransformContext(loweringContext)
-    val units = mutableListOf<DartCompilationUnit>()
+    val units = mutableMapOf<Path, DartCompilationUnit>()
     for (file in ir.module.files) {
         context.enterFile(file)
-        units.add(file.accept(IrToDartCompilationUnitTransformer, context))
+
+        file.accept(IrToDartCompilationUnitTransformer, context).let {
+            if (it.declarations.isNotEmpty()) {
+                units[context.run { file.dartPath }] = it
+            }
+        }
+    }
+
+    if (isPublicPackage) {
+        // Add exports file.
+        // TODO: Use package name
+        units[Path("package_name.g.dart")] = DartCompilationUnit(
+            directives = units.mapNotNull { (path, unit) ->
+                when {
+                    // If all declarations in the unit are private or internal, we don't need to export it.
+                    unit.declarations.all {
+                        (it is DartNamedCompilationUnitMember && it.name.isPrivate) || DartAnnotation.INTERNAL in it.annotations
+                    } -> null
+                    else -> DartExportDirective(
+                        uri = DartSimpleStringLiteral(path.toString())
+                    )
+                }
+            }
+        )
     }
 
     return units

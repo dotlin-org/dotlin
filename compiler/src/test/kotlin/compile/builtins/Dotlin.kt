@@ -21,7 +21,6 @@ package compile.builtins
 
 import BaseTest
 import assertCompile
-import assertCompileFiles
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
@@ -614,7 +613,7 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartLibrary aliased separate input files`() = assertCompileFiles {
+    fun `@DartLibrary aliased separate input files`() = assertCompile {
         kotlin(
             """
             package test
@@ -636,9 +635,9 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
             import 'dart:core' as core;
             import 'dart:core' hide List;
+            import 'package:meta/meta.dart';
 
             void main() {
               core.List();
@@ -736,7 +735,7 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartHideNameFromCore twice, multiple files`() = assertCompileFiles {
+    fun `@DartHideNameFromCore twice, multiple files`() = assertCompile {
         kotlin(
             """
             @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
@@ -771,6 +770,14 @@ class Dotlin : BaseTest {
 
             @sealed
             class SomethingElse {}
+            """
+        )
+
+        dart(
+            """
+            import '0.g.dart';
+            import 'dart:core' hide Something;
+            import 'package:meta/meta.dart';
 
             void main() {
               Something();
@@ -961,7 +968,7 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartImplementationOf`() = assertCompileFiles {
+    fun `@DartImplementationOf`() = assertCompile {
         kotlin(
             """
             @file:Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE") // TODO: Fix in analyzer
@@ -1000,7 +1007,7 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartImplementationOf and @DartName`() = assertCompileFiles {
+    fun `@DartImplementationOf and @DartName`() = assertCompile {
         kotlin(
             """
             @file:Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE") // TODO: Fix in analyzer

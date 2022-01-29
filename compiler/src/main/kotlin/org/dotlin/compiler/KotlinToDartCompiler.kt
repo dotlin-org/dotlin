@@ -37,27 +37,23 @@ import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.konan.file.file
-import org.jetbrains.kotlin.konan.file.zipFileSystem
 import java.io.File
 import java.nio.file.Path
-import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.createFile
-import kotlin.io.path.createTempDirectory
-import org.jetbrains.kotlin.konan.file.File as KonanFile
+import kotlin.io.path.*
 
 object KotlinToDartCompiler {
     /**
-     * Compiles the given Kotlin code and returns Dart code.
+     * Compiles the given Kotlin code and returns the output path.
      */
     @OptIn(ExperimentalPathApi::class)
     fun compile(
         kotlin: String,
-        dependencies: Set<File> = emptySet(),
+        dependencies: Set<Path> = emptySet(),
         format: Boolean = false,
         klib: Boolean = false,
-        outputFile: File? = null
-    ): String {
+        output: Path = createTempDirectory(),
+        isPublicPackage: Boolean = false,
+    ): Path {
         val tmpDir = createTempDirectory().also {
             it.resolve("main.kt")
                 .createFile()
@@ -66,55 +62,67 @@ object KotlinToDartCompiler {
         }
 
         return compile(
-            sourceRoots = setOf(tmpDir),
+            sourceRoot = tmpDir,
             dependencies,
             format,
             klib,
-            outputFile,
+            output,
+            isPublicPackage
         )
     }
 
     fun compile(
-        sourceRoots: Set<Path>,
-        dependencies: Set<File>,
+        sourceRoot: Path,
+        dependencies: Set<Path>,
         format: Boolean = false,
-        klib: Boolean = false,
-        outputFile: File? = null,
-    ): String {
-        val (env, config) = prepareCompile(sourceRoots, showFiles = true)
+        isKlib: Boolean = false,
+        output: Path = createTempDirectory(),
+        isPublicPackage: Boolean = false,
+    ): Path {
+        require(output.isDirectory())
 
-        val ir = sourceToIr(env, config, dependencies)
+        val (env, config) = prepareCompile(sourceRoot, showFiles = true)
+
+        val ir = sourceToIr(env, config, dependencies, sourceRoot.toRealPath().absolute())
 
         // By lazy is important here, the klib must be written before compiling to Dart source,
         // since it will change the IR in place.
-        val dartSource by lazy {
-            compileToDartSource(ir, config).let { if (format) dartFormat(it) else it }
-        }
+        val dartSources by lazy { compileToDartSource(ir, config, isPublicPackage) }
 
         when {
-            klib -> {
-                if (outputFile == null) error("outputFile must not be null if writing to a klib")
+            isKlib -> {
+                writeToKlib(env, config, ir, output)
 
-                writeToKlib(env, config, ir, outputFile)
+                val dartSourcePath = output.resolve("lib/src")
 
-                // If we're compiling to a klib, we want to put the Dart source in the klib.
-                KonanFile(outputFile.absolutePath).zipFileSystem().use {
-                    it.file("dart/main.dart").apply {
-                        parentFile.mkdirs()
-                        writeText(dartSource)
+                for ((path, source) in dartSources) {
+                    val relativePath = dartSourcePath.resolve(
+                        path.minus(sourceRoot.toRealPath().absolute()).joinToString(File.separator)
+                    )
+
+                    relativePath.apply {
+                        parent?.createDirectories()
+                        writeText(source)
                     }
                 }
             }
-            else -> outputFile?.apply {
-                parentFile?.mkdirs()
-                writeText(dartSource)
+            else -> for ((path, source) in dartSources) {
+                // TODO: Make path relative
+                output.resolve(path).toFile().apply {
+                    parentFile.mkdirs()
+                    writeText(source)
+                }
             }
         }
 
-        return dartSource.removeSuffix("\n")
+        if (format) {
+            dartFormat(output.absolutePathString())
+        }
+
+        return output
     }
 
-    private fun prepareCompile(sourceRoots: Set<Path>, showFiles: Boolean, outputFile: File? = null)
+    private fun prepareCompile(sourceRoot: Path, showFiles: Boolean)
             : Pair<KotlinCoreEnvironment, CompilerConfiguration> {
         val compilerConfig = CompilerConfiguration().apply {
             val messageCollector = PrintingMessageCollector(
@@ -129,10 +137,10 @@ object KotlinToDartCompiler {
                 KlibMetadataVersion(*versionArray)
             }
 
-            put(CommonConfigurationKeys.MODULE_NAME, outputFile?.nameWithoutExtension ?: "main")
+            put(CommonConfigurationKeys.MODULE_NAME, "main")  // TODO: Use package name
             put(CLIConfigurationKeys.PERF_MANAGER, object : CommonCompilerPerformanceManager("Dotlin") {})
 
-            addKotlinSourceRoots(sourceRoots.map { it.toString() })
+            addKotlinSourceRoots(listOf(sourceRoot.toString()))
         }
 
         val rootDisposable = Disposer.newDisposable()
@@ -152,14 +160,15 @@ object KotlinToDartCompiler {
     private fun compileToDartSource(
         ir: IrResult,
         config: CompilerConfiguration,
-    ): String {
-        val dartAst = irToDartAst(config, ir)
+        isPublicPackage: Boolean
+    ): Map<Path, String> {
+        val dartAst = irToDartAst(config, ir, isPublicPackage)
         return dartAstToDartSource(dartAst)
     }
 
     class Arguments : CommonCompilerArguments()
 
-    private fun execDartFormat(args: String = ""): Process {
+    private fun dartFormat(vararg args: String): Int {
         val home = System.getenv("HOME").let {
             if (!it.endsWith(File.separator)) it + File.separator else it
         }
@@ -172,22 +181,6 @@ object KotlinToDartCompiler {
             .firstOrNull { it.exists() && it.isFile && it.canExecute() }
             ?: throw IllegalStateException("dart could not be found or cannot be executed")
 
-        return Runtime.getRuntime().exec("$dart format $args")
-    }
-
-    private fun dartFormat(code: String): String {
-        val process = execDartFormat()
-        val stdin = process.outputStream
-        val stdout = process.inputStream
-
-        stdin.apply {
-            write(code.encodeToByteArray())
-            flush()
-            close()
-        }
-
-        val output = String(stdout.readBytes())
-
-        return if (output.isNotEmpty()) output else code
+        return Runtime.getRuntime().exec("$dart format ${args.joinToString(" ")}").waitFor()
     }
 }

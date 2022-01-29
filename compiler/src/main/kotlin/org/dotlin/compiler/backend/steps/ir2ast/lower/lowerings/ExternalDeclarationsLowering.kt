@@ -21,15 +21,12 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.deepCopyWith
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.jetbrains.kotlin.backend.jvm.codegen.psiElement
+import org.dotlin.compiler.backend.util.isExplicitlyExternal
 import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrPossiblyExternalDeclaration
 import org.jetbrains.kotlin.ir.util.companionObject
 import org.jetbrains.kotlin.ir.util.isEffectivelyExternal
-import org.jetbrains.kotlin.lexer.KtTokens
-import org.jetbrains.kotlin.psi.KtDeclaration
 
 class ExternalDeclarationsLowering(override val context: DartLoweringContext) : IrFileLowering {
     override fun DartLoweringContext.transform(file: IrFile) {
@@ -63,6 +60,3 @@ class ExternalDeclarationsLowering(override val context: DartLoweringContext) : 
         }
     }
 }
-
-private val IrDeclaration.isExplicitlyExternal: Boolean
-    get() = (psiElement as? KtDeclaration)?.hasModifier(KtTokens.EXTERNAL_KEYWORD) == true

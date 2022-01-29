@@ -42,15 +42,6 @@ internal annotation class DartGetter
 internal annotation class DartExtension
 
 /**
- * Specifies that whenever this declaration is referenced, `dart:core` will be imported with a `hide` with the same
- * name as this declaration. For example, if this annotation is used on a class named `Foo`, the generated import
- * will be `import 'dart:core' hide Foo;`. This can be used to prevent name clashes.
- */
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.SOURCE)
-annotation class DartHideNameFromCore()
-
-/**
  * Specifies that whenever this type is used in a catch clause, it should be caught as the type [T] instead.
  */
 @Target(AnnotationTarget.CLASS)

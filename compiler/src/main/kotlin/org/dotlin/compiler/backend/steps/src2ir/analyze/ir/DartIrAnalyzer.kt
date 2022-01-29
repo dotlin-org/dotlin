@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
+import java.nio.file.Path
 
 /*
  * Copyright 2022 Wilko Manger
@@ -46,13 +47,14 @@ class DartIrAnalyzer(
     private val trace: BindingTrace,
     private val symbolTable: SymbolTable,
     private val dartNameGenerator: DartNameGenerator,
+    private val sourceRoot: Path,
     config: CompilerConfiguration,
     private val checkers: List<IrDeclarationChecker> = listOf(),
 ) {
     private val messageCollector = config[CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY] ?: MessageCollector.NONE
 
     fun analyzeAndReport(): AnalysisResult {
-        val context = IrAnalyzerContext(trace, symbolTable, dartNameGenerator)
+        val context = IrAnalyzerContext(trace, symbolTable, dartNameGenerator, sourceRoot)
 
         module.files.forEach {
             context.enterFile(it)
@@ -101,7 +103,8 @@ class DartIrAnalyzer(
 class IrAnalyzerContext(
     val trace: BindingTrace,
     override val symbolTable: SymbolTable,
-    override val dartNameGenerator: DartNameGenerator
+    override val dartNameGenerator: DartNameGenerator,
+    override val sourceRoot: Path
 ) : IrContext()
 
 interface IrDeclarationChecker {

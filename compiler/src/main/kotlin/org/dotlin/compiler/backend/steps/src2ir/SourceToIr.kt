@@ -52,17 +52,19 @@ import org.jetbrains.kotlin.resolve.BindingTraceContext
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.util.DummyLogger
 import org.jetbrains.kotlin.utils.addToStdlib.cast
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.absolutePathString
 
 fun sourceToIr(
     env: KotlinCoreEnvironment,
     config: CompilerConfiguration,
-    dependencies: Set<File>,
+    dependencies: Set<Path>,
+    sourceRoot: Path,
 ): IrResult {
     val sourceFiles = env.getSourceFiles()
 
     val resolvedLibraries = resolveLibraries(
-        dependencies.map { it.absolutePath },
+        dependencies.map { it.absolutePathString() },
         DummyLogger,
     )
 
@@ -72,6 +74,7 @@ fun sourceToIr(
         sourceFiles,
         irFactory = IrFactoryImpl,
         resolvedLibraries,
+        sourceRoot
     )
 }
 
@@ -81,6 +84,7 @@ private fun loadIr(
     files: List<KtFile>,
     irFactory: IrFactory,
     resolvedLibs: KotlinLibraryResolveResult,
+    sourceRoot: Path
 ): IrResult {
     val builtIns = DartKotlinBuiltIns()
 
@@ -181,7 +185,7 @@ private fun loadIr(
 
     val dartNameGenerator = DartNameGenerator()
 
-    DartIrAnalyzer(module, trace, symbolTable, dartNameGenerator, config).analyzeAndReport().also {
+    DartIrAnalyzer(module, trace, symbolTable, dartNameGenerator, sourceRoot, config).analyzeAndReport().also {
         it.throwIfIsError()
     }
 
@@ -190,7 +194,8 @@ private fun loadIr(
         resolvedLibs,
         trace,
         symbolTable,
-        dartNameGenerator
+        dartNameGenerator,
+        sourceRoot
     )
 }
 
@@ -212,10 +217,11 @@ private val ModuleDescriptorImpl.dependencies: Set<ModuleDescriptorImpl>
         return allDependencies
     }
 
-data class IrResult(
+class IrResult(
     val module: IrModuleFragment,
     val resolvedLibs: KotlinLibraryResolveResult,
     val bindingTrace: BindingTrace,
     val symbolTable: SymbolTable,
-    val dartNameGenerator: DartNameGenerator
+    val dartNameGenerator: DartNameGenerator,
+    val sourceRoot: Path
 )

@@ -39,7 +39,7 @@ import org.dotlin.compiler.dart.ast.declaration.variable.DartTopLevelVariableDec
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
 import org.dotlin.compiler.dart.ast.directive.DartCombinator
-import org.dotlin.compiler.dart.ast.directive.DartImportDirective
+import org.dotlin.compiler.dart.ast.directive.DartNamespaceDirective
 import org.dotlin.compiler.dart.ast.expression.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.dotlin.compiler.dart.ast.expression.invocation.DartInvocationExpression
@@ -110,7 +110,7 @@ interface DartAstNodeVisitor<R, C> {
         visitAstNode(initializer, context)
 
     // Directives
-    fun visitImportDirective(directive: DartImportDirective, context: C): R = visitAstNode(directive, context)
+    fun visitNamespaceDirective(directive: DartNamespaceDirective, context: C): R = visitAstNode(directive, context)
     fun visitCombinator(combinator: DartCombinator, context: C): R = visitAstNode(combinator, context)
 
     // Expressions
