@@ -20,10 +20,15 @@
 package org.dotlin.compiler.backend
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
-import org.dotlin.compiler.backend.util.*
+import org.dotlin.compiler.backend.util.getSingleAnnotationStringArgumentOf
+import org.dotlin.compiler.backend.util.getSingleAnnotationTypeArgumentOf
+import org.dotlin.compiler.backend.util.hasAnnotation
+import org.dotlin.compiler.backend.util.hasOverriddenAnnotation
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.util.*
+import org.jetbrains.kotlin.ir.util.isGetter
+import org.jetbrains.kotlin.ir.util.isSetter
+import org.jetbrains.kotlin.ir.util.parentClassOrNull
 
 object DotlinAnnotations {
     const val dartName = "dotlin.DartName"
@@ -57,50 +62,6 @@ val IrDeclaration.dartAnnotatedName: String?
         }
         else -> this
     }.run { getSingleAnnotationStringArgumentOf(DotlinAnnotations.dartName) }
-
-data class DartUnresolvedImport(val library: String, val alias: String?, val hidden: Boolean)
-
-private val builtInImports = mapOf(
-    "dart.core" to "dart:core",
-    "dart.typeddata" to "dart:typed_data",
-    "dart.math" to "dart:math"
-)
-
-private fun IrAnnotationContainer.dartLibraryImportOf(declaration: IrDeclarationWithName): DartUnresolvedImport? {
-    return getTwoAnnotationArgumentsOf<String, Boolean>(DotlinAnnotations.dartLibrary)
-        ?.let { (library, aliased) ->
-            DartUnresolvedImport(
-                library,
-                alias = when {
-                    aliased -> library.split(':')[1] // TODO: Improve for non Dart SDK imports.
-                    else -> null
-                },
-                hidden = aliased
-            )
-        } ?: when (this) {
-        // Try to see if the file has a @DartLibrary annotation.
-        !is IrFile -> declaration.fileOrNull?.dartLibraryImportOf(declaration)
-            ?: declaration.getPackageFragment()?.fqName?.let { fqName ->
-                builtInImports[fqName.asString()]?.let {
-                    DartUnresolvedImport(
-                        library = it,
-                        alias = null,
-                        hidden = false,
-                    )
-                }
-            }
-        else -> null
-    }
-}
-
-val IrDeclaration.dartUnresolvedImport: DartUnresolvedImport?
-    get() = (this as? IrDeclarationWithName)?.dartLibraryImportOf(this)
-
-val IrDeclaration.dartLibrary: String?
-    get() = dartUnresolvedImport?.library
-
-val IrDeclaration.dartLibraryAlias: String?
-    get() = dartUnresolvedImport?.alias
 
 val IrDeclaration.dartCatchAsType: IrType?
     get() = getSingleAnnotationTypeArgumentOf(DotlinAnnotations.dartCatchAs)

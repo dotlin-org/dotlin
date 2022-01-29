@@ -1,21 +1,27 @@
 package org.dotlin.compiler.backend
 
+import org.dotlin.compiler.backend.util.getTwoAnnotationArgumentsOf
+import org.dotlin.compiler.backend.util.isActuallyExternal
 import org.dotlin.compiler.backend.util.runWith
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartPrefixedIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.jetbrains.kotlin.descriptors.findClassAcrossModuleDependencies
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.util.SymbolTable
-import org.jetbrains.kotlin.ir.util.companionObject
-import org.jetbrains.kotlin.ir.util.fileOrNull
+import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import java.nio.file.Path
 
 abstract class IrContext {
     abstract val symbolTable: SymbolTable
     abstract val dartNameGenerator: DartNameGenerator
+
+    /**
+     * The source root. This is a real, absolute path, meaning symlinks are resolved.
+     */
+    abstract val sourceRoot: Path
 
     lateinit var currentFile: IrFile
         private set
@@ -110,39 +116,100 @@ abstract class IrContext {
     fun IrTypeParameter.dartNameValueWith(superTypes: Boolean) =
         dartNameGenerator.run { dartNameValueWith(superTypes) }
 
+    /**
+     * Path is relative to the [sourceRoot], and the original Kotlin file name is transformed to snake case,
+     * and the `.kt` extension is replaced with `.g.dart`.
+     */
+    val IrFile.dartPath: Path
+        get() = dartNameGenerator.runWith(this) { dartPathOf(it) }
+
     // Annotation utils
     val IrDeclaration.dartHiddenNameFromCore: String?
         get() = when {
             hasDartHideNameFromCoreAnnotation() -> (this as? IrDeclarationWithName)?.simpleDartNameOrNull?.value
             else -> null
         }
+
+    // Import utils
+    private val builtInImports = mapOf(
+        "dart.core" to "dart:core",
+        "dart.typeddata" to "dart:typed_data",
+        "dart.math" to "dart:math"
+    )
+
+    private fun IrAnnotationContainer.unresolvedImportFromAnnotationFor(declaration: IrDeclarationWithName) =
+        getTwoAnnotationArgumentsOf<String, Boolean>(DotlinAnnotations.dartLibrary)
+            ?.let { (library, aliased) ->
+                DartUnresolvedImport(
+                    library,
+                    alias = when {
+                        aliased -> library.split(':')[1] // TODO: Improve for non Dart SDK imports.
+                        else -> null
+                    },
+                    hidden = aliased
+                )
+            }
+
+    private fun IrDeclarationWithName.getDartLibraryImport(): DartUnresolvedImport? {
+        return when {
+            isActuallyExternal -> unresolvedImportFromAnnotationFor(this) ?: when {
+                // We don't want to look at the parent's class @DartLibrary annotation for companion objects,
+                // because we never need to import an external companion object
+                // (it's an error to use it as an instance instead of as static container).
+                (this as? IrClass)?.isCompanion != true -> parentClassOrNull?.let {
+                    // Aliases and hidings for class member imports are ignored.
+                    it.unresolvedImportFromAnnotationFor(it)?.copy(alias = null, hidden = false)
+                }
+                else -> null
+            } ?: when (this) {
+                // Try to see if the file has a @DartLibrary annotation.
+                !is IrFile -> fileOrNull?.unresolvedImportFromAnnotationFor(this)
+                    ?: getPackageFragment()?.fqName?.let { fqName ->
+                        // If the declaration belongs to a built-in package (e.g. `dart.math`), we know what to import.
+                        builtInImports[fqName.asString()]?.let {
+                            DartUnresolvedImport(
+                                library = it,
+                                alias = null,
+                                hidden = false,
+                            )
+                        }
+                    }
+                else -> null
+            }
+            else -> fileOrNull?.let { file ->
+                when {
+                    file != currentFile -> when {
+                        // TODO: Package imports
+                        file.module != currentFile.module -> null
+                        else -> file.dartPath.let { theirDartPath ->
+                            val currentDartPath = currentFile.dartPath
+                            val importPath = currentDartPath.parent?.relativize(theirDartPath)?.toString()
+                                ?: theirDartPath.toString()
+
+                            when {
+                                importPath.isNotBlank() -> DartUnresolvedImport(
+                                    library = importPath,
+                                    alias = null,
+                                    hidden = false
+                                )
+                                else -> null
+                            }
+                        }
+                    }
+                    else -> null
+                }
+            }
+        }
+    }
+
+    val IrDeclaration.dartUnresolvedImport: DartUnresolvedImport?
+        get() = (this as? IrDeclarationWithName)?.getDartLibraryImport()
+
+    val IrDeclaration.dartLibrary: String?
+        get() = dartUnresolvedImport?.library
+
+    val IrDeclaration.dartLibraryAlias: String?
+        get() = dartUnresolvedImport?.alias
 }
-/*
-    fun IrDeclarationWithName.dartNameIn(file: IrFile) =
-        dartNameGenerator.runWith(this) { dartNameOf(it, file) }
 
-    fun IrDeclarationWithName.dartNameOrNullIn(file: IrFile) =
-        dartNameGenerator.runWith(this) { dartNameOrNullOf(it, file) }
-
-    fun IrDeclarationWithName.dartNameAsSimpleIn(file: IrFile) =
-        dartNameGenerator.runWith(this) { dartNameAsSimpleOf(it, file) }
-
-    fun IrDeclarationWithName.dartNameAsSimpleOrNullIn(file: IrFile) =
-        dartNameGenerator.runWith(this) { dartNameAsSimpleOrNullOf(it, file) }
-
-    /**
-     * The [dartName] for this declaration. If it's a [DartPrefixedIdentifier], the prefix is removed.
-     */
-    fun IrDeclarationWithName.simpleDartNameIn(file: IrFile) =
-        dartNameGenerator.runWith(this) { simpleDartNameOf(it, file) }
-
-
-    fun IrDeclarationWithName.simpleDartNameOrNullIn(file: IrFile) =
-        dartNameGenerator.runWith(this) { simpleDartNameOrNullOf(it, file) }
-
-    // Some IR elements can be asserted that they always have simple identifiers.
-    fun IrValueDeclaration.dartNameIn(file: IrFile): DartSimpleIdentifier = dartNameAsSimpleIn(file)
-    fun IrField.dartNameIn(file: IrFile): DartSimpleIdentifier = dartNameAsSimpleIn(file)
-    fun IrConstructor.dartNameIn(file: IrFile): DartSimpleIdentifier = dartNameAsSimpleIn(file)
-    fun IrConstructor.dartNameOrNullIn(file: IrFile): DartSimpleIdentifier? = dartNameAsSimpleOrNullIn(file)
- */
+data class DartUnresolvedImport(val library: String, val alias: String?, val hidden: Boolean)

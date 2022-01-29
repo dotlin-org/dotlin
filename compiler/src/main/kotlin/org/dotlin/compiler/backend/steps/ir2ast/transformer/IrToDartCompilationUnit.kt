@@ -38,7 +38,7 @@ object IrToDartCompilationUnitTransformer : IrDartAstTransformer<DartCompilation
                 .asSequence()
                 .map { import ->
                     DartImportDirective(
-                        name = DartSimpleStringLiteral(import.library),
+                        uri = DartSimpleStringLiteral(import.library),
                         combinators = listOfNotNull(
                             import.hide?.let {
                                 DartHideCombinator(
@@ -57,7 +57,7 @@ object IrToDartCompilationUnitTransformer : IrDartAstTransformer<DartCompilation
                 // Always import the meta package for extra annotations.
                 .plus(
                     DartImportDirective(
-                        name = DartSimpleStringLiteral("package:meta/meta.dart")
+                        uri = DartSimpleStringLiteral("package:meta/meta.dart")
                     )
                 )
                 .optimizeImports()

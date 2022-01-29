@@ -28,10 +28,11 @@ interface BaseTest {
         @JvmStatic
         fun compileStdlib() {
             KotlinToDartCompiler.compile(
-                sourceRoots = setOf(stdlibSrc),
-                outputFile = stdlibKlib,
+                sourceRoot = stdlibSrc,
+                output = stdlibKlib,
                 dependencies = emptySet(),
-                klib = true
+                isKlib = true,
+                isPublicPackage = true
             )
         }
     }

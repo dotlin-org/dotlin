@@ -17,14 +17,10 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.backend.steps.ast2dart
+package org.dotlin.compiler.dart.ast.directive
 
-import org.dotlin.compiler.backend.steps.ast2dart.transformer.accept
-import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
-import java.nio.file.Path
+import org.dotlin.compiler.dart.ast.expression.literal.DartStringLiteral
 
-fun dartAstToDartSource(units: Map<Path, DartCompilationUnit>): Map<Path, String> {
-    val context = DartGenerationContext()
-
-    return units.mapValues { (_, unit) -> unit.accept(context) }
+interface DartUriBasedDirective : DartDirective {
+    val uri: DartStringLiteral
 }

@@ -34,12 +34,12 @@ fun Collection<DartDirective>.optimizeImports() = asSequence().optimizeImports()
 fun Sequence<DartDirective>.optimizeImports() =
     distinct()
         .filterIsInstance<DartImportDirective>()
-        .groupBy { it.name to it.alias }
+        .groupBy { it.uri to it.alias }
         .entries
         .map { (key, directives) ->
-            val (name, alias) = key
+            val (uri, alias) = key
             DartImportDirective(
-                name, alias,
+                uri, alias,
                 annotations = directives.map { it.annotations }.flatten(),
                 combinators = directives.map { it.combinators }
                     .flatten()

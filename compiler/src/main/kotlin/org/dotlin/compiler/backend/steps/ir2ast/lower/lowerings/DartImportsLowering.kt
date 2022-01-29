@@ -19,7 +19,6 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.dartUnresolvedImport
 import org.dotlin.compiler.backend.steps.ir2ast.attributes.DartImport
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementVisitorVoid
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
@@ -32,8 +31,10 @@ import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrTypeParametersContainer
 import org.jetbrains.kotlin.ir.expressions.IrDeclarationReference
 import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
+import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classOrNull
+import org.jetbrains.kotlin.ir.types.typeOrNull
 import org.jetbrains.kotlin.ir.util.TypeRemapper
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.ir.util.remapTypes
@@ -132,7 +133,17 @@ class DartImportsLowering(override val context: DartLoweringContext) : IrFileLow
         file.remapTypes(
             object : TypeRemapper {
                 override fun remapType(type: IrType): IrType {
-                    type.classOrNull?.owner?.also { maybeAddDartImports(it) }
+                    fun maybeAddImport(type: IrType) {
+                        type.classOrNull?.let { maybeAddDartImports(it.owner) }
+                        if (type is IrSimpleType) {
+                            type.arguments.forEach {
+                                it.typeOrNull?.let { t -> maybeAddImport(t) }
+                            }
+                        }
+                    }
+
+                    maybeAddImport(type)
+
                     return type
                 }
 

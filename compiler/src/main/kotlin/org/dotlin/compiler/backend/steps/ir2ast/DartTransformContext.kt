@@ -37,6 +37,7 @@ class DartTransformContext(
 ) : IrContext(), ExtraIrAttributes by loweringContext {
     override val symbolTable = loweringContext.symbolTable
     override val dartNameGenerator = loweringContext.dartNameGenerator
+    override val sourceRoot = loweringContext.sourceRoot
 
     fun <N : DartAstNode> IrFunction.transformBy(
         context: DartTransformContext,

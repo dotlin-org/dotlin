@@ -55,6 +55,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.types.Variance
+import java.nio.file.Path
 
 class DartLoweringContext(
     override val configuration: CompilerConfiguration,
@@ -63,6 +64,7 @@ class DartLoweringContext(
     val irModuleFragment: IrModuleFragment,
     override val dartNameGenerator: DartNameGenerator,
     private val extraIrAttributes: ExtraIrAttributes = ExtraIrAttributes.default(),
+    override val sourceRoot: Path
 ) : IrContext(), CommonBackendContext, ExtraIrAttributes by extraIrAttributes {
     override val builtIns = irModuleFragment.descriptor.builtIns
     override var inVerbosePhase = false

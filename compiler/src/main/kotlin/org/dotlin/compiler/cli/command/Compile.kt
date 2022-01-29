@@ -20,38 +20,37 @@
 package org.dotlin.compiler.cli.command
 
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.parameters.arguments.*
+import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.help
+import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.options.*
-import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.path
 import org.dotlin.compiler.KotlinToDartCompiler
-import java.io.File
 import java.nio.file.Path
+import kotlin.io.path.extension
 
 class Compile : CliktCommand(name = "dotlin") {
-    private val sourceRoots: Set<Path>? by argument("SOURCE_ROOTS")
+    private val sourceRoot: Path? by argument("SOURCE_ROOT")
         .help("Kotlin source root directories")
         .path(
             mustExist = true,
             mustBeReadable = true,
             canBeFile = false,
         )
-        .multiple()
-        .unique()
         .optional()
 
-    private val output: File? by argument()
+    private val output: Path? by argument()
         .help(
             """
-            Path of output file to compile to.
+            Path of the directory to compile to.
             
             If the extension of the file is .dart, Dart source will be generated. If the
             extension of the file is .klib, a Klib will be generated.
             """.trimIndent()
         )
-        .file(
+        .path(
             mustExist = false,
-            canBeDir = false,
+            canBeFile = false
         )
         .optional()
 
@@ -59,9 +58,9 @@ class Compile : CliktCommand(name = "dotlin") {
         .help("Whether to format the output Dart code using dart format")
         .flag("--no-format", default = false)
 
-    private val dependencies: Set<File> by option("-d", "--dependency")
+    private val dependencies: Set<Path> by option("-d", "--dependency")
         .help("A .klib dependency necessary for compiling. Can be used multiple times.")
-        .file(
+        .path(
             mustExist = true,
             mustBeReadable = true,
             canBeDir = false,
@@ -70,7 +69,7 @@ class Compile : CliktCommand(name = "dotlin") {
         .unique()
 
     override fun run() {
-        if (sourceRoots == null && output == null) {
+        if (sourceRoot == null && output == null) {
             println(KotlinToDartCompiler.compile(readLine()!!, format = format))
             return
         }
@@ -78,10 +77,10 @@ class Compile : CliktCommand(name = "dotlin") {
         // TODO: Handle null output (write to stdout)
 
         KotlinToDartCompiler.compile(
-            sourceRoots!!,
+            sourceRoot!!,
             dependencies,
             format,
-            klib = output!!.extension == ".klib",
+            isKlib = output!!.extension == "klib",
             output!!,
         )
     }

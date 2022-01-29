@@ -107,7 +107,7 @@ annotation class DartLibrary(val library: String, val aliased: Boolean = false)
  *
  * A call to `Foo.bar()` in Kotlin would then translate to `Foo.bar()` in Dart (as opposed to `Foo.$instance.$bar()`).
  *
- * It's also possbile to to annotate the companion object itself with `@DartStatic`. Then it functions the same as if
+ * It's also possbile to to annotate the companion object itself with `@DartStatic`. Then it behaves the same as if
  * every member of the companion object is annotated with `@DartStatic`.
  *
  * Not to be confused with how `@JvmStatic` works, which generates a static member. In Dotlin static members are always
@@ -119,3 +119,12 @@ annotation class DartStatic
 
 // TODO: Error for external companion object (or member) without a @DartStatic annotation, atleast
 // until Dart singleton pattern is supported.
+
+/**
+ * Specifies that whenever this declaration is referenced, `dart:core` will be imported with a `hide` with the same
+ * name as this declaration. For example, if this annotation is used on a class named `Foo`, the generated import
+ * will be `import 'dart:core' hide Foo;`. This can be used to prevent name clashes.
+ */
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.SOURCE)
+annotation class DartHideNameFromCore()

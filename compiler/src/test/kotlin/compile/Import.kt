@@ -21,7 +21,6 @@ package compile
 
 import BaseTest
 import assertCompile
-import assertCompileFiles
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 

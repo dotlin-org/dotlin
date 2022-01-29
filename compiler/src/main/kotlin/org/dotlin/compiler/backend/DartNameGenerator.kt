@@ -32,6 +32,10 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.isSetter
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
+import org.jetbrains.kotlin.konan.file.File
+import java.nio.file.Path
+import kotlin.io.path.Path
+import kotlin.io.path.absolute
 
 class DartNameGenerator {
     private fun IrContext.dartNameOrNullOf(
@@ -252,4 +256,21 @@ class DartNameGenerator {
         }
 
     private fun List<*>.isLastIndexAndNotSingle(index: Int) = index == size - 1 && size != 1
+
+    fun IrContext.dartPathOf(file: IrFile): Path {
+        val fileName = file.name.foldIndexed(initial = "") { index, acc, char ->
+            acc + when {
+                index != 0 && char.isUpperCase() && !acc.last().isUpperCase() -> "_$char"
+                else -> char.toString()
+            }
+        }.lowercase().replace(Regex("\\.kt$"), ".g.dart")
+
+        val relativePath: Path? =
+            Path(
+                (Path(file.fileEntry.name).toRealPath().absolute() - sourceRoot)
+                    .joinToString(File.separator)
+            ).parent
+
+        return relativePath?.resolve(fileName) ?: Path(fileName)
+    }
 }

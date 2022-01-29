@@ -21,9 +21,7 @@ package org.dotlin.compiler.backend.steps.ast2dart.transformer
 
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
-import org.dotlin.compiler.dart.ast.directive.DartCombinator
-import org.dotlin.compiler.dart.ast.directive.DartDirective
-import org.dotlin.compiler.dart.ast.directive.DartImportDirective
+import org.dotlin.compiler.dart.ast.directive.*
 
 object DartCompilationUnitTransformer : DartAstNodeTransformer {
     override fun visitCompilationUnit(unit: DartCompilationUnit, context: DartGenerationContext): String {
@@ -33,20 +31,22 @@ object DartCompilationUnitTransformer : DartAstNodeTransformer {
         return "$directives\n$declarations"
     }
 
-    override fun visitImportDirective(directive: DartImportDirective, context: DartGenerationContext): String {
-        val annotations = directive.annotations.accept(context)
-        val import = "import"
-        val library = directive.name.accept(context)
-        val alias = directive.alias?.accept(context)?.let { " as $it" } ?: ""
-        val combinators = directive.combinators.let { combinators ->
-            when {
-                combinators.isEmpty() -> ""
-                else -> combinators.joinToString(" ", prefix = " ") { it.accept(context) }
+    override fun visitNamespaceDirective(directive: DartNamespaceDirective, context: DartGenerationContext) =
+        directive.let {
+            val annotations = it.annotations.accept(context)
+            val keyword = when (it) {
+                is DartImportDirective -> "import"
+                is DartExportDirective -> "export"
             }
-        }
+            val library = it.uri.accept(context)
+            val alias = when (it) {
+                is DartImportDirective -> it.alias?.accept(context)?.let { alias -> " as $alias" } ?: ""
+                else -> ""
+            }
+            val combinators = it.combinators.accept(context)
 
-        return "$annotations$import $library$alias$combinators;"
-    }
+            "$annotations$keyword $library$alias$combinators;"
+        }
 
     override fun visitCombinator(combinator: DartCombinator, context: DartGenerationContext): String {
         val keyword = combinator.keyword
@@ -54,6 +54,11 @@ object DartCompilationUnitTransformer : DartAstNodeTransformer {
 
         return "$keyword $names"
     }
+}
+
+private fun Collection<DartCombinator>.accept(context: DartGenerationContext) = when {
+    isEmpty() -> ""
+    else -> joinToString(" ", prefix = " ") { it.accept(context) }
 }
 
 fun DartCompilationUnit.accept(context: DartGenerationContext) = accept(DartCompilationUnitTransformer, context)

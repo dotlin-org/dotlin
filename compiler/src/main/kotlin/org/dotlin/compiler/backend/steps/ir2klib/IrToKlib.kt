@@ -31,9 +31,10 @@ import org.jetbrains.kotlin.library.KotlinAbiVersion
 import org.jetbrains.kotlin.library.KotlinLibraryVersioning
 import org.jetbrains.kotlin.library.impl.BuiltInsPlatform
 import org.jetbrains.kotlin.library.impl.buildKotlinLibrary
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.absolutePathString
 
-fun writeToKlib(env: KotlinCoreEnvironment, config: CompilerConfiguration, irResult: IrResult, outputFile: File) {
+fun writeToKlib(env: KotlinCoreEnvironment, config: CompilerConfiguration, irResult: IrResult, outputFile: Path) {
     val serializedIr = DartIrModuleSerializer(
         messageLogger = config.get(IrMessageLogger.IR_MESSAGE_LOGGER) ?: IrMessageLogger.None,
         builtIns = irResult.module.irBuiltins,
@@ -63,9 +64,9 @@ fun writeToKlib(env: KotlinCoreEnvironment, config: CompilerConfiguration, irRes
         metadata = serializedMetadata,
         ir = serializedIr,
         versions = versions,
-        output = outputFile.absolutePath,
+        output = outputFile.absolutePathString(),
         moduleName = irResult.module.name.asStringStripSpecialMarkers(),
-        nopack = false,
+        nopack = true,
         perFile = false, // TODO
         manifestProperties = null,
         dataFlowGraph = null,

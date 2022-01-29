@@ -29,11 +29,17 @@
 
 package kotlin
 
+@DartLibrary("dart:core")
+@DartName("int")
 internal external abstract class Byte private constructor() : Number(), Comparable<Byte>
 
+@DartLibrary("dart:core")
+@DartName("int")
 internal external abstract class Short private constructor() : Number(), Comparable<Short>
 
 // Only has its members so they can be called on Long literals.
+@DartLibrary("dart:core")
+@DartName("int")
 internal external class Long private constructor() : Number(), Comparable<Long> {
     /**
      * Compares this value with the specified value for order.
@@ -369,4 +375,6 @@ internal external class Long private constructor() : Number(), Comparable<Long> 
     fun toRadixString(radix: Int): String
 }
 
+@DartLibrary("dart:core")
+@DartName("double")
 internal external abstract class Float private constructor() : Number(), Comparable<Float>
