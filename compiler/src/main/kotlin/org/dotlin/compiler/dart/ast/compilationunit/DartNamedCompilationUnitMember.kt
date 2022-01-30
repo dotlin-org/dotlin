@@ -24,3 +24,6 @@ import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 interface DartNamedCompilationUnitMember : DartCompilationUnitMember {
     val name: DartSimpleIdentifier
 }
+
+val DartNamedCompilationUnitMember.isPrivate: Boolean
+    get() = name.isPrivate
