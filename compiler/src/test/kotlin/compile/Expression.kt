@@ -1743,7 +1743,7 @@ class Expression : BaseTest {
             kotlin(
                 """
                 class Test {
-                    operator fun set(index: Int, value: Boolean) {}
+                    operator fun set(index: Int, value: Boolean) = value
                 }
 
                 fun main() {
@@ -1759,10 +1759,13 @@ class Expression : BaseTest {
                 @sealed
                 class Test {
                   @nonVirtual
-                  void set(
+                  bool set(
                     int index,
                     bool value,
-                  ) {}
+                  ) {
+                    return value;
+                  }
+
                   @nonVirtual
                   void operator []=(
                     int index,

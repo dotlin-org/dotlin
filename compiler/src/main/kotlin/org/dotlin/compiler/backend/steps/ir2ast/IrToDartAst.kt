@@ -23,8 +23,8 @@ import org.dotlin.compiler.backend.steps.ir2ast.lower.lower
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.IrToDartCompilationUnitTransformer
 import org.dotlin.compiler.backend.steps.src2ir.IrResult
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.DartIrAnalyzer
-import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.DartNameChecker
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.DartNameChecker
 import org.dotlin.compiler.backend.steps.src2ir.throwIfIsError
 import org.dotlin.compiler.dart.ast.annotation.isInternal
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit

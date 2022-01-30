@@ -22,6 +22,9 @@ package org.dotlin.compiler.backend.steps.src2ir.analyze.ir
 import org.dotlin.compiler.backend.DartNameGenerator
 import org.dotlin.compiler.backend.DartPackage
 import org.dotlin.compiler.backend.IrContext
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.DartExtensionWithoutProperAnnotationChecker
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.WrongSetOperatorReturnChecker
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.WrongSetOperatorReturnTypeChecker
 import org.dotlin.compiler.hasErrors
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.backend.jvm.codegen.psiElement
@@ -53,7 +56,10 @@ class DartIrAnalyzer(
     private val sourceRoot: Path,
     private val dartPackage: DartPackage,
     config: CompilerConfiguration,
-    private val checkers: List<IrDeclarationChecker> = listOf(DartExtensionWithoutProperAnnotationChecker),
+    private val checkers: List<IrDeclarationChecker> = listOf(
+        DartExtensionWithoutProperAnnotationChecker,
+        WrongSetOperatorReturnTypeChecker, WrongSetOperatorReturnChecker
+    ),
     private val onlyReport: Collection<DiagnosticFactory<*>>? = null,
 ) {
     private val messageCollector = config[CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY] ?: MessageCollector.NONE

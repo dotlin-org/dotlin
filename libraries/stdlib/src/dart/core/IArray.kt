@@ -69,7 +69,7 @@ external interface IArray<E> : Iterable<E> {
      * which means that `index` must be non-negative and
      * less than [size].
      */
-    operator fun set(index: Int, value: E): Unit
+    operator fun set(index: Int, value: E): E
 
     /**
      * The number of objects in this array.
