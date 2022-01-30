@@ -32,14 +32,26 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
 
         put(
             ErrorsDart.DART_NAME_CLASH,
-            "Dart name ({0}) generated for this declaration clashes with another declaration: {1}",
+            "dart name ({0}) generated for this declaration clashes with another declaration: {1}",
             Renderers.STRING,
             Renderers.COMPACT
         )
 
         put(
             ErrorsDart.EXTENSION_WITHOUT_EXPLICIT_DART_EXTENSION_NAME_IN_PUBLIC_PACKAGE,
-            "Public extension has no name set with @DartExtensionName even though this package is public",
+            "public extension has no name set with @DartExtensionName even though this package is public",
+        )
+
+        put(
+            ErrorsDart.WRONG_SET_OPERATOR_RETURN_TYPE,
+            "return type of set operator must be the same type as its value parameter: {0}",
+            Renderers.RENDER_TYPE
+        )
+
+        put(
+            ErrorsDart.WRONG_SET_OPERATOR_RETURN,
+            "set operator must return its value parameter: {0}",
+            Renderers.NAME
         )
 
         this

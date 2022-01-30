@@ -67,7 +67,7 @@ external class Array<T> : IArray<T> {
      * If the [index] is out of bounds of this array, throws an [IndexOutOfBoundsException] except in Kotlin/JS
      * where the behavior is unspecified.
      */
-    override operator fun set(index: Int, value: T): Unit
+    override operator fun set(index: Int, value: T): T
 
     /**
      * Returns the number of elements in the array.

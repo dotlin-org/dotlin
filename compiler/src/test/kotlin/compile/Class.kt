@@ -2219,7 +2219,7 @@ class Class : BaseTest {
             kotlin(
                 """
                 class Test {
-                    operator fun set(index: Int, value: Boolean) {}
+                    operator fun set(index: Int, value: Boolean): Boolean = value
                 }
                 """
             )
@@ -2231,10 +2231,13 @@ class Class : BaseTest {
                 @sealed
                 class Test {
                   @nonVirtual
-                  void set(
+                  bool set(
                     int index,
                     bool value,
-                  ) {}
+                  ) {
+                    return value;
+                  }
+
                   @nonVirtual
                   void operator []=(
                     int index,

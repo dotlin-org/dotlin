@@ -17,16 +17,19 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.backend.steps.src2ir.analyze.ir
+package org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers
 
 import org.dotlin.compiler.backend.hasDartExtensionNameAnnotation
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isExtension
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
-import org.jetbrains.kotlin.ir.declarations.*
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
+import org.jetbrains.kotlin.ir.declarations.IrDeclaration
+import org.jetbrains.kotlin.ir.declarations.IrProperty
+import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.psi.KtDeclaration
 
 object DartExtensionWithoutProperAnnotationChecker : IrDeclarationChecker {
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun IrAnalyzerContext.check(source: KtDeclaration, declaration: IrDeclaration) {
         // TODO: Report if mixing Dart and Kotlin code
         if (!dartPackage.isPublic) return

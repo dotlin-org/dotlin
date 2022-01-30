@@ -172,6 +172,10 @@ class OperatorsLowering(override val context: DartLoweringContext) : IrDeclarati
                     name = Name.identifier(operatorIdentifier)
                     isOperator = true
                     origin = operatorOrigin
+
+                    if (operatorIdentifier == "[]=") {
+                        returnType = irBuiltIns.unitType
+                    }
                 }.apply {
                     val irOperatorFunction = this
 
