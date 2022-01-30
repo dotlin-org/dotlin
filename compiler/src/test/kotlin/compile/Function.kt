@@ -1237,4 +1237,28 @@ class Function : BaseTest {
                 )
             }
     }
+
+    @Test
+    fun `function with built-in Dart identifier in name`() = assertCompile {
+        kotlin("fun covariant() {}")
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void covariant() {}
+            """
+        )
+    }
+
+    @Test
+    fun `function with reserved Dart word in name`() = assertCompile {
+        kotlin("fun with() {}")
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void ${'$'}with() {}
+            """
+        )
+    }
 }

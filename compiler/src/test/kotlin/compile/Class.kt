@@ -3870,4 +3870,43 @@ class Class : BaseTest {
                 """
             )
         }
+
+    @Test
+    fun `class with built-in Dart identifier in name`() = assertCompile {
+        kotlin("class covariant")
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class ${'$'}covariant {}
+            """
+        )
+    }
+
+    @Test
+    fun `class with reserved Dart word in name`() = assertCompile {
+        kotlin("class final")
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class ${'$'}final {}
+            """
+        )
+    }
+
+    @Test
+    fun `class with reserved Dart and Kotlin word in name`() = assertCompile {
+        kotlin("class `class`")
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class ${'$'}class {}
+            """
+        )
+    }
 }
