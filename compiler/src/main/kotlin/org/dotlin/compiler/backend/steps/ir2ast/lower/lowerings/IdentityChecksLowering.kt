@@ -21,9 +21,10 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
+import org.jetbrains.kotlin.ir.declarations.copyAttributes
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
+import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.util.copyTypeAndValueArgumentsFrom
 
@@ -32,7 +33,30 @@ import org.jetbrains.kotlin.ir.util.copyTypeAndValueArgumentsFrom
  */
 class IdentityChecksLowering(override val context: DartLoweringContext) : IrExpressionLowering {
     override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
-        if (expression !is IrCall || expression.origin != IrStatementOrigin.EQEQEQ) return noChange()
+        if (expression !is IrCall || (expression.origin != EQEQEQ && expression.origin != EXCLEQEQ)) return noChange()
+
+        // For EXCLEQEQ, we only want to change the 'EQEQEQ' call itself. However, the 'not' call should be fixed
+        // to have the correct origin.
+        if (expression.origin == EXCLEQEQ && expression.symbol.owner.name.identifierOrNullIfSpecial == "not") {
+            return expression.let {
+                replaceWith(
+                    IrCallImpl(
+                        UNDEFINED_OFFSET,
+                        UNDEFINED_OFFSET,
+                        it.type,
+                        it.symbol,
+                        it.typeArgumentsCount,
+                        it.valueArgumentsCount,
+                        origin = EXCL
+                    ).apply {
+                        copyAttributes(expression)
+                        copyTypeAndValueArgumentsFrom(expression)
+                        dispatchReceiver = expression.dispatchReceiver
+                        extensionReceiver = expression.extensionReceiver
+                    }
+                )
+            }
+        }
 
         return replaceWith(
             IrCallImpl(
@@ -43,6 +67,7 @@ class IdentityChecksLowering(override val context: DartLoweringContext) : IrExpr
                 typeArgumentsCount = 0,
                 valueArgumentsCount = 2,
             ).apply {
+                copyAttributes(expression)
                 copyTypeAndValueArgumentsFrom(expression)
             }
         )
