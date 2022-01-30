@@ -37,6 +37,24 @@ import kotlin.io.path.Path
 import kotlin.io.path.absolute
 
 class DartNameGenerator {
+    private val builtInIdentifiers = listOf(
+        "abstract", "as", "covariant", "deferred",
+        "dynamic", "export", "extension", "external",
+        "factory", "Function", "get", "implements",
+        "import", "interface", "late", "library",
+        "mixin", "operator", "part", "required",
+        "set", "static", "typedef"
+    )
+    private val asyncWords = listOf("await", "yield")
+    private val reservedWords = listOf(
+        "assert", "break", "case", "catch", "class",
+        "const", "continue", "default", "do", "else",
+        "enum", "extends", "false", "final", "finally",
+        "for", "if", "in", "is", "new", "null", "rethrow",
+        "return", "super", "switch", "this", "throw", "true",
+        "try", "var", "void", "while", "with"
+    )
+
     private fun IrContext.dartNameOrNullOf(
         declaration: IrDeclarationWithName,
         currentFile: IrFile,
@@ -47,6 +65,12 @@ class DartNameGenerator {
             val aliasPrefix = dartLibraryAlias?.toDartIdentifier() ?: when {
                 useKotlinAlias -> importAliasIn(currentFile)?.toDartIdentifier()
                 else -> null
+            }?.let {
+                // Built-in identifiers cannot be used as import prefixes.
+                when (it.value) {
+                    in builtInIdentifiers -> it.asGenerated()
+                    else -> it
+                }
             }
             val annotatedName = dartAnnotatedName?.toDartIdentifier()
 
@@ -184,6 +208,13 @@ class DartNameGenerator {
                         .toString(radix = 16)
                 )
             }
+
+            // Built-in identifier and reserved words check. This should _always_ happen last.
+            if ((this is IrClass && name?.value in builtInIdentifiers) || name?.value in reservedWords) {
+                name = name?.asGenerated()
+            }
+
+            // TODO: Async words check
 
             return when {
                 aliasPrefix != null && name != null -> DartPrefixedIdentifier(aliasPrefix, name)
