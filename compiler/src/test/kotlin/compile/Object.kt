@@ -415,4 +415,32 @@ class Object : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `object with method from Any override`() = assertCompile {
+        kotlin(
+            """
+            object Test {
+                override fun toString(): String = "Test"
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {
+              const Test._() : super();
+              @override
+              String toString() {
+                return 'Test';
+              }
+
+              static const Test ${'$'}instance = const Test._();
+            }
+            """
+        )
+    }
 }
