@@ -23,6 +23,8 @@ import org.dotlin.compiler.dart.ast.DartAstNode
 
 interface DartAnnotatedNode : DartAstNode {
     val annotations: List<DartAnnotation>
-
     val documentationComment: String?
 }
+
+val DartAnnotatedNode.isInternal: Boolean
+    get() = DartAnnotation.INTERNAL in annotations

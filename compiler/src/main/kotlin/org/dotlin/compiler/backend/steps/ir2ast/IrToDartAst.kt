@@ -26,13 +26,16 @@ import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.DartIrAnalyzer
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.DartNameChecker
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
 import org.dotlin.compiler.backend.steps.src2ir.throwIfIsError
-import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
+import org.dotlin.compiler.dart.ast.annotation.isInternal
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
 import org.dotlin.compiler.dart.ast.compilationunit.DartNamedCompilationUnitMember
+import org.dotlin.compiler.dart.ast.compilationunit.isPrivate
 import org.dotlin.compiler.dart.ast.directive.DartExportDirective
+import org.dotlin.compiler.dart.ast.directive.DartHideCombinator
 import org.dotlin.compiler.dart.ast.expression.literal.DartSimpleStringLiteral
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.diagnostics.Diagnostic
+import org.jetbrains.kotlin.util.collectionUtils.filterIsInstanceAnd
 import java.nio.file.Path
 import kotlin.io.path.Path
 
@@ -76,10 +79,19 @@ fun irToDartAst(
                 when {
                     // If all declarations in the unit are private or internal, we don't need to export it.
                     unit.declarations.all {
-                        (it is DartNamedCompilationUnitMember && it.name.isPrivate) || DartAnnotation.INTERNAL in it.annotations
+                        (it is DartNamedCompilationUnitMember && it.isPrivate) || it.isInternal
                     } -> null
                     else -> DartExportDirective(
-                        uri = DartSimpleStringLiteral(path.toString())
+                        uri = DartSimpleStringLiteral(path.toString()),
+                        combinators = unit.declarations
+                            .filterIsInstanceAnd<DartNamedCompilationUnitMember> { it.isInternal }
+                            .map { it.name }
+                            .let {
+                                when {
+                                    it.isEmpty() -> emptyList()
+                                    else -> listOf(DartHideCombinator(it))
+                                }
+                            }
                     )
                 }
             }
