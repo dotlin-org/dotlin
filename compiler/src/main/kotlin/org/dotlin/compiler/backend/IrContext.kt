@@ -23,6 +23,8 @@ abstract class IrContext {
      */
     abstract val sourceRoot: Path
 
+    abstract val dartPackage: DartPackage
+
     lateinit var currentFile: IrFile
         private set
 

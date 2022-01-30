@@ -40,7 +40,7 @@ sealed class IrDartDeclarationOrigin(private val name: String) : IrDeclarationOr
 
     object WAS_OPERATOR : IrDartDeclarationOrigin("WAS_OPERATOR")
 
-    object EXTENSION : IrDartDeclarationOrigin("EXTENSION")
+    data class EXTENSION(val hasGeneratedName: Boolean) : IrDartDeclarationOrigin("EXTENSION")
 
     object STATIC_OBJECT_MEMBER : IrDartDeclarationOrigin("STATIC_OBJECT_MEMBER")
 

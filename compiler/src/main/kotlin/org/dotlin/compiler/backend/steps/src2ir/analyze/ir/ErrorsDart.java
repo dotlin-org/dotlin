@@ -20,18 +20,22 @@
 package org.dotlin.compiler.backend.steps.src2ir.analyze.ir;
 
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor;
+import org.jetbrains.kotlin.diagnostics.DiagnosticFactory0;
 import org.jetbrains.kotlin.diagnostics.DiagnosticFactory2;
 import org.jetbrains.kotlin.diagnostics.Errors;
 import org.jetbrains.kotlin.diagnostics.Severity;
 import org.jetbrains.kotlin.psi.KtDeclaration;
 
-import static org.jetbrains.kotlin.diagnostics.PositioningStrategies.*;
+import static org.jetbrains.kotlin.diagnostics.PositioningStrategies.DECLARATION_SIGNATURE_OR_DEFAULT;
 
 // This MUST be in Java, because the initializer code uses Java reflection.
 
 public interface ErrorsDart {
     DiagnosticFactory2<KtDeclaration, String, DeclarationDescriptor> DART_NAME_CLASH =
             DiagnosticFactory2.create(Severity.ERROR, DECLARATION_SIGNATURE_OR_DEFAULT);
+
+    DiagnosticFactory0<KtDeclaration> EXTENSION_WITHOUT_EXPLICIT_DART_EXTENSION_NAME_IN_PUBLIC_PACKAGE =
+            DiagnosticFactory0.create(Severity.WARNING, DECLARATION_SIGNATURE_OR_DEFAULT);
 
     @SuppressWarnings("UnusedDeclaration")
     Object _initializer = new Object() {

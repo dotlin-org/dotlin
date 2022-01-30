@@ -20,7 +20,9 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
 import org.dotlin.compiler.backend.DartNameGenerator
+import org.dotlin.compiler.backend.DartPackage
 import org.dotlin.compiler.backend.IrContext
+import org.dotlin.compiler.backend.dartExtensionName
 import org.dotlin.compiler.backend.steps.ir2ast.DartIrBuiltIns
 import org.dotlin.compiler.backend.steps.ir2ast.attributes.ExtraIrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
@@ -64,7 +66,8 @@ class DartLoweringContext(
     val irModuleFragment: IrModuleFragment,
     override val dartNameGenerator: DartNameGenerator,
     private val extraIrAttributes: ExtraIrAttributes = ExtraIrAttributes.default(),
-    override val sourceRoot: Path
+    override val sourceRoot: Path,
+    override val dartPackage: DartPackage
 ) : IrContext(), CommonBackendContext, ExtraIrAttributes by extraIrAttributes {
     override val builtIns = irModuleFragment.descriptor.builtIns
     override var inVerbosePhase = false
@@ -163,7 +166,8 @@ class DartLoweringContext(
             val receiverType = receiver.type
             val receiverTypeParameters = receiverType.typeParametersOrSelf
 
-            val containerName = run {
+            val dartExtensionName = dartExtensionName
+            val containerName = dartExtensionName ?: run {
                 val (file, mainName) = when (val classifier = receiverType.classifierOrNull?.owner) {
                     is IrClass -> classifier.file to classifier.defaultType.let {
                         when {
@@ -198,7 +202,7 @@ class DartLoweringContext(
                 .getOrPut(file) { mutableMapOf() }
                 .getOrPut(containerName) {
                     irFactory.buildClass {
-                        origin = IrDartDeclarationOrigin.EXTENSION
+                        origin = IrDartDeclarationOrigin.EXTENSION(hasGeneratedName = dartExtensionName == null)
                         name = Name.identifier(containerName)
                     }.apply {
                         parent = file

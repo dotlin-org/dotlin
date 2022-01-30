@@ -37,6 +37,11 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
             Renderers.COMPACT
         )
 
+        put(
+            ErrorsDart.EXTENSION_WITHOUT_EXPLICIT_DART_EXTENSION_NAME_IN_PUBLIC_PACKAGE,
+            "Public extension has no name set with @DartExtensionName even though this package is public",
+        )
+
         this
     }
 }

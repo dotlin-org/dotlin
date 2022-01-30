@@ -87,7 +87,8 @@ fun IrResult.lower(configuration: CompilerConfiguration): DartLoweringContext {
         symbolTable = symbolTable,
         bindingContext = bindingTrace.bindingContext,
         dartNameGenerator = dartNameGenerator,
-        sourceRoot = sourceRoot
+        sourceRoot = sourceRoot,
+        dartPackage = dartPackage
     )
 
     lowerings.forEach { lowering ->
