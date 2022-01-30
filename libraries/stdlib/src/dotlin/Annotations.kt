@@ -121,10 +121,21 @@ annotation class DartStatic
 // until Dart singleton pattern is supported.
 
 /**
- * Specifies that whenever this declaration is referenced, `dart:core` will be imported with a `hide` with the same
- * name as this declaration. For example, if this annotation is used on a class named `Foo`, the generated import
- * will be `import 'dart:core' hide Foo;`. This can be used to prevent name clashes.
+ * Specifies the Dart extension container name for this declaration.
+ *
+ * In Dart, extensions live in an extension container. By default in Dotlin, names for these are generated using the
+ * type on which the extension is on, _and_ a hash based on the file location. The hash is necessary when exporting
+ * extensions, since if there are multiple extensions on the same types but in different files, the extension names
+ * would clash without a hash.
+ *
+ * Since the extension container name is considered part of the API, it's recommend to use this annotation for all
+ * public extensions in a public (published) package, to prevent the name changing when renaming or
+ * moving the containing file.
+ *
+ * It's also recommended to use this annotation when mixing Dart and Kotlin code, for the same reason.
+ *
+ * If applied to a file, it behaves the same as if all extension methods/properties were annotated individually.
  */
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FUNCTION, AnnotationTarget.FILE)
 @Retention(AnnotationRetention.SOURCE)
-annotation class DartHideNameFromCore()
+annotation class DartExtensionName(val name: String)

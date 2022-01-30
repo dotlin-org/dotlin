@@ -38,6 +38,7 @@ class DartTransformContext(
     override val symbolTable = loweringContext.symbolTable
     override val dartNameGenerator = loweringContext.dartNameGenerator
     override val sourceRoot = loweringContext.sourceRoot
+    override val dartPackage = loweringContext.dartPackage
 
     fun <N : DartAstNode> IrFunction.transformBy(
         context: DartTransformContext,

@@ -1,29 +1,3 @@
-package org.dotlin.compiler.backend.steps.src2ir.analyze.ir
-
-import org.dotlin.compiler.backend.DartNameGenerator
-import org.dotlin.compiler.backend.IrContext
-import org.dotlin.compiler.backend.steps.src2ir.hasErrors
-import org.jetbrains.kotlin.analyzer.AnalysisResult
-import org.jetbrains.kotlin.backend.jvm.codegen.psiElement
-import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
-import org.jetbrains.kotlin.cli.common.messages.DefaultDiagnosticReporter
-import org.jetbrains.kotlin.cli.common.messages.MessageCollector
-import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.diagnostics.Diagnostic
-import org.jetbrains.kotlin.diagnostics.rendering.DefaultErrorMessages
-import org.jetbrains.kotlin.ir.IrElement
-import org.jetbrains.kotlin.ir.declarations.IrAttributeContainer
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationBase
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.ir.util.SymbolTable
-import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
-import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
-import org.jetbrains.kotlin.psi.KtDeclaration
-import org.jetbrains.kotlin.resolve.BindingTrace
-import org.jetbrains.kotlin.utils.addToStdlib.safeAs
-import java.nio.file.Path
-
 /*
  * Copyright 2022 Wilko Manger
  *
@@ -42,19 +16,50 @@ import java.nio.file.Path
  * You should have received a copy of the GNU Affero General Public License
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+package org.dotlin.compiler.backend.steps.src2ir.analyze.ir
+
+import org.dotlin.compiler.backend.DartNameGenerator
+import org.dotlin.compiler.backend.DartPackage
+import org.dotlin.compiler.backend.IrContext
+import org.dotlin.compiler.hasErrors
+import org.jetbrains.kotlin.analyzer.AnalysisResult
+import org.jetbrains.kotlin.backend.jvm.codegen.psiElement
+import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
+import org.jetbrains.kotlin.cli.common.messages.DefaultDiagnosticReporter
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
+import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.diagnostics.Diagnostic
+import org.jetbrains.kotlin.diagnostics.DiagnosticFactory
+import org.jetbrains.kotlin.diagnostics.rendering.DefaultErrorMessages
+import org.jetbrains.kotlin.ir.IrElement
+import org.jetbrains.kotlin.ir.declarations.IrAttributeContainer
+import org.jetbrains.kotlin.ir.declarations.IrDeclaration
+import org.jetbrains.kotlin.ir.declarations.IrDeclarationBase
+import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.util.SymbolTable
+import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
+import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
+import org.jetbrains.kotlin.psi.KtDeclaration
+import org.jetbrains.kotlin.resolve.BindingTrace
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
+import java.nio.file.Path
+
 class DartIrAnalyzer(
     private val module: IrModuleFragment,
     private val trace: BindingTrace,
     private val symbolTable: SymbolTable,
     private val dartNameGenerator: DartNameGenerator,
     private val sourceRoot: Path,
+    private val dartPackage: DartPackage,
     config: CompilerConfiguration,
-    private val checkers: List<IrDeclarationChecker> = listOf(),
+    private val checkers: List<IrDeclarationChecker> = listOf(DartExtensionWithoutProperAnnotationChecker),
+    private val onlyReport: Collection<DiagnosticFactory<*>>? = null,
 ) {
     private val messageCollector = config[CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY] ?: MessageCollector.NONE
 
     fun analyzeAndReport(): AnalysisResult {
-        val context = IrAnalyzerContext(trace, symbolTable, dartNameGenerator, sourceRoot)
+        val context = IrAnalyzerContext(trace, symbolTable, dartNameGenerator, sourceRoot, dartPackage)
 
         module.files.forEach {
             context.enterFile(it)
@@ -94,7 +99,14 @@ class DartIrAnalyzer(
 
     private fun reportDiagnostics(diagnostics: Iterable<Diagnostic>) {
         val reporter = DefaultDiagnosticReporter(messageCollector)
-        diagnostics.forEach {
+
+        val diagnosticsToReport = when {
+            onlyReport == null -> diagnostics
+            onlyReport.isEmpty() -> emptyList()
+            else -> diagnostics.filter { it.factory in onlyReport }
+        }
+
+        diagnosticsToReport.forEach {
             reporter.report(it, it.psiFile, DefaultErrorMessages.render(it))
         }
     }
@@ -104,7 +116,8 @@ class IrAnalyzerContext(
     val trace: BindingTrace,
     override val symbolTable: SymbolTable,
     override val dartNameGenerator: DartNameGenerator,
-    override val sourceRoot: Path
+    override val sourceRoot: Path,
+    override val dartPackage: DartPackage
 ) : IrContext()
 
 interface IrDeclarationChecker {

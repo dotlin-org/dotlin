@@ -20,6 +20,7 @@
 package org.dotlin.compiler
 
 import com.intellij.openapi.util.Disposer
+import org.dotlin.compiler.backend.DartPackage
 import org.dotlin.compiler.backend.steps.ast2dart.dartAstToDartSource
 import org.dotlin.compiler.backend.steps.ir2ast.irToDartAst
 import org.dotlin.compiler.backend.steps.ir2klib.writeToKlib
@@ -37,6 +38,7 @@ import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.diagnostics.Diagnostic
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.*
@@ -53,7 +55,7 @@ object KotlinToDartCompiler {
         klib: Boolean = false,
         output: Path = createTempDirectory(),
         isPublicPackage: Boolean = false,
-    ): Path {
+    ): CompilationResult {
         val tmpDir = createTempDirectory().also {
             it.resolve("main.kt")
                 .createFile()
@@ -78,16 +80,24 @@ object KotlinToDartCompiler {
         isKlib: Boolean = false,
         output: Path = createTempDirectory(),
         isPublicPackage: Boolean = false,
-    ): Path {
+    ): CompilationResult {
         require(output.isDirectory())
 
         val (env, config) = prepareCompile(sourceRoot, showFiles = true)
 
-        val ir = sourceToIr(env, config, dependencies, sourceRoot.toRealPath().absolute())
+        val ir = sourceToIr(
+            env,
+            config,
+            dependencies,
+            sourceRoot.toRealPath().absolute(),
+            DartPackage(
+                isPublic = isPublicPackage
+            )
+        )
 
         // By lazy is important here, the klib must be written before compiling to Dart source,
         // since it will change the IR in place.
-        val dartSources by lazy { compileToDartSource(ir, config, isPublicPackage) }
+        val result by lazy { generateDartCode(ir, config, isPublicPackage) }
 
         when {
             isKlib -> {
@@ -95,14 +105,14 @@ object KotlinToDartCompiler {
 
                 val dartSourcePath = output.resolve("lib")
 
-                for ((path, source) in dartSources) {
+                for ((path, source) in result.sources) {
                     dartSourcePath.resolve(path).apply {
                         parent?.createDirectories()
                         writeText(source)
                     }
                 }
             }
-            else -> for ((path, source) in dartSources) {
+            else -> for ((path, source) in result.sources) {
                 output.resolve(path).toFile().apply {
                     parentFile.mkdirs()
                     writeText(source)
@@ -114,7 +124,10 @@ object KotlinToDartCompiler {
             dartFormat(output.absolutePathString())
         }
 
-        return output
+        return CompilationResult(
+            output,
+            diagnostics = result.diagnostics
+        )
     }
 
     private fun prepareCompile(sourceRoot: Path, showFiles: Boolean)
@@ -152,13 +165,13 @@ object KotlinToDartCompiler {
     /**
      * Compiles the given Kotlin IR and returns the Dart source.
      */
-    private fun compileToDartSource(
+    private fun generateDartCode(
         ir: IrResult,
         config: CompilerConfiguration,
         isPublicPackage: Boolean
-    ): Map<Path, String> {
-        val dartAst = irToDartAst(config, ir, isPublicPackage)
-        return dartAstToDartSource(dartAst)
+    ): DartCodeGenerationResult {
+        val (dartAst, diagnostics) = irToDartAst(config, ir, isPublicPackage)
+        return DartCodeGenerationResult(dartAstToDartSource(dartAst), diagnostics)
     }
 
     class Arguments : CommonCompilerArguments()
@@ -179,3 +192,13 @@ object KotlinToDartCompiler {
         return Runtime.getRuntime().exec("$dart format ${args.joinToString(" ")}").waitFor()
     }
 }
+
+data class CompilationResult(
+    val output: Path,
+    val diagnostics: Collection<Diagnostic>
+)
+
+private data class DartCodeGenerationResult(
+    val sources: Map<Path, String>,
+    val diagnostics: Collection<Diagnostic>
+)

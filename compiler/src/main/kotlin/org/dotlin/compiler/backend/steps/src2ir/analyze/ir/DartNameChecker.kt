@@ -20,7 +20,6 @@
 package org.dotlin.compiler.backend.steps.src2ir.analyze.ir
 
 import org.jetbrains.kotlin.backend.common.lower.parents
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.util.isPropertyAccessor
 import org.jetbrains.kotlin.psi.KtDeclaration
@@ -28,7 +27,6 @@ import org.jetbrains.kotlin.util.collectionUtils.filterIsInstanceAnd
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
 
 class DartNameChecker : IrDeclarationChecker {
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun IrAnalyzerContext.check(source: KtDeclaration, declaration: IrDeclaration) {
         if (declaration !is IrDeclarationWithName) return
         val scope = declaration.parents.firstIsInstanceOrNull<IrDeclarationContainer>() ?: return
@@ -65,7 +63,7 @@ class DartNameChecker : IrDeclarationChecker {
                 continue
             }
 
-            trace.report(ErrorsDart.DART_NAME_CLASH.on(source, dartName.value, declaration.descriptor))
+            trace.report(ErrorsDart.DART_NAME_CLASH.on(source, dartName.value, clash))
         }
     }
 }

@@ -173,8 +173,7 @@ class DartNameGenerator {
                 }
             }
 
-            // TODO: Only do this if the extension container does not have a name set with an annotation.
-            if (this is IrClass && isDartExtensionContainer) {
+            if (this is IrClass && isDartExtensionWithGeneratedName) {
                 // A suffix is added to extension containers to prevent name conflicts with extension containers in
                 // other files for the same type.
                 name = name?.copy(

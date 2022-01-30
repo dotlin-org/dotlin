@@ -17,14 +17,22 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.backend.steps.src2ir
+package org.dotlin.compiler
 
-import org.dotlin.compiler.backend.DotlinCompilerError
-import org.dotlin.compiler.errors
-import org.jetbrains.kotlin.analyzer.AnalysisResult
+import org.jetbrains.kotlin.diagnostics.Diagnostic
+import org.jetbrains.kotlin.diagnostics.Severity
 
-fun AnalysisResult.throwIfIsError() {
-    if (isError()) {
-        throw DotlinCompilerError(bindingContext.diagnostics.errors)
-    }
-}
+val Iterable<Diagnostic>.warnings
+    get() = filter { it.severity == Severity.WARNING }
+
+val Iterable<Diagnostic>.errors
+    get() = filter { it.severity == Severity.ERROR }
+
+val Iterable<Diagnostic>.hasWarnings
+    get() = warnings.isNotEmpty()
+
+val Iterable<Diagnostic>.hasErrors
+    get() = errors.isNotEmpty()
+
+val Iterable<Diagnostic>.names
+    get() = map { it.factory.name }

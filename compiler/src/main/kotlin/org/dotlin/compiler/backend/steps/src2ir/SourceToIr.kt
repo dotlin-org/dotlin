@@ -19,10 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.src2ir
 
-import org.dotlin.compiler.backend.DartDescriptorBasedMangler
-import org.dotlin.compiler.backend.DartIrLinker
-import org.dotlin.compiler.backend.DartKotlinBuiltIns
-import org.dotlin.compiler.backend.DartNameGenerator
+import org.dotlin.compiler.backend.*
 import org.dotlin.compiler.backend.steps.src2ir.analyze.DartKotlinAnalyzer
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.DartIrAnalyzer
 import org.jetbrains.kotlin.backend.common.serialization.DeserializationStrategy
@@ -60,6 +57,7 @@ fun sourceToIr(
     config: CompilerConfiguration,
     dependencies: Set<Path>,
     sourceRoot: Path,
+    dartPackage: DartPackage
 ): IrResult {
     val sourceFiles = env.getSourceFiles()
 
@@ -74,7 +72,8 @@ fun sourceToIr(
         sourceFiles,
         irFactory = IrFactoryImpl,
         resolvedLibraries,
-        sourceRoot
+        sourceRoot,
+        dartPackage
     )
 }
 
@@ -84,7 +83,8 @@ private fun loadIr(
     files: List<KtFile>,
     irFactory: IrFactory,
     resolvedLibs: KotlinLibraryResolveResult,
-    sourceRoot: Path
+    sourceRoot: Path,
+    dartPackage: DartPackage
 ): IrResult {
     val builtIns = DartKotlinBuiltIns()
 
@@ -185,9 +185,10 @@ private fun loadIr(
 
     val dartNameGenerator = DartNameGenerator()
 
-    DartIrAnalyzer(module, trace, symbolTable, dartNameGenerator, sourceRoot, config).analyzeAndReport().also {
-        it.throwIfIsError()
-    }
+    DartIrAnalyzer(module, trace, symbolTable, dartNameGenerator, sourceRoot, dartPackage, config).analyzeAndReport()
+        .also {
+            it.throwIfIsError()
+        }
 
     return IrResult(
         module,
@@ -195,7 +196,8 @@ private fun loadIr(
         trace,
         symbolTable,
         dartNameGenerator,
-        sourceRoot
+        sourceRoot,
+        dartPackage
     )
 }
 
@@ -223,5 +225,6 @@ class IrResult(
     val bindingTrace: BindingTrace,
     val symbolTable: SymbolTable,
     val dartNameGenerator: DartNameGenerator,
-    val sourceRoot: Path
+    val sourceRoot: Path,
+    val dartPackage: DartPackage
 )

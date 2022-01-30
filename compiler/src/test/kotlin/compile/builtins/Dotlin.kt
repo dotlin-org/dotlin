@@ -1184,4 +1184,95 @@ class Dotlin : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `@DartExtensionName`() = assertCompile {
+        kotlin(
+            """
+            @DartExtensionName("NegativeIntExtensions")
+            fun Int.toNegative() = when {
+                this > 0 -> -this
+                else -> this
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            extension NegativeIntExtensions on int {
+              int toNegative() {
+                return this > 0 ? -this : this;
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartExtensionName with same type but different names in same file`() = assertCompile {
+        kotlin(
+            """
+            @DartExtensionName("NegativeIntExtensions")
+            fun Int.toNegative() = when {
+                this > 0 -> -this
+                else -> this
+            }
+
+            @DartExtensionName("PositiveIntExtensions")
+            fun Int.toPositive() = abs()
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            extension NegativeIntExtensions on int {
+              int toNegative() {
+                return this > 0 ? -this : this;
+              }
+            }
+
+            extension PositiveIntExtensions on int {
+              int toPositive() {
+                return this.abs();
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartExtensionName on file`() = assertCompile {
+        kotlin(
+            """
+            @file:DartExtensionName("IntExtensions")
+
+            fun Int.toNegative() = when {
+                this > 0 -> -this
+                else -> this
+            }
+
+            fun Int.toPositive() = abs()
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            extension IntExtensions on int {
+              int toNegative() {
+                return this > 0 ? -this : this;
+              }
+
+              int toPositive() {
+                return this.abs();
+              }
+            }
+            """
+        )
+    }
 }

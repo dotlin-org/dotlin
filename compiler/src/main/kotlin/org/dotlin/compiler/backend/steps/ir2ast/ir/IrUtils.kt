@@ -462,7 +462,10 @@ fun IrElement.replaceExpressions(block: (IrExpression) -> IrExpression) {
 }
 
 val IrClass.isDartExtensionContainer: Boolean
-    get() = origin == IrDartDeclarationOrigin.EXTENSION
+    get() = origin is IrDartDeclarationOrigin.EXTENSION
+
+val IrClass.isDartExtensionWithGeneratedName: Boolean
+    get() = origin.let { it is IrDartDeclarationOrigin.EXTENSION && it.hasGeneratedName }
 
 fun IrDeclaration.isFakeOverride() = isFakeOverride || origin == IrDeclarationOrigin.FAKE_OVERRIDE
 

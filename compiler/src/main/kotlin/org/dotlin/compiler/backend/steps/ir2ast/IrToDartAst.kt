@@ -24,6 +24,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.transformer.IrToDartCompilationU
 import org.dotlin.compiler.backend.steps.src2ir.IrResult
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.DartIrAnalyzer
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.DartNameChecker
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
 import org.dotlin.compiler.backend.steps.src2ir.throwIfIsError
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
@@ -31,6 +32,7 @@ import org.dotlin.compiler.dart.ast.compilationunit.DartNamedCompilationUnitMemb
 import org.dotlin.compiler.dart.ast.directive.DartExportDirective
 import org.dotlin.compiler.dart.ast.expression.literal.DartSimpleStringLiteral
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.diagnostics.Diagnostic
 import java.nio.file.Path
 import kotlin.io.path.Path
 
@@ -38,7 +40,7 @@ fun irToDartAst(
     config: CompilerConfiguration,
     ir: IrResult,
     isPublicPackage: Boolean
-): Map<Path, DartCompilationUnit> {
+): IrToDartAstResult {
     val loweringContext = ir.lower(config)
 
     // Dart names are checked after lowering.
@@ -46,8 +48,10 @@ fun irToDartAst(
         ir.module, ir.bindingTrace,
         ir.symbolTable, ir.dartNameGenerator,
         ir.sourceRoot,
+        loweringContext.dartPackage,
         config,
-        checkers = listOf(DartNameChecker())
+        checkers = listOf(DartNameChecker()),
+        onlyReport = listOf(ErrorsDart.DART_NAME_CLASH)
     ).analyzeAndReport().also {
         it.throwIfIsError()
     }
@@ -82,5 +86,10 @@ fun irToDartAst(
         )
     }
 
-    return units
+    return IrToDartAstResult(units, ir.bindingTrace.bindingContext.diagnostics.all())
 }
+
+data class IrToDartAstResult(
+    val units: Map<Path, DartCompilationUnit>,
+    val diagnostics: Collection<Diagnostic>
+)

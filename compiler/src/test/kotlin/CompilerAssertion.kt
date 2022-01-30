@@ -17,8 +17,11 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import org.dotlin.compiler.CompilationResult
 import org.dotlin.compiler.KotlinToDartCompiler
 import org.dotlin.compiler.backend.DotlinCompilerError
+import org.dotlin.compiler.names
+import org.dotlin.compiler.warnings
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
@@ -36,7 +39,7 @@ abstract class CompilerAssertion {
     protected open val isKlib: Boolean = false
     protected open val isPublicPackage: Boolean = false
 
-    protected fun compile(): Path {
+    protected fun compile(): CompilationResult {
         return KotlinToDartCompiler.compile(
             sourceRoot,
             dependencies,
@@ -51,6 +54,8 @@ abstract class CompilerAssertion {
 
 abstract class AssertCompileFiles : CompilerAssertion() {
     private val kotlinSources = mutableListOf<String>()
+
+    public override var isPublicPackage: Boolean = false
 
     fun kotlin(@Language("kotlin") kotlin: String) {
         kotlinSources += kotlin.trimIndent()
@@ -73,7 +78,7 @@ class AssertCompilesTo : AssertCompileFiles() {
 
     override fun assert() {
         val compiledDartSources =
-            Files.walk(assertDoesNotThrow { compile() })
+            Files.walk(assertDoesNotThrow { compile() }.output)
                 .filter { it.isRegularFile() }
                 .toList()
                 .sortedBy { it.nameWithoutExtension }
@@ -85,13 +90,28 @@ class AssertCompilesTo : AssertCompileFiles() {
     }
 }
 
-class AssertCompilesWithError : AssertCompileFiles() {
-    lateinit var diagnostics: List<String>
+abstract class AssertCompilesWithDiagnostics : AssertCompileFiles() {
+    abstract var diagnostics: List<String>
+}
+
+class AssertCompilesWithError : AssertCompilesWithDiagnostics() {
+    override lateinit var diagnostics: List<String>
 
     override fun assert() {
         val error = assertThrows<DotlinCompilerError> { compile() }
         diagnostics.forEach {
-            assertContains(error.diagnosticNames, it)
+            assertContains(error.errors.names, it)
+        }
+    }
+}
+
+class AssertCompilesWithWarning : AssertCompilesWithDiagnostics() {
+    override lateinit var diagnostics: List<String>
+
+    override fun assert() {
+        val (_, diagnostics) = assertDoesNotThrow { compile() }
+        this.diagnostics.forEach {
+            assertContains(diagnostics.warnings.names, it)
         }
     }
 }
@@ -105,7 +125,6 @@ class AssertCanCompile : AssertCompileFiles() {
 abstract class AssertCompileLibrary<O> : CompilerAssertion() {
     public override var dependencies = setOf(stdlibKlib)
     override val isKlib = true
-    public override var isPublicPackage: Boolean = false
 }
 
 class AssertCanCompileLibraryFromPath : AssertCompileLibrary<Unit>() {
@@ -137,6 +156,18 @@ inline fun assertCompilesWithErrors(vararg names: String, block: AssertCompilesW
         require(names.isNotEmpty())
         it.diagnostics = names.toList()
         block(it)
+        it.assert()
+    }
+
+inline fun assertCompilesWithWarning(name: String, block: AssertCompilesWithWarning.() -> Unit) =
+    assertCompilesWithWarnings(name, block = block)
+
+inline fun assertCompilesWithWarnings(vararg names: String, block: AssertCompilesWithWarning.() -> Unit) =
+    AssertCompilesWithWarning().let {
+        require(names.isNotEmpty())
+        it.diagnostics = names.toList()
+        block(it)
+        it.assert()
     }
 
 inline fun assertCanCompileLib(block: AssertCanCompileLibraryFromPath.() -> Unit) =

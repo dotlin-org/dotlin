@@ -17,10 +17,28 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.backend
+package analysis
 
-import org.jetbrains.kotlin.diagnostics.Diagnostic
+import BaseTest
+import assertCanCompile
+import assertCompilesWithError
+import assertCompilesWithErrors
+import assertCompilesWithWarning
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
 
-open class DotlinError(override val message: String? = null) : Error(message)
+@DisplayName("Analysis: Dotlin")
+class Dotlin : BaseTest {
+    @Test
+    fun `warning when declaring extension without @DartExtensionName in public package`() =
+        assertCompilesWithWarning("EXTENSION_WITHOUT_EXPLICIT_DART_EXTENSION_NAME_IN_PUBLIC_PACKAGE") {
+            isPublicPackage = true
 
-class DotlinCompilerError constructor(val errors: Collection<Diagnostic>) : DotlinError()
+            kotlin(
+                """
+                fun Int.negate() = -this
+                """
+            )
+        }
+}
