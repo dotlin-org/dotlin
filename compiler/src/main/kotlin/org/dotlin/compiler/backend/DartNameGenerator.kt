@@ -19,9 +19,7 @@
 
 package org.dotlin.compiler.backend
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
-import org.dotlin.compiler.backend.steps.ir2ast.ir.isExplicitBackingField
-import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrivate
+import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.util.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartPrefixedIdentifier
@@ -30,6 +28,7 @@ import org.dotlin.compiler.dart.ast.expression.identifier.toDartIdentifier
 import org.jetbrains.kotlin.backend.common.lower.parents
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.types.*
+import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.isSetter
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.konan.file.File
@@ -174,6 +173,19 @@ class DartNameGenerator {
                 }
             }
 
+            // TODO: Only do this if the extension container does not have a name set with an annotation.
+            if (this is IrClass && isDartExtensionContainer) {
+                // A suffix is added to extension containers to prevent name conflicts with extension containers in
+                // other files for the same type.
+                name = name?.copy(
+                    suffix = "$" + file.relativeDartPath
+                        .toString()
+                        .hashCode()
+                        .toUInt()
+                        .toString(radix = 16)
+                )
+            }
+
             return when {
                 aliasPrefix != null && name != null -> DartPrefixedIdentifier(aliasPrefix, name)
                 else -> name
@@ -257,20 +269,30 @@ class DartNameGenerator {
 
     private fun List<*>.isLastIndexAndNotSingle(index: Int) = index == size - 1 && size != 1
 
-    fun IrContext.dartPathOf(file: IrFile): Path {
-        val fileName = file.name.foldIndexed(initial = "") { index, acc, char ->
+    private fun dartNameOf(file: IrFile): String {
+        return file.name.foldIndexed(initial = "") { index, acc, char ->
             acc + when {
                 index != 0 && char.isUpperCase() && !acc.last().isUpperCase() -> "_$char"
                 else -> char.toString()
             }
         }.lowercase().replace(Regex("\\.kt$"), ".g.dart")
+    }
 
-        val relativePath: Path? =
-            Path(
-                (Path(file.fileEntry.name).toRealPath().absolute() - sourceRoot)
+    fun IrContext.dartRelativePathOf(file: IrFile): Path {
+        val fileName = dartNameOf(file)
+        val filePath = Path(file.path)
+
+        val relativePath: Path? = when {
+            file.isInCurrentModule -> Path(
+                (filePath.toRealPath().absolute() - sourceRoot)
                     .joinToString(File.separator)
             ).parent
+            else -> filePath.parent // File paths are always serialized as relative to their source root.
+        }
 
-        return relativePath?.resolve(fileName) ?: Path(fileName)
+        // All Dart files are always put in /src in Dotlin.
+        // TODO: Don't assume all Dart files are in src/ (e.g. non-Dotlin Dart packages).
+        val root = Path("src")
+        return relativePath?.let { root.resolve(it) }?.resolve(fileName) ?: root.resolve(fileName)
     }
 }

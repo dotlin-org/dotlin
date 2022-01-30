@@ -1846,7 +1846,7 @@ class Expression : BaseTest {
               Test().add(Test());
             }
 
-            extension ${'$'}TestExtensions on Test {
+            extension ${'$'}TestExtensions${'$'}21ad63ef on Test {
               Test add(Test other) {
                 return Test();
               }
@@ -1872,10 +1872,10 @@ class Expression : BaseTest {
             import 'package:meta/meta.dart';
 
             void main() {
-              ${'$'}KotlinIntExtensions(1).add(2);
+              ${'$'}KotlinIntExtensions${'$'}21ad63ef(1).add(2);
             }
 
-            extension ${'$'}KotlinIntExtensions on int {
+            extension ${'$'}KotlinIntExtensions${'$'}21ad63ef on int {
               int add(int other) {
                 return this + other;
               }

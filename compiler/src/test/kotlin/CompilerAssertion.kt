@@ -25,6 +25,7 @@ import org.junit.jupiter.api.assertThrows
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.*
+import kotlin.streams.toList
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 

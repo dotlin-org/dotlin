@@ -93,21 +93,16 @@ object KotlinToDartCompiler {
             isKlib -> {
                 writeToKlib(env, config, ir, output)
 
-                val dartSourcePath = output.resolve("lib/src")
+                val dartSourcePath = output.resolve("lib")
 
                 for ((path, source) in dartSources) {
-                    val relativePath = dartSourcePath.resolve(
-                        path.minus(sourceRoot.toRealPath().absolute()).joinToString(File.separator)
-                    )
-
-                    relativePath.apply {
+                    dartSourcePath.resolve(path).apply {
                         parent?.createDirectories()
                         writeText(source)
                     }
                 }
             }
             else -> for ((path, source) in dartSources) {
-                // TODO: Make path relative
                 output.resolve(path).toFile().apply {
                     parentFile.mkdirs()
                     writeText(source)
