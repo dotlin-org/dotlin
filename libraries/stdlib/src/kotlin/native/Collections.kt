@@ -34,7 +34,7 @@ interface Collection<out E> : Iterable<E> {
     /**
      * Returns `true` if the collection is empty (contains no elements), `false` otherwise.
      */
-    fun isEmpty(): Boolean
+    override fun isEmpty(): Boolean
 
     /**
      * Checks if the specified element is contained in this collection.
@@ -290,6 +290,7 @@ interface Map<K, out V> {
     /**
      * Returns `true` if the map is empty (contains no elements), `false` otherwise.
      */
+    @DartGetter
     fun isEmpty(): Boolean
 
     /**

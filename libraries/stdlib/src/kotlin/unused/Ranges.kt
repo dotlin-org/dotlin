@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-@file:Suppress("EXTERNAL_TYPE_EXTENDS_NON_EXTERNAL_TYPE")
+@file:Suppress("EXTERNAL_TYPE_EXTENDS_NON_EXTERNAL_TYPE", "MANY_INTERFACES_MEMBER_NOT_IMPLEMENTED")
 
 package kotlin.ranges
 
