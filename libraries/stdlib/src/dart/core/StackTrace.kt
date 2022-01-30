@@ -19,6 +19,7 @@
     "MUST_BE_INITIALIZED_OR_BE_ABSTRACT",
     "NESTED_CLASS_IN_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
     "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
+    "NESTED_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
 )
 
 package dart.core
@@ -40,16 +41,16 @@ external interface StackTrace {
          * This stack trace is used as the default in situations where
          * a stack trace is required, but the user has not supplied one.
          */
+        @DartStatic
         @DartName("empty")
-        val EMPTY: StackTrace
-            get() = dart("StackTrace.empty")
+        external val EMPTY: StackTrace
 
         /**
          * Returns a representation of the current stack trace.
          */
+        @DartStatic
         @DartName("current")
-        val CURRENT: StackTrace
-            get() = dart("StackTrace.current")
+        external val CURRENT: StackTrace
     }
 
     /**
