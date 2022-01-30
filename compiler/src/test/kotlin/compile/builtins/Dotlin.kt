@@ -462,7 +462,7 @@ class Dotlin : BaseTest {
               Hobbit().isProudfoot();
             }
 
-            extension ${'$'}HobbitExtensions on Hobbit {
+            extension ${'$'}HobbitExtensions${'$'}21ad63ef on Hobbit {
               bool isProudfoot() {
                 return true;
               }
@@ -505,13 +505,13 @@ class Dotlin : BaseTest {
               Proudfoot().isProudfoot();
             }
 
-            extension ${'$'}HobbitExtensions on Hobbit {
+            extension ${'$'}HobbitExtensions${'$'}21ad63ef on Hobbit {
               bool isProudfoot() {
                 return false;
               }
             }
 
-            extension ${'$'}ProudfootExtensions on Proudfoot {
+            extension ${'$'}ProudfootExtensions${'$'}21ad63ef on Proudfoot {
               bool isProudfoot() {
                 return true;
               }
@@ -556,7 +556,7 @@ class Dotlin : BaseTest {
               Proudfoot().isProudfoot();
             }
 
-            extension ${'$'}ProudfootExtensions on Proudfoot {
+            extension ${'$'}ProudfootExtensions${'$'}21ad63ef on Proudfoot {
               bool isProudfoot() {
                 return true;
               }

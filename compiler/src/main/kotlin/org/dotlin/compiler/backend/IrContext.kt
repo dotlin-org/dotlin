@@ -117,11 +117,13 @@ abstract class IrContext {
         dartNameGenerator.run { dartNameValueWith(superTypes) }
 
     /**
-     * Path is relative to the [sourceRoot], and the original Kotlin file name is transformed to snake case,
-     * and the `.kt` extension is replaced with `.g.dart`.
+     * The path for the (eventually) generated Dart file. The path is relative to its source root ([sourceRoot] if it's
+     * a file in the currently compiling module).
+     *
+     * The original Kotlin file name is transformed to snake case, and the `.kt` extension is replaced with `.g.dart`.
      */
-    val IrFile.dartPath: Path
-        get() = dartNameGenerator.runWith(this) { dartPathOf(it) }
+    val IrFile.relativeDartPath: Path
+        get() = dartNameGenerator.runWith(this) { dartRelativePathOf(it) }
 
     // Annotation utils
     val IrDeclaration.dartHiddenNameFromCore: String?
@@ -179,10 +181,8 @@ abstract class IrContext {
             else -> fileOrNull?.let { file ->
                 when {
                     file != currentFile -> when {
-                        // TODO: Package imports
-                        file.module != currentFile.module -> null
-                        else -> file.dartPath.let { theirDartPath ->
-                            val currentDartPath = currentFile.dartPath
+                        file.isInCurrentModule -> file.relativeDartPath.let { theirDartPath ->
+                            val currentDartPath = currentFile.relativeDartPath
                             val importPath = currentDartPath.parent?.relativize(theirDartPath)?.toString()
                                 ?: theirDartPath.toString()
 
@@ -195,6 +195,8 @@ abstract class IrContext {
                                 else -> null
                             }
                         }
+                        // TODO: Package imports
+                        else -> null
                     }
                     else -> null
                 }
@@ -210,6 +212,12 @@ abstract class IrContext {
 
     val IrDeclaration.dartLibraryAlias: String?
         get() = dartUnresolvedImport?.alias
+
+    val IrFile.isInCurrentModule: Boolean
+        get() = module == currentFile.module
+
+    val IrDeclaration.isInCurrentModule: Boolean
+        get() = fileOrNull?.isInCurrentModule == true
 }
 
 data class DartUnresolvedImport(val library: String, val alias: String?, val hidden: Boolean)

@@ -59,7 +59,7 @@ fun irToDartAst(
 
         file.accept(IrToDartCompilationUnitTransformer, context).let {
             if (it.declarations.isNotEmpty()) {
-                units[context.run { file.dartPath }] = it
+                units[context.run { file.relativeDartPath }] = it
             }
         }
     }

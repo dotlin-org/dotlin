@@ -26,50 +26,95 @@ import org.jetbrains.kotlin.backend.common.serialization.metadata.KlibMetadataVe
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.languageVersionSettings
+import org.jetbrains.kotlin.ir.IrFileEntry
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
+import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
 import org.jetbrains.kotlin.ir.util.IrMessageLogger
+import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.library.KotlinAbiVersion
 import org.jetbrains.kotlin.library.KotlinLibraryVersioning
 import org.jetbrains.kotlin.library.impl.BuiltInsPlatform
 import org.jetbrains.kotlin.library.impl.buildKotlinLibrary
 import java.nio.file.Path
+import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
 
 fun writeToKlib(env: KotlinCoreEnvironment, config: CompilerConfiguration, irResult: IrResult, outputFile: Path) {
-    val serializedIr = DartIrModuleSerializer(
-        messageLogger = config.get(IrMessageLogger.IR_MESSAGE_LOGGER) ?: IrMessageLogger.None,
-        builtIns = irResult.module.irBuiltins,
-    ).serializedIrModule(irResult.module)
+    irResult.module.withFilePathsRelativeTo(irResult.sourceRoot) { module ->
+        val serializedIr = DartIrModuleSerializer(
+            messageLogger = config.get(IrMessageLogger.IR_MESSAGE_LOGGER) ?: IrMessageLogger.None,
+            builtIns = module.irBuiltins,
+        ).serializedIrModule(module)
 
-    val metadataVersion = KlibMetadataVersion.INSTANCE
+        val metadataVersion = KlibMetadataVersion.INSTANCE
 
-    val versions = KotlinLibraryVersioning(
-        libraryVersion = null,
-        compilerVersion = null, // TODO: get
-        abiVersion = KotlinAbiVersion.CURRENT,
-        metadataVersion = metadataVersion.toString(),
-        irVersion = KlibIrVersion.INSTANCE.toString()
-    )
+        val versions = KotlinLibraryVersioning(
+            libraryVersion = null,
+            compilerVersion = null, // TODO: get
+            abiVersion = KotlinAbiVersion.CURRENT,
+            metadataVersion = metadataVersion.toString(),
+            irVersion = KlibIrVersion.INSTANCE.toString()
+        )
 
-    val serializedMetadata = KlibMetadataMonolithicSerializer(
-        languageVersionSettings = config.languageVersionSettings,
-        metadataVersion = metadataVersion,
-        project = env.project,
-        exportKDoc = false,
-        skipExpects = true,
-        allowErrorTypes = false
-    ).serializeModule(irResult.module.descriptor)
+        val serializedMetadata = KlibMetadataMonolithicSerializer(
+            languageVersionSettings = config.languageVersionSettings,
+            metadataVersion = metadataVersion,
+            project = env.project,
+            exportKDoc = true,
+            skipExpects = true,
+            allowErrorTypes = false
+        ).serializeModule(irResult.module.descriptor)
 
-    buildKotlinLibrary(
-        linkDependencies = irResult.resolvedLibs.getFullList(),
-        metadata = serializedMetadata,
-        ir = serializedIr,
-        versions = versions,
-        output = outputFile.absolutePathString(),
-        moduleName = irResult.module.name.asStringStripSpecialMarkers(),
-        nopack = true,
-        perFile = false, // TODO
-        manifestProperties = null,
-        dataFlowGraph = null,
-        builtInsPlatform = BuiltInsPlatform.COMMON,
-    )
+        buildKotlinLibrary(
+            linkDependencies = irResult.resolvedLibs.getFullList(),
+            metadata = serializedMetadata,
+            ir = serializedIr,
+            versions = versions,
+            output = outputFile.absolutePathString(),
+            moduleName = module.name.asStringStripSpecialMarkers(),
+            nopack = true,
+            perFile = false, // TODO
+            manifestProperties = null,
+            dataFlowGraph = null,
+            builtInsPlatform = BuiltInsPlatform.COMMON,
+        )
+    }
+}
+
+@OptIn(ObsoleteDescriptorBasedAPI::class)
+private fun IrModuleFragment.withFilePathsRelativeTo(sourceRoot: Path, block: (IrModuleFragment) -> Unit) {
+    // We want to serialize the file paths as relative to the source root.
+    val originalFiles = files.toList()
+    files.clear()
+    originalFiles.mapTo(files) {
+        IrFileImpl(
+            fileEntry = it.fileEntry.let { entry ->
+                object : IrFileEntry {
+                    override val name = sourceRoot.relativize(Path(entry.name)).toString()
+                    override val maxOffset = entry.maxOffset
+                    override fun getColumnNumber(offset: Int) = entry.getColumnNumber(offset)
+                    override fun getLineNumber(offset: Int) = entry.getLineNumber(offset)
+
+                    override fun getSourceRangeInfo(beginOffset: Int, endOffset: Int) =
+                        entry.getSourceRangeInfo(beginOffset, endOffset)
+                }
+            },
+            it.packageFragmentDescriptor,
+            it.module
+        ).apply {
+            declarations.addAll(it.declarations)
+            patchDeclarationParents(this)
+            annotations = it.annotations
+        }
+    }
+
+    block(this)
+
+    // We put back the original files, so that there are no side effects to calling this function.
+    files.apply {
+        clear()
+        addAll(originalFiles)
+        forEach { patchDeclarationParents(it) }
+    }
 }

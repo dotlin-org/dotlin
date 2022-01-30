@@ -43,7 +43,7 @@ class Extension : BaseTest {
             @sealed
             class Test {}
 
-            extension ${'$'}TestExtensions on Test {
+            extension ${'$'}TestExtensions${'$'}21ad63ef on Test {
               void doIt() {}
             }
             """
@@ -67,7 +67,7 @@ class Extension : BaseTest {
             @sealed
             class Test {}
 
-            extension ${'$'}TestExtensions on Test {
+            extension ${'$'}TestExtensions${'$'}21ad63ef on Test {
               int get number {
                 return 3;
               }
@@ -95,7 +95,7 @@ class Extension : BaseTest {
             @sealed
             class Test {}
 
-            extension ${'$'}TestExtensions on Test {
+            extension ${'$'}TestExtensions${'$'}21ad63ef on Test {
               int get number {
                 return 3;
               }
@@ -123,7 +123,7 @@ class Extension : BaseTest {
             @sealed
             class Test<T> {}
 
-            extension ${'$'}TestExtensions<T> on Test<T> {
+            extension ${'$'}TestExtensions${'$'}21ad63ef<T> on Test<T> {
               void doIt() {}
             }
             """
@@ -149,7 +149,7 @@ class Extension : BaseTest {
             @sealed
             class Test<T> {}
 
-            extension ${'$'}TestExtensions<T> on Test<T> {
+            extension ${'$'}TestExtensions${'$'}21ad63ef<T> on Test<T> {
               void doIt() {}
               void doItAgain() {}
             }
@@ -176,11 +176,11 @@ class Extension : BaseTest {
             @sealed
             class Test<T> {}
 
-            extension ${'$'}TestExtensions<T> on Test<T> {
+            extension ${'$'}TestExtensions${'$'}21ad63ef<T> on Test<T> {
               void doIt() {}
             }
 
-            extension ${'$'}TestIntExtensions on Test<int> {
+            extension ${'$'}TestIntExtensions${'$'}21ad63ef on Test<int> {
               void doItAgain() {}
             }
             """
@@ -204,7 +204,7 @@ class Extension : BaseTest {
             @sealed
             class Test<T> {}
 
-            extension ${'$'}TestExtensions<A> on Test<A> {
+            extension ${'$'}TestExtensions${'$'}21ad63ef<A> on Test<A> {
               void doIt<B>() {}
             }
             """
@@ -223,7 +223,7 @@ class Extension : BaseTest {
             """
             import 'package:meta/meta.dart';
 
-            extension ${'$'}KotlinStringExtensions on String {
+            extension ${'$'}KotlinStringExtensions${'$'}21ad63ef on String {
               void titlecase() {}
             }
             """
@@ -242,7 +242,7 @@ class Extension : BaseTest {
             """
             import 'package:meta/meta.dart';
 
-            extension ${'$'}TMustBeAnyExtensions<T> on T {
+            extension ${'$'}TMustBeAnyExtensions${'$'}21ad63ef<T> on T {
               void doIt() {}
             }
             """
@@ -266,7 +266,7 @@ class Extension : BaseTest {
             @sealed
             class Test<T> {}
 
-            extension ${'$'}TMustBeTestWithTExtensions<T extends Test<T>> on T {
+            extension ${'$'}TMustBeTestWithTExtensions${'$'}21ad63ef<T extends Test<T>> on T {
               void doIt() {}
             }
             """
@@ -290,7 +290,8 @@ class Extension : BaseTest {
             @sealed
             class Test<T> {}
 
-            extension ${'$'}TMustBeTestWithStringExtensions<T extends Test<String>> on T {
+            extension ${'$'}TMustBeTestWithStringExtensions${'$'}21ad63ef<T extends Test<String>>
+                on T {
               void doIt() {}
             }
             """
@@ -354,7 +355,8 @@ class Extension : BaseTest {
               SomeItem().buildAndIdentify();
             }
 
-            extension ${'$'}TMustBeBuildableAndIdentifiableExtensions<T extends Object> on T {
+            extension ${'$'}TMustBeBuildableAndIdentifiableExtensions${'$'}21ad63ef<T extends Object>
+                on T {
               void buildAndIdentify() {
                 (this as Identifiable).identify();
                 (this as Buildable).build();
@@ -377,10 +379,33 @@ class Extension : BaseTest {
             """
             import 'package:meta/meta.dart';
 
-            extension ${'$'}KotlinIntExtensions on int {
+            extension ${'$'}KotlinIntExtensions${'$'}21ad63ef on int {
               int shift() {
                 return 0;
               }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `calling extension from other package on Kotlin number primitive`() = assertCompile {
+        kotlin(
+            """
+            import kotlin.math.absoluteValue
+
+            fun main() {
+                0.absoluteValue
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              ${'$'}KotlinIntExtensions${'$'}b6c37449(0).absoluteValue;
             }
             """
         )
