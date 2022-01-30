@@ -20,6 +20,7 @@
     "MUST_BE_INITIALIZED_OR_BE_ABSTRACT",
     "UNUSED_PARAMETER",
     "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
+    "ABSTRACT_MEMBER_NOT_IMPLEMENTED" // TODO: Fix in analyzer (external declarations don't need to implement anything)
 )
 
 package kotlin

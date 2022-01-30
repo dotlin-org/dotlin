@@ -57,7 +57,7 @@ open class IntProgression
      * Progression with a positive step is empty if its first element is greater than the last element.
      * Progression with a negative step is empty if its first element is less than the last element.
      */
-    open fun isEmpty(): Boolean = if (step > 0) first > last else first < last
+    override fun isEmpty(): Boolean = if (step > 0) first > last else first < last
 
     override fun equals(other: Any?): Boolean =
         other is IntProgression && (isEmpty() && other.isEmpty() ||

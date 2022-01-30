@@ -27,6 +27,14 @@ import kotlin.internal.PlatformDependent
 @DartLibrary("dart:core")
 external interface Iterable<out T> {
     /**
+     * Whether this iterable has no elements.
+     *
+     * May be computed by checking if `iterator.hasNext()` returns `false`.
+     */
+    @DartGetter
+    fun isEmpty(): Boolean
+
+    /**
      * Returns an iterator over the elements of this object.
      */
     @DartGetter
