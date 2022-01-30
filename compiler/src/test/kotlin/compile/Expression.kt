@@ -652,6 +652,32 @@ class Expression : BaseTest {
     }
 
     @Test
+    fun `!==`() = assertCompile {
+        kotlin(
+            """
+            class Test
+
+            fun main() {
+               Test() !== Test()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {}
+
+            void main() {
+              !identical(Test(), Test());
+            }
+            """
+        )
+    }
+
+    @Test
     fun `Boolean not`() = assertCompile {
         kotlin(
             """
