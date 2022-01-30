@@ -35,27 +35,26 @@ import org.jetbrains.kotlin.ir.types.impl.originalKotlinType
 import org.jetbrains.kotlin.ir.util.isFunctionTypeOrSubtype
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
-fun IrType.accept(context: DartTransformContext): DartTypeAnnotation = context.runWith(this) {
-    // TODO: Check for function type
+fun IrType.accept(context: DartTransformContext, isConstructorType: Boolean = false): DartTypeAnnotation =
+    context.runWith(this) {
+        if (!isConstructorType && it.isUnit()) {
+            return@runWith DartTypeAnnotation.VOID
+        }
 
-    if (it.isUnit()) {
-        return@runWith DartTypeAnnotation.VOID
-    }
-
-    when (it) {
-        is IrSimpleType -> when {
-            it.isFunctionTypeOrSubtype() -> DartFunctionType(
-                returnType = it.arguments.last().accept(context),
-                parameters = DartFormalParameterList(
-                    it.arguments.dropLast(1).map { arg ->
-                        DartSimpleFormalParameter(
-                            identifier = arg.safeAs<IrSimpleType>()
-                                ?.originalKotlinType
-                                ?.extractParameterNameFromFunctionTypeArgument()
-                                ?.identifier
-                                ?.let { name -> DartSimpleIdentifier(name) },
-                            type = arg.accept(context),
-                        )
+        when (it) {
+            is IrSimpleType -> when {
+                it.isFunctionTypeOrSubtype() -> DartFunctionType(
+                    returnType = it.arguments.last().accept(context),
+                    parameters = DartFormalParameterList(
+                        it.arguments.dropLast(1).map { arg ->
+                            DartSimpleFormalParameter(
+                                identifier = arg.safeAs<IrSimpleType>()
+                                    ?.originalKotlinType
+                                    ?.extractParameterNameFromFunctionTypeArgument()
+                                    ?.identifier
+                                    ?.let { name -> DartSimpleIdentifier(name) },
+                                type = arg.accept(context),
+                            )
                     }
                 )
             )

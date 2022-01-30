@@ -225,7 +225,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
 
                         when (irCallLike) {
                             is IrConstructorCall, is IrEnumConstructorCall -> {
-                                val type = irCallLike.type.accept(context) as DartNamedType
+                                val type = irCallLike.type.accept(context, isConstructorType = true) as DartNamedType
                                 val name = irCallLike.symbol.owner.simpleDartNameOrNull
 
                                 DartInstanceCreationExpression(
