@@ -24,6 +24,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartStatementOrigin.*
 import org.dotlin.compiler.backend.steps.ir2ast.ir.extensionReceiverOrNull
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrimitiveInteger
 import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.createDartAssignment
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
 import org.dotlin.compiler.dart.ast.expression.*
@@ -33,13 +34,17 @@ import org.dotlin.compiler.dart.ast.statement.*
 import org.dotlin.compiler.dart.ast.statement.trycatch.DartCatchClause
 import org.dotlin.compiler.dart.ast.statement.trycatch.DartTryStatement
 import org.jetbrains.kotlin.ir.IrStatement
+import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin.*
+import org.jetbrains.kotlin.ir.expressions.impl.IrGetFieldImpl
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
 import org.jetbrains.kotlin.ir.util.superTypes
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.utils.addToStdlib.cast
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -125,111 +130,138 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
     }
 
     override fun DartTransformContext.visitBlock(irBlock: IrBlock, context: DartTransformContext): DartStatement {
-        if (irBlock.origin == IrStatementOrigin.FOR_LOOP) {
-            val irPossibleSubject = ((irBlock.statements.first() as IrVariable).initializer as IrCall).dispatchReceiver
+        when (irBlock.origin) {
+            FOR_LOOP -> {
+                val irPossibleSubject =
+                    ((irBlock.statements.first() as IrVariable).initializer as IrCall).dispatchReceiver
 
-            val irWhileLoop = irBlock.statements.last() as IrWhileLoop
-            val irBody = irWhileLoop.body as IrBlock
+                val irWhileLoop = irBlock.statements.last() as IrWhileLoop
+                val irBody = irWhileLoop.body as IrBlock
 
-            /**
-             * Note: Removes the variable from the loop block.
-             */
-            val loopVariables by lazy {
-                (irBody.statements.first() as IrVariable)
-                    .acceptAsStatement(context)
-                    .variables.copy(isFinal = false)
-                    .also {
-                        irBody.statements.removeAt(0)
-                    }
-            }
+                /**
+                 * Note: Removes the variable from the loop block.
+                 */
+                /**
+                 * Note: Removes the variable from the loop block.
+                 */
+                /**
+                 * Note: Removes the variable from the loop block.
+                 */
+                val loopVariables by lazy {
+                    (irBody.statements.first() as IrVariable)
+                        .acceptAsStatement(context)
+                        .variables.copy(isFinal = false)
+                        .also {
+                            irBody.statements.removeAt(0)
+                        }
+                }
 
-            /**
-             * Should be accessed after [loopVariables].
-             */
-            val body by lazy { irBody.acceptAsStatement(context) }
+                /**
+                 * Should be accessed after [loopVariables].
+                 */
+                val body by lazy { irBody.acceptAsStatement(context) }
 
-            when {
-                // `x until y`, `x..y` and `x downTo y` calls are translated as traditional for-loops.
-                irPossibleSubject.hasOrIsUntilCall() ||
-                        irPossibleSubject.hasOrIsPrimitiveNumberRangeToCall() ||
-                        irPossibleSubject.hasOrIsDownToCall() -> {
-                    irPossibleSubject as IrCall
+                when {
+                    // `x until y`, `x..y` and `x downTo y` calls are translated as traditional for-loops.
+                    irPossibleSubject.hasOrIsUntilCall() ||
+                            irPossibleSubject.hasOrIsPrimitiveNumberRangeToCall() ||
+                            irPossibleSubject.hasOrIsDownToCall() -> {
+                        irPossibleSubject as IrCall
 
-                    val irSubject: IrCall
-                    val step: DartExpression
+                        val irSubject: IrCall
+                        val step: DartExpression
 
-                    if (irPossibleSubject.isStepCall()) {
-                        irSubject = irPossibleSubject.let {
-                            it.untilCall() ?: it.primitiveNumberRangeToCall() ?: it.downToCall()
-                        }!!
-                        step = irPossibleSubject.valueArguments[0]!!.accept(context)
-                    } else {
-                        irSubject = irPossibleSubject
-                        step = DartIntegerLiteral(1)
-                    }
+                        if (irPossibleSubject.isStepCall()) {
+                            irSubject = irPossibleSubject.let {
+                                it.untilCall() ?: it.primitiveNumberRangeToCall() ?: it.downToCall()
+                            }!!
+                            step = irPossibleSubject.valueArguments[0]!!.accept(context)
+                        } else {
+                            irSubject = irPossibleSubject
+                            step = DartIntegerLiteral(1)
+                        }
 
-                    val from = (irSubject.dispatchReceiver ?: irSubject.extensionReceiverOrNull)!!.let {
-                        when {
-                            it is IrConstructorCall && it.origin == EXTENSION_CONSTRUCTOR_CALL -> {
-                                it.valueArguments[0]!!
-                            }
-                            else -> it
-                        }.accept(context)
-                    }
-                    val to = irSubject.valueArguments[0]!!.accept(context)
+                        val from = (irSubject.dispatchReceiver ?: irSubject.extensionReceiverOrNull)!!.let {
+                            when {
+                                it is IrConstructorCall && it.origin == EXTENSION_CONSTRUCTOR_CALL -> {
+                                    it.valueArguments[0]!!
+                                }
+                                else -> it
+                            }.accept(context)
+                        }
+                        val to = irSubject.valueArguments[0]!!.accept(context)
 
-                    val isInclusive = !irSubject.hasOrIsUntilCall()
-                    val isReversed = irSubject.hasOrIsDownToCall()
+                        val isInclusive = !irSubject.hasOrIsUntilCall()
+                        val isReversed = irSubject.hasOrIsDownToCall()
 
-                    val variables = loopVariables.let {
-                        it.copy(variables = listOf(it[0].copy(expression = from)))
-                    }
-                    val variable = variables[0]
+                        val variables = loopVariables.let {
+                            it.copy(variables = listOf(it[0].copy(expression = from)))
+                        }
+                        val variable = variables[0]
 
-                    return DartForStatement(
-                        loopParts = DartForPartsWithDeclarations(
-                            variables = variables,
-                            condition = DartComparisonExpression(
-                                left = variable.name,
-                                operator = when {
-                                    isReversed -> when {
-                                        isInclusive -> Operators.GREATER_OR_EQUAL
-                                        else -> Operators.GREATER
-                                    }
-                                    else -> when {
-                                        isInclusive -> Operators.LESS_OR_EQUAL
-                                        else -> Operators.LESS
-                                    }
-                                },
-                                right = to,
-                            ),
-                            updaters = listOf(
-                                DartAssignmentExpression(
+                        return DartForStatement(
+                            loopParts = DartForPartsWithDeclarations(
+                                variables = variables,
+                                condition = DartComparisonExpression(
                                     left = variable.name,
                                     operator = when {
-                                        isReversed -> DartAssignmentOperator.SUBTRACT
-                                        else -> DartAssignmentOperator.ADD
+                                        isReversed -> when {
+                                            isInclusive -> Operators.GREATER_OR_EQUAL
+                                            else -> Operators.GREATER
+                                        }
+                                        else -> when {
+                                            isInclusive -> Operators.LESS_OR_EQUAL
+                                            else -> Operators.LESS
+                                        }
                                     },
-                                    right = step
+                                    right = to,
+                                ),
+                                updaters = listOf(
+                                    DartAssignmentExpression(
+                                        left = variable.name,
+                                        operator = when {
+                                            isReversed -> DartAssignmentOperator.SUBTRACT
+                                            else -> DartAssignmentOperator.ADD
+                                        },
+                                        right = step
+                                    )
                                 )
-                            )
-                        ),
-                        body = body
-                    )
-                }
-                irPossibleSubject?.type?.isDartIterable() == true -> {
-                    val subject = irPossibleSubject.accept(context)
+                            ),
+                            body = body
+                        )
+                    }
+                    irPossibleSubject?.type?.isDartIterable() == true -> {
+                        val subject = irPossibleSubject.accept(context)
 
-                    return DartForStatement(
-                        loopParts = DartForEachPartsWithDeclarations(
-                            variables = loopVariables.let {
-                                it.copy(variables = listOf(it[0].copy(expression = null)))
-                            },
-                            iterable = subject
-                        ),
-                        body = body
-                    )
+                        return DartForStatement(
+                            loopParts = DartForEachPartsWithDeclarations(
+                                variables = loopVariables.let {
+                                    it.copy(variables = listOf(it[0].copy(expression = null)))
+                                },
+                                iterable = subject
+                            ),
+                            body = body
+                        )
+                    }
                 }
+            }
+            PLUSEQ, MINUSEQ, MULTEQ, DIVEQ -> {
+                val irOriginalReceiver = irBlock.statements.first().cast<IrVariable>().initializer!!
+                val irSetField = irBlock.statements.last().cast<IrSetField>()
+                val irReceiver = IrGetFieldImpl(
+                    UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+                    symbol = irSetField.symbol,
+                    type = irSetField.type,
+                ).apply {
+                    receiver = irOriginalReceiver
+                }
+
+                return createDartAssignment(
+                    irBlock.origin,
+                    receiver = irReceiver.accept(context),
+                    irReceiverType = irReceiver.type,
+                    irValue = irSetField.value
+                ).asStatement()
             }
         }
 

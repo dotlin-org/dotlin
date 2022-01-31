@@ -432,5 +432,214 @@ class Statement : BaseTest {
                 """
             )
         }
+
+        @Test
+        fun `div= on Double`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    var x = 0.0
+                    x /= 3
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                void main() {
+                  double x = 0.0;
+                  x /= 3;
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `= on property`() = assertCompile {
+            kotlin(
+                """
+                class Test {
+                    var x = 0
+                }
+
+                fun main() {
+                    Test().x = 3
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                @sealed
+                class Test {
+                  @nonVirtual
+                  int x = 0;
+                }
+
+                void main() {
+                  Test().x = 3;
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `+= on property`() = assertCompile {
+            kotlin(
+                """
+                class Test {
+                    var x = 0
+                }
+
+                fun main() {
+                    Test().x += 3
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                @sealed
+                class Test {
+                  @nonVirtual
+                  int x = 0;
+                }
+
+                void main() {
+                  Test().x += 3;
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `-= on property`() = assertCompile {
+            kotlin(
+                """
+                class Test {
+                    var x = 0
+                }
+
+                fun main() {
+                    Test().x -= 3
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                @sealed
+                class Test {
+                  @nonVirtual
+                  int x = 0;
+                }
+
+                void main() {
+                  Test().x -= 3;
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `*= on property`() = assertCompile {
+            kotlin(
+                """
+                class Test {
+                    var x = 0
+                }
+
+                fun main() {
+                    Test().x *= 3
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                @sealed
+                class Test {
+                  @nonVirtual
+                  int x = 0;
+                }
+
+                void main() {
+                  Test().x *= 3;
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `div= on property`() = assertCompile {
+            kotlin(
+                """
+                class Test {
+                    var x = 0
+                }
+
+                fun main() {
+                    Test().x /= 3
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                @sealed
+                class Test {
+                  @nonVirtual
+                  int x = 0;
+                }
+
+                void main() {
+                  Test().x ~/= 3;
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `div= on Double property`() = assertCompile {
+            kotlin(
+                """
+                class Test {
+                    var x = 0.0
+                }
+
+                fun main() {
+                    Test().x /= 3
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                @sealed
+                class Test {
+                  @nonVirtual
+                  double x = 0.0;
+                }
+
+                void main() {
+                  Test().x /= 3;
+                }
+                """
+            )
+        }
     }
 }
