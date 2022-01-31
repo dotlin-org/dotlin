@@ -139,8 +139,8 @@
     - [x] Extension methods
     - [x] Extension properties
     - [ ] Companion object extensions
-- [ ] Generics
-  - [ ] Variance (in, out)
+- [x] Generics
+  - [x] Variance (in, out)
   - [x] Constraints
     - [x] One upper bound
     - [x] Multiple upper bounds
