@@ -25,6 +25,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.ObjectLowering
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.createDartAssignment
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartInt
 import org.dotlin.compiler.backend.util.component6
 import org.dotlin.compiler.backend.util.component7
@@ -51,7 +52,6 @@ import org.jetbrains.kotlin.ir.types.isString
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
@@ -350,33 +350,11 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
         irSetValue: IrSetValue,
         context: DartTransformContext
     ): DartExpression {
-        val valueType = irSetValue.symbol.owner.type
-        val irOperationAssignValue by lazy {
-            irSetValue.value.cast<IrFunctionAccessExpression>().getValueArgumentOrDefault(0)
-        }
-
-        val operator = when (irSetValue.origin) {
-            PLUSEQ -> ADD
-            MINUSEQ -> SUBTRACT
-            MULTEQ -> MULTIPLY
-            DIVEQ -> when {
-                // Dart's int divide operator returns a double, while Kotlin's Int divide operator returns an
-                // Int. So, we use the ~/ Dart operator, which returns an int.
-                valueType.isDartInt() && irOperationAssignValue.type.isDartInt() -> INTEGER_DIVIDE
-                else -> DIVIDE
-            }
-            else -> ASSIGN
-        }
-
-        val irValue = when {
-            operator != ASSIGN -> irOperationAssignValue
-            else -> irSetValue.value
-        }
-
-        return DartAssignmentExpression(
-            left = irSetValue.symbol.owner.dartName,
-            operator = operator,
-            right = irValue.accept(context)
+        return createDartAssignment(
+            irSetValue.origin,
+            receiver = irSetValue.symbol.owner.dartName,
+            irReceiverType = irSetValue.symbol.owner.type,
+            irValue = irSetValue.value
         )
     }
 
