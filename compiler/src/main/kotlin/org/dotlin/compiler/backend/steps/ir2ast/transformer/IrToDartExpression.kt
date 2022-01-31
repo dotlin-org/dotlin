@@ -32,6 +32,7 @@ import org.dotlin.compiler.backend.util.runWith
 import org.dotlin.compiler.backend.util.toPair
 import org.dotlin.compiler.dart.ast.collection.DartCollectionElementList
 import org.dotlin.compiler.dart.ast.expression.*
+import org.dotlin.compiler.dart.ast.expression.DartAssignmentOperator.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.toDartIdentifier
 import org.dotlin.compiler.dart.ast.expression.invocation.DartFunctionExpressionInvocation
@@ -50,6 +51,7 @@ import org.jetbrains.kotlin.ir.types.isString
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
@@ -348,9 +350,33 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
         irSetValue: IrSetValue,
         context: DartTransformContext
     ): DartExpression {
+        val valueType = irSetValue.symbol.owner.type
+        val irOperationAssignValue by lazy {
+            irSetValue.value.cast<IrFunctionAccessExpression>().getValueArgumentOrDefault(0)
+        }
+
+        val operator = when (irSetValue.origin) {
+            PLUSEQ -> ADD
+            MINUSEQ -> SUBTRACT
+            MULTEQ -> MULTIPLY
+            DIVEQ -> when {
+                // Dart's int divide operator returns a double, while Kotlin's Int divide operator returns an
+                // Int. So, we use the ~/ Dart operator, which returns an int.
+                valueType.isDartInt() && irOperationAssignValue.type.isDartInt() -> INTEGER_DIVIDE
+                else -> DIVIDE
+            }
+            else -> ASSIGN
+        }
+
+        val irValue = when {
+            operator != ASSIGN -> irOperationAssignValue
+            else -> irSetValue.value
+        }
+
         return DartAssignmentExpression(
             left = irSetValue.symbol.owner.dartName,
-            right = irSetValue.value.accept(context)
+            operator = operator,
+            right = irValue.accept(context)
         )
     }
 

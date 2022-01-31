@@ -42,5 +42,6 @@ enum class DartAssignmentOperator {
     ADD,
     SUBTRACT,
     MULTIPLY,
-    DIVIDE
+    DIVIDE,
+    INTEGER_DIVIDE
 }
