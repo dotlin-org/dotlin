@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test
 @DisplayName("Compile: Covariant")
 class Covariant : BaseTest {
     @Test
-    fun `covariant variable initialization`() = assertCompile {
+    fun `variable initialization with type that has covariant type parameter`() = assertCompile {
         kotlin(
             """
             class HasCovariant<in T>
@@ -62,7 +62,7 @@ class Covariant : BaseTest {
     }
 
     @Test
-    fun `covariant function generic bound`() = assertCompile {
+    fun `function with generic type with bound that has covariant type parameter`() = assertCompile {
         kotlin(
             """
             class HasCovariant<in T>
@@ -92,7 +92,7 @@ class Covariant : BaseTest {
     }
 
     @Test
-    fun `covariant class generic bound`() = assertCompile {
+    fun `class with generic type with bound that has covariant type parameter`() = assertCompile {
         kotlin(
             """
             class HasCovariant<in T>
@@ -123,68 +123,7 @@ class Covariant : BaseTest {
     }
 
     @Test
-    fun `covariant class generic bound and invariant bound`() = assertCompile {
-        kotlin(
-            """
-            class HasCovariant<in T>
-
-            open class A
-            class B : A()
-
-            class Test<T : HasCovariant<T>, A : Number>
-            """
-        )
-
-        dart(
-            """
-            import 'package:meta/meta.dart';
-
-            @sealed
-            class HasCovariant<T> {}
-
-            class A {}
-
-            @sealed
-            class B extends A {}
-
-            @sealed
-            class Test<T extends HasCovariant<dynamic>, A extends num> {}
-            """
-        )
-    }
-
-    @Test
-    fun `covariant function parameter`() = assertCompile {
-        kotlin(
-            """
-            class HasCovariant<in T>
-
-            open class A
-            class B : A()
-
-            fun test(x: HasCovariant<A>) {}
-            """
-        )
-
-        dart(
-            """
-            import 'package:meta/meta.dart';
-
-            @sealed
-            class HasCovariant<T> {}
-
-            class A {}
-
-            @sealed
-            class B extends A {}
-
-            void test(HasCovariant<dynamic> x) {}
-            """
-        )
-    }
-
-    @Test
-    fun `covariant class nested generic bound`() = assertCompile {
+    fun `class with nested generic type with bound that has covariant type parameter`() = assertCompile {
         kotlin(
             """
             class HasCovariant<in T>
@@ -215,6 +154,68 @@ class Covariant : BaseTest {
 
             @sealed
             class Test<T extends Other<HasCovariant<dynamic>>> {}
+            """
+        )
+    }
+
+    @Test
+    fun `class with regular generic type and generic type with bound that has covariant type parameter`() =
+        assertCompile {
+            kotlin(
+                """
+                class HasCovariant<in T>
+
+                open class A
+                class B : A()
+
+                class Test<T : HasCovariant<T>, A : Number>
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                @sealed
+                class HasCovariant<T> {}
+
+                class A {}
+
+                @sealed
+                class B extends A {}
+
+                @sealed
+                class Test<T extends HasCovariant<dynamic>, A extends num> {}
+                """
+            )
+    }
+
+    @Test
+    fun `function with value parameter that has a type with a covariant type parameter`() = assertCompile {
+        kotlin(
+            """
+            class HasCovariant<in T>
+
+            open class A
+            class B : A()
+
+            fun test(x: HasCovariant<A>) {}
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class HasCovariant<T> {}
+
+            class A {}
+
+            @sealed
+            class B extends A {}
+
+            void test(HasCovariant<dynamic> x) {}
             """
         )
     }
