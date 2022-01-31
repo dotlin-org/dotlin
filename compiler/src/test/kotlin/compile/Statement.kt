@@ -266,50 +266,171 @@ class Statement : BaseTest {
         }
     }
 
-    @Test
-    fun `return without value`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                return
-            }
-            """
-        )
+    @Nested
+    inner class Return {
+        @Test
+        fun `return without value`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    return
+                }
+                """
+            )
 
-        dart(
-            """
-            import 'package:meta/meta.dart';
+            dart(
+                """
+                import 'package:meta/meta.dart';
 
-            void main() {
-              return;
-            }
-            """
-        )
+                void main() {
+                  return;
+                }
+                """
+            )
+        }
+
+
+        @Test
+        fun `return in if`() = assertCompile {
+            kotlin(
+                """
+                fun doIt(x: Int?): String {
+                    if (x == null) return "null"
+                    return x.toString()
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                String doIt(int? x) {
+                  if (x == null) {
+                    return 'null';
+                  }
+                  return x.toString();
+                }
+                """
+            )
+        }
     }
 
+    @Nested
+    inner class Assignment {
+        @Test
+        fun `=`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    var x = 0
+                    x = 3
+                }
+                """
+            )
 
-    @Test
-    fun `return in if`() = assertCompile {
-        kotlin(
-            """
-            fun doIt(x: Int?): String {
-                if (x == null) return "null"
-                return x.toString()
-            }
-            """
-        )
+            dart(
+                """
+                import 'package:meta/meta.dart';
 
-        dart(
-            """
-            import 'package:meta/meta.dart';
+                void main() {
+                  int x = 0;
+                  x = 3;
+                }
+                """
+            )
+        }
 
-            String doIt(int? x) {
-              if (x == null) {
-                return 'null';
-              }
-              return x.toString();
-            }
-            """
-        )
+        @Test
+        fun `+=`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    var x = 0
+                    x += 3
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                void main() {
+                  int x = 0;
+                  x += 3;
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `-=`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    var x = 0
+                    x -= 3
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                void main() {
+                  int x = 0;
+                  x -= 3;
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `*=`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    var x = 0
+                    x *= 3
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                void main() {
+                  int x = 0;
+                  x *= 3;
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `div=`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    var x = 0
+                    x /= 3
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                void main() {
+                  int x = 0;
+                  x ~/= 3;
+                }
+                """
+            )
+        }
     }
 }
