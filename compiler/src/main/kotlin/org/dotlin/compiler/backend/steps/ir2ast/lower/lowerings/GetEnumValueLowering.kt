@@ -28,7 +28,6 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrGetFieldImpl
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.parentAsClass
 
-@Suppress("UnnecessaryVariable")
 class GetEnumValueLowering(override val context: DartLoweringContext) : IrExpressionLowering {
     override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
         if (expression !is IrGetEnumValue) return noChange()

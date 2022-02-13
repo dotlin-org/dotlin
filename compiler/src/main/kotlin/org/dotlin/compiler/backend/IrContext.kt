@@ -124,8 +124,17 @@ abstract class IrContext {
      *
      * The original Kotlin file name is transformed to snake case, and the `.kt` extension is replaced with `.g.dart`.
      */
+    val IrFile.dartPath: Path
+        get() = dartNameGenerator.runWith(this) { dartPathOf(it) }
+
+    /**
+     * The path for the (eventually) generated Dart file. The path is relative to the [currentFile]. Will be empty
+     * if this file is the [currentFile].
+     *
+     * The original Kotlin file name is transformed to snake case, and the `.kt` extension is replaced with `.g.dart`.
+     */
     val IrFile.relativeDartPath: Path
-        get() = dartNameGenerator.runWith(this) { dartRelativePathOf(it) }
+        get() = dartNameGenerator.runWith(this) { relativeDartPathOf(it) }
 
     // Annotation utils
     val IrDeclaration.dartHiddenNameFromCore: String?
@@ -183,11 +192,7 @@ abstract class IrContext {
             else -> fileOrNull?.let { file ->
                 when {
                     file != currentFile -> when {
-                        file.isInCurrentModule -> file.relativeDartPath.let { theirDartPath ->
-                            val currentDartPath = currentFile.relativeDartPath
-                            val importPath = currentDartPath.parent?.relativize(theirDartPath)?.toString()
-                                ?: theirDartPath.toString()
-
+                        file.isInCurrentModule -> file.relativeDartPath.toString().let { importPath ->
                             when {
                                 importPath.isNotBlank() -> DartUnresolvedImport(
                                     library = importPath,
@@ -220,6 +225,11 @@ abstract class IrContext {
 
     val IrDeclaration.isInCurrentModule: Boolean
         get() = fileOrNull?.isInCurrentModule == true
+
+    val isCurrentModuleBuiltIns: Boolean
+        get() = currentFile.module.descriptor.let {
+            it == it.builtIns.builtInsModule
+        }
 }
 
 data class DartUnresolvedImport(val library: String, val alias: String?, val hidden: Boolean)
