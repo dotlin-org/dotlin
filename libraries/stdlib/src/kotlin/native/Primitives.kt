@@ -36,7 +36,7 @@ package kotlin
  */
 @DartLibrary("dart:core")
 @DartName("int")
-external class Int private constructor() : Number(), Comparable<Int> {
+external class Int private constructor() : Number() {
     @DartName("Int\$Companion")
     companion object {
         /**
@@ -61,27 +61,6 @@ external class Int private constructor() : Number(), Comparable<Int> {
         @SinceKotlin("1.3")
         const val SIZE_BITS: Int = 64
     }
-
-    /**
-     * Compares this value with the specified value for order.
-     * Returns zero if this value is equal to the specified other value, a negative number if it's less than other,
-     * or a positive number if it's greater than other.
-     */
-    override operator fun compareTo(other: Int): Int
-
-    /**
-     * Compares this value with the specified value for order.
-     * Returns zero if this value is equal to the specified other value, a negative number if it's less than other,
-     * or a positive number if it's greater than other.
-     */
-    internal operator fun compareTo(other: Long): Int
-
-    /**
-     * Compares this value with the specified value for order.
-     * Returns zero if this value is equal to the specified other value, a negative number if it's less than other,
-     * or a positive number if it's greater than other.
-     */
-    operator fun compareTo(other: Double): Int
 
     /** Adds the other value to this value. */
     operator fun plus(other: Int): Int
@@ -394,7 +373,7 @@ external class Int private constructor() : Number(), Comparable<Int> {
  */
 @DartLibrary("dart:core")
 @DartName("double")
-external class Double private constructor() : Number(), Comparable<Double> {
+external class Double private constructor() : Number() {
     @DartName("Double\$Companion")
     companion object {
         /**
@@ -434,27 +413,6 @@ external class Double private constructor() : Number(), Comparable<Double> {
         @SinceKotlin("1.4")
         const val SIZE_BITS: Int = 64
     }
-
-    /**
-     * Compares this value with the specified value for order.
-     * Returns zero if this value is equal to the specified other value, a negative number if it's less than other,
-     * or a positive number if it's greater than other.
-     */
-    operator fun compareTo(other: Int): Int
-
-    /**
-     * Compares this value with the specified value for order.
-     * Returns zero if this value is equal to the specified other value, a negative number if it's less than other,
-     * or a positive number if it's greater than other.
-     */
-    internal operator fun compareTo(other: Long): Int
-
-    /**
-     * Compares this value with the specified value for order.
-     * Returns zero if this value is equal to the specified other value, a negative number if it's less than other,
-     * or a positive number if it's greater than other.
-     */
-    override operator fun compareTo(other: Double): Int
 
     /** Adds the other value to this value. */
     operator fun plus(other: Int): Double
