@@ -25,19 +25,19 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-@DisplayName("Compile: Covariant")
-class Covariant : BaseTest {
+@DisplayName("Compile: Contravariant")
+class Contravariant : BaseTest {
     @Test
-    fun `variable initialization with type that has covariant type parameter`() = assertCompile {
+    fun `variable initialization with type that has contravariant type parameter`() = assertCompile {
         kotlin(
             """
-            class HasCovariant<in T>
+            class HasContravariant<in T>
 
             open class A
             class B : A()
 
             fun main() {
-                val x: HasCovariant<B> = HasCovariant<A>()
+                val x: HasContravariant<B> = HasContravariant<A>()
             }
             """
         )
@@ -47,7 +47,7 @@ class Covariant : BaseTest {
             import 'package:meta/meta.dart';
 
             @sealed
-            class HasCovariant<T> {}
+            class HasContravariant<T> {}
 
             class A {}
 
@@ -55,22 +55,22 @@ class Covariant : BaseTest {
             class B extends A {}
 
             void main() {
-              final HasCovariant<dynamic> x = HasCovariant<A>();
+              final HasContravariant<dynamic> x = HasContravariant<A>();
             }
             """
         )
     }
 
     @Test
-    fun `function with generic type with bound that has covariant type parameter`() = assertCompile {
+    fun `function with generic type with bound that has contravariant type parameter`() = assertCompile {
         kotlin(
             """
-            class HasCovariant<in T>
+            class HasContravariant<in T>
 
             open class A
             class B : A()
 
-            fun <T : HasCovariant<T>> test() {}
+            fun <T : HasContravariant<T>> test() {}
             """
         )
 
@@ -79,28 +79,28 @@ class Covariant : BaseTest {
             import 'package:meta/meta.dart';
 
             @sealed
-            class HasCovariant<T> {}
+            class HasContravariant<T> {}
 
             class A {}
 
             @sealed
             class B extends A {}
 
-            void test<T extends HasCovariant<dynamic>>() {}
+            void test<T extends HasContravariant<dynamic>>() {}
             """
         )
     }
 
     @Test
-    fun `class with generic type with bound that has covariant type parameter`() = assertCompile {
+    fun `class with generic type with bound that has contravariant type parameter`() = assertCompile {
         kotlin(
             """
-            class HasCovariant<in T>
+            class HasContravariant<in T>
 
             open class A
             class B : A()
 
-            class Test<T : HasCovariant<T>>
+            class Test<T : HasContravariant<T>>
             """
         )
 
@@ -109,7 +109,7 @@ class Covariant : BaseTest {
             import 'package:meta/meta.dart';
 
             @sealed
-            class HasCovariant<T> {}
+            class HasContravariant<T> {}
 
             class A {}
 
@@ -117,23 +117,23 @@ class Covariant : BaseTest {
             class B extends A {}
 
             @sealed
-            class Test<T extends HasCovariant<dynamic>> {}
+            class Test<T extends HasContravariant<dynamic>> {}
             """
         )
     }
 
     @Test
-    fun `class with nested generic type with bound that has covariant type parameter`() = assertCompile {
+    fun `class with nested generic type with bound that has contravariant type parameter`() = assertCompile {
         kotlin(
             """
-            class HasCovariant<in T>
+            class HasContravariant<in T>
 
             open class A
             class B : A()
 
             class Other<T>
 
-            class Test<T : Other<HasCovariant<T>>>
+            class Test<T : Other<HasContravariant<T>>>
             """
         )
 
@@ -142,7 +142,7 @@ class Covariant : BaseTest {
             import 'package:meta/meta.dart';
 
             @sealed
-            class HasCovariant<T> {}
+            class HasContravariant<T> {}
 
             class A {}
 
@@ -153,22 +153,22 @@ class Covariant : BaseTest {
             class Other<T> {}
 
             @sealed
-            class Test<T extends Other<HasCovariant<dynamic>>> {}
+            class Test<T extends Other<HasContravariant<dynamic>>> {}
             """
         )
     }
 
     @Test
-    fun `class with regular generic type and generic type with bound that has covariant type parameter`() =
+    fun `class with regular generic type and generic type with bound that has contravariant type parameter`() =
         assertCompile {
             kotlin(
                 """
-                class HasCovariant<in T>
+                class HasContravariant<in T>
 
                 open class A
                 class B : A()
 
-                class Test<T : HasCovariant<T>, A : Number>
+                class Test<T : HasContravariant<T>, A : Number>
                 """
             )
 
@@ -177,7 +177,7 @@ class Covariant : BaseTest {
                 import 'package:meta/meta.dart';
 
                 @sealed
-                class HasCovariant<T> {}
+                class HasContravariant<T> {}
 
                 class A {}
 
@@ -185,21 +185,21 @@ class Covariant : BaseTest {
                 class B extends A {}
 
                 @sealed
-                class Test<T extends HasCovariant<dynamic>, A extends num> {}
+                class Test<T extends HasContravariant<dynamic>, A extends num> {}
                 """
             )
     }
 
     @Test
-    fun `function with value parameter that has a type with a covariant type parameter`() = assertCompile {
+    fun `function with value parameter that has a type with a contravariant type parameter`() = assertCompile {
         kotlin(
             """
-            class HasCovariant<in T>
+            class HasContravariant<in T>
 
             open class A
             class B : A()
 
-            fun test(x: HasCovariant<A>) {}
+            fun test(x: HasContravariant<A>) {}
             """
         )
 
@@ -208,14 +208,14 @@ class Covariant : BaseTest {
             import 'package:meta/meta.dart';
 
             @sealed
-            class HasCovariant<T> {}
+            class HasContravariant<T> {}
 
             class A {}
 
             @sealed
             class B extends A {}
 
-            void test(HasCovariant<dynamic> x) {}
+            void test(HasContravariant<dynamic> x) {}
             """
         )
     }
