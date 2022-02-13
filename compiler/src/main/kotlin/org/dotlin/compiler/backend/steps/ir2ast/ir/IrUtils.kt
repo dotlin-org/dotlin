@@ -616,3 +616,12 @@ fun IrClass.allSuperTypes(): Set<IrType> = defaultType.allSuperTypes()
 
 fun IrType.allSuperTypes(): Set<IrType> =
     superTypes().map { listOf(it, *it.allSuperTypes().toTypedArray()) }.flatten().toSet()
+
+fun IrType.parametersByArguments(): Map<IrTypeParameter, IrTypeArgument> {
+    if (this !is IrSimpleType) return emptyMap()
+    val owner = classOrNull?.owner ?: return emptyMap()
+
+    return arguments
+        .withIndex()
+        .associate { owner.typeParameters[it.index] to it.value }
+}
