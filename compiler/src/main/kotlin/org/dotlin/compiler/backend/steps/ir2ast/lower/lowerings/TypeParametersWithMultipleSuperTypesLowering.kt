@@ -44,24 +44,26 @@ import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.ir.util.superTypes
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 
-class MultipleTypeParametersLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
+class TypeParametersWithMultipleSuperTypesLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
     override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrTypeParametersContainer || declaration.typeParameters.all { it.superTypes.size < 2 }) {
             return noChange()
         }
 
-        val newSuperTypes = declaration.typeParameters
+        val relevantTypeParameters = declaration.typeParameters.filter { it.superTypes.size >= 2 }
+
+        val newSuperTypes = relevantTypeParameters
             .associateWith { it.superSuperTypes() }
             .map { (param, superTypesBySuperTypes) ->
-                param to superTypesBySuperTypes.values
+                param to (superTypesBySuperTypes.values
                     .reduce { acc, types -> acc.intersect(types) } // These are the common super types.
-                    .first() // First is the nearest super type.
+                    .firstOrNull() ?: irBuiltIns.anyType.makeNullable()) // First is the nearest super type.
             }
             .map { (param, superType) ->
                 when {
                     // If all original super types of all type parameters are nullable,
                     // the new super type should be too.
-                    declaration.typeParameters
+                    relevantTypeParameters
                         .map { it.defaultType.superTypes() }
                         .flatten()
                         .all { it.isNullable() } -> {
@@ -72,7 +74,7 @@ class MultipleTypeParametersLowering(override val context: DartLoweringContext) 
             }
             .toMap()
 
-        declaration.typeParameters.forEach {
+        relevantTypeParameters.forEach {
             it.superTypes = listOf(newSuperTypes[it]!!)
         }
 
@@ -113,7 +115,7 @@ class MultipleTypeParametersLowering(override val context: DartLoweringContext) 
                     // No need to cast if the type is already exactly correct.
                     if (type == castType) return
 
-                    val matchedType = declaration.typeParameters
+                    val matchedType = relevantTypeParameters
                         .map { it.defaultType }
                         .firstOrNull { type == it } ?: return
 

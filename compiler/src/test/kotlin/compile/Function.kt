@@ -1261,4 +1261,130 @@ class Function : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `function with multiple type parameter bounds that has an extra parameter thats implicitly bounded`() =
+        assertCompile {
+            kotlin(
+                """
+                interface ImplicitBound<T>
+
+                interface Marker1<T : ImplicitBound<T>> {
+                    fun execute()
+                }
+
+                interface Marker2<T>
+
+                fun <T, M> test(obj: T, marked: M) where M : Marker1<T>, M : Marker2<T> {
+                    marked.execute()
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                abstract class ImplicitBound<T> {}
+
+                abstract class Marker1<T extends ImplicitBound<T>> {
+                  void execute();
+                }
+
+                abstract class Marker2<T> {}
+
+                void test<T extends ImplicitBound<T>, M extends Object>(
+                  T obj,
+                  M marked,
+                ) {
+                  (marked as Marker1<T>).execute();
+                }
+                """
+            )
+        }
+
+    @Test
+    fun `function with multiple type parameter bounds that has an extra parameter thats implicitly bounded by multiple types`() =
+        assertCompile {
+            kotlin(
+                """
+                interface ImplicitBound1<T>
+                interface ImplicitBound2<T>
+
+                interface Marker1<T> where T : ImplicitBound1<T>, T : ImplicitBound2<T> {
+                    fun execute()
+                }
+
+                interface Marker2<T>
+
+                fun <T, M> test(obj: T, marked: M) where M : Marker1<T>, M : Marker2<T> {
+                    marked.execute()
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                abstract class ImplicitBound1<T> {}
+
+                abstract class ImplicitBound2<T> {}
+
+                abstract class Marker1<T extends Object> {
+                  void execute();
+                }
+
+                abstract class Marker2<T> {}
+
+                void test<T extends Object, M extends Object>(
+                  T obj,
+                  M marked,
+                ) {
+                  (marked as Marker1<T>).execute();
+                }
+                """
+            )
+        }
+
+    @Test
+    fun `function with multiple type parameter bounds that is generic and its type argument is a type parameter`() =
+        assertCompile {
+            kotlin(
+                """
+                interface Marker0
+
+                interface Marker1<T : Marker0> {
+                    fun execute()
+                }
+
+                interface Marker2<T>
+
+                fun <T : Marker0, M> test(obj: T, marked: M) where M : Marker1<T>, M : Marker2<T> {
+                    marked.execute()
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                abstract class Marker0 {}
+
+                abstract class Marker1<T extends Marker0> {
+                  void execute();
+                }
+
+                abstract class Marker2<T> {}
+
+                void test<T extends Marker0, M extends Object>(
+                  T obj,
+                  M marked,
+                ) {
+                  (marked as Marker1<T>).execute();
+                }
+                """
+            )
+        }
 }
