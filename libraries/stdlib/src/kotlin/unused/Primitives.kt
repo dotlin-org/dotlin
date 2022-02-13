@@ -31,37 +31,16 @@ package kotlin
 
 @DartLibrary("dart:core")
 @DartName("int")
-internal external abstract class Byte private constructor() : Number(), Comparable<Byte>
+internal external abstract class Byte private constructor() : Number()
 
 @DartLibrary("dart:core")
 @DartName("int")
-internal external abstract class Short private constructor() : Number(), Comparable<Short>
+internal external abstract class Short private constructor() : Number()
 
 // Only has its members so they can be called on Long literals.
 @DartLibrary("dart:core")
 @DartName("int")
-internal external class Long private constructor() : Number(), Comparable<Long> {
-    /**
-     * Compares this value with the specified value for order.
-     * Returns zero if this value is equal to the specified other value, a negative number if it's less than other,
-     * or a positive number if it's greater than other.
-     */
-    operator fun compareTo(other: Int): Int
-
-    /**
-     * Compares this value with the specified value for order.
-     * Returns zero if this value is equal to the specified other value, a negative number if it's less than other,
-     * or a positive number if it's greater than other.
-     */
-    override operator fun compareTo(other: Long): Int
-
-    /**
-     * Compares this value with the specified value for order.
-     * Returns zero if this value is equal to the specified other value, a negative number if it's less than other,
-     * or a positive number if it's greater than other.
-     */
-    operator fun compareTo(other: Double): Int
-
+internal external class Long private constructor() : Number() {
     /** Adds the other value to this value. */
     operator fun plus(other: Int): Int
     /** Adds the other value to this value. */
@@ -377,4 +356,4 @@ internal external class Long private constructor() : Number(), Comparable<Long> 
 
 @DartLibrary("dart:core")
 @DartName("double")
-internal external abstract class Float private constructor() : Number(), Comparable<Float>
+internal external abstract class Float private constructor() : Number()

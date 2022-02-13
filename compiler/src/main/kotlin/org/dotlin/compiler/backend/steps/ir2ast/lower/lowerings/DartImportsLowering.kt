@@ -29,13 +29,16 @@ import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationWithName
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrTypeParametersContainer
+import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrDeclarationReference
 import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
+import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin.*
 import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.types.typeOrNull
 import org.jetbrains.kotlin.ir.util.TypeRemapper
+import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.ir.util.remapTypes
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
@@ -48,10 +51,29 @@ class DartImportsLowering(override val context: DartLoweringContext) : IrFileLow
     override fun DartLoweringContext.transform(file: IrFile) {
         val imports = mutableSetOf<DartImport>()
 
-        fun maybeAddDartImports(declaration: IrDeclarationWithName) {
+        fun maybeAddComparableOperatorImport(
+            declaration: IrDeclarationWithName,
+            reference: IrDeclarationReference? = null
+        ) {
+            // In the stdlib, we need to import the file where the Comparable<T> '>', '<', '>=', '<=' extensions live.
+            val isBuiltInsAndComparableOperatorCall =
+                isCurrentModuleBuiltIns &&
+                        reference is IrCall && reference.origin in listOf(GT, GTEQ, LT, LTEQ) &&
+                        declaration.parentClassOrNull?.symbol == irBuiltIns.comparableClass
+
+            if (isBuiltInsAndComparableOperatorCall) {
+                imports += DartImport(
+                    library = declaration.file.relativeDartPath.toString()
+                )
+            }
+        }
+
+        fun maybeAddDartImports(declaration: IrDeclarationWithName, reference: IrDeclarationReference? = null) {
             val unresolvedImport = declaration.dartUnresolvedImport
             val hiddenNameFromCore = declaration.dartHiddenNameFromCore
             val kotlinImportAlias = declaration.importAliasIn(currentFile)
+
+            maybeAddComparableOperatorImport(declaration, reference)
 
             // We don't need to import "dart:core" if there's no alias or hidden names.
             if (kotlinImportAlias == null &&
@@ -120,7 +142,7 @@ class DartImportsLowering(override val context: DartLoweringContext) : IrFileLow
                         else -> owner as? IrDeclarationWithName
                     } ?: return
 
-                    maybeAddDartImports(referenced)
+                    maybeAddDartImports(referenced, expression)
                 }
 
                 override fun visitMemberAccess(expression: IrMemberAccessExpression<*>) =
