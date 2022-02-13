@@ -201,7 +201,7 @@ class DartNameGenerator {
                 // A suffix is added to extension containers to prevent name conflicts with extension containers in
                 // other files for the same type.
                 name = name?.copy(
-                    suffix = "$" + file.relativeDartPath
+                    suffix = "$" + file.dartPath
                         .toString()
                         .hashCode()
                         .toUInt()
@@ -308,7 +308,7 @@ class DartNameGenerator {
         }.lowercase().replace(Regex("\\.kt$"), ".g.dart")
     }
 
-    fun IrContext.dartRelativePathOf(file: IrFile): Path {
+    fun IrContext.dartPathOf(file: IrFile): Path {
         val fileName = dartNameOf(file)
         val filePath = Path(file.path)
 
@@ -324,5 +324,12 @@ class DartNameGenerator {
         // TODO: Don't assume all Dart files are in src/ (e.g. non-Dotlin Dart packages).
         val root = Path("src")
         return relativePath?.let { root.resolve(it) }?.resolve(fileName) ?: root.resolve(fileName)
+    }
+
+    fun IrContext.relativeDartPathOf(file: IrFile): Path {
+        val theirDartPath = dartPathOf(file)
+        val currentDartPath = dartPathOf(currentFile)
+
+        return currentDartPath.parent?.relativize(theirDartPath) ?: theirDartPath
     }
 }
