@@ -19,8 +19,10 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.*
-import org.dotlin.compiler.backend.steps.ir2ast.lower.*
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementTransformerVoid
+import org.dotlin.compiler.backend.steps.ir2ast.ir.parametersByArguments
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.lower.IrFileLowering
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.types.*
@@ -37,12 +39,12 @@ import org.jetbrains.kotlin.types.Variance
  * necessary.
  */
 // TODO: Add annotation specifying the original type.
-class CovariantLowering(override val context: DartLoweringContext) : IrFileLowering {
+class ContravariantLowering(override val context: DartLoweringContext) : IrFileLowering {
     override fun DartLoweringContext.transform(file: IrFile) {
-        fun IrType.makeCovariantArgumentsDynamic(): IrType {
+        fun IrType.makeContravariantArgumentsDynamic(): IrType {
             if (this !is IrSimpleType) return this
 
-            val covariantArguments = covariantTypeArguments()
+            val contravariantArguments = contravariantTypeArguments()
 
             return IrSimpleTypeImpl(
                 originalKotlinType,
@@ -51,10 +53,10 @@ class CovariantLowering(override val context: DartLoweringContext) : IrFileLower
                 arguments = arguments
                     .map {
                         when (it) {
-                            in covariantArguments -> makeTypeProjection(dynamicType, Variance.INVARIANT)
+                            in contravariantArguments -> makeTypeProjection(dynamicType, Variance.INVARIANT)
                             else -> when (it) {
                                 is IrTypeProjection -> makeTypeProjection(
-                                    it.type.makeCovariantArgumentsDynamic(),
+                                    it.type.makeContravariantArgumentsDynamic(),
                                     it.variance
                                 )
                                 else -> it
@@ -72,7 +74,7 @@ class CovariantLowering(override val context: DartLoweringContext) : IrFileLower
                     if (declaration is IrTypeParametersContainer) {
                         declaration.apply {
                             typeParameters.forEach { param ->
-                                param.superTypes = param.superTypes.map { it.makeCovariantArgumentsDynamic() }
+                                param.superTypes = param.superTypes.map { it.makeContravariantArgumentsDynamic() }
                             }
                         }
                     }
@@ -82,7 +84,7 @@ class CovariantLowering(override val context: DartLoweringContext) : IrFileLower
 
                 override fun visitVariable(declaration: IrVariable): IrStatement {
                     declaration.apply {
-                        type = type.makeCovariantArgumentsDynamic()
+                        type = type.makeContravariantArgumentsDynamic()
                     }
 
                     return super.visitVariable(declaration)
@@ -91,7 +93,7 @@ class CovariantLowering(override val context: DartLoweringContext) : IrFileLower
                 override fun visitFunction(declaration: IrFunction): IrStatement {
                     declaration.apply {
                         valueParameters.forEach {
-                            it.type = it.type.makeCovariantArgumentsDynamic()
+                            it.type = it.type.makeContravariantArgumentsDynamic()
                         }
                     }
 
@@ -100,7 +102,7 @@ class CovariantLowering(override val context: DartLoweringContext) : IrFileLower
 
                 override fun visitField(declaration: IrField): IrStatement {
                     declaration.apply {
-                        type = type.makeCovariantArgumentsDynamic()
+                        type = type.makeContravariantArgumentsDynamic()
                     }
                     return super.visitField(declaration)
                 }
@@ -109,15 +111,13 @@ class CovariantLowering(override val context: DartLoweringContext) : IrFileLower
     }
 }
 
-private fun IrSimpleType.covariantTypeArguments(): List<IrTypeArgument> {
+private fun IrSimpleType.contravariantTypeArguments(): List<IrTypeArgument> {
     val owner = classOrNull?.owner ?: return emptyList()
 
     // Function types have their value parameter types declared as covariant, we ignore this.
     if (owner.defaultType.isFunctionTypeOrSubtype()) return emptyList()
 
-    return arguments
-        .withIndex()
-        .associate { owner.typeParameters[it.index] to it.value }
+    return parametersByArguments()
         .entries
         .mapNotNull { (param, arg) ->
             when (param.variance) {
