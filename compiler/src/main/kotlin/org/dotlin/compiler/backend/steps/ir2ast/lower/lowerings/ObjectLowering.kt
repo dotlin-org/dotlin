@@ -128,7 +128,7 @@ class ObjectLowering(override val context: DartLoweringContext) : IrDeclarationL
             expression = context.buildStatement(symbol) {
                 irCall(
                     original,
-                    receiver = irGetField(receiver = null, instanceField),
+                    receiver = irGetObject(obj.symbol),
                     valueArguments = valueParameters.map { irGet(it) }.toTypedArray(),
                     origin = when {
                         original.isGetter -> IrStatementOrigin.GET_PROPERTY
@@ -184,7 +184,7 @@ class ObjectLowering(override val context: DartLoweringContext) : IrDeclarationL
                                         initializer = IrExpressionBodyImpl(
                                             expression = buildStatement(symbol) {
                                                 irGetField(
-                                                    receiver = irGetField(receiver = null, instanceField),
+                                                    receiver = irGetObject(obj.symbol),
                                                     original.backingField!!,
                                                 )
                                             }

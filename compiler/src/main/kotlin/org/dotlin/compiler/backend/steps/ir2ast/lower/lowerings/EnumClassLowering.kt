@@ -60,8 +60,6 @@ class EnumClassLowering(override val context: DartLoweringContext) : IrDeclarati
     override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrClass || !declaration.isEnumClass) return noChange()
 
-        // TODO: Apply @sealed annotation
-
         // TODO: Handle enum entry classes
 
         val enum = declaration
