@@ -19,11 +19,8 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementTransformerVoid
-import org.dotlin.compiler.backend.steps.ir2ast.ir.allSuperTypes
+import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrNullAwareExpression
-import org.dotlin.compiler.backend.steps.ir2ast.ir.firstNonFakeOverrideOrSelf
-import org.dotlin.compiler.backend.steps.ir2ast.ir.polymorphicallyIs
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
@@ -35,16 +32,19 @@ import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.declarations.IrTypeParametersContainer
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrTypeOperatorCallImpl
-import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.defaultType
-import org.jetbrains.kotlin.ir.types.isNullable
-import org.jetbrains.kotlin.ir.types.makeNullable
+import org.jetbrains.kotlin.ir.types.*
+import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
+import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
+import org.jetbrains.kotlin.ir.types.impl.originalKotlinType
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.ir.util.superTypes
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
+import org.jetbrains.kotlin.types.Variance
 
 class TypeParametersWithMultipleSuperTypesLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
+    private val originalSuperTypes = mutableMapOf<IrTypeParameter, List<IrType>>()
+
     override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrTypeParametersContainer || declaration.typeParameters.all { it.superTypes.size < 2 }) {
             return noChange()
@@ -75,6 +75,7 @@ class TypeParametersWithMultipleSuperTypesLowering(override val context: DartLow
             .toMap()
 
         relevantTypeParameters.forEach {
+            originalSuperTypes[it] = it.superTypes
             it.superTypes = listOf(newSuperTypes[it]!!)
         }
 
@@ -115,26 +116,32 @@ class TypeParametersWithMultipleSuperTypesLowering(override val context: DartLow
                     // No need to cast if the type is already exactly correct.
                     if (type == castType) return
 
-                    val matchedType = relevantTypeParameters
-                        .map { it.defaultType }
-                        .firstOrNull { type == it } ?: return
+                    val matchedTypeParameter = relevantTypeParameters
+                        .firstOrNull { type == it.defaultType }
+                        ?: return
 
-                    val possiblyNullableCastType = when {
-                        isInNullAware || matchedType.isNullable() -> castType.makeNullable()
-                        else -> castType
+                    val matchedType = matchedTypeParameter.defaultType
+
+                    var actualCastType = castType.withArgumentsFrom(originalSuperTypes[matchedTypeParameter]!!)
+
+                    actualCastType = when {
+                        isInNullAware || matchedType.isNullable() -> actualCastType.makeNullable()
+                        else -> actualCastType
                     }
 
                     // We don't need to cast if the types are polymorphically equivalent.
-                    if (type polymorphicallyIs possiblyNullableCastType) {
+                    if (type polymorphicallyIs actualCastType) {
                         return
                     }
+
+                    actualCastType = actualCastType.makeArgumentsDynamicIfNecessary()
 
                     set(
                         IrTypeOperatorCallImpl(
                             UNDEFINED_OFFSET, UNDEFINED_OFFSET,
-                            type = possiblyNullableCastType,
+                            type = actualCastType,
                             operator = IrTypeOperator.CAST,
-                            typeOperand = possiblyNullableCastType,
+                            typeOperand = actualCastType,
                             argument = this
                         )
                     )
@@ -181,4 +188,47 @@ class TypeParametersWithMultipleSuperTypesLowering(override val context: DartLow
     }
 
     private fun IrTypeParameter.superSuperTypes() = superTypes.associateWith { it.allSuperTypes() }
+
+    private fun IrType.withArgumentsFrom(originalSuperTypes: List<IrType>): IrType {
+        if (this !is IrSimpleType) return this
+
+        val originalSuperType =
+            originalSuperTypes.firstOrNull { it.classifierOrNull == this.classifierOrNull } as? IrSimpleType
+                ?: return this
+
+        return IrSimpleTypeImpl(
+            originalKotlinType,
+            classifier,
+            hasQuestionMark,
+            arguments = originalSuperType.arguments,
+            annotations,
+            abbreviation
+        )
+    }
+
+    private fun IrType.makeArgumentsDynamicIfNecessary(): IrType {
+        if (this !is IrSimpleType) return this
+
+        return IrSimpleTypeImpl(
+            originalKotlinType,
+            classifier,
+            hasQuestionMark,
+            arguments = arguments.map {
+                val typeParam = it.typeOrNull?.typeParameterOrNull ?: return@map it
+
+                when {
+                    typeParam.originalSuperTypes.size >= 2 -> makeTypeProjection(
+                        context.dynamicType,
+                        Variance.INVARIANT
+                    )
+                    else -> it
+                }
+            },
+            annotations,
+            abbreviation
+        )
+    }
+
+    private val IrTypeParameter.originalSuperTypes: List<IrType>
+        get() = this@TypeParametersWithMultipleSuperTypesLowering.originalSuperTypes[this] ?: superTypes
 }

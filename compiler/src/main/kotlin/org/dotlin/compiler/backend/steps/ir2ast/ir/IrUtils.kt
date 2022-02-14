@@ -543,7 +543,7 @@ infix fun IrType.polymorphicallyIs(other: IrType): Boolean {
 }
 
 fun IrType.isPrimitiveInteger() = isByte() || isChar() || isShort() || isInt() || isLong()
-fun IrType.isPrimitiveDecimal() =  isFloat() || isDouble()
+fun IrType.isPrimitiveDecimal() = isFloat() || isDouble()
 fun IrType.isPrimitiveNumber() = isPrimitiveInteger() || isPrimitiveDecimal()
 
 val IrDeclaration.isAbstract: Boolean
