@@ -191,4 +191,184 @@ class Enum : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `call Enum values()`() = assertCompile {
+        kotlin(
+            """
+            enum class Test {
+                ALPHA,
+                BETA,
+            }
+
+            fun main() {
+                Test.values()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'dart:core' hide Enum, List;
+            import 'dart:core' as core;
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test extends Enum<Test> {
+              const Test._(
+                String name,
+                int ordinal,
+              ) : super(name, ordinal);
+              static const Test ALPHA = const Test._('ALPHA', 0);
+              static const Test BETA = const Test._('BETA', 1);
+              static core.List<Test> values() {
+                return <Test>[Test.ALPHA, Test.BETA];
+              }
+
+              static Test valueOf(String value) {
+                return values().firstWhere((v) => v.name == value);
+              }
+            }
+
+            void main() {
+              Test.values();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call Enum valueOf()`() = assertCompile {
+        kotlin(
+            """
+            enum class Test {
+                ALPHA,
+                BETA,
+            }
+
+            fun main() {
+                Test.valueOf("ALPHA")
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'dart:core' hide Enum, List;
+            import 'dart:core' as core;
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test extends Enum<Test> {
+              const Test._(
+                String name,
+                int ordinal,
+              ) : super(name, ordinal);
+              static const Test ALPHA = const Test._('ALPHA', 0);
+              static const Test BETA = const Test._('BETA', 1);
+              static core.List<Test> values() {
+                return <Test>[Test.ALPHA, Test.BETA];
+              }
+
+              static Test valueOf(String value) {
+                return values().firstWhere((v) => v.name == value);
+              }
+            }
+
+            void main() {
+              Test.valueOf('ALPHA');
+            }
+            """
+        )
+    }
+
+    @Test
+    fun enumValues() = assertCompile {
+        kotlin(
+            """
+            enum class Test {
+                ALPHA,
+                BETA,
+            }
+
+            fun main() {
+                enumValues<Test>()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'dart:core' hide Enum, List;
+            import 'dart:core' as core;
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test extends Enum<Test> {
+              const Test._(
+                String name,
+                int ordinal,
+              ) : super(name, ordinal);
+              static const Test ALPHA = const Test._('ALPHA', 0);
+              static const Test BETA = const Test._('BETA', 1);
+              static core.List<Test> values() {
+                return <Test>[Test.ALPHA, Test.BETA];
+              }
+
+              static Test valueOf(String value) {
+                return values().firstWhere((v) => v.name == value);
+              }
+            }
+
+            void main() {
+              Test.values();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun enumValueOf() = assertCompile {
+        kotlin(
+            """
+            enum class Test {
+                ALPHA,
+                BETA,
+            }
+
+            fun main() {
+                enumValueOf<Test>("ALPHA")
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'dart:core' hide Enum, List;
+            import 'dart:core' as core;
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test extends Enum<Test> {
+              const Test._(
+                String name,
+                int ordinal,
+              ) : super(name, ordinal);
+              static const Test ALPHA = const Test._('ALPHA', 0);
+              static const Test BETA = const Test._('BETA', 1);
+              static core.List<Test> values() {
+                return <Test>[Test.ALPHA, Test.BETA];
+              }
+
+              static Test valueOf(String value) {
+                return values().firstWhere((v) => v.name == value);
+              }
+            }
+
+            void main() {
+              Test.valueOf('ALPHA');
+            }
+            """
+        )
+    }
 }
