@@ -1341,7 +1341,7 @@ class Function : BaseTest {
                   T obj,
                   M marked,
                 ) {
-                  (marked as Marker1<T>).execute();
+                  (marked as Marker1<dynamic>).execute();
                 }
                 """
             )
@@ -1383,6 +1383,96 @@ class Function : BaseTest {
                   M marked,
                 ) {
                   (marked as Marker1<T>).execute();
+                }
+                """
+            )
+        }
+
+    @Test
+    fun `function with multiple type parameter bounds that is generic and has an argument that is a type parameter`() =
+        assertCompile {
+            kotlin(
+                """
+                interface Marker0
+
+                interface Marker1
+
+                interface Marked0<Y : Marker0> {
+                    fun execute()
+                }
+
+                interface Marked1
+
+                fun <T : Marker0, M> test(obj: T, marked: M) where M : Marked0<T>, M : Marked1 {
+                    marked.execute()
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                abstract class Marker0 {}
+
+                abstract class Marker1 {}
+
+                abstract class Marked0<Y extends Marker0> {
+                  void execute();
+                }
+
+                abstract class Marked1 {}
+
+                void test<T extends Marker0, M extends Object>(
+                  T obj,
+                  M marked,
+                ) {
+                  (marked as Marked0<T>).execute();
+                }
+                """
+            )
+        }
+
+    @Test
+    fun `function with multiple type parameter bounds that is generic and has an argument that is a type parameter with multiple super types`() =
+        assertCompile {
+            kotlin(
+                """
+                interface Marker0
+
+                interface Marker1
+
+                interface Marked0<Y : Marker0> {
+                    fun execute()
+                }
+
+                interface Marked1
+
+                fun <T, M> test(obj: T, marked: M) where T : Marker0, T : Marker1, M : Marked0<T>, M : Marked1 {
+                    marked.execute()
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                abstract class Marker0 {}
+
+                abstract class Marker1 {}
+
+                abstract class Marked0<Y extends Marker0> {
+                  void execute();
+                }
+
+                abstract class Marked1 {}
+
+                void test<T extends Object, M extends Object>(
+                  T obj,
+                  M marked,
+                ) {
+                  (marked as Marked0<dynamic>).execute();
                 }
                 """
             )
