@@ -134,7 +134,7 @@ external class Int private constructor() : Number() {
      /** Creates a range from this value to the specified [other] value. */
     operator fun rangeTo(other: Int): IntRange
      /** Creates a range from this value to the specified [other] value. */
-     internal operator fun rangeTo(other: Long): IntRange
+    internal operator fun rangeTo(other: Long): IntRange
 
     /**
      * Shifts this value left by the [bitCount] number of bits.

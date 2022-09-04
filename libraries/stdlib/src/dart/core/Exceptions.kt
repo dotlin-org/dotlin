@@ -14,22 +14,35 @@
  * limitations under the License.
  */
 
-@file:Suppress("WRONG_BODY_OF_EXTERNAL_DECLARATION") // TODO: Fix in analyzer
+@file:Suppress(
+    "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
+    "NON_ABSTRACT_MEMBER_OF_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
+    "NESTED_CLASS_IN_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
+    "WRONG_INITIALIZER_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
+    "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
+    "NESTED_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
+    "WRONG_DEFAULT_VALUE_FOR_EXTERNAL_FUN_PARAMETER", // TODO: Fix in analyzer
+    "EXTERNAL_CLASS_CONSTRUCTOR_PROPERTY_PARAMETER", // TODO: Fix in analyzer
+    "EXTERNAL_DELEGATED_CONSTRUCTOR_CALL" // TODO: Fix in analyzer
+)
+
+@file:DartLibrary("dart:core")
 
 package dart.core
 
-@DartLibrary("dart:core", aliased = true)
-external sealed interface Exception
+external open class Exception {
+    constructor(message: String)
+}
 
 /**
  * Exception thrown when a string or some other data does not have an expected
  * format and cannot be parsed or processed.
  */
-external sealed interface FormatException : Exception {
+external open class FormatException(
     /**
      * A message describing the format error.
      */
-    val message: String
+    val message: String,
 
     /**
      * The actual source input which caused the error.
@@ -39,7 +52,7 @@ external sealed interface FormatException : Exception {
      *
      * The source is `null` if omitted or unknown.
      */
-    val source: dynamic
+    val source: dynamic,
 
     /**
      * The offset in [source] where the error was detected.
@@ -55,13 +68,4 @@ external sealed interface FormatException : Exception {
      * May be omitted. If present, [source] should also be present if possible.
      */
     val offset: Int?
-}
-
-@Deprecated("Use UnsupportedError instead")
-external sealed interface IntegerDivisionByZeroException : Exception, UnsupportedError {
-    override val message: String?
-        get() = "Division resulted in non-finite value"
-
-    override val stackTrace: StackTrace?
-        get() = null
-}
+) : Exception

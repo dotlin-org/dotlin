@@ -144,5 +144,5 @@ inline operator fun <T, R> R.contains(element: T?): Boolean where T : Any, R : I
     element != null && contains(element)
 
 internal fun checkStepIsPositive(isPositive: Boolean, step: Number) {
-    if (!isPositive) throw IllegalArgumentException("Step must be positive, was: $step.")
+    if (!isPositive) throw ArgumentError("Step must be positive, was: $step.")
 }

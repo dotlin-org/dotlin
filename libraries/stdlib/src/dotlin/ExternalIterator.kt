@@ -18,7 +18,7 @@
 
 package dotlin
 
-internal open class ExternalIterator<T>(open val delegate: dart.core.Iterator<T>) : Iterator<T>, dart.core.Iterator<T> {
+internal open class ExternalIterator<T>(open val delegate: dart.core.Iterator<T>) : kotlin.collections.Iterator<T>, dart.core.Iterator<T> {
     protected lateinit var currentValue: T
     private lateinit var nextValue: T
 
@@ -54,8 +54,8 @@ internal open class ExternalIterator<T>(open val delegate: dart.core.Iterator<T>
     override val current: T
         get() = try {
             currentValue
-        } catch (t: Throwable) {
-            throw NoSuchElementException()
+        } catch (t: dynamic) {
+            throw StateError("No such element")
         }
 
     override fun moveNext(): Boolean {
@@ -65,7 +65,7 @@ internal open class ExternalIterator<T>(open val delegate: dart.core.Iterator<T>
 }
 
 internal open class ExternalBidirectionalIterator<T>(override val delegate: dart.core.BidirectionalIterator<T>) :
-    ExternalIterator<T>(delegate), BidirectionalIterator<T>, dart.core.BidirectionalIterator<T> {
+    ExternalIterator<T>(delegate), kotlin.collections.BidirectionalIterator<T>, dart.core.BidirectionalIterator<T> {
 
     private lateinit var previousValue: T
     private var hasPreviousValue = false

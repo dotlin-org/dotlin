@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2021 JetBrains s.r.o.
+ * Copyright 2010-2015 JetBrains s.r.o.
  * Copyright 2021-2022 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,4 @@
 
 package kotlin
 
-/**
- * An exception is thrown to indicate that a method body remains to be implemented.
- */
-class NotImplementedError(message: String = "An operation is not implemented.") : Error(message)
+internal open class Throwable

@@ -194,13 +194,13 @@ class Statement : BaseTest {
                 fun main() {
                     try {
                         thisThrows()
-                    } catch (e: RuntimeException) {
+                    } catch (e: Exception) {
                         thisThrows()
                     }
                 }
 
                 fun thisThrows(): Int {
-                    throw RuntimeException("You done did it now")
+                    throw Exception("You done did it now")
                 }
                 """
             )
@@ -212,13 +212,13 @@ class Statement : BaseTest {
                 void main() {
                   try {
                     thisThrows();
-                  } on RuntimeException catch (e) {
+                  } on Exception catch (e) {
                     thisThrows();
                   }
                 }
 
                 int thisThrows() {
-                  throw RuntimeException.message('You done did it now');
+                  throw Exception('You done did it now');
                 }
                 """
             )
@@ -232,14 +232,14 @@ class Statement : BaseTest {
                     try {
                         thisThrows()
                         thisThrows()
-                    } catch (e: RuntimeException) {
+                    } catch (e: Exception) {
                         thisThrows()
                         thisThrows()
                     }
                 }
 
                 fun thisThrows(): Int {
-                    throw RuntimeException("You done did it now")
+                    throw Exception("You done did it now")
                 }
                 """
             )
@@ -252,14 +252,14 @@ class Statement : BaseTest {
                   try {
                     thisThrows();
                     thisThrows();
-                  } on RuntimeException catch (e) {
+                  } on Exception catch (e) {
                     thisThrows();
                     thisThrows();
                   }
                 }
 
                 int thisThrows() {
-                  throw RuntimeException.message('You done did it now');
+                  throw Exception('You done did it now');
                 }
                 """
             )

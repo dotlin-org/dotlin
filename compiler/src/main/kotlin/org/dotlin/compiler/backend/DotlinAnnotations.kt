@@ -44,7 +44,6 @@ object DotlinAnnotations {
     const val dartGetter = "dotlin.DartGetter"
     const val dartExtension = "dotlin.DartExtension"
     const val dartHideNameFromCore = "dotlin.DartHideNameFromCore"
-    const val dartCatchAs = "dotlin.DartCatchAs"
 }
 
 fun IrDeclaration.hasDartGetterAnnotation() = hasOverriddenAnnotation(DotlinAnnotations.dartGetter)
@@ -65,9 +64,6 @@ val IrDeclaration.dartAnnotatedName: String?
         }
         else -> this
     }.run { getSingleAnnotationStringArgumentOf(DotlinAnnotations.dartName) }
-
-val IrDeclaration.dartCatchAsType: IrType?
-    get() = getSingleAnnotationTypeArgumentOf(DotlinAnnotations.dartCatchAs)
 
 val IrValueParameter.isDartPositional: Boolean
     get() = (parent as? IrFunction)?.hasDartPositionalAnnotation() == true

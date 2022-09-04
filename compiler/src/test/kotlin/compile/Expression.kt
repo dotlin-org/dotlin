@@ -794,13 +794,13 @@ class Expression : BaseTest {
             fun main() {
                 val x = try {
                     thisThrows()
-                } catch (e: RuntimeException) {
+                } catch (e: Exception) {
                     thisThrows()
                 }
             }
 
             fun thisThrows(): Int {
-                throw RuntimeException("You done did it now")
+                throw Exception("You done did it now")
             }
             """
         )
@@ -813,14 +813,14 @@ class Expression : BaseTest {
               final int x = () {
                 try {
                   return thisThrows();
-                } on RuntimeException catch (e) {
+                } on Exception catch (e) {
                   return thisThrows();
                 }
               }.call();
             }
 
             int thisThrows() {
-              throw RuntimeException.message('You done did it now');
+              throw Exception('You done did it now');
             }
             """
         )
@@ -834,13 +834,13 @@ class Expression : BaseTest {
                 val x: Int
                     get() = try {
                         thisThrows()
-                    } catch (e: RuntimeException) {
+                    } catch (e: Exception) {
                         thisThrows()
                     }
             }
 
             fun thisThrows(): Int {
-                throw RuntimeException("You done did it now")
+                throw Exception("You done did it now")
             }
             """
         )
@@ -856,7 +856,7 @@ class Expression : BaseTest {
                 return () {
                   try {
                     return thisThrows();
-                  } on RuntimeException catch (e) {
+                  } on Exception catch (e) {
                     return thisThrows();
                   }
                 }.call();
@@ -864,7 +864,7 @@ class Expression : BaseTest {
             }
 
             int thisThrows() {
-              throw RuntimeException.message('You done did it now');
+              throw Exception('You done did it now');
             }
             """
         )

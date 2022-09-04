@@ -16,7 +16,14 @@
 
 @file:Suppress(
     "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "NON_ABSTRACT_MEMBER_OF_EXTERNAL_INTERFACE" // TODO: Fix in analyzer
+    "NON_ABSTRACT_MEMBER_OF_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
+    "NESTED_CLASS_IN_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
+    "WRONG_INITIALIZER_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
+    "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
+    "NESTED_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
+    "WRONG_DEFAULT_VALUE_FOR_EXTERNAL_FUN_PARAMETER", // TODO: Fix in analyzer
+    "EXTERNAL_CLASS_CONSTRUCTOR_PROPERTY_PARAMETER", // TODO: Fix in analyzer
+    "EXTERNAL_DELEGATED_CONSTRUCTOR_CALL" // TODO: Fix in analyzer
 )
 
 package dart.core
@@ -63,80 +70,94 @@ package dart.core
  * occurrence, but being an [Exception] has no other effect
  * than documentation.
  */
-@DartLibrary("dart:core", aliased = true)
-external sealed interface Error {
+@DartLibrary("dart:core")
+external open class Error {
     /**
      * The stack trace at the point where this error was first thrown.
      */
-    val stackTrace: StackTrace?
+    val stackTrace: StackTrace? = definedExternally
 }
 
 /**
  * Error thrown by the runtime system when an assert statement fails.
+ *
+ * @constructor Creates an assertion error with the provided [message].
  */
-@DartLibrary("dart:core", aliased = true)
-external sealed interface AssertionError : Error {
+@DartLibrary("dart:core")
+external class AssertionError @DartPositional constructor(
     /**
      * Message describing the assertion error.
      */
-    val message: Any?
-}
+    val message: Any? = null
+) : Error
 
 /**
  * Error thrown by the runtime system when a dynamic type error happens.
  */
-external sealed interface TypeError : Error
+external class TypeError : Error
 
 /**
  * Error thrown when a function is passed an unacceptable argument.
  */
-external sealed interface ArgumentError : Error {
+external open class ArgumentError @DartPositional constructor(
+    /**
+     * Message describing the problem.
+     */
+    val message: dynamic = null,
+    /**
+     * Name of the invalid argument, if available.
+     */
+    val name: String? = null
+) : Error {
     /**
      * The invalid value.
      */
     val invalidValue: dynamic
 
     /**
-     * Name of the invalid argument, if available.
+     * Creates error containing the invalid [value].
+     *
+     * A message is built by suffixing the [message] argument with
+     * the [name] argument (if provided) and the value. Example:
+     * ```plaintext
+     * Invalid argument (foo): null
+     * ```
+     * The `name` should match the argument name of the function, but if
+     * the function is a method implementing an interface, and its argument
+     * names differ from the interface, it might be more useful to use the
+     * interface method's argument name (or just rename arguments to match).
      */
-    val name: String?
-
-    /**
-     * Message describing the problem.
-     */
-    val message: dynamic
+    @DartName("value")
+    @DartPositional
+    constructor(invalidValue: dynamic, name: String? = null, message: dynamic = null)
 }
 
 /**
  * Error thrown due to a value being outside a valid range.
  */
-external sealed interface RangeError : ArgumentError {
+external open class RangeError(
+    // TODO: Add all properties
     /**
      * The minimum value that [value] is allowed to assume.
      */
-    val start: Number?
+    open val start: Number?,
 
     /**
      * The maximum value that [value] is allowed to assume.
      */
-    val end: Number?
+    open val end: Number?
+) : ArgumentError(invalidValue = null, name = "null", message = null)
+
+external open class IndexError @DartPositional constructor(
+    // TODO: Add all propreties
+    val indexable: dynamic,
+    val length: Int? = null
+) : RangeError {
+    override val start: Int = definedExternally
+    override val end: Int = definedExternally
 }
 
-external sealed interface IndexError : RangeError {
-    val indexable: dynamic
-
-    val length: Int
-
-    override val start: Int
-        get() = 0
-
-    override val end: Int
-        get() = length - 1
-}
-
-external sealed interface UnsupportedError : Error {
-    val message: String?
-}
+external open class UnsupportedError(val message: String?) : Error
 
 /**
  * The operation was not allowed by the current state of the object.
@@ -152,9 +173,7 @@ external sealed interface UnsupportedError : Error {
  * This is a generic error used for a variety of different erroneous
  * actions. The message should be descriptive.
  */
-external sealed interface StateError : Error {
-    val message: String
-}
+external open class StateError(val message: String) : Error
 
 /**
  * Error occurring when a collection is modified during iteration.
@@ -163,9 +182,22 @@ external sealed interface StateError : Error {
  * ([Iterable] or similar collection of values) should declare which operations
  * are allowed during an iteration.
  */
-external sealed interface ConcurrentModificationError : Error {
+external open class ConcurrentModificationError @DartPositional constructor(
     /**
      * The object that was modified in an incompatible way.
      */
-    val modifiedObject: Any?
-}
+    val modifiedObject: Any? = null
+) : Error
+
+/**
+ * Thrown by operations that have not been implemented yet.
+ *
+ * This [Error] is thrown by unfinished code that hasn't yet implemented
+ * all the features it needs.
+ *
+ * If the class does not intend to implement the feature, it should throw
+ * an [UnsupportedError] instead. This error is only intended for
+ * use during development.
+ */
+external open class UnimplementedError @DartPositional constructor(val message: String? = null) :
+    Error

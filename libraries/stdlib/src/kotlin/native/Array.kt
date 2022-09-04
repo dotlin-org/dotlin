@@ -78,7 +78,7 @@ external class Array<T> : IArray<T> {
      * Creates an [Iterator] for iterating over the elements of the array.
      */
     @DartExtension
-    /*inline*/ override operator fun iterator(): Iterator<T>
+    /*inline*/ override operator fun iterator(): kotlin.collections.Iterator<T>
 
     override fun subArray(start: Int, end: Int?): IArray<T>
 }

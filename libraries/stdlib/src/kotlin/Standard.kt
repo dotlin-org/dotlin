@@ -30,7 +30,7 @@ package kotlin
  */
 
 //@kotlin.internal.InlineOnly TODO
-inline fun TODO(): Nothing = throw NotImplementedError()
+inline fun TODO(): Nothing = throw UnimplementedError()
 
 /**
  * Always throws [NotImplementedError] stating that operation is not implemented.
@@ -38,7 +38,7 @@ inline fun TODO(): Nothing = throw NotImplementedError()
  * @param reason a string explaining why the implementation is missing.
  */
 //@kotlin.internal.InlineOnly TODO
-inline fun TODO(reason: String): Nothing = throw NotImplementedError("An operation is not implemented: $reason")
+inline fun TODO(reason: String): Nothing = throw UnimplementedError("An operation is not implemented: $reason")
 
 /**
  * Calls the specified function [block] and returns its result.

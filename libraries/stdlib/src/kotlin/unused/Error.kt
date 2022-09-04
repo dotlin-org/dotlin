@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2021 JetBrains s.r.o.
  * Copyright 2021-2022 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,18 +18,6 @@
 package kotlin
 
 /**
- * The base class for all errors and exceptions. Only instances of this class can be thrown or caught.
- *
- * @param message the detail message string.
- * @param cause the cause of this throwable.
+ * An exception is thrown to indicate that a method body remains to be implemented.
  */
-open class Throwable(open val message: String?, open val cause: Throwable?) {
-    @DartName("message")
-    constructor(message: String?) : this(message, null)
-
-    @DartName("cause")
-    constructor(cause: Throwable?) : this(cause?.toString(), cause)
-
-    @DartName("empty")
-    constructor() : this(null, null)
-}
+private class NotImplementedError : Error()

@@ -44,7 +44,7 @@ inline fun require(value: Boolean, lazyMessage: () -> Any): Unit {
     //}
     if (!value) {
         val message = lazyMessage()
-        throw IllegalArgumentException(message.toString())
+        throw ArgumentError(message.toString())
     }
 }
 
@@ -73,7 +73,7 @@ inline fun <T : Any> requireNotNull(value: T?, lazyMessage: () -> Any): T {
 
     if (value == null) {
         val message = lazyMessage()
-        throw IllegalArgumentException(message.toString())
+        throw ArgumentError(message.toString())
     } else {
         return value
     }
@@ -104,7 +104,7 @@ inline fun check(value: Boolean, lazyMessage: () -> Any): Unit {
     //}
     if (!value) {
         val message = lazyMessage()
-        throw IllegalStateException(message.toString())
+        throw StateError(message.toString())
     }
 }
 
@@ -136,7 +136,7 @@ inline fun <T : Any> checkNotNull(value: T?, lazyMessage: () -> Any): T {
 
     if (value == null) {
         val message = lazyMessage()
-        throw IllegalStateException(message.toString())
+        throw StateError(message.toString())
     } else {
         return value
     }
@@ -144,9 +144,9 @@ inline fun <T : Any> checkNotNull(value: T?, lazyMessage: () -> Any): T {
 
 
 /**
- * Throws an [IllegalStateException] with the given [message].
+ * Throws an [ArgumentError] with the given [message].
  *
  * @sample samples.misc.Preconditions.failWithError
  */
 //@kotlin.internal.InlineOnly
-inline fun error(message: Any): Nothing = throw IllegalStateException(message.toString())
+inline fun error(message: Any): Nothing = throw StateError(message.toString())

@@ -22,3 +22,5 @@ package dotlin
  * The [code] `String` must be a compile-time constant.
  */
 external fun dart(code: String): dynamic
+
+external val definedExternally: Nothing

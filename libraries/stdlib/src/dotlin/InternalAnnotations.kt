@@ -49,10 +49,3 @@ internal annotation class DartExtension
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.SOURCE)
 internal annotation class DartHideNameFromCore
-
-/**
- * Specifies that whenever this type is used in a catch clause, it should be caught as the type [T] instead.
- */
-@Target(AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.SOURCE)
-internal annotation class DartCatchAs<T>

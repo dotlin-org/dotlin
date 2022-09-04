@@ -188,7 +188,7 @@ fun Double.coerceAtMost(maximumValue: Double): Double {
  */
 fun <T : Comparable<T>> T.coerceIn(minimumValue: T?, maximumValue: T?): T {
     if (minimumValue !== null && maximumValue !== null) {
-        if (minimumValue > maximumValue) throw IllegalArgumentException("Cannot coerce value to an empty range: maximum $maximumValue is less than minimum $minimumValue.")
+        if (minimumValue > maximumValue) throw ArgumentError("Cannot coerce value to an empty range: maximum $maximumValue is less than minimum $minimumValue.")
         if (this < minimumValue) return minimumValue
         if (this > maximumValue) return maximumValue
     }
@@ -207,7 +207,7 @@ fun <T : Comparable<T>> T.coerceIn(minimumValue: T?, maximumValue: T?): T {
  * @sample samples.comparisons.ComparableOps.coerceIn
  */
 fun Int.coerceIn(minimumValue: Int, maximumValue: Int): Int {
-    if (minimumValue > maximumValue) throw IllegalArgumentException("Cannot coerce value to an empty range: maximum $maximumValue is less than minimum $minimumValue.")
+    if (minimumValue > maximumValue) throw ArgumentError("Cannot coerce value to an empty range: maximum $maximumValue is less than minimum $minimumValue.")
     if (this < minimumValue) return minimumValue
     if (this > maximumValue) return maximumValue
     return this
@@ -221,7 +221,7 @@ fun Int.coerceIn(minimumValue: Int, maximumValue: Int): Int {
  * @sample samples.comparisons.ComparableOps.coerceIn
  */
 fun Double.coerceIn(minimumValue: Double, maximumValue: Double): Double {
-    if (minimumValue > maximumValue) throw IllegalArgumentException("Cannot coerce value to an empty range: maximum $maximumValue is less than minimum $minimumValue.")
+    if (minimumValue > maximumValue) throw ArgumentError("Cannot coerce value to an empty range: maximum $maximumValue is less than minimum $minimumValue.")
     if (this < minimumValue) return minimumValue
     if (this > maximumValue) return maximumValue
     return this
@@ -236,7 +236,7 @@ fun Double.coerceIn(minimumValue: Double, maximumValue: Double): Double {
  */
 @SinceKotlin("1.1")
 fun <T : Comparable<T>> T.coerceIn(range: ClosedFloatingPointRange<T>): T {
-    if (range.isEmpty()) throw IllegalArgumentException("Cannot coerce value to an empty range: $range.")
+    if (range.isEmpty()) throw ArgumentError("Cannot coerce value to an empty range: $range.")
     return when {
         // this < start equiv to this <= start && !(this >= start)
         range.lessThanOrEquals(this, range.start) && !range.lessThanOrEquals(range.start, this) -> range.start
@@ -257,7 +257,7 @@ fun <T : Comparable<T>> T.coerceIn(range: ClosedRange<T>): T {
     if (range is ClosedFloatingPointRange) {
         return this.coerceIn<T>(range)
     }
-    if (range.isEmpty()) throw IllegalArgumentException("Cannot coerce value to an empty range: $range.")
+    if (range.isEmpty()) throw ArgumentError("Cannot coerce value to an empty range: $range.")
     return when {
         this < range.start -> range.start
         this > range.endInclusive -> range.endInclusive
@@ -276,7 +276,7 @@ fun Int.coerceIn(range: ClosedRange<Int>): Int {
     if (range is ClosedFloatingPointRange) {
         return this.coerceIn<Int>(range)
     }
-    if (range.isEmpty()) throw IllegalArgumentException("Cannot coerce value to an empty range: $range.")
+    if (range.isEmpty()) throw ArgumentError("Cannot coerce value to an empty range: $range.")
     return when {
         this < range.start -> range.start
         this > range.endInclusive -> range.endInclusive
