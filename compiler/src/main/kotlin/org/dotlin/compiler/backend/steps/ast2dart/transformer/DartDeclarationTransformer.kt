@@ -20,6 +20,7 @@
 package org.dotlin.compiler.backend.steps.ast2dart.transformer
 
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
+import org.dotlin.compiler.dart.ast.`typealias`.DartTypeAlias
 import org.dotlin.compiler.dart.ast.declaration.DartDeclaration
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartClassDeclaration
 import org.dotlin.compiler.dart.ast.declaration.extension.DartExtensionDeclaration
@@ -41,7 +42,10 @@ object DartDeclarationTransformer : DartAstNodeTransformer {
         return "$annotations$returnType $name$function"
     }
 
-    override fun visitClassDeclaration(classDeclaration: DartClassDeclaration, context: DartGenerationContext): String {
+    override fun visitClassDeclaration(
+        classDeclaration: DartClassDeclaration,
+        context: DartGenerationContext
+    ): String {
         val annotations = classDeclaration.annotations.accept(context)
         val abstract = if (classDeclaration.isAbstract) "abstract " else ""
         val name = classDeclaration.name.accept(context)
@@ -62,7 +66,8 @@ object DartDeclarationTransformer : DartAstNodeTransformer {
 
         val members =
             if (classDeclaration.members.isNotEmpty())
-                classDeclaration.members.accept(context).joinToString("", prefix = " {", postfix = "}")
+                classDeclaration.members.accept(context)
+                    .joinToString("", prefix = " {", postfix = "}")
             else
                 " {}"
 
@@ -118,7 +123,19 @@ object DartDeclarationTransformer : DartAstNodeTransformer {
 
         prefix + it.joinToString { variable -> variable.accept(context) }
     }
+
+    override fun visitTypeAlias(typeAlias: DartTypeAlias, context: DartGenerationContext) =
+        typeAlias.let {
+            val name = it.name.accept(context)
+            val typeParameters = it.typeParameters.accept(context)
+            val aliased = it.aliased.accept(context)
+
+            "typedef $name$typeParameters = $aliased;"
+        }
 }
 
-fun DartDeclaration.accept(context: DartGenerationContext) = accept(DartDeclarationTransformer, context)
-fun DartVariableDeclarationList.accept(context: DartGenerationContext) = accept(DartDeclarationTransformer, context)
+fun DartDeclaration.accept(context: DartGenerationContext) =
+    accept(DartDeclarationTransformer, context)
+
+fun DartVariableDeclarationList.accept(context: DartGenerationContext) =
+    accept(DartDeclarationTransformer, context)
