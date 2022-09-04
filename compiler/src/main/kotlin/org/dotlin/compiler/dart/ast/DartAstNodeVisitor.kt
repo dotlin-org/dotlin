@@ -19,6 +19,9 @@
 
 package org.dotlin.compiler.dart.ast
 
+import org.dotlin.compiler.dart.ast.`typealias`.DartClassTypeAlias
+import org.dotlin.compiler.dart.ast.`typealias`.DartFunctionTypeAlias
+import org.dotlin.compiler.dart.ast.`typealias`.DartTypeAlias
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.collection.DartCollectionElementList
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
@@ -66,6 +69,10 @@ interface DartAstNodeVisitor<R, C> {
 
     // Annotation
     fun visitAnnotation(annotation: DartAnnotation, context: C): R = visitAstNode(annotation, context)
+
+    // Type alias
+    fun visitTypeAlias(typeAlias: DartTypeAlias, context: C): R =
+        visitAstNode(typeAlias, context)
 
     // Declarations
     fun visitTopLevelFunctionDeclaration(functionDeclaration: DartTopLevelFunctionDeclaration, context: C): R =

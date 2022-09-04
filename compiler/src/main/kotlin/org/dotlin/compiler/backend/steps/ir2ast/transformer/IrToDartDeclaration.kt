@@ -22,7 +22,10 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.*
+import org.dotlin.compiler.dart.ast.`typealias`.DartClassTypeAlias
+import org.dotlin.compiler.dart.ast.`typealias`.DartFunctionTypeAlias
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnitMember
+import org.dotlin.compiler.dart.ast.compilationunit.DartNamedCompilationUnitMember
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartClassDeclaration
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartExtendsClause
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartImplementsClause
@@ -32,14 +35,13 @@ import org.dotlin.compiler.dart.ast.declaration.variable.DartTopLevelVariableDec
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
 import org.dotlin.compiler.dart.ast.expression.DartFunctionExpression
+import org.dotlin.compiler.dart.ast.type.DartFunctionType
 import org.dotlin.compiler.dart.ast.type.DartNamedType
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.types.*
-import org.jetbrains.kotlin.ir.util.isClass
-import org.jetbrains.kotlin.ir.util.isInterface
-import org.jetbrains.kotlin.ir.util.parentAsClass
+import org.jetbrains.kotlin.ir.util.*
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnitMember>() {
@@ -185,6 +187,27 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
             ),
             annotations = irField.dartAnnotations,
         )
+
+    override fun DartTransformContext.visitTypeAlias(
+        irAlias: IrTypeAlias,
+        context: DartTransformContext
+    ) = irAlias.let {
+        val name = it.dartNameAsSimple
+        val typeParameters = it.typeParameters.accept(context)
+
+        when {
+            it.expandedType.isFunctionTypeOrSubtype() -> DartFunctionTypeAlias(
+                name, typeParameters,
+                aliased = it.expandedType.accept(context) as DartFunctionType,
+                annotations = irAlias.dartAnnotations
+            )
+            else -> DartClassTypeAlias(
+                name, typeParameters,
+                aliased = it.expandedType.accept(context) as DartNamedType,
+                annotations = irAlias.dartAnnotations
+            )
+        }
+    }
 }
 
 fun IrDeclaration.accept(context: DartTransformContext) = accept(IrToDartDeclarationTransformer, context)

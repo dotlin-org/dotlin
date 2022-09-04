@@ -148,7 +148,7 @@
 - [x] Nothing type
 - [x] Function overloading
 - [ ] Coroutines
-- [ ] Type aliases
+- [x] Type aliases
 - [ ] Annotations
 - [ ] Destructuring
 - [ ] Reflection
