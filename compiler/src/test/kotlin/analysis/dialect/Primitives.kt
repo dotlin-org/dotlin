@@ -17,7 +17,7 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package analysis
+package analysis.dialect
 
 import BaseTest
 import assertCanCompile
@@ -28,8 +28,8 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
-@DisplayName("Analysis: Dialect")
-class Dialect : BaseTest {
+@DisplayName("Analysis: Dialect: Primitives")
+class Primitives : BaseTest {
     @Test
     fun `using Long literal on Int`() = assertCanCompile {
         kotlin(
