@@ -30,8 +30,8 @@ open class IntProgression
             step: Int
     ) : Iterable<Int> {
     init {
-        if (step == 0) throw kotlin.IllegalArgumentException("Step must be non-zero.")
-        if (step == Int.MIN_VALUE) throw kotlin.IllegalArgumentException("Step must be greater than Int.MIN_VALUE to avoid overflow on negation.")
+        if (step == 0) throw ArgumentError("Step must be non-zero.")
+        if (step == Int.MIN_VALUE) throw ArgumentError("Step must be greater than Int.MIN_VALUE to avoid overflow on negation.")
     }
 
     /**
@@ -49,7 +49,7 @@ open class IntProgression
      */
     val step: Int = step
 
-    override fun iterator(): Iterator<Int> = IntProgressionIterator(first, last, step)
+    override fun iterator(): kotlin.collections.Iterator<Int> = IntProgressionIterator(first, last, step)
 
     /**
      * Checks if the progression is empty.

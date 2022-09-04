@@ -22,4 +22,4 @@ package kotlin.reflect
  */
 @SinceKotlin("1.6")
 inline fun <reified T> typeOf(): KType =
-    throw UnsupportedOperationException("This function is implemented as an intrinsic on all supported platforms.")
+    throw UnsupportedError("This function is implemented as an intrinsic on all supported platforms.")

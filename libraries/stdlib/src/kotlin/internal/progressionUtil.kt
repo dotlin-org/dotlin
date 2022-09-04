@@ -48,5 +48,5 @@ private fun differenceModulo(a: Int, b: Int, c: Int): Int {
 internal fun getProgressionLastElement(start: Int, end: Int, step: Int): Int = when {
     step > 0 -> if (start >= end) end else end - differenceModulo(end, start, step)
     step < 0 -> if (start <= end) end else end + differenceModulo(start, end, -step)
-    else -> throw kotlin.IllegalArgumentException("Step is zero.")
+    else -> throw ArgumentError("Step is zero.")
 }

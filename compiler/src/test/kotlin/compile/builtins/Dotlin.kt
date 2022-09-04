@@ -840,45 +840,6 @@ class Dotlin : BaseTest {
     }
 
     @Test
-    fun `@DartCatchAs`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                try {
-                    something()
-                } catch (e: UnsupportedOperationException) {
-                    e.message
-                }
-            }
-
-            fun something(): Nothing = throw UnsupportedOperationException()
-            """
-        )
-
-        dart(
-            """
-            import 'package:meta/meta.dart';
-
-            void main() {
-              try {
-                something();
-              } on UnsupportedError catch (e) {
-                final UnsupportedOperationException tmp0_catchAs =
-                    e is! UnsupportedOperationException
-                        ? UnsupportedOperationException.from(e)
-                        : e;
-                tmp0_catchAs.message;
-              }
-            }
-
-            Never something() {
-              throw UnsupportedOperationException.empty();
-            }
-            """
-        )
-    }
-
-    @Test
     fun `@DartPositional`() = assertCompile {
         kotlin(
             """
