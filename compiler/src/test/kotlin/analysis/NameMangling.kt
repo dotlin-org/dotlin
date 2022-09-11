@@ -23,6 +23,7 @@ import BaseTest
 import assertCanCompile
 import assertCompilesWithError
 import assertCompilesWithErrors
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -30,7 +31,7 @@ import org.junit.jupiter.api.Test
 @DisplayName("Analysis: Name Mangling")
 class NameMangling : BaseTest {
     @Test
-    fun `name clash`() = assertCompilesWithError("DART_NAME_CLASH") {
+    fun `name clash`() = assertCompilesWithError(ErrorsDart.DART_NAME_CLASH) {
         kotlin(
             """
             fun main() {}
@@ -42,7 +43,7 @@ class NameMangling : BaseTest {
     }
 
     @Test
-    fun `multiple name clashes`() = assertCompilesWithError("DART_NAME_CLASH") {
+    fun `multiple name clashes`() = assertCompilesWithError(ErrorsDart.DART_NAME_CLASH) {
         kotlin(
             """
             fun main() {}
@@ -57,7 +58,7 @@ class NameMangling : BaseTest {
     }
 
     @Test
-    fun `backing field name clash`() = assertCompilesWithError("DART_NAME_CLASH") {
+    fun `backing field name clash`() = assertCompilesWithError(ErrorsDart.DART_NAME_CLASH) {
         kotlin(
             """
             class Test {

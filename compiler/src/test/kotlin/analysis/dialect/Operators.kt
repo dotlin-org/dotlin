@@ -24,6 +24,7 @@ import assertCanCompile
 import assertCompilesWithError
 import assertCompilesWithErrors
 import assertCompilesWithWarning
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -32,7 +33,7 @@ import org.junit.jupiter.api.Test
 class Operators : BaseTest {
     @Test
     fun `error when defining set operator that does not have the return type of its value`() =
-        assertCompilesWithError("WRONG_SET_OPERATOR_RETURN_TYPE") {
+        assertCompilesWithError(ErrorsDart.WRONG_SET_OPERATOR_RETURN_TYPE) {
             kotlin(
                 """
                 class Test {
@@ -44,7 +45,7 @@ class Operators : BaseTest {
 
     @Test
     fun `warning when defining set operator that does not return its value`() =
-        assertCompilesWithWarning("WRONG_SET_OPERATOR_RETURN") {
+        assertCompilesWithWarning(ErrorsDart.WRONG_SET_OPERATOR_RETURN) {
             kotlin(
                 """
                 class Test {

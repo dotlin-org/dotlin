@@ -34,5 +34,5 @@ val Iterable<Diagnostic>.hasWarnings
 val Iterable<Diagnostic>.hasErrors
     get() = errors.isNotEmpty()
 
-val Iterable<Diagnostic>.names
-    get() = map { it.factory.name }
+val Iterable<Diagnostic>.factories
+    get() = map { it.factory }

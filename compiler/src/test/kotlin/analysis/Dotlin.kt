@@ -24,6 +24,7 @@ import assertCanCompile
 import assertCompilesWithError
 import assertCompilesWithErrors
 import assertCompilesWithWarning
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -32,7 +33,7 @@ import org.junit.jupiter.api.Test
 class Dotlin : BaseTest {
     @Test
     fun `warning when declaring extension without @DartExtensionName in public package`() =
-        assertCompilesWithWarning("EXTENSION_WITHOUT_EXPLICIT_DART_EXTENSION_NAME_IN_PUBLIC_PACKAGE") {
+        assertCompilesWithWarning(ErrorsDart.EXTENSION_WITHOUT_EXPLICIT_DART_EXTENSION_NAME_IN_PUBLIC_PACKAGE) {
             isPublicPackage = true
 
             kotlin(
