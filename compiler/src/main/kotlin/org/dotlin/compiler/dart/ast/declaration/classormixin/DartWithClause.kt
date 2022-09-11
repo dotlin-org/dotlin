@@ -17,33 +17,20 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package compile
+package org.dotlin.compiler.dart.ast.declaration.classormixin
 
-import BaseTest
-import assertCompile
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
+import org.dotlin.compiler.dart.ast.DartAstNode
+import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
+import org.dotlin.compiler.dart.ast.accept
+import org.dotlin.compiler.dart.ast.type.DartNamedType
 
-@DisplayName("Compile: Dialect")
-class Dialect : BaseTest {
-    @Test
-    fun `using Long literal on Int`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                val x: Int = 9223372036854775807
-            }
-            """
-        )
+data class DartWithClause(
+    val mixins: List<DartNamedType>,
+) : DartAstNode {
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitWithClause(this, data)
 
-        dart(
-            """
-            import 'package:meta/meta.dart';
-
-            void main() {
-              final int x = 9223372036854775807;
-            }
-            """
-        )
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        mixins.accept(visitor, data)
     }
 }

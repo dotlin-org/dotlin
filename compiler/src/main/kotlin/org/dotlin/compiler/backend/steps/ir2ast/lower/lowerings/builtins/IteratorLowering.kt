@@ -63,7 +63,6 @@ class IteratorSubtypeImplementationsLowering(override val context: DartLoweringC
 
         val elementType = declaration.resolveConcreteIteratorElementType() ?: return noChange()
 
-
         val dartIteratorClass = when {
             isBidirectional -> dartBuiltIns.bidirectionalIterator.owner
             else -> dartBuiltIns.iterator.owner

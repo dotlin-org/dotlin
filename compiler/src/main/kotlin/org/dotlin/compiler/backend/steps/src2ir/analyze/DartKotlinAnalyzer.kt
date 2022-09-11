@@ -19,11 +19,8 @@
 
 package org.dotlin.compiler.backend.steps.src2ir.analyze
 
-import com.intellij.openapi.Disposable
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.extensions.ExtensionPointName
-import org.dotlin.compiler.backend.DartKotlinBuiltIns
 import org.jetbrains.kotlin.analyzer.AnalysisResult
+import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.functions.functionInterfacePackageFragmentProvider
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
@@ -44,30 +41,22 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.platform.js.JsPlatforms
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.*
-import org.jetbrains.kotlin.resolve.diagnostics.DiagnosticSuppressor
 import org.jetbrains.kotlin.resolve.lazy.KotlinCodeAnalyzer
 import org.jetbrains.kotlin.resolve.lazy.declarations.FileBasedDeclarationProviderFactory
+import org.jetbrains.kotlin.storage.StorageManager
 
 class DartKotlinAnalyzer(
     private val env: KotlinCoreEnvironment,
-    private val config: CompilerConfiguration
+    private val config: CompilerConfiguration,
 ) {
     fun analyze(
         files: List<KtFile>,
         modules: List<ModuleDescriptorImpl>,
         isBuiltInsModule: Boolean = false,
-        builtInsModule: ModuleDescriptorImpl?,
+        builtIns: KotlinBuiltIns,
         targetEnvironment: TargetEnvironment,
         trace: BindingTrace,
     ): AnalysisResult {
-        val builtIns: KotlinBuiltIns = when {
-            isBuiltInsModule -> {
-                require(builtInsModule == null)
-                DartKotlinBuiltIns()
-            }
-            else -> builtInsModule!!.builtIns
-        }
-
         val moduleName = config[CommonConfigurationKeys.MODULE_NAME]!!
         val moduleContext = ContextForNewModule(
             ProjectContext(env.project, "Dart Kotlin Analyzer"),
@@ -84,11 +73,6 @@ class DartKotlinAnalyzer(
 
         thisModule.setDependencies(
             (setOf(thisModule) + modules + builtIns.builtInsModule).toList()
-        )
-
-        DiagnosticSuppressor.EP_NAME.registerExtension(
-            DartDiagnosticSuppressor,
-            disposable = env.projectEnvironment.parentDisposable
         )
 
         val container = createContainer(
@@ -133,15 +117,4 @@ class DartKotlinAnalyzer(
             else -> AnalysisResult.success(trace.bindingContext, thisModule)
         }
     }
-}
-
-private fun <T : Any> ExtensionPointName<T>.registerExtension(ext: T, disposable: Disposable) {
-    ApplicationManager.getApplication()
-        .extensionArea
-        .getExtensionPoint(this)
-        .let { ep ->
-            if (!ep.extensions.any { it == ext }) {
-                ep.registerExtension(ext, disposable)
-            }
-        }
 }

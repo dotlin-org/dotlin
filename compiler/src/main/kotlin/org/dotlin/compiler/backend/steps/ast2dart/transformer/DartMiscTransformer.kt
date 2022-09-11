@@ -24,6 +24,7 @@ import org.dotlin.compiler.dart.ast.DartLabel
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartExtendsClause
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartImplementsClause
+import org.dotlin.compiler.dart.ast.declaration.classormixin.DartWithClause
 
 object DartMiscTransformer : DartAstNodeTransformer {
     override fun visitLabel(label: DartLabel, context: DartGenerationContext) = "${label.value.accept(context)}: "
@@ -36,6 +37,11 @@ object DartMiscTransformer : DartAstNodeTransformer {
     override fun visitImplementsClause(implementsClause: DartImplementsClause, context: DartGenerationContext): String {
         val types = implementsClause.interfaces.joinToString { it.accept(context) }
         return "implements $types"
+    }
+
+    override fun visitWithClause(withClause: DartWithClause, context: DartGenerationContext): String {
+        val types = withClause.mixins.joinToString { it.accept(context) }
+        return "with $types"
     }
 
     override fun visitAnnotation(annotation: DartAnnotation, context: DartGenerationContext) = annotation.let {
@@ -51,6 +57,7 @@ object DartMiscTransformer : DartAstNodeTransformer {
 fun DartLabel.accept(context: DartGenerationContext) = accept(DartMiscTransformer, context)
 fun DartExtendsClause.accept(context: DartGenerationContext) = accept(DartMiscTransformer, context)
 fun DartImplementsClause.accept(context: DartGenerationContext) = accept(DartMiscTransformer, context)
+fun DartWithClause.accept(context: DartGenerationContext) = accept(DartMiscTransformer, context)
 fun DartAnnotation.accept(context: DartGenerationContext) = accept(DartMiscTransformer, context)
 fun Collection<DartAnnotation>.accept(context: DartGenerationContext) = when {
     isEmpty() -> ""

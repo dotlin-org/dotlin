@@ -24,3 +24,38 @@ package dotlin
 external fun dart(code: String): dynamic
 
 external val definedExternally: Nothing
+
+/**
+ * Marker interface to indicate that a class can be either implement the implicit interface or be mixed in.
+ *
+ * @see Interface
+ * @see Mixin
+ */
+sealed interface InterfaceOrMixin
+
+/**
+ * Marker object to indicate that the implicit interface from a Dart class should be implemented, instead of
+ * the class itself.
+ *
+ * In Dart, every class has an implicit interface, meaning you can `implement` (as opposed to `extend`) any class.
+ * To do the same in Dotlin, you can use a special constructor to indicate that the implicit interface should be used
+ * as a super type, instead of the class. For example:
+ * ```kotlin
+ * class MyClass : SomeDartClass(Interface)
+ * ```
+ */
+object Interface : InterfaceOrMixin
+
+/**
+ * Marker object to indicate that a Dart class should be used as a mixin, instead of inherited as a class.
+ *
+ * In Dart, certain classes can be used as a `mixin`, meaning you can implement them like interfaces, but with
+ * behavior (similar to Kotlin interfaces with default implementations).
+ *
+ * To do the same in Dotlin, you can use a special constructor to indicate that a class should be mixed in as
+ * a super type, instead of inherited normally. For example:
+ * ```kotlin
+ * class MyClass : SomeDartClass(Mixin)
+ * ```
+ */
+object Mixin : InterfaceOrMixin

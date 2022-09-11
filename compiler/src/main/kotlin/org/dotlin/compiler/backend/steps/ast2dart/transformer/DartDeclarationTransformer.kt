@@ -64,6 +64,12 @@ object DartDeclarationTransformer : DartAstNodeTransformer {
             else
                 ""
 
+        val with =
+            if (classDeclaration.withClause != null)
+                " ${classDeclaration.withClause.accept(context)}"
+            else
+                ""
+
         val members =
             if (classDeclaration.members.isNotEmpty())
                 classDeclaration.members.accept(context)
@@ -71,7 +77,7 @@ object DartDeclarationTransformer : DartAstNodeTransformer {
             else
                 " {}"
 
-        return "$annotations${abstract}class $name$typeParameters$extends$implements$members"
+        return "$annotations${abstract}class $name$typeParameters$extends$with$implements$members"
     }
 
     override fun visitExtensionDeclaration(

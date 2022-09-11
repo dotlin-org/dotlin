@@ -23,6 +23,7 @@ import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.on
+import org.jetbrains.kotlin.diagnostics.DiagnosticFactory
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
@@ -40,6 +41,8 @@ abstract class WrongSetOperatorChecker : IrDeclarationChecker {
 }
 
 object WrongSetOperatorReturnTypeChecker : WrongSetOperatorChecker() {
+    override val reports = listOf(ErrorsDart.WRONG_SET_OPERATOR_RETURN_TYPE)
+
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun IrAnalyzerContext.check(source: KtDeclaration, declaration: IrDeclaration) {
         if (declaration.isNotRelevantSet()) return
@@ -54,6 +57,8 @@ object WrongSetOperatorReturnTypeChecker : WrongSetOperatorChecker() {
 }
 
 object WrongSetOperatorReturnChecker : WrongSetOperatorChecker() {
+    override val reports = listOf(ErrorsDart.WRONG_SET_OPERATOR_RETURN)
+
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun IrAnalyzerContext.check(source: KtDeclaration, declaration: IrDeclaration) {
         if (declaration.isNotRelevantSet()) return

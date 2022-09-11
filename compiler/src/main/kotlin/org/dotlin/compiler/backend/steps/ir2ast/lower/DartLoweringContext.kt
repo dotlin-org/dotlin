@@ -62,7 +62,7 @@ import java.nio.file.Path
 class DartLoweringContext(
     override val configuration: CompilerConfiguration,
     override val symbolTable: SymbolTable,
-    val bindingContext: BindingContext,
+    override val bindingContext: BindingContext,
     val irModuleFragment: IrModuleFragment,
     override val dartNameGenerator: DartNameGenerator,
     private val extraIrAttributes: ExtraIrAttributes = ExtraIrAttributes.default(),

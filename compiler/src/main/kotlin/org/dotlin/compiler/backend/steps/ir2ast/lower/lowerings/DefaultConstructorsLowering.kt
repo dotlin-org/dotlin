@@ -19,11 +19,14 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
+import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
+import org.dotlin.compiler.backend.util.isSpecialInheritanceMarker
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.expressions.IrDelegatingConstructorCall
+import org.jetbrains.kotlin.ir.expressions.IrGetObjectValue
 import org.jetbrains.kotlin.ir.util.statements
 import org.jetbrains.kotlin.name.Name
 
@@ -54,10 +57,19 @@ class DefaultConstructorsLowering(override val context: DartLoweringContext) : I
             .singleOrNull()
             ?: return noChange()
 
-        if (delegatingConstructorCall.valueArgumentsCount > 0 || delegatingConstructorCall.typeArgumentsCount > 0) {
-            return noChange()
+        delegatingConstructorCall.let {
+            // The super constructor call for the special inheritance (implicit interfaces, mixins) should be removed.
+            if (!it.isSpecialInheritanceConstructorCall() && (it.valueArgumentsCount > 0 || it.typeArgumentsCount > 0)) {
+                return noChange()
+            }
         }
 
         return just { remove() }
+    }
+
+    private fun IrDelegatingConstructorCall.isSpecialInheritanceConstructorCall(): Boolean {
+        return valueArguments.singleOrNull()?.let {
+            it is IrGetObjectValue && it.type.isSpecialInheritanceMarker()
+        } == true
     }
 }

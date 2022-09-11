@@ -77,7 +77,7 @@ object EnumValues {
 
 
 private fun IrDeclaration.isEnumValues() =
-    this is IrFunction && kotlinFqName == FqName.fromSegments(listOf("kotlin", "enumValues"))
+    this is IrFunction && kotlinFqName == FqName("kotlin.enumValues")
 
 private fun IrDeclaration.isEnumValueOf() =
-    this is IrFunction && kotlinFqName == FqName.fromSegments(listOf("kotlin", "enumValueOf"))
+    this is IrFunction && kotlinFqName == FqName("kotlin.enumValueOf")

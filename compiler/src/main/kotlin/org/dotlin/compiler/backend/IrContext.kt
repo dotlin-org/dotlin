@@ -1,21 +1,34 @@
 package org.dotlin.compiler.backend
 
-import org.dotlin.compiler.backend.util.getTwoAnnotationArgumentsOf
-import org.dotlin.compiler.backend.util.isActuallyExternal
-import org.dotlin.compiler.backend.util.runWith
+import org.dotlin.compiler.backend.util.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartPrefixedIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
+import org.jetbrains.kotlin.backend.jvm.codegen.psiElement
+import org.jetbrains.kotlin.codegen.kotlinType
 import org.jetbrains.kotlin.descriptors.findClassAcrossModuleDependencies
+import org.jetbrains.kotlin.ir.IrBuiltIns
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.classOrNull
+import org.jetbrains.kotlin.ir.types.toKotlinType
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.psi.KtClass
+import org.jetbrains.kotlin.psi.KtNameReferenceExpression
+import org.jetbrains.kotlin.psi.KtValueArgumentList
+import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.resolve.bindingContextUtil.getAbbreviatedTypeOrType
+import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
 import java.nio.file.Path
 
 abstract class IrContext {
+    abstract val bindingContext: BindingContext
     abstract val symbolTable: SymbolTable
+    abstract val irBuiltIns: IrBuiltIns
     abstract val dartNameGenerator: DartNameGenerator
 
     /**
@@ -230,6 +243,92 @@ abstract class IrContext {
         get() = currentFile.module.descriptor.let {
             it == it.builtIns.builtInsModule
         }
+
+    private fun IrClass.superTypeSet(): Set<IrType> = defaultType.superTypes().toSet()
+    fun IrClass.baseClass(): IrType {
+        val classes = superTypeSet().filter { it.classOrNull?.owner?.isClass == true }
+        val superImplicitInterfaces = superImplicitInterfaces()
+        val superMixins = superMixins()
+
+        return classes.singleOrNull { it !in superImplicitInterfaces && it !in superMixins } ?: irBuiltIns.anyType
+    }
+
+    fun IrClass.superInterfaces(): Set<IrType> =
+        superTypeSet().filter { it.classOrNull?.owner?.isInterface == true }.toSet()
+
+    @OptIn(ObsoleteDescriptorBasedAPI::class)
+    private fun IrClass.superSpecialClasses(only: SuperTypeKind.Special): Set<IrType> {
+        val ktClass = psiElement as? KtClass ?: return emptySet()
+        val superTypeEntries = ktClass.getSuperTypeList()?.entries?.toList() ?: return emptySet()
+        val ktTypes = superTypeEntries.mapNotNull {
+            val typeReference = it.typeReference ?: return@mapNotNull null
+
+            val isSpecialClass = typeReference.isSpecialInheritanceConstructorCall(
+                bindingContext, mustBe = when (only) {
+                    SuperTypeKind.Interface.Implicit -> SpecialInheritanceKind.IMPLICIT_INTERFACE
+                    SuperTypeKind.Mixin -> SpecialInheritanceKind.MIXIN
+                }
+            )
+
+            when {
+                isSpecialClass -> typeReference.typeElement?.getAbbreviatedTypeOrType(bindingContext)
+                else -> null
+            }
+        }
+
+        return superTypes.filter { it.toKotlinType() in ktTypes }.toSet()
+    }
+
+    fun IrClass.superImplicitInterfaces() = superSpecialClasses(only = SuperTypeKind.Interface.Implicit)
+    fun IrClass.allSuperImplicitInterfaces(): Set<IrType> =
+        superImplicitInterfaces() union superTypes.flatMap {
+            it.classOrNull?.owner?.allSuperImplicitInterfaces() ?: emptySet()
+        }
+
+    fun IrClass.superMixins() = superSpecialClasses(only = SuperTypeKind.Mixin)
+
+    fun IrClass.superTypes(): Set<SuperType> {
+        return setOf(SuperType(SuperTypeKind.Class, baseClass()))
+            .plus(superInterfaces().map { SuperType(SuperTypeKind.Interface.Regular, it) })
+            .plus(superImplicitInterfaces().map { SuperType(SuperTypeKind.Interface.Implicit, it) })
+            .plus(superMixins().map { SuperType(SuperTypeKind.Mixin, it) })
+            .toSet()
+    }
+
+    fun Iterable<SuperType>.baseClass() = firstOrNull { it.kind is SuperTypeKind.Class }?.type
+    fun Iterable<SuperType>.interfaces() = filter { it.kind is SuperTypeKind.Interface }.types()
+    fun Iterable<SuperType>.regularInterfaces() = filter { it.kind is SuperTypeKind.Interface.Regular }.types()
+    fun Iterable<SuperType>.implicitInterfaces() = filter { it.kind is SuperTypeKind.Interface.Implicit }.types()
+    fun Iterable<SuperType>.mixins() = filter { it.kind is SuperTypeKind.Mixin }.types()
+
+    fun Iterable<SuperType>.types() = map { it.type }
 }
 
 data class DartUnresolvedImport(val library: String, val alias: String?, val hidden: Boolean)
+
+sealed interface SuperTypeKind {
+    /**
+     * Special cases of super types: implicit interfaces or mixins.
+     */
+    sealed interface Special
+
+    object Class : SuperTypeKind {
+        override fun toString() = "SuperTypeKind.Class"
+    }
+
+    sealed interface Interface : SuperTypeKind {
+        object Regular : Interface {
+            override fun toString() = "SuperTypeKind.Interface.Regular"
+        }
+
+        object Implicit : Interface, Special {
+            override fun toString() = "SuperTypeKind.Interface.Implicit"
+        }
+    }
+
+    object Mixin : SuperTypeKind, Special {
+        override fun toString() = "SuperTypeKind.Mixin"
+    }
+}
+
+data class SuperType(val kind: SuperTypeKind, val type: IrType)
