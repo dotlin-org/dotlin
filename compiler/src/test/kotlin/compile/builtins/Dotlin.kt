@@ -528,9 +528,7 @@ class Dotlin : BaseTest {
             """
             @file:Suppress(
                 "INVISIBLE_MEMBER",
-                "INVISIBLE_REFERENCE",
-                "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-                "EXTERNAL_DELEGATED_CONSTRUCTOR_CALL" // TODO: Fix in analyzer
+                "INVISIBLE_REFERENCE"
             )
 
             abstract external class Hobbit {
@@ -932,11 +930,6 @@ class Dotlin : BaseTest {
     fun `@DartStatic`() = assertCompile {
         kotlin(
             """
-            @file:Suppress(
-                "NESTED_CLASS_IN_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
-                "NESTED_EXTERNAL_DECLARATION" // TODO: Fix in analyzer
-            )
-
             external interface DateTime {
                 @DartStatic
                 external companion object {
@@ -966,11 +959,6 @@ class Dotlin : BaseTest {
     fun `@DartStatic on method`() = assertCompile {
         kotlin(
             """
-            @file:Suppress(
-                "NESTED_CLASS_IN_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
-                "NESTED_EXTERNAL_DECLARATION" // TODO: Fix in analyzer
-            )
-
             external interface DateTime {
                 external companion object {
                     @DartStatic
@@ -999,11 +987,6 @@ class Dotlin : BaseTest {
     fun `@DartStatic on property`() = assertCompile {
         kotlin(
             """
-            @file:Suppress(
-                "NESTED_CLASS_IN_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
-                "NESTED_EXTERNAL_DECLARATION" // TODO: Fix in analyzer
-            )
-
             external interface DateTime {
                 external companion object {
                     @DartStatic
@@ -1032,11 +1015,6 @@ class Dotlin : BaseTest {
     fun `@DartStatic on method but in non-external companion object`() = assertCompile {
         kotlin(
             """
-            @file:Suppress(
-                "NESTED_CLASS_IN_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
-                "NESTED_EXTERNAL_DECLARATION" // TODO: Fix in analyzer
-            )
-
             external interface DateTime {
                 companion object {
                     @DartStatic

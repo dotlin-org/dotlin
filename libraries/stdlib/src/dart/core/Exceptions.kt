@@ -14,18 +14,6 @@
  * limitations under the License.
  */
 
-@file:Suppress(
-    "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "NON_ABSTRACT_MEMBER_OF_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
-    "NESTED_CLASS_IN_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
-    "WRONG_INITIALIZER_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "NESTED_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "WRONG_DEFAULT_VALUE_FOR_EXTERNAL_FUN_PARAMETER", // TODO: Fix in analyzer
-    "EXTERNAL_CLASS_CONSTRUCTOR_PROPERTY_PARAMETER", // TODO: Fix in analyzer
-    "EXTERNAL_DELEGATED_CONSTRUCTOR_CALL" // TODO: Fix in analyzer
-)
-
 @file:DartLibrary("dart:core")
 
 package dart.core

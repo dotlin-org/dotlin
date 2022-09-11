@@ -18,9 +18,7 @@
 @file:Suppress(
     "NON_ABSTRACT_FUNCTION_WITH_NO_BODY",
     "MUST_BE_INITIALIZED_OR_BE_ABSTRACT",
-    "UNUSED_PARAMETER",
-    "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "ABSTRACT_MEMBER_NOT_IMPLEMENTED" // TODO: Fix in analyzer (external declarations don't need to implement anything)
+    "UNUSED_PARAMETER"
 )
 
 package kotlin
@@ -136,7 +134,6 @@ external open class Array<T> {
      * 0 ≤ `start` ≤ `end` ≤ [size]
      * If `end` is equal to `start`, then the returned array is empty.
      */
-    @Suppress("WRONG_DEFAULT_VALUE_FOR_EXTERNAL_FUN_PARAMETER") // TODO: Fix in analyzer
     @DartPositional
     @DartName("sublist")
     open fun subArray(start: Int, end: Int? = definedExternally): Array<T>

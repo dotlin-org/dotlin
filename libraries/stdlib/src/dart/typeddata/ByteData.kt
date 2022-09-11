@@ -15,12 +15,6 @@
  */
 
 @file:Suppress(
-    "NESTED_CLASS_IN_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
-    "WRONG_INITIALIZER_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "NESTED_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "CONST_VAL_WITHOUT_INITIALIZER", // TODO: Fix in analyzer
-    "WRONG_DEFAULT_VALUE_FOR_EXTERNAL_FUN_PARAMETER", // TODO: Fix in analyzer
     "ABSTRACT_MEMBER_NOT_IMPLEMENTED" // TODO: Fix in analyzer
 )
 
