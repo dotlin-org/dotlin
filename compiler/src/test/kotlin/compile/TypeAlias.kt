@@ -91,7 +91,7 @@ class TypeAlias : BaseTest {
     fun `function type alias with named parameter`() = assertCompile {
         kotlin(
             """
-            typealias Processor= (number: Int) -> Unit
+            typealias Processor = (number: Int) -> Unit
             """
         )
         dart(
