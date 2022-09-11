@@ -17,12 +17,10 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import org.dotlin.compiler.CompilationResult
-import org.dotlin.compiler.KotlinToDartCompiler
+import org.dotlin.compiler.*
 import org.dotlin.compiler.backend.DotlinCompilerError
-import org.dotlin.compiler.names
-import org.dotlin.compiler.warnings
 import org.intellij.lang.annotations.Language
+import org.jetbrains.kotlin.diagnostics.DiagnosticFactory
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import java.nio.file.Files
@@ -91,27 +89,27 @@ class AssertCompilesTo : AssertCompileFiles() {
 }
 
 abstract class AssertCompilesWithDiagnostics : AssertCompileFiles() {
-    abstract var diagnostics: List<String>
+    abstract var diagnostics: List<DiagnosticFactory<*>>
 }
 
 class AssertCompilesWithError : AssertCompilesWithDiagnostics() {
-    override lateinit var diagnostics: List<String>
+    override lateinit var diagnostics: List<DiagnosticFactory<*>>
 
     override fun assert() {
         val error = assertThrows<DotlinCompilerError> { compile() }
         diagnostics.forEach {
-            assertContains(error.errors.names, it)
+            assertContains(error.errors.factories, it)
         }
     }
 }
 
 class AssertCompilesWithWarning : AssertCompilesWithDiagnostics() {
-    override lateinit var diagnostics: List<String>
+    override lateinit var diagnostics: List<DiagnosticFactory<*>>
 
     override fun assert() {
         val (_, diagnostics) = assertDoesNotThrow { compile() }
         this.diagnostics.forEach {
-            assertContains(diagnostics.warnings.names, it)
+            assertContains(diagnostics.warnings.factories, it)
         }
     }
 }
@@ -148,24 +146,27 @@ inline fun assertCanCompile(block: AssertCanCompile.() -> Unit) = AssertCanCompi
     it.assert()
 }
 
-inline fun assertCompilesWithError(name: String, block: AssertCompilesWithError.() -> Unit) =
-    assertCompilesWithErrors(name, block = block)
+inline fun assertCompilesWithError(factory: DiagnosticFactory<*>, block: AssertCompilesWithError.() -> Unit) =
+    assertCompilesWithErrors(factory, block = block)
 
-inline fun assertCompilesWithErrors(vararg names: String, block: AssertCompilesWithError.() -> Unit) =
+inline fun assertCompilesWithErrors(vararg factories: DiagnosticFactory<*>, block: AssertCompilesWithError.() -> Unit) =
     AssertCompilesWithError().let {
-        require(names.isNotEmpty())
-        it.diagnostics = names.toList()
+        require(factories.isNotEmpty())
+        it.diagnostics = factories.toList()
         block(it)
         it.assert()
     }
 
-inline fun assertCompilesWithWarning(name: String, block: AssertCompilesWithWarning.() -> Unit) =
-    assertCompilesWithWarnings(name, block = block)
+inline fun assertCompilesWithWarning(factory: DiagnosticFactory<*>, block: AssertCompilesWithWarning.() -> Unit) =
+    assertCompilesWithWarnings(factory, block = block)
 
-inline fun assertCompilesWithWarnings(vararg names: String, block: AssertCompilesWithWarning.() -> Unit) =
+inline fun assertCompilesWithWarnings(
+    vararg factories: DiagnosticFactory<*>,
+    block: AssertCompilesWithWarning.() -> Unit
+) =
     AssertCompilesWithWarning().let {
-        require(names.isNotEmpty())
-        it.diagnostics = names.toList()
+        require(factories.isNotEmpty())
+        it.diagnostics = factories.toList()
         block(it)
         it.assert()
     }

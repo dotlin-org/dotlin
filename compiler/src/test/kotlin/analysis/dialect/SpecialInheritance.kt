@@ -24,6 +24,8 @@ import assertCanCompile
 import assertCompilesWithError
 import assertCompilesWithErrors
 import assertCompilesWithWarning
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
+import org.jetbrains.kotlin.diagnostics.Errors
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -85,7 +87,7 @@ class SpecialInheritance : BaseTest {
     // TODO: Raise more specific error ("class should be first in super type list")
     @Test
     fun `raise error if regular class inheritance is not first in list`() =
-        assertCompilesWithError("MANY_CLASSES_IN_SUPERTYPE_LIST") {
+        assertCompilesWithError(Errors.MANY_CLASSES_IN_SUPERTYPE_LIST) {
             kotlin(
                 """
                 external open class Pigeon {
@@ -112,7 +114,7 @@ class SpecialInheritance : BaseTest {
 
     @Test
     fun `raise error if fake interface marker is used`() =
-        assertCompilesWithError("MANY_CLASSES_IN_SUPERTYPE_LIST") {
+        assertCompilesWithError(Errors.MANY_CLASSES_IN_SUPERTYPE_LIST) {
             kotlin(
                 """
                 object Interface
@@ -141,7 +143,7 @@ class SpecialInheritance : BaseTest {
 
     @Test
     fun `raise error when missing implementation from implicit interface`() =
-        assertCompilesWithError("ABSTRACT_MEMBER_NOT_IMPLEMENTED") {
+        assertCompilesWithError(Errors.ABSTRACT_MEMBER_NOT_IMPLEMENTED) {
             kotlin(
                 """
                 external open class Pigeon {
@@ -157,7 +159,7 @@ class SpecialInheritance : BaseTest {
 
     @Test
     fun `raise error when missing implementation from transitive implicit interface`() =
-        assertCompilesWithError("ABSTRACT_MEMBER_NOT_IMPLEMENTED") {
+        assertCompilesWithError(Errors.ABSTRACT_MEMBER_NOT_IMPLEMENTED) {
             kotlin(
                 """
                 external open class Pigeon {
@@ -191,7 +193,7 @@ class SpecialInheritance : BaseTest {
 
     @Test
     fun `raise error when using special inheritance constructor in non-inheritance context`() =
-        assertCompilesWithError("SPECIAL_INHERITANCE_CONSTRUCTOR_MISUSE") {
+        assertCompilesWithError(ErrorsDart.SPECIAL_INHERITANCE_CONSTRUCTOR_MISUSE) {
             kotlin(
                 """
                 external open class Pigeon {

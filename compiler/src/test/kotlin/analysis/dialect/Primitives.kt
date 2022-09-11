@@ -24,6 +24,8 @@ import assertCanCompile
 import assertCompilesWithError
 import assertCompilesWithErrors
 import assertCompilesWithWarning
+import org.jetbrains.kotlin.diagnostics.DiagnosticFactory
+import org.jetbrains.kotlin.diagnostics.Errors
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -53,18 +55,19 @@ class Primitives : BaseTest {
     }
 
     @Test
-    fun `error when using literal larger than Long on Int`() = assertCompilesWithErrors("INT_LITERAL_OUT_OF_RANGE") {
-        kotlin(
-            """
-            fun main() {
-                val x: Int = 100223372036854775807
-            }
-            """
-        )
-    }
+    fun `error when using literal larger than Long on Int`() =
+        assertCompilesWithErrors(Errors.INT_LITERAL_OUT_OF_RANGE) {
+            kotlin(
+                """
+                fun main() {
+                    val x: Int = 100223372036854775807
+                }
+                """
+            )
+        }
 
     @Test
-    fun `error when using String literal on Int`() = assertCompilesWithError("TYPE_MISMATCH") {
+    fun `error when using String literal on Int`() = assertCompilesWithError(Errors.TYPE_MISMATCH) {
         kotlin(
             """
             fun main() {
@@ -76,7 +79,7 @@ class Primitives : BaseTest {
 
     @Disabled
     @Test
-    fun `error when using Long`() = assertCompilesWithError("") {
+    fun `error when using Long`() = assertCompilesWithErrors(*emptyList<DiagnosticFactory<*>>().toTypedArray()) {
         kotlin(
             """
             fun main() {
@@ -88,7 +91,7 @@ class Primitives : BaseTest {
 
     @Disabled
     @Test
-    fun `error when using Char`() = assertCompilesWithError("") {
+    fun `error when using Char`() = assertCompilesWithErrors(*emptyList<DiagnosticFactory<*>>().toTypedArray()) {
         kotlin(
             """
             fun main() {
@@ -100,7 +103,7 @@ class Primitives : BaseTest {
 
     @Disabled
     @Test
-    fun `error when using Float`() = assertCompilesWithError("") {
+    fun `error when using Float`() = assertCompilesWithErrors(*emptyList<DiagnosticFactory<*>>().toTypedArray()) {
         kotlin(
             """
             fun main() {
