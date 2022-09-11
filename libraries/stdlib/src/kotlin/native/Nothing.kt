@@ -15,10 +15,6 @@
  * limitations under the License.
  */
 
-@file:Suppress(
-    "WRONG_EXTERNAL_DECLARATION" // TODO: Fix in analyzer
-)
-
 package kotlin
 
 /**

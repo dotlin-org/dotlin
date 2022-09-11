@@ -16,10 +16,7 @@
 
 @file:Suppress(
     "NON_ABSTRACT_FUNCTION_WITH_NO_BODY",
-    "MUST_BE_INITIALIZED_OR_BE_ABSTRACT",
-    "NESTED_CLASS_IN_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
-    "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "NESTED_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
+    "MUST_BE_INITIALIZED_OR_BE_ABSTRACT"
 )
 
 package dart.core
@@ -43,14 +40,14 @@ external interface StackTrace {
          */
         @DartStatic
         @DartName("empty")
-        external val EMPTY: StackTrace
+        external val EMPTY: StackTrace = definedExternally
 
         /**
          * Returns a representation of the current stack trace.
          */
         @DartStatic
         @DartName("current")
-        external val CURRENT: StackTrace
+        external val CURRENT: StackTrace = definedExternally
     }
 
     /**

@@ -34,8 +34,6 @@ class SpecialInheritance : BaseTest {
     fun `implement multiple implicit interfaces`() = assertCanCompile {
         kotlin(
             """
-            @file:Suppress("WRONG_BODY_OF_EXTERNAL_DECLARATION") // TODO: Fix in analyzer
-
             external open class Pigeon {
                 constructor(implement: Interface)
             
@@ -62,8 +60,6 @@ class SpecialInheritance : BaseTest {
     fun `implement multiple implicit interfaces that can be mixed in`() = assertCanCompile {
         kotlin(
             """
-            @file:Suppress("WRONG_BODY_OF_EXTERNAL_DECLARATION") // TODO: Fix in analyzer
-
             external open class Pigeon {
                 constructor(implement: Interface)
             
@@ -92,8 +88,6 @@ class SpecialInheritance : BaseTest {
         assertCompilesWithError("MANY_CLASSES_IN_SUPERTYPE_LIST") {
             kotlin(
                 """
-                @file:Suppress("WRONG_BODY_OF_EXTERNAL_DECLARATION") // TODO: Fix in analyzer
-    
                 external open class Pigeon {
                     constructor(implement: Interface)
                 
@@ -121,8 +115,6 @@ class SpecialInheritance : BaseTest {
         assertCompilesWithError("MANY_CLASSES_IN_SUPERTYPE_LIST") {
             kotlin(
                 """
-                @file:Suppress("WRONG_BODY_OF_EXTERNAL_DECLARATION") // TODO: Fix in analyzer
-    
                 object Interface
 
                 external open class Pigeon {
@@ -152,8 +144,6 @@ class SpecialInheritance : BaseTest {
         assertCompilesWithError("ABSTRACT_MEMBER_NOT_IMPLEMENTED") {
             kotlin(
                 """
-                @file:Suppress("WRONG_BODY_OF_EXTERNAL_DECLARATION") // TODO: Fix in analyzer
-
                 external open class Pigeon {
                     constructor(implement: InterfaceOrMixin)
                 
@@ -170,8 +160,6 @@ class SpecialInheritance : BaseTest {
         assertCompilesWithError("ABSTRACT_MEMBER_NOT_IMPLEMENTED") {
             kotlin(
                 """
-                @file:Suppress("WRONG_BODY_OF_EXTERNAL_DECLARATION") // TODO: Fix in analyzer
-
                 external open class Pigeon {
                     constructor(implement: InterfaceOrMixin)
                 
@@ -190,8 +178,6 @@ class SpecialInheritance : BaseTest {
         assertCanCompile {
             kotlin(
                 """
-                @file:Suppress("WRONG_BODY_OF_EXTERNAL_DECLARATION") // TODO: Fix in analyzer
-
                 external open class Pigeon {
                     constructor(implement: InterfaceOrMixin)
                 

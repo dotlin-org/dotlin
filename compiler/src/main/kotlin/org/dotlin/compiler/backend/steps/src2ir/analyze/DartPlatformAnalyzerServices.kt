@@ -19,12 +19,8 @@
 
 package org.dotlin.compiler.backend.steps.src2ir.analyze
 
-import org.jetbrains.kotlin.builtins.DefaultBuiltIns
-import org.jetbrains.kotlin.builtins.KotlinBuiltIns
-import org.jetbrains.kotlin.js.resolve.JsPlatformConfigurator
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.ImportPath
-import org.jetbrains.kotlin.resolve.PlatformConfigurator
 import org.jetbrains.kotlin.resolve.PlatformDependentAnalyzerServices
 import org.jetbrains.kotlin.storage.StorageManager
 
@@ -41,10 +37,6 @@ object DartPlatformAnalyzerServices : PlatformDependentAnalyzerServices() {
         )
     }
 
-    override val platformConfigurator: PlatformConfigurator = JsPlatformConfigurator // TODO: JS reference
-
-    val builtIns: KotlinBuiltIns
-        get() = DefaultBuiltIns.Instance
-
+    override val platformConfigurator = DartPlatformConfigurator
     override val excludedImports: List<FqName> = emptyList()
 }

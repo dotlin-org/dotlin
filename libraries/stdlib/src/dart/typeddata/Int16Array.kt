@@ -14,15 +14,6 @@
  * limitations under the License.
  */
 
-@file:Suppress(
-    "NESTED_CLASS_IN_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
-    "WRONG_INITIALIZER_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "NESTED_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "CONST_VAL_WITHOUT_INITIALIZER", // TODO: Fix in analyzer
-    "EXTERNAL_DELEGATED_CONSTRUCTOR_CALL" // TODO: Fix in analyzer
-)
-
 package dart.typeddata
 
 /**
@@ -54,7 +45,8 @@ external interface Int16Array : Array<Int>(Interface), TypedData {
     override fun subArray(start: Int, end: Int?): Int16Array
 
     companion object {
+        // TODO: const
         @DartStatic
-        external const val bytesPerElement: Int
+        external val bytesPerElement: Int = definedExternally
     }
 }

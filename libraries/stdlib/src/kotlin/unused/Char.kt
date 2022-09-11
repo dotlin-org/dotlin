@@ -15,11 +15,6 @@
  * limitations under the License.
  */
 
-@file:Suppress(
-    "WRONG_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "WRONG_INITIALIZER_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-)
-
 package kotlin
 
 internal external abstract class Char private constructor() : Comparable<Char>

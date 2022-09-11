@@ -14,15 +14,6 @@
  * limitations under the License.
  */
 
-@file:Suppress(
-    "NESTED_CLASS_IN_EXTERNAL_INTERFACE", // TODO: Fix in analyzer
-    "WRONG_INITIALIZER_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "NESTED_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "CONST_VAL_WITHOUT_INITIALIZER", // TODO: Fix in analyzer
-    "TYPE_CANT_BE_USED_FOR_CONST_VAL" // TODO: Fix in analyzer
-)
-
 package dart.typeddata
 
 /**
@@ -31,16 +22,19 @@ package dart.typeddata
  */
 external interface Endian {
     companion object {
+        // TODO: const
         @DartStatic
         @DartName("big")
-        external const val BIG: Endian
+        external val BIG: Endian = definedExternally
 
+        // TODO: const
         @DartStatic
         @DartName("little")
-        external const val LITTLE: Endian
+        external val LITTLE: Endian = definedExternally
 
+        // TODO: const
         @DartStatic
         @DartName("host")
-        external const val HOST: Endian
+        external val HOST: Endian = definedExternally
     }
 }
