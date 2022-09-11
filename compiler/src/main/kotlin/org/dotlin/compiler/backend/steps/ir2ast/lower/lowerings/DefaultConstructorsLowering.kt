@@ -21,7 +21,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.dotlin.compiler.backend.util.isSpecialInheritanceMarker
+import org.dotlin.compiler.backend.util.isDerivedSpecialInheritanceMarker
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
@@ -69,7 +69,7 @@ class DefaultConstructorsLowering(override val context: DartLoweringContext) : I
 
     private fun IrDelegatingConstructorCall.isSpecialInheritanceConstructorCall(): Boolean {
         return valueArguments.singleOrNull()?.let {
-            it is IrGetObjectValue && it.type.isSpecialInheritanceMarker()
+            it is IrGetObjectValue && it.type.isDerivedSpecialInheritanceMarker()
         } == true
     }
 }

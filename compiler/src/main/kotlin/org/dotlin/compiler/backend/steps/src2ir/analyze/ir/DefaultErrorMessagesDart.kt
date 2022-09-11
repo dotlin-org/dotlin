@@ -54,6 +54,11 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
             Renderers.NAME
         )
 
+        put(
+            ErrorsDart.SPECIAL_INHERITANCE_CONSTRUCTOR_MISUSE,
+            "special inheritance constructor can only be used as super type constructor"
+        )
+
         this
     }
 }

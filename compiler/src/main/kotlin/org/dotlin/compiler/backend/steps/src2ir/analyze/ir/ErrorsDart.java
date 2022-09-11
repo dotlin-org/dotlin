@@ -22,9 +22,11 @@ package org.dotlin.compiler.backend.steps.src2ir.analyze.ir;
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor;
 import org.jetbrains.kotlin.diagnostics.*;
 import org.jetbrains.kotlin.psi.KtDeclaration;
+import org.jetbrains.kotlin.psi.KtExpression;
 import org.jetbrains.kotlin.types.KotlinType;
 
 import static org.jetbrains.kotlin.diagnostics.PositioningStrategies.DECLARATION_SIGNATURE_OR_DEFAULT;
+import static org.jetbrains.kotlin.diagnostics.PositioningStrategies.DEFAULT;
 
 // This MUST be in Java, because the initializer code uses Java reflection.
 
@@ -40,6 +42,9 @@ public interface ErrorsDart {
 
     DiagnosticFactory1<KtDeclaration, DeclarationDescriptor> WRONG_SET_OPERATOR_RETURN =
             DiagnosticFactory1.create(Severity.WARNING, DECLARATION_SIGNATURE_OR_DEFAULT);
+
+    DiagnosticFactory0<KtExpression> SPECIAL_INHERITANCE_CONSTRUCTOR_MISUSE =
+            DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
 
     @SuppressWarnings("UnusedDeclaration")
     Object _initializer = new Object() {
