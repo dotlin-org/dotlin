@@ -140,7 +140,7 @@ class SpecialInheritance : BaseTest {
         }
 
     @Test
-    fun `raise errors when missing implementations from implicit interface`() =
+    fun `raise error when missing implementation from implicit interface`() =
         assertCompilesWithError("ABSTRACT_MEMBER_NOT_IMPLEMENTED") {
             kotlin(
                 """
@@ -156,7 +156,7 @@ class SpecialInheritance : BaseTest {
         }
 
     @Test
-    fun `raise errors when missing implementations from transitive implicit interface`() =
+    fun `raise error when missing implementation from transitive implicit interface`() =
         assertCompilesWithError("ABSTRACT_MEMBER_NOT_IMPLEMENTED") {
             kotlin(
                 """
@@ -185,6 +185,24 @@ class SpecialInheritance : BaseTest {
                 }
     
                 interface CarrierPigeon : Pigeon(Interface)
+                """
+            )
+        }
+
+    @Test
+    fun `raise error when using special inheritance constructor in non-inheritance context`() =
+        assertCompilesWithError("SPECIAL_INHERITANCE_CONSTRUCTOR_MISUSE") {
+            kotlin(
+                """
+                external open class Pigeon {
+                    constructor(implement: InterfaceOrMixin)
+
+                    open fun fly(): Unit = definedExternally
+                }
+
+                fun test() {
+                    val p = Pigeon(Interface)
+                }
                 """
             )
         }

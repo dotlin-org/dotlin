@@ -41,22 +41,33 @@ fun FqName?.isDotlinInterface() = this?.asString() == "dotlin.$interfaceMarkerNa
 fun FqName?.isDotlinMixin() = this?.asString() == "dotlin.$mixinMarkerName"
 
 /**
- * Whether type is either a implicit interface or mixin marker.
+ * Whether type is either `dotlin.Interface`, `Mixin` or `InterfaceOrMixin`.
  */
-fun IrType.isSpecialInheritanceMarker() = isImplicitInterfaceMarker() || isMixinMarker()
+fun IrType.isSpecialInheritanceMarker() = isInterfaceOrMixinMarker() || isImplicitInterfaceMarker() || isMixinMarker()
+
+/**
+ * Whether type is either `dotlin.Interface`, `Mixin` or `InterfaceOrMixin`.
+ */
+fun KotlinType.isSpecialInheritanceMarker() =
+    isInterfaceOrMixinMarker() || isImplicitInterfaceMarker() || isMixinMarker()
 
 /**
  * Whether type is either a implicit interface or mixin marker.
  */
-fun KotlinType.isSpecialInheritanceMarker() = isImplicitInterfaceMarker() || isMixinMarker()
+fun IrType.isDerivedSpecialInheritanceMarker() = isImplicitInterfaceMarker() || isMixinMarker()
 
 /**
- * Whether the type is `dotlin.InterfaceOrMixin`. Not to be confused with [isSpecialInheritanceMarker].
+ * Whether type is either a implicit interface or mixin marker.
+ */
+fun KotlinType.isDerivedSpecialInheritanceMarker() = isImplicitInterfaceMarker() || isMixinMarker()
+
+/**
+ * Whether the type is `dotlin.InterfaceOrMixin`. Not to be confused with [isDerivedSpecialInheritanceMarker].
  */
 fun IrType.isInterfaceOrMixinMarker() = classFqName?.isDotlinInterfaceOrMixin() == true
 
 /**
- * Whether the type is `dotlin.InterfaceOrMixin`. Not to be confused with [isSpecialInheritanceMarker].
+ * Whether the type is `dotlin.InterfaceOrMixin`. Not to be confused with [isDerivedSpecialInheritanceMarker].
  */
 fun KotlinType.isInterfaceOrMixinMarker() =
     constructor.declarationDescriptor?.fqNameOrNull()?.isDotlinInterfaceOrMixin() == true
@@ -107,7 +118,7 @@ fun PsiElement.isSpecialInheritanceConstructorCall(
         else -> when (mustBe) {
             SpecialInheritanceKind.IMPLICIT_INTERFACE -> type.isImplicitInterfaceMarker()
             SpecialInheritanceKind.MIXIN -> type.isMixinMarker()
-            else -> type.isSpecialInheritanceMarker()
+            else -> type.isDerivedSpecialInheritanceMarker()
         }
     }
 }

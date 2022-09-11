@@ -20,25 +20,13 @@
 package org.dotlin.compiler.backend.steps.src2ir.analyze
 
 import org.dotlin.compiler.backend.steps.src2ir.analyze.checkers.call.SpecialInheritanceConstructorCallChecker
-import org.jetbrains.kotlin.builtins.DefaultBuiltIns
-import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.container.StorageComponentContainer
-import org.jetbrains.kotlin.container.useImpl
-import org.jetbrains.kotlin.container.useInstance
-import org.jetbrains.kotlin.js.analyze.JsNativeDiagnosticSuppressor
-import org.jetbrains.kotlin.js.naming.NameSuggestion
-import org.jetbrains.kotlin.js.resolve.*
-import org.jetbrains.kotlin.js.resolve.JsPlatformConfigurator
-import org.jetbrains.kotlin.js.resolve.diagnostics.*
-import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.resolve.ImportPath
-import org.jetbrains.kotlin.resolve.PlatformConfigurator
 import org.jetbrains.kotlin.resolve.PlatformConfiguratorBase
-import org.jetbrains.kotlin.resolve.PlatformDependentAnalyzerServices
-import org.jetbrains.kotlin.resolve.checkers.ExpectedActualDeclarationChecker
-import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.types.DynamicTypesAllowed
 
-object DartPlatformConfigurator : PlatformConfiguratorBase(DynamicTypesAllowed()) {
+object DartPlatformConfigurator : PlatformConfiguratorBase(
+    DynamicTypesAllowed(),
+    additionalCallCheckers = listOf(SpecialInheritanceConstructorCallChecker)
+) {
     override fun configureModuleComponents(container: StorageComponentContainer) {}
 }
