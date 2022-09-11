@@ -1,13 +1,13 @@
 ![Dotlin logo](docs/assets/dotlin.png)
 
 Dotlin is a Kotlin to Dart compiler. The aim is to integrate Kotlin as a language
-into the Dart ecosystem, combing best of both worlds: The Kotlin language & standard library,
+into the Dart ecosystem, combining best of both worlds: The Kotlin language & standard library,
 and the Dart ecosystem & build system.
 
 ## About Dotlin
 
 Dotlin makes use of Kotlin's IR (Immediate Representation) compiler, and uses that to generate Dart source code.
-At the moment only a small subset of Kotlin's features are supported, to see what exactly, you can
+At the moment some but not all of Kotlin's features are supported, to see what exactly, you can
 look at the [TODO](TODO.md).
 
 ## Goals
