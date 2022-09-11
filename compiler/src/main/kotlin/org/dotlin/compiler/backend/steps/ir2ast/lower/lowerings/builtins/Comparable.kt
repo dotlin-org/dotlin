@@ -39,7 +39,7 @@ import org.jetbrains.kotlin.types.Variance
  * remove the `compareTo` again, since that's already defined in Dart's `Comparable`.
  */
 object Comparable {
-    private lateinit var compareToExtensionMethod: IrSimpleFunction
+    private var compareToExtensionMethod: IrSimpleFunction? = null
     class PreOperatorsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
         override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
             if (declaration !is IrClass || !declaration.defaultType.isComparable()) return noChange()

@@ -29,6 +29,7 @@ import org.dotlin.compiler.dart.ast.compilationunit.DartNamedCompilationUnitMemb
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartClassDeclaration
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartExtendsClause
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartImplementsClause
+import org.dotlin.compiler.dart.ast.declaration.classormixin.DartWithClause
 import org.dotlin.compiler.dart.ast.declaration.extension.DartExtensionDeclaration
 import org.dotlin.compiler.dart.ast.declaration.function.DartTopLevelFunctionDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartTopLevelVariableDeclaration
@@ -74,6 +75,8 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
                 val name = irClass.simpleDartName
                 val isDefaultValueClass = irClass.origin == IrDartDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE
 
+                val superTypes = irClass.superTypes()
+
                 DartClassDeclaration(
                     name = name,
                     isAbstract = irClass.modality == Modality.ABSTRACT || irClass.isInterface,
@@ -81,32 +84,39 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
                     // If the class is a default value for a complex parameter, we want to implement
                     // it and not extend it, so we don't extend anything.
                     extendsClause = when {
-                        !isDefaultValueClass -> irClass.superTypes
-                            .firstOrNull { it.getClass()?.isClass ?: false && !it.isAny() }
+                        !isDefaultValueClass -> superTypes
+                            .baseClass()
+                            ?.let { if (it.isAny()) null else it }
                             ?.accept(context)
                             ?.let { DartExtendsClause(it as DartNamedType) }
                         else -> null
                     },
-                    implementsClause = irClass.superTypes
-                        .let {
-                            // If our class is a default value for a complex parameter, we want it to implement
-                            // the type is a default value for, even if that type is a class and not an interface.
-                            when {
-                                !isDefaultValueClass -> it.filter { type -> type.getClass()?.isInterface ?: false }
-                                else -> it
-                            }
+                    implementsClause = when {
+                        // If our class is a default value for a complex parameter, we want it to implement
+                        // the type is a default value for, even if that type is a class and not an interface.
+                        isDefaultValueClass -> irClass.superTypes
+                        else -> superTypes.interfaces()
+                    }
+                    // TODO: This should never be a DartFunctionType
+                    .mapNotNull { it.accept(context) as? DartNamedType }
+                    .let {
+                        when {
+                            it.isNotEmpty() -> DartImplementsClause(it)
+                            else -> null
                         }
-                        // TODO: This should never be a DartFunctionType
+                    },
+                    withClause = superTypes.mixins()
                         .mapNotNull { it.accept(context) as? DartNamedType }
                         .let {
                             when {
-                                it.isNotEmpty() -> DartImplementsClause(it)
+                                it.isNotEmpty() -> DartWithClause(it)
                                 else -> null
                             }
                         },
                     members = irClass.declarations
                         .asSequence()
-                        // We handle fake overrides only from interfaces and if this itself is not an interface.
+                        // We handle fake overrides only from regular interfaces and if this itself is not a
+                        // a regular interface.
                         .filter {
                             if (!it.isFakeOverride()) {
                                 return@filter true

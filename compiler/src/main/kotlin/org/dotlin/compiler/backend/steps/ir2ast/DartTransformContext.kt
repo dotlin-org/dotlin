@@ -35,7 +35,9 @@ import org.jetbrains.kotlin.ir.declarations.IrFunction
 class DartTransformContext(
     loweringContext: DartLoweringContext,
 ) : IrContext(), ExtraIrAttributes by loweringContext {
+    override val bindingContext = loweringContext.bindingContext
     override val symbolTable = loweringContext.symbolTable
+    override val irBuiltIns = loweringContext.irBuiltIns
     override val dartNameGenerator = loweringContext.dartNameGenerator
     override val sourceRoot = loweringContext.sourceRoot
     override val dartPackage = loweringContext.dartPackage

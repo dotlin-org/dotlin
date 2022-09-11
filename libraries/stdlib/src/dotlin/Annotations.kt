@@ -47,28 +47,6 @@ annotation class DartConst
 annotation class DartPositional
 
 /**
- * Specifies that the class is the implementation of the corresponding interface in Dart.
- *
- * This annotation is used for Kotlin headers that were generated from Dart code. In Dart, it's possible to either
- * extend or implement (almost) any class. Since this might be part of the API, it should also be possible to choose
- * whether to implement a Dart class like an interface or extend it like a class. That's why generated Dart classes
- * have a nested class `Impl`. It compiles to the same class in Dart, but can be used to specify that you want to
- * _extend_ the class instead of _implement_ it.
- *
- * This annotation is used on those `Impl` classes.
- *
- * Only allowed on `external` classes.
- *
- * The annotated class cannot have a `companion object` itself. The companion object of the corresponding interface is
- * used, if any.
- *
- * @param fqName The fully qualified name of the interface this class is an implementation of.
- */
-@Target(AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.SOURCE)
-annotation class DartImplementationOf(val fqName: String)
-
-/**
  * Specifies that whenever this declaration is referenced, [library] should be imported in the file this declaration
  * was referenced in. Can only be used on `external` declarations.
  *

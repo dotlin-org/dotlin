@@ -24,13 +24,16 @@ import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.on
 import org.jetbrains.kotlin.backend.common.lower.parents
+import org.jetbrains.kotlin.diagnostics.DiagnosticFactory
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.util.isPropertyAccessor
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.util.collectionUtils.filterIsInstanceAnd
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
 
-class DartNameChecker : IrDeclarationChecker {
+object DartNameChecker : IrDeclarationChecker {
+    override val reports = listOf(ErrorsDart.DART_NAME_CLASH)
+
     override fun IrAnalyzerContext.check(source: KtDeclaration, declaration: IrDeclaration) {
         if (declaration !is IrDeclarationWithName) return
         val scope = declaration.parents.firstIsInstanceOrNull<IrDeclarationContainer>() ?: return

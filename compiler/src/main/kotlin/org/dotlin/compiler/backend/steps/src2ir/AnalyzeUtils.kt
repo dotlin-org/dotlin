@@ -21,10 +21,63 @@ package org.dotlin.compiler.backend.steps.src2ir
 
 import org.dotlin.compiler.backend.DotlinCompilerError
 import org.dotlin.compiler.errors
+import org.dotlin.compiler.hasErrors
 import org.jetbrains.kotlin.analyzer.AnalysisResult
+import org.jetbrains.kotlin.cli.common.messages.DefaultDiagnosticReporter
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
+import org.jetbrains.kotlin.diagnostics.Diagnostic
+import org.jetbrains.kotlin.diagnostics.DiagnosticFactory
+import org.jetbrains.kotlin.diagnostics.rendering.DefaultErrorMessages
+import org.jetbrains.kotlin.diagnostics.reportDiagnosticOnce
+import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.resolve.BindingTraceContext
+import org.jetbrains.kotlin.resolve.calls.model.DiagnosticReporter
+import org.jetbrains.kotlin.resolve.diagnostics.Diagnostics
+import org.jetbrains.kotlin.util.slicedMap.BasicWritableSlice
+import org.jetbrains.kotlin.util.slicedMap.RewritePolicy
 
-fun AnalysisResult.throwIfIsError() {
-    if (isError()) {
-        throw DotlinCompilerError(bindingContext.diagnostics.errors)
+/**
+ * Throws if there are any non-suppressed errors in the `bindingContext`.
+ */
+fun AnalysisResult.throwIfHasErrors() = bindingContext.diagnosticsExceptSuppressed.throwIfHasErrors()
+
+fun Iterable<Diagnostic>.throwIfHasErrors() {
+    if (hasErrors) {
+        throw DotlinCompilerError(errors)
+    }
+}
+
+private val suppressedDiagnosticsSlice = BasicWritableSlice<Int, Diagnostic>(RewritePolicy.DO_NOTHING)
+
+fun BindingTraceContext.markSuppressed(diagnostic: Diagnostic) {
+    record(suppressedDiagnosticsSlice, diagnostic.hashCode(), diagnostic)
+}
+
+val BindingContext.diagnosticsExceptSuppressed: Iterable<Diagnostic>
+    get() = diagnostics.filter { get(suppressedDiagnosticsSlice, it.hashCode()) == null }
+
+fun DefaultDiagnosticReporter.report(diagnostic: Diagnostic) = diagnostic.let {
+    report(it, it.psiFile, DefaultErrorMessages.render(it))
+}
+
+fun MessageCollector.report(diagnostic: Diagnostic) {
+    DefaultDiagnosticReporter(this).report(diagnostic)
+}
+
+fun Iterable<Diagnostic>.reportAll(messageCollector: MessageCollector) {
+    val reporter = DefaultDiagnosticReporter(messageCollector)
+
+    forEach {
+        reporter.report(it)
+    }
+}
+
+fun Iterable<Diagnostic>.reportOnly(messageCollector: MessageCollector, vararg diagnostics: DiagnosticFactory<*>) {
+    val reporter = DefaultDiagnosticReporter(messageCollector)
+
+    filter {
+        it.factory in diagnostics
+    }.forEach {
+        reporter.report(it)
     }
 }

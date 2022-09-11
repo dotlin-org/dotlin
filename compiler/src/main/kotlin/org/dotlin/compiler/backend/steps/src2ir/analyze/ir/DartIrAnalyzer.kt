@@ -23,8 +23,11 @@ import org.dotlin.compiler.backend.DartNameGenerator
 import org.dotlin.compiler.backend.DartPackage
 import org.dotlin.compiler.backend.IrContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.DartExtensionWithoutProperAnnotationChecker
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.ImplicitInterfaceOverrideChecker
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.WrongSetOperatorReturnChecker
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.WrongSetOperatorReturnTypeChecker
+import org.dotlin.compiler.backend.steps.src2ir.reportAll
+import org.dotlin.compiler.backend.steps.src2ir.reportOnly
 import org.dotlin.compiler.hasErrors
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.backend.jvm.codegen.psiElement
@@ -35,6 +38,7 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticFactory
 import org.jetbrains.kotlin.diagnostics.rendering.DefaultErrorMessages
+import org.jetbrains.kotlin.ir.IrBuiltIns
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrAttributeContainer
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
@@ -44,13 +48,15 @@ import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.psi.KtDeclaration
+import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
+import org.jetbrains.kotlin.resolve.BindingTraceContext
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import java.nio.file.Path
 
 class DartIrAnalyzer(
     private val module: IrModuleFragment,
-    private val trace: BindingTrace,
+    private val trace: BindingTraceContext,
     private val symbolTable: SymbolTable,
     private val dartNameGenerator: DartNameGenerator,
     private val sourceRoot: Path,
@@ -58,14 +64,16 @@ class DartIrAnalyzer(
     config: CompilerConfiguration,
     private val checkers: List<IrDeclarationChecker> = listOf(
         DartExtensionWithoutProperAnnotationChecker,
-        WrongSetOperatorReturnTypeChecker, WrongSetOperatorReturnChecker
+        WrongSetOperatorReturnTypeChecker,
+        WrongSetOperatorReturnChecker,
+        ImplicitInterfaceOverrideChecker
     ),
-    private val onlyReport: Collection<DiagnosticFactory<*>>? = null,
 ) {
     private val messageCollector = config[CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY] ?: MessageCollector.NONE
 
     fun analyzeAndReport(): AnalysisResult {
-        val context = IrAnalyzerContext(trace, symbolTable, dartNameGenerator, sourceRoot, dartPackage)
+        val context =
+            IrAnalyzerContext(trace, symbolTable, module.irBuiltins, dartNameGenerator, sourceRoot, dartPackage)
 
         module.files.forEach {
             context.enterFile(it)
@@ -88,11 +96,16 @@ class DartIrAnalyzer(
         }
 
         return context.trace.bindingContext.let {
-            reportDiagnostics(it.diagnostics)
+            // We only want to report the diagnostics from the IR checkers
+            // not previously reported, unrelated diagnostics.
+            val factories = checkers.flatMap { c -> c.reports }
+            val diagnosticsToReport = it.diagnostics.filter { d -> d.factory in factories }
+
+            diagnosticsToReport.reportAll(messageCollector)
 
             when {
-                it.diagnostics.hasErrors -> AnalysisResult.compilationError(it)
-                else -> AnalysisResult.Companion.success(it, module.descriptor)
+                diagnosticsToReport.hasErrors -> AnalysisResult.compilationError(it)
+                else -> AnalysisResult.success(it, module.descriptor)
             }
         }
     }
@@ -102,30 +115,20 @@ class DartIrAnalyzer(
             is IrAttributeContainer -> attributeOwnerId.safeAs<IrDeclaration>()?.psiElement as? KtDeclaration
             else -> null
         }
-
-    private fun reportDiagnostics(diagnostics: Iterable<Diagnostic>) {
-        val reporter = DefaultDiagnosticReporter(messageCollector)
-
-        val diagnosticsToReport = when {
-            onlyReport == null -> diagnostics
-            onlyReport.isEmpty() -> emptyList()
-            else -> diagnostics.filter { it.factory in onlyReport }
-        }
-
-        diagnosticsToReport.forEach {
-            reporter.report(it, it.psiFile, DefaultErrorMessages.render(it))
-        }
-    }
 }
 
 class IrAnalyzerContext(
-    val trace: BindingTrace,
+    val trace: BindingTraceContext,
     override val symbolTable: SymbolTable,
+    override val irBuiltIns: IrBuiltIns,
     override val dartNameGenerator: DartNameGenerator,
     override val sourceRoot: Path,
     override val dartPackage: DartPackage
-) : IrContext()
+) : IrContext() {
+    override val bindingContext = trace.bindingContext
+}
 
 interface IrDeclarationChecker {
+    val reports: List<DiagnosticFactory<*>>
     fun IrAnalyzerContext.check(source: KtDeclaration, declaration: IrDeclaration)
 }

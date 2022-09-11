@@ -19,12 +19,11 @@
     "WRONG_INITIALIZER_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
     "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
     "NESTED_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "CONST_VAL_WITHOUT_INITIALIZER" // TODO: Fix in analyzer
+    "CONST_VAL_WITHOUT_INITIALIZER", // TODO: Fix in analyzer
+    "EXTERNAL_DELEGATED_CONSTRUCTOR_CALL" // TODO: Fix in analyzer
 )
 
 package dart.typeddata
-
-import dart.core.IArray
 
 /**
  * A fixed-size array of 32-bit signed integers that is viewable as a
@@ -38,7 +37,7 @@ import dart.core.IArray
  * range -2147483648 to 2147483647.
  */
 @DartName("Int32List")
-external interface Int32Array : IArray<Int>, TypedData {
+external interface Int32Array : Array<Int>(Interface), TypedData {
     /**
      * Returns a new array containing the elements between [start] and [end].
      *

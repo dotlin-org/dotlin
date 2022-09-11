@@ -17,16 +17,33 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.backend
+package compile.dialect
 
-import org.jetbrains.kotlin.builtins.KotlinBuiltIns
-import org.jetbrains.kotlin.storage.LockBasedStorageManager
+import BaseTest
+import assertCompile
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
 
-class DartKotlinBuiltIns(createBuiltInsModule: Boolean = false) :
-    KotlinBuiltIns(LockBasedStorageManager("DartKotlinBuiltIns")) {
-    init {
-        if (createBuiltInsModule) {
-            createBuiltInsModule(false)
-        }
+@DisplayName("Compile: Dialect: Primitives")
+class Primitives : BaseTest {
+    @Test
+    fun `using Long literal on Int`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                val x: Int = 9223372036854775807
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              final int x = 9223372036854775807;
+            }
+            """
+        )
     }
 }

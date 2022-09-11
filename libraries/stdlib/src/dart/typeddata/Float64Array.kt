@@ -19,12 +19,11 @@
     "WRONG_INITIALIZER_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
     "WRONG_BODY_OF_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
     "NESTED_EXTERNAL_DECLARATION", // TODO: Fix in analyzer
-    "CONST_VAL_WITHOUT_INITIALIZER" // TODO: Fix in analyzer
+    "CONST_VAL_WITHOUT_INITIALIZER", // TODO: Fix in analyzer
+    "EXTERNAL_DELEGATED_CONSTRUCTOR_CALL" // TODO: Fix in analyzer
 )
 
 package dart.typeddata
-
-import dart.core.IArray
 
 /**
  * A fixed-size array of IEEE 754 double-precision binary floating-point
@@ -35,7 +34,7 @@ import dart.core.IArray
  * the default [array] implementation.
  */
 @DartName("Float64List")
-external interface Float64Array : IArray<Double>, TypedData {
+external interface Float64Array : Array<Double>(Interface), TypedData {
     /**
      * Returns a new array containing the elements between [start] and [end].
      *

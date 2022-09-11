@@ -19,6 +19,9 @@
 
 package org.dotlin.compiler
 
+import com.intellij.core.CoreApplicationEnvironment
+import com.intellij.core.CoreProjectEnvironment
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.util.Disposer
 import org.dotlin.compiler.backend.DartPackage
 import org.dotlin.compiler.backend.steps.ast2dart.dartAstToDartSource
@@ -35,10 +38,12 @@ import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
 import org.jetbrains.kotlin.cli.common.messages.PrintingMessageCollector
 import org.jetbrains.kotlin.cli.common.setupCommonArguments
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
+import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreApplicationEnvironment
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.diagnostics.Diagnostic
+import org.jetbrains.kotlin.resolve.diagnostics.DiagnosticSuppressor
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.*
@@ -83,55 +88,59 @@ object KotlinToDartCompiler {
     ): CompilationResult {
         require(output.isDirectory())
 
-        val (env, config) = prepareCompile(sourceRoot, showFiles = true)
+        val (env, config, rootDisposable) = prepareCompile(sourceRoot, showFiles = true)
 
-        val ir = sourceToIr(
-            env,
-            config,
-            dependencies,
-            sourceRoot.toRealPath().absolute(),
-            DartPackage(
-                isPublic = isPublicPackage
+        try {
+            val ir = sourceToIr(
+                env,
+                config,
+                dependencies,
+                sourceRoot.toRealPath().absolute(),
+                DartPackage(
+                    isPublic = isPublicPackage
+                )
             )
-        )
 
-        // By lazy is important here, the klib must be written before compiling to Dart source,
-        // since it will change the IR in place.
-        val result by lazy { generateDartCode(ir, config, isPublicPackage) }
+            // By lazy is important here, the klib must be written before compiling to Dart source,
+            // since it will change the IR in place.
+            val result by lazy { generateDartCode(ir, config, isPublicPackage) }
 
-        when {
-            isKlib -> {
-                writeToKlib(env, config, ir, output)
+            when {
+                isKlib -> {
+                    writeToKlib(env, config, ir, output)
 
-                val dartSourcePath = output.resolve("lib")
+                    val dartSourcePath = output.resolve("lib")
 
-                for ((path, source) in result.sources) {
-                    dartSourcePath.resolve(path).apply {
-                        parent?.createDirectories()
+                    for ((path, source) in result.sources) {
+                        dartSourcePath.resolve(path).apply {
+                            parent?.createDirectories()
+                            writeText(source)
+                        }
+                    }
+                }
+                else -> for ((path, source) in result.sources) {
+                    output.resolve(path).toFile().apply {
+                        parentFile.mkdirs()
                         writeText(source)
                     }
                 }
             }
-            else -> for ((path, source) in result.sources) {
-                output.resolve(path).toFile().apply {
-                    parentFile.mkdirs()
-                    writeText(source)
-                }
+
+            if (format) {
+                dartFormat(output.absolutePathString())
             }
-        }
 
-        if (format) {
-            dartFormat(output.absolutePathString())
+            return CompilationResult(
+                output,
+                diagnostics = result.diagnostics
+            )
+        } finally {
+            Disposer.dispose(rootDisposable)
         }
-
-        return CompilationResult(
-            output,
-            diagnostics = result.diagnostics
-        )
     }
 
     private fun prepareCompile(sourceRoot: Path, showFiles: Boolean)
-            : Pair<KotlinCoreEnvironment, CompilerConfiguration> {
+            : Triple<KotlinCoreEnvironment, CompilerConfiguration, Disposable> {
         val compilerConfig = CompilerConfiguration().apply {
             val messageCollector = PrintingMessageCollector(
                 System.out,
@@ -152,6 +161,9 @@ object KotlinToDartCompiler {
         }
 
         val rootDisposable = Disposer.newDisposable()
+
+        // TODO `createForProduction` has memory leaks when running tests, however `createForTests` has assumptions
+        // about certain files being present.
         val env = KotlinCoreEnvironment.createForProduction(
             rootDisposable,
             compilerConfig,
@@ -159,7 +171,7 @@ object KotlinToDartCompiler {
             EnvironmentConfigFiles.NATIVE_CONFIG_FILES
         )
 
-        return env to compilerConfig
+        return Triple(env, compilerConfig, rootDisposable)
     }
 
     /**

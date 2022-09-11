@@ -28,6 +28,7 @@ import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartClassDeclaration
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartExtendsClause
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartImplementsClause
+import org.dotlin.compiler.dart.ast.declaration.classormixin.DartWithClause
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartMethodDeclaration
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartConstructorDeclaration
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartConstructorFieldInitializer
@@ -106,6 +107,7 @@ interface DartAstNodeVisitor<R, C> {
     fun visitExtendsClause(extendsClause: DartExtendsClause, context: C): R = visitAstNode(extendsClause, context)
     fun visitImplementsClause(implementsClause: DartImplementsClause, context: C): R =
         visitAstNode(implementsClause, context)
+    fun visitWithClause(withClause: DartWithClause, context: C): R = visitAstNode(withClause, context)
 
     fun visitCatchClause(catchClause: DartCatchClause, context: C): R = visitAstNode(catchClause, context)
 
