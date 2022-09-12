@@ -29,41 +29,39 @@ import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.name.FqName
 
 @Suppress("UNCHECKED_CAST")
-fun <T> IrAnnotationContainer.getAnnotationArgumentOf(name: String): T? =
-    getAnnotation(name)
+fun <T> IrAnnotationContainer.getAnnotationArgumentOf(fqName: FqName): T? =
+    getAnnotation(fqName)
         ?.getValueArgumentOrDefault(0)
         ?.let { it as IrConst<T> }
         ?.value
 
 @Suppress("UNCHECKED_CAST")
-fun <T0, T1> IrAnnotationContainer.getTwoAnnotationArgumentsOf(name: String): Pair<T0, T1>? =
-    getAnnotation(name)
+fun <T0, T1> IrAnnotationContainer.getTwoAnnotationArgumentsOf(fqName: FqName): Pair<T0, T1>? =
+    getAnnotation(fqName)
         ?.let { (0..1).map { i -> it.getValueArgumentOrDefault(i) } }
         ?.let { listOf(it[0] as IrConst<T0>, it[1] as IrConst<T1>) }
         ?.let { Pair(it[0].value as T0, it[1].value as T1) }
 
 @Suppress("UNCHECKED_CAST")
-fun <T0, T1, T2> IrAnnotationContainer.getThreeAnnotationArgumentsOf(name: String): Triple<T0, T1, T2>? =
-    getAnnotation(name)
+fun <T0, T1, T2> IrAnnotationContainer.getThreeAnnotationArgumentsOf(fqName: FqName): Triple<T0, T1, T2>? =
+    getAnnotation(fqName)
         ?.let { (0..2).map { i -> it.getValueArgumentOrDefault(i) } }
         ?.let { listOf(it[0] as IrConst<T0>, it[1] as IrConst<T1>, it[2] as IrConst<T2>) }
         ?.let { Triple(it[0].value as T0, it[1].value as T1, it[2].value as T2) }
 
-@Suppress("UNCHECKED_CAST")
-fun IrAnnotationContainer.getSingleAnnotationStringArgumentOf(name: String) = getAnnotationArgumentOf<String>(name)
+fun IrAnnotationContainer.getSingleAnnotationStringArgumentOf(fqName: FqName) = getAnnotationArgumentOf<String>(fqName)
 
-@Suppress("UNCHECKED_CAST")
-fun IrAnnotationContainer.getSingleAnnotationTypeArgumentOf(name: String) =
-    getAnnotation(name)?.getTypeArgument(0)
+fun IrAnnotationContainer.getSingleAnnotationTypeArgumentOf(fqName: FqName) =
+    getAnnotation(fqName)?.getTypeArgument(0)
 
-fun IrAnnotationContainer.getAnnotation(name: String) = getAnnotation(FqName(name))
+fun IrAnnotationContainer.getAnnotation(fqName: FqName) = getAnnotation(fqName)
 
-fun IrAnnotationContainer.hasAnnotation(name: String) = hasAnnotation(FqName(name))
+fun IrAnnotationContainer.hasAnnotation(fqName: FqName) = hasAnnotation(fqName)
 
-fun IrDeclaration.hasOverriddenAnnotation(name: String): Boolean =
-    hasAnnotation(name) || when (this) {
+fun IrDeclaration.hasOverriddenAnnotation(fqName: FqName): Boolean =
+    hasAnnotation(fqName) || when (this) {
         is IrOverridableDeclaration<*> -> overriddenSymbols.any {
-            (it.owner as? IrDeclaration)?.hasOverriddenAnnotation(name) == true
+            (it.owner as? IrDeclaration)?.hasOverriddenAnnotation(fqName) == true
         }
         else -> false
     }

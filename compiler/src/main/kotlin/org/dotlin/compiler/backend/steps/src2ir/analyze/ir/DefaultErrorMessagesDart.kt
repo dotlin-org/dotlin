@@ -28,7 +28,7 @@ class DefaultErrorMessagesDart : DefaultErrorMessages.Extension {
 }
 
 private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
-    with(DiagnosticFactoryToRendererMap("Dart")) {
+    DiagnosticFactoryToRendererMap("Dart").run {
 
         put(
             ErrorsDart.DART_NAME_CLASH,
@@ -57,6 +57,26 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
         put(
             ErrorsDart.SPECIAL_INHERITANCE_CONSTRUCTOR_MISUSE,
             "special inheritance constructor can only be used as super type constructor"
+        )
+
+        put(
+            ErrorsDart.CONST_INITIALIZED_WITH_NON_CONSTANT_VALUE,
+            "const variables must be initialized with a constant value"
+        )
+
+        put(
+            ErrorsDart.ONLY_CONSTRUCTOR_CALLS_CAN_BE_CONST,
+            "only constructor call expressions can be const"
+        )
+
+        put(
+            ErrorsDart.CONST_WITH_NON_CONST,
+            "the constructor being called isn't a const constructor"
+        )
+
+        put(
+            ErrorsDart.NON_CONSTANT_DEFAULT_VALUE_IN_CONST_CONSTRUCTOR,
+            "the default value of an optional parameter in a const constructor must be constant"
         )
 
         this

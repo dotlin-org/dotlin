@@ -17,14 +17,13 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers
+package org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.post
 
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.on
 import org.jetbrains.kotlin.backend.common.lower.parents
-import org.jetbrains.kotlin.diagnostics.DiagnosticFactory
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.util.isPropertyAccessor
 import org.jetbrains.kotlin.psi.KtDeclaration

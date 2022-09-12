@@ -23,7 +23,6 @@ import BaseTest
 import assertCanCompile
 import assertCompilesWithError
 import assertCompilesWithErrors
-import assertCompilesWithWarning
 import org.jetbrains.kotlin.diagnostics.DiagnosticFactory
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.junit.jupiter.api.Disabled
@@ -55,7 +54,7 @@ class Primitives : BaseTest {
     }
 
     @Test
-    fun `error when using literal larger than Long on Int`() =
+    fun `error if using literal larger than Long on Int`() =
         assertCompilesWithErrors(Errors.INT_LITERAL_OUT_OF_RANGE) {
             kotlin(
                 """
@@ -67,7 +66,7 @@ class Primitives : BaseTest {
         }
 
     @Test
-    fun `error when using String literal on Int`() = assertCompilesWithError(Errors.TYPE_MISMATCH) {
+    fun `error if using String literal on Int`() = assertCompilesWithError(Errors.TYPE_MISMATCH) {
         kotlin(
             """
             fun main() {
@@ -79,7 +78,7 @@ class Primitives : BaseTest {
 
     @Disabled
     @Test
-    fun `error when using Long`() = assertCompilesWithErrors(*emptyList<DiagnosticFactory<*>>().toTypedArray()) {
+    fun `error if using Long`() = assertCompilesWithErrors(*emptyList<DiagnosticFactory<*>>().toTypedArray()) {
         kotlin(
             """
             fun main() {
@@ -91,7 +90,7 @@ class Primitives : BaseTest {
 
     @Disabled
     @Test
-    fun `error when using Char`() = assertCompilesWithErrors(*emptyList<DiagnosticFactory<*>>().toTypedArray()) {
+    fun `error if using Char`() = assertCompilesWithErrors(*emptyList<DiagnosticFactory<*>>().toTypedArray()) {
         kotlin(
             """
             fun main() {
@@ -103,7 +102,7 @@ class Primitives : BaseTest {
 
     @Disabled
     @Test
-    fun `error when using Float`() = assertCompilesWithErrors(*emptyList<DiagnosticFactory<*>>().toTypedArray()) {
+    fun `error if using Float`() = assertCompilesWithErrors(*emptyList<DiagnosticFactory<*>>().toTypedArray()) {
         kotlin(
             """
             fun main() {
@@ -112,4 +111,15 @@ class Primitives : BaseTest {
             """
         )
     }
+
+    @Disabled
+    @Test
+    fun `error if not specifying type explicitly on "Long" literal`() =
+        assertCanCompile {
+            kotlin(
+                """
+                const val x: Int = -9223372036854775807 - 1
+                """
+            )
+        }
 }

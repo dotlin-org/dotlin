@@ -22,6 +22,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 import org.dotlin.compiler.backend.steps.ir2ast.attributes.attributeOwner
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartPrimitive
 import org.jetbrains.kotlin.backend.common.ir.createParameterDeclarations
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
@@ -150,7 +151,7 @@ class ComplexParametersLowering(override val context: DartLoweringContext) : IrD
                 val defaultValueConstructor = defaultValueClass.primaryConstructor!!
 
                 newIrValueParameter.apply {
-                    type = if (originalType.isDartCorePrimitive()) context.dynamicType else originalType
+                    type = if (originalType.isDartPrimitive(orNullable = true)) context.dynamicType else originalType
                     defaultValue = IrConstructorCallImpl.fromSymbolOwner(
                         UNDEFINED_OFFSET,
                         UNDEFINED_OFFSET,
@@ -165,7 +166,7 @@ class ComplexParametersLowering(override val context: DartLoweringContext) : IrD
                 }
 
                 assignmentEqualsElsePart = when {
-                    originalType.isDartCorePrimitive() -> irBuilder.buildStatement {
+                    originalType.isDartPrimitive(orNullable = true) -> irBuilder.buildStatement {
                         irAs(
                             argument = irGetParam,
                             type = originalType
@@ -215,7 +216,10 @@ class ComplexParametersLowering(override val context: DartLoweringContext) : IrD
     ): IrClass = context.run {
         context.irFactory.buildClass {
             name = Name.identifier(
-                if (type.isDartCorePrimitive()) "\$DefaultValue" else "\$Default${type.getClass()!!.dartName}Value"
+                if (type.isDartPrimitive(orNullable = true))
+                    "\$DefaultValue"
+                else
+                    "\$Default${type.getClass()!!.dartName}Value"
             )
             visibility = DescriptorVisibilities.PRIVATE
             origin = IrDartDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE
@@ -226,7 +230,7 @@ class ComplexParametersLowering(override val context: DartLoweringContext) : IrD
 
             createParameterDeclarations()
 
-            superTypes = if (!type.isDartCorePrimitive()) listOf(type.makeNotNull()) else emptyList()
+            superTypes = if (!type.isDartPrimitive(orNullable = true)) listOf(type.makeNotNull()) else emptyList()
 
             declarations += context.irFactory.buildConstructor {
                 isPrimary = true

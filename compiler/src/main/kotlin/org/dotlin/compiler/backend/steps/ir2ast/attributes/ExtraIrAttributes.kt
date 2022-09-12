@@ -19,44 +19,21 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.attributes
 
-import org.dotlin.compiler.backend.DotlinAnnotations
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementVisitor
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrIfNullExpression
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartConst
-import org.jetbrains.kotlin.ir.IrElement
+import org.dotlin.compiler.backend.util.getFqName
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
-import org.jetbrains.kotlin.ir.util.hasEqualFqName
-import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.psi.KtExpression
+import org.jetbrains.kotlin.psi.psiUtil.getAnnotationEntries
+import org.jetbrains.kotlin.resolve.BindingContext
 
-/**
- * All [IrElement]s referenced must be the `attributeOwnerId`s.
- */
 interface ExtraIrAttributes {
     companion object {
         fun default() = object : ExtraIrAttributes {
             override val propertiesInitializedInConstructorBody = mutableSetOf<IrProperty>()
             override val propertiesInitializedInFieldInitializerList = mutableSetOf<IrProperty>()
             override val parameterPropertyReferencesInParameterDefaultValue = mutableSetOf<IrGetValue>()
-            private val annotatedExpressions = mutableMapOf<IrExpression, MutableList<IrConstructorCall>>()
             private val dartImportsPerFile = mutableMapOf<IrFile, MutableSet<DartImport>>()
-
-            override fun IrExpression.annotate(annotations: Iterable<IrConstructorCall>) {
-                annotatedExpressions.compute(this) { _, currentAnnotations ->
-                    (currentAnnotations ?: mutableListOf()).apply {
-                        addAll(annotations)
-                    }
-                }
-            }
-
-            override val IrExpression.annotations: List<IrConstructorCall>
-                get() = annotatedExpressions[attributeOwner()] ?: emptyList()
-
-
-            override fun IrExpression.hasAnnotation(name: String) = annotations.any {
-                it.symbol.owner.parentAsClass.hasEqualFqName(FqName(name))
-            }
 
             override val IrFile.dartImports: Set<DartImport>
                 get() = dartImportsPerFile[this] ?: emptySet()
@@ -68,6 +45,15 @@ interface ExtraIrAttributes {
                     }
                 }
             }
+
+            private var irExpressionSources: Map<IrExpression, KtExpression>? = null
+
+            override fun setIrExpressionSources(sources: Map<IrExpression, KtExpression>) {
+                irExpressionSources = sources
+            }
+
+            override val IrExpression.ktExpression: KtExpression?
+                get() = irExpressionSources?.get(this)
         }
     }
 
@@ -98,47 +84,19 @@ interface ExtraIrAttributes {
      */
     val parameterPropertyReferencesInParameterDefaultValue: MutableSet<IrGetValue>
 
-    fun IrExpression.annotate(buildAnnotation: () -> IrConstructorCall) = annotate(buildAnnotation())
-    fun IrExpression.annotate(annotation: IrConstructorCall) = annotate(listOf(annotation))
-    fun IrExpression.annotate(annotations: Iterable<IrConstructorCall>)
-
-    val IrExpression.annotations: List<IrConstructorCall>
-
-    fun IrExpression.isDartConst(): Boolean = when (this) {
-        // Enums are always constructed as const.
-        is IrEnumConstructorCall -> true
-        is IrConst<*> -> true
-        is IrWhen, is IrIfNullExpression -> {
-            var isConst = true
-
-            acceptChildren(
-                object : IrCustomElementVisitor<Unit, Nothing?> {
-                    override fun visitElement(element: IrElement, data: Nothing?) {
-                        if (element is IrExpression) {
-                            isConst = isConst && element.isDartConst()
-                        }
-
-                        element.acceptChildren(this, null)
-                    }
-
-                },
-                data = null
-            )
-
-            isConst
-        }
-        else -> when {
-            this is IrConstructorCall && symbol.owner.parentAsClass.isDartConst() -> true
-            else -> hasAnnotation(DotlinAnnotations.dartConst)
-        }
-    }
-
-    fun IrExpression.hasAnnotation(name: String): Boolean
-
     val IrFile.dartImports: Set<DartImport>
 
     fun IrFile.addDartImport(import: DartImport) = addDartImports(listOf(import))
     fun IrFile.addDartImports(imports: Iterable<DartImport>)
+
+    fun setIrExpressionSources(sources: Map<IrExpression, KtExpression>)
+    val IrExpression.ktExpression: KtExpression?
+
+    fun IrExpression.hasAnnotation(fqName: FqName, bindingContext: BindingContext): Boolean {
+        val ktExpression = ktExpression ?: return false
+
+        return ktExpression.getAnnotationEntries().any { it.getFqName(bindingContext) == fqName }
+    }
 }
 
 data class DartImport(

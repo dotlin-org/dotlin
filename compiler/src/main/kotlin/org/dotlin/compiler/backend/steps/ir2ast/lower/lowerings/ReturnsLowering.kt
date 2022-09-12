@@ -67,19 +67,6 @@ class ReturnsLowering(override val context: DartLoweringContext) : IrDeclaration
             )
         }
 
-        fun IrExpression.makeConstIf(condition: Boolean) = apply {
-            if (condition) {
-                annotate {
-                    buildStatement(declaration.symbol) {
-                        irCallConstructor(
-                            dartBuiltIns.dotlin.dartConst.owner.primaryConstructor!!.symbol,
-                            typeArguments = emptyList()
-                        )
-                    }
-                }
-            }
-        }
-
         body.transformExpressions(initialParent = declaration) { expression, parent ->
             expression.transformChildren(parent)
             if (expression !is IrReturn || expression.isStatementIn(parent)) return@transformExpressions expression
@@ -99,7 +86,7 @@ class ReturnsLowering(override val context: DartLoweringContext) : IrDeclaration
                     ).apply {
                         type = returnClassType
                         putValueArgument(index = 0, value)
-                    }.makeConstIf(value.isDartConst())
+                    }
                 )
             }
         }

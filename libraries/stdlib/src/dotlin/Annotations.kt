@@ -30,11 +30,21 @@ package dotlin
 annotation class DartName(val name: String)
 
 /**
- * Specifies that the constructor or constructor call should be `const` in Dart.
+ * Specifies that the constructor call should be `const` in Dart. Only works on `const constructor`s.
+ *
+ * For defining a `const constructor`, you can use the keyword itself, for example:
+ * ```kotlin
+ * class Example const constructor()
+ * ```
+ *
+ * Only when _invoking_ a `const constructor` must you use the annotation `@const`. For example:
+ * ```
+ * val myExample = @const Example()
+ * ```
  */
-@Target(AnnotationTarget.CONSTRUCTOR, AnnotationTarget.EXPRESSION)
+@Target(AnnotationTarget.EXPRESSION)
 @Retention(AnnotationRetention.SOURCE)
-annotation class DartConst
+annotation class const
 
 /**
  * Specifies that the parameters with default values of this function (or constructor)

@@ -16,4 +16,4 @@
 
 package dotlin
 
-internal class `$Return`<T> @DartConst constructor(val value: T)
+internal class `$Return`<T> const constructor(val value: T)

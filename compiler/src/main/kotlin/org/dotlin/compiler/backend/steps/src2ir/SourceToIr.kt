@@ -19,8 +19,13 @@
 
 package org.dotlin.compiler.backend.steps.src2ir
 
-import org.dotlin.compiler.backend.*
-import org.dotlin.compiler.backend.steps.src2ir.analyze.*
+import org.dotlin.compiler.backend.DartDescriptorBasedMangler
+import org.dotlin.compiler.backend.DartIrLinker
+import org.dotlin.compiler.backend.DartNameGenerator
+import org.dotlin.compiler.backend.DartPackage
+import org.dotlin.compiler.backend.steps.ir2ast.IrExpressionSourceMapper
+import org.dotlin.compiler.backend.steps.ir2ast.attributes.ExtraIrAttributes
+import org.dotlin.compiler.backend.steps.src2ir.analyze.DartKotlinAnalyzerReporter
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.DartIrAnalyzer
 import org.jetbrains.kotlin.backend.common.serialization.DeserializationStrategy
 import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDescriptor
@@ -171,9 +176,22 @@ private fun loadIr(
         linkerExtensions = emptyList(),
     )
 
+    val extraIrAttributes = ExtraIrAttributes.default()
+
+    IrExpressionSourceMapper.run(module.files, extraIrAttributes)
+
     val dartNameGenerator = DartNameGenerator()
 
-    DartIrAnalyzer(module, trace, symbolTable, dartNameGenerator, sourceRoot, dartPackage, config).analyzeAndReport()
+    DartIrAnalyzer(
+        module,
+        trace,
+        symbolTable,
+        dartNameGenerator,
+        sourceRoot,
+        dartPackage,
+        config,
+        extraIrAttributes
+    ).analyzeAndReport()
         .also {
             it.throwIfHasErrors()
         }
@@ -183,6 +201,7 @@ private fun loadIr(
         resolvedLibs,
         trace,
         symbolTable,
+        extraIrAttributes,
         dartNameGenerator,
         sourceRoot,
         dartPackage
@@ -212,6 +231,7 @@ class IrResult(
     val resolvedLibs: KotlinLibraryResolveResult,
     val bindingTrace: BindingTraceContext,
     val symbolTable: SymbolTable,
+    val extraIrAttributes: ExtraIrAttributes,
     val dartNameGenerator: DartNameGenerator,
     val sourceRoot: Path,
     val dartPackage: DartPackage

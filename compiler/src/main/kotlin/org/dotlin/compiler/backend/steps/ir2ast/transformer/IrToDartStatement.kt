@@ -25,6 +25,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.extensionReceiverOrNull
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrimitiveInteger
 import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.createDartAssignment
+import org.dotlin.compiler.backend.util.isDartConst
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
 import org.dotlin.compiler.dart.ast.expression.*
@@ -93,7 +94,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
                         expression = it.initializer?.accept(context)
                     ),
                     type = irVariable.type.accept(context),
-                    isConst = it.isConst,
+                    isConst = it.isDartConst(),
                     isFinal = !it.isVar,
                     isLate = false
                 )

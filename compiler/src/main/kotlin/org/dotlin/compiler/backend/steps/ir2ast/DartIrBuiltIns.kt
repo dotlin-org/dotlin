@@ -152,7 +152,7 @@ class DartIrBuiltIns(private val context: DartLoweringContext) {
             }
         }
 
-        val dartConst = classSymbolAt("dotlin", "DartConst") { _, members, _, _ ->
+        val const = classSymbolAt("dotlin", "const") { _, members, _, _ ->
             kind = ClassKind.ANNOTATION_CLASS
 
             members.addConstructor { _, _ ->
@@ -184,7 +184,7 @@ class DartIrBuiltIns(private val context: DartLoweringContext) {
             }
         }
 
-        val returnClass = classSymbolAt("dotlin", "\$Return") { typeParameters, members, _, _ ->
+        val returnClass = classSymbolAt(FqNames.DOTLIN_RETURN) { typeParameters, members, _, _ ->
             val typeParameter = typeParameters.add {
                 name = Name.identifier("T")
             }
@@ -225,6 +225,16 @@ class DartIrBuiltIns(private val context: DartLoweringContext) {
         }
     }
 
+    object FqNames {
+        val DOTLIN_RETURN = FqName("dotlin.\$Return")
+        // TODO: Add all as FqName
+    }
+
+    private inline fun <reified S : IrSymbol, O : IrSymbolOwner> symbolAt(
+        fqName: FqName,
+        crossinline createStub: (S, packageFqName: FqName, identifier: Name) -> O
+    ) = symbolAt(fqName.parent().asString(), fqName.shortName().asString(), createStub)
+
     private inline fun <reified S : IrSymbol, O : IrSymbolOwner> symbolAt(
         packageName: String,
         memberName: String,
@@ -250,6 +260,11 @@ class DartIrBuiltIns(private val context: DartLoweringContext) {
             }.symbol as S
         }
     }
+
+    private fun functionSymbolAt(
+        fqName: FqName,
+        buildStub: IrFunctionStubBuilder,
+    ) = functionSymbolAt(fqName.parent().asString(), fqName.shortName().asString(), buildStub)
 
     private fun functionSymbolAt(
         packageName: String,
@@ -326,6 +341,11 @@ class DartIrBuiltIns(private val context: DartLoweringContext) {
             add(it)
         }
     }
+
+    private fun classSymbolAt(
+        fqName: FqName,
+        buildStub: IrClassStubBuilder,
+    ) = classSymbolAt(fqName.parent().asString(), fqName.shortName().asString(), buildStub)
 
     private fun classSymbolAt(
         packageName: String,

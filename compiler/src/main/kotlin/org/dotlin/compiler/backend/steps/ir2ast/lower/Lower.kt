@@ -33,12 +33,10 @@ private val lowerings: List<KFunction1<DartLoweringContext, IrLowering>> = listO
     ::ExternalDeclarationsLowering,
     ::EnumLowering,
     ::IdentityChecksLowering,
-    ::AnnotatedExpressionsLowering,
     ::EnumClassLowering,
     ::GetEnumValueLowering,
     EnumValues::ReplaceExpressionsLowering,
     EnumValues::RemoveDeclarationsLowering,
-    ::DartConstExpressionsInConstConstructorsLowering,
     ::ConjunctionsDisjunctionsLowering,
     ::ComplexParametersLowering,
     ::PropertiesReferencingThisLowering,
@@ -90,7 +88,8 @@ fun IrResult.lower(configuration: CompilerConfiguration): DartLoweringContext {
         bindingContext = bindingTrace.bindingContext,
         dartNameGenerator = dartNameGenerator,
         sourceRoot = sourceRoot,
-        dartPackage = dartPackage
+        dartPackage = dartPackage,
+        extraIrAttributes = extraIrAttributes
     )
 
     lowerings.forEach { lowering ->

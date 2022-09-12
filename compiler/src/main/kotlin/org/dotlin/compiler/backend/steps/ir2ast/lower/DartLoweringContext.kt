@@ -19,10 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
-import org.dotlin.compiler.backend.DartNameGenerator
-import org.dotlin.compiler.backend.DartPackage
-import org.dotlin.compiler.backend.IrContext
-import org.dotlin.compiler.backend.dartExtensionName
+import org.dotlin.compiler.backend.*
 import org.dotlin.compiler.backend.steps.ir2ast.DartIrBuiltIns
 import org.dotlin.compiler.backend.steps.ir2ast.attributes.ExtraIrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
