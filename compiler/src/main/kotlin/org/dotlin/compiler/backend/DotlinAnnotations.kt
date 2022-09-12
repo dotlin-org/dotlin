@@ -21,29 +21,28 @@ package org.dotlin.compiler.backend
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.backend.util.getSingleAnnotationStringArgumentOf
-import org.dotlin.compiler.backend.util.getSingleAnnotationTypeArgumentOf
 import org.dotlin.compiler.backend.util.hasAnnotation
 import org.dotlin.compiler.backend.util.hasOverriddenAnnotation
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.fileOrNull
 import org.jetbrains.kotlin.ir.util.isGetter
 import org.jetbrains.kotlin.ir.util.isSetter
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
+import org.jetbrains.kotlin.name.FqName
 
 object DotlinAnnotations {
-    const val dartName = "dotlin.DartName"
-    const val dartConst = "dotlin.DartConst"
-    const val dartPositional = "dotlin.DartPositional"
-    const val dartLibrary = "dotlin.DartLibrary"
-    const val dartImplementationOf = "dotlin.DartImplementationOf"
-    const val dartStatic = "dotlin.DartStatic"
-    const val dartExtensionName = "dotlin.DartExtensionName"
+    val const = FqName("dotlin.const")
+    val dartName = FqName("dotlin.DartName")
+    val dartPositional = FqName("dotlin.DartPositional")
+    val dartLibrary = FqName("dotlin.DartLibrary")
+    val dartImplementationOf = FqName("dotlin.DartImplementationOf")
+    val dartStatic = FqName("dotlin.DartStatic")
+    val dartExtensionName = FqName("dotlin.DartExtensionName")
 
     // Internal annotations.
-    const val dartGetter = "dotlin.DartGetter"
-    const val dartExtension = "dotlin.DartExtension"
-    const val dartHideNameFromCore = "dotlin.DartHideNameFromCore"
+    val dartGetter = FqName("dotlin.DartGetter")
+    val dartExtension = FqName("dotlin.DartExtension")
+    val dartHideNameFromCore = FqName("dotlin.DartHideNameFromCore")
 }
 
 fun IrDeclaration.hasDartGetterAnnotation() = hasOverriddenAnnotation(DotlinAnnotations.dartGetter)

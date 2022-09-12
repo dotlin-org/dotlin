@@ -23,8 +23,8 @@ import org.dotlin.compiler.backend.hasDartGetterAnnotation
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartAnnotations
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartConst
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartFactory
+import org.dotlin.compiler.backend.util.isDartConst
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartClassMember
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartMethodDeclaration
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.*

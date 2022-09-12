@@ -22,25 +22,18 @@ package org.dotlin.compiler.backend.steps.src2ir.analyze.ir
 import org.dotlin.compiler.backend.DartNameGenerator
 import org.dotlin.compiler.backend.DartPackage
 import org.dotlin.compiler.backend.IrContext
-import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.DartExtensionWithoutProperAnnotationChecker
-import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.ImplicitInterfaceOverrideChecker
-import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.WrongSetOperatorReturnChecker
-import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.WrongSetOperatorReturnTypeChecker
+import org.dotlin.compiler.backend.steps.ir2ast.attributes.ExtraIrAttributes
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.*
 import org.dotlin.compiler.backend.steps.src2ir.reportAll
-import org.dotlin.compiler.backend.steps.src2ir.reportOnly
+import org.dotlin.compiler.backend.util.ktDeclaration
 import org.dotlin.compiler.hasErrors
 import org.jetbrains.kotlin.analyzer.AnalysisResult
-import org.jetbrains.kotlin.backend.jvm.codegen.psiElement
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
-import org.jetbrains.kotlin.cli.common.messages.DefaultDiagnosticReporter
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticFactory
-import org.jetbrains.kotlin.diagnostics.rendering.DefaultErrorMessages
 import org.jetbrains.kotlin.ir.IrBuiltIns
 import org.jetbrains.kotlin.ir.IrElement
-import org.jetbrains.kotlin.ir.declarations.IrAttributeContainer
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationBase
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
@@ -48,33 +41,36 @@ import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.psi.KtDeclaration
-import org.jetbrains.kotlin.resolve.BindingContext
-import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.BindingTraceContext
-import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import java.nio.file.Path
 
-class DartIrAnalyzer(
+open class DartIrAnalyzer(
     private val module: IrModuleFragment,
-    private val trace: BindingTraceContext,
-    private val symbolTable: SymbolTable,
-    private val dartNameGenerator: DartNameGenerator,
-    private val sourceRoot: Path,
-    private val dartPackage: DartPackage,
+    trace: BindingTraceContext,
+    symbolTable: SymbolTable,
+    dartNameGenerator: DartNameGenerator,
+    sourceRoot: Path,
+    dartPackage: DartPackage,
     config: CompilerConfiguration,
+    extraIrAttributes: ExtraIrAttributes,
     private val checkers: List<IrDeclarationChecker> = listOf(
         DartExtensionWithoutProperAnnotationChecker,
         WrongSetOperatorReturnTypeChecker,
         WrongSetOperatorReturnChecker,
-        ImplicitInterfaceOverrideChecker
+        ImplicitInterfaceOverrideChecker,
+        ConstValInitializerChecker,
+        ConstConstructorParameterDefaultValueChecker
     ),
 ) {
     private val messageCollector = config[CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY] ?: MessageCollector.NONE
 
-    fun analyzeAndReport(): AnalysisResult {
-        val context =
-            IrAnalyzerContext(trace, symbolTable, module.irBuiltins, dartNameGenerator, sourceRoot, dartPackage)
+    private val context: IrAnalyzerContext = IrAnalyzerContext(
+        trace, symbolTable, module.irBuiltins,
+        dartNameGenerator, sourceRoot, dartPackage,
+        extraIrAttributes
+    )
 
+    fun analyzeAndReport(): AnalysisResult {
         module.files.forEach {
             context.enterFile(it)
             it.acceptChildrenVoid(
@@ -109,12 +105,6 @@ class DartIrAnalyzer(
             }
         }
     }
-
-    private val IrDeclaration.ktDeclaration: KtDeclaration?
-        get() = psiElement as? KtDeclaration ?: when (this) {
-            is IrAttributeContainer -> attributeOwnerId.safeAs<IrDeclaration>()?.psiElement as? KtDeclaration
-            else -> null
-        }
 }
 
 class IrAnalyzerContext(
@@ -123,10 +113,12 @@ class IrAnalyzerContext(
     override val irBuiltIns: IrBuiltIns,
     override val dartNameGenerator: DartNameGenerator,
     override val sourceRoot: Path,
-    override val dartPackage: DartPackage
-) : IrContext() {
+    override val dartPackage: DartPackage,
+    extraIrAttributes: ExtraIrAttributes
+) : IrContext(), ExtraIrAttributes by extraIrAttributes {
     override val bindingContext = trace.bindingContext
 }
+
 
 interface IrDeclarationChecker {
     val reports: List<DiagnosticFactory<*>>

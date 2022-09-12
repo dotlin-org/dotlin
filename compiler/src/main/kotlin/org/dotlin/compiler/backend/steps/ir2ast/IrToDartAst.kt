@@ -23,8 +23,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.lower.lower
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.IrToDartCompilationUnitTransformer
 import org.dotlin.compiler.backend.steps.src2ir.IrResult
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.DartIrAnalyzer
-import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.DartNameChecker
-import org.dotlin.compiler.backend.steps.src2ir.diagnosticsExceptSuppressed
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.post.DartNameChecker
 import org.dotlin.compiler.backend.steps.src2ir.throwIfHasErrors
 import org.dotlin.compiler.dart.ast.annotation.isInternal
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
@@ -46,13 +45,14 @@ fun irToDartAst(
 ): IrToDartAstResult {
     val loweringContext = ir.lower(config)
 
-    // Dart names are checked after lowering.
+    // Some analysis must be done after lowering.
     DartIrAnalyzer(
         ir.module, ir.bindingTrace,
         ir.symbolTable, ir.dartNameGenerator,
         ir.sourceRoot,
         loweringContext.dartPackage,
         config,
+        loweringContext,
         checkers = listOf(DartNameChecker),
     ).analyzeAndReport().also {
         it.throwIfHasErrors()

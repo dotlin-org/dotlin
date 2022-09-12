@@ -1,15 +1,25 @@
 package org.dotlin.compiler.backend
 
+import org.dotlin.compiler.backend.steps.ir2ast.attributes.ExtraIrAttributes
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementVisitor
+import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrIfNullExpression
+import org.dotlin.compiler.backend.steps.ir2ast.ir.receiver
+import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartBool
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartNumberPrimitive
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartString
 import org.dotlin.compiler.backend.util.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartPrefixedIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.jetbrains.kotlin.backend.jvm.codegen.psiElement
-import org.jetbrains.kotlin.codegen.kotlinType
 import org.jetbrains.kotlin.descriptors.findClassAcrossModuleDependencies
 import org.jetbrains.kotlin.ir.IrBuiltIns
+import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin.*
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.types.toKotlinType
@@ -17,15 +27,13 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.psi.KtAnnotationEntry
 import org.jetbrains.kotlin.psi.KtClass
-import org.jetbrains.kotlin.psi.KtNameReferenceExpression
-import org.jetbrains.kotlin.psi.KtValueArgumentList
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.bindingContextUtil.getAbbreviatedTypeOrType
-import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
 import java.nio.file.Path
 
-abstract class IrContext {
+abstract class IrContext : ExtraIrAttributes {
     abstract val bindingContext: BindingContext
     abstract val symbolTable: SymbolTable
     abstract val irBuiltIns: IrBuiltIns
@@ -244,6 +252,80 @@ abstract class IrContext {
             it == it.builtIns.builtInsModule
         }
 
+    fun KtAnnotationEntry.getFqName() = getFqName(bindingContext)
+
+    fun IrExpression.hasAnnotation(fqName: FqName) = hasAnnotation(fqName, bindingContext)
+
+    fun IrExpression.isDartConst(allowImplicit: Boolean = false): Boolean {
+        fun IrExpression.isOperatorCallOnConstPrimitives(): Boolean {
+            if (this !is IrCall) return false
+            if (valueArgumentsCount > 0 && valueArguments.all { it?.isDartConst(allowImplicit) != true }) return false
+            if (receiver != null && !receiver!!.isDartConst(allowImplicit)) return false
+
+            val types = listOfNotNull(receiver?.type) + valueArguments.mapNotNull { it?.type }
+
+            return when {
+                types.all { it.isDartNumberPrimitive(orNullable = true) } -> when (origin) {
+                    PLUS, UPLUS, MINUS, UMINUS, MUL, DIV -> true
+                    else -> false
+                }
+                types.all { it.isDartString(orNullable = true) } -> when (origin) {
+                    PLUS -> true
+                    else -> false
+                }
+                types.all { it.isDartBool(orNullable = true) } -> when (origin) {
+                    OROR, ANDAND -> true
+                    else -> false
+                }
+                else -> false
+            }
+        }
+
+        return when (this) {
+            // Enums are always constructed as const.
+            is IrGetEnumValue, is IrEnumConstructorCall -> true
+            is IrConst<*> -> true
+            is IrWhen, is IrIfNullExpression -> {
+                var isConst = true
+
+                acceptChildren(
+                    object : IrCustomElementVisitor<Unit, Nothing?> {
+                        override fun visitElement(element: IrElement, data: Nothing?) {
+                            if (element is IrExpression) {
+                                isConst = isConst && element.isDartConst(allowImplicit)
+                            }
+
+                            element.acceptChildren(this, null)
+                        }
+
+                    },
+                    data = null
+                )
+
+                isConst
+            }
+            is IrConstructorCall -> {
+                val constructor = symbol.owner
+                val parentClass = constructor.parentAsClass
+
+                when {
+                    // If @const is optional, having the called constructor be const is enough.
+                    allowImplicit && constructor.isDartConst() -> true
+                    // Some classes are always to be const constructed.
+                    parentClass.isDartConst() -> true
+                    // If the argument(s) in the $Return are all const, make it const.
+                    parentClass.defaultType.isDotlinReturn() -> {
+                        valueArguments.all { it?.isDartConst(allowImplicit) == true }
+                    }
+                    else -> hasAnnotation(DotlinAnnotations.const)
+                }
+            }
+            is IrTypeOperatorCall -> argument.isDartConst(allowImplicit)
+            else -> isOperatorCallOnConstPrimitives()
+        }
+    }
+
+    // Super type utils
     private fun IrClass.superTypeSet(): Set<IrType> = defaultType.superTypes().toSet()
     fun IrClass.baseClass(): IrType {
         val classes = superTypeSet().filter { it.classOrNull?.owner?.isClass == true }

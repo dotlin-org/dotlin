@@ -19,8 +19,21 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer.util
 
+import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.jetbrains.kotlin.ir.types.*
 
-fun IrType.isDartInt() = isByte() || isShort() || isInt() || isLong()
+fun IrType.isDartPrimitive(orNullable: Boolean = false) =
+    isDartBool(orNullable) || isDartNumberPrimitive(orNullable) || isDartString(orNullable)
 
-fun IrType.isDartDouble() = isFloat() || isDouble()
+fun IrType.isDartBool(orNullable: Boolean = false) = isBoolean() || (orNullable && isNullableBoolean())
+
+fun IrType.isDartString(orNullable: Boolean = false) = isString() || isChar() ||
+        (orNullable && (isNullableString() || isNullableChar()))
+
+fun IrType.isDartInt(orNullable: Boolean = false) = isInt() || isLong() || isByte() || isShort() ||
+        (orNullable && (isNullableInt() || isNullableLong() || isNullableByte() || isNullableShort()))
+
+fun IrType.isDartDouble(orNullable: Boolean) = isDouble() || isFloat() ||
+        (orNullable && (isNullableDouble() || isNullableFloat()))
+
+fun IrType.isDartNumberPrimitive(orNullable: Boolean = false) = isDartInt(orNullable) || isDartDouble(orNullable)

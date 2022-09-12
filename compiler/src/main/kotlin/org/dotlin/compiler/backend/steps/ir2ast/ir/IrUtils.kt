@@ -259,25 +259,6 @@ fun IrType.isNullableFloat() = isNullableType(IdSignatureValues._float)
 fun IrType.isNullableDouble() = isNullableType(IdSignatureValues._double)
 fun IrType.isNullableChar() = isNullableType(IdSignatureValues._char)
 
-
-// Dart built-ins:
-// - bool
-// - double
-// - Enum
-// - int
-// - Null
-// - num
-// - String
-fun IrType.isDartCorePrimitive() =
-    isBoolean() || isNullableBoolean() ||
-            isByte() || isNullableByte() ||
-            isShort() || isNullableShort() ||
-            isInt() || isNullableInt() ||
-            isLong() || isNullableLong() ||
-            isDouble() || isNullableDouble() ||
-            isFloat() || isNullableFloat() ||
-            isString() || isNullableString()
-
 val IrDeclarationWithVisibility.isPrivate
     get() = visibility == DescriptorVisibilities.PRIVATE
 
@@ -625,3 +606,6 @@ fun IrType.parametersByArguments(): Map<IrTypeParameter, IrTypeArgument> {
         .withIndex()
         .associate { owner.typeParameters[it.index] to it.value }
 }
+
+val IrMemberAccessExpression<*>.receiver: IrExpression?
+    get() = extensionReceiver ?: dispatchReceiver

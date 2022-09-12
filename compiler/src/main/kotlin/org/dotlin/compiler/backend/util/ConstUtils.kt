@@ -17,14 +17,12 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.backend.steps.ir2ast.transformer.util
+package org.dotlin.compiler.backend.util
 
-import org.dotlin.compiler.backend.DotlinAnnotations
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.backend.steps.ir2ast.ir.hasExplicitBackingField
-import org.dotlin.compiler.backend.util.hasAnnotation
-import org.dotlin.compiler.backend.util.isSimple
+import org.jetbrains.kotlin.backend.jvm.codegen.psiElement
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrGetObjectValue
@@ -32,9 +30,11 @@ import org.jetbrains.kotlin.ir.util.isAnnotationClass
 import org.jetbrains.kotlin.ir.util.isEnumClass
 import org.jetbrains.kotlin.ir.util.isObject
 import org.jetbrains.kotlin.ir.util.parentAsClass
+import org.jetbrains.kotlin.lexer.KtTokens
+import org.jetbrains.kotlin.psi.KtModifierListOwner
 
 fun IrDeclaration.isDartConst(): Boolean = when (this) {
-    is IrConstructor -> hasAnnotation(DotlinAnnotations.dartConst) || parentAsClass.isDartConst()
+    is IrConstructor -> hasConstModifier() || parentAsClass.isDartConst()
     // Enum fields are always const.
     is IrField -> when {
         origin == IrDeclarationOrigin.FIELD_FOR_ENUM_ENTRY -> true
@@ -62,5 +62,11 @@ fun IrDeclaration.isDartConst(): Boolean = when (this) {
         // Annotations, enums and _$DefaultValue classes are always const.
         else -> isEnumClass || isAnnotationClass || origin == IrDartDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE
     }
+    is IrVariable -> isConst || hasConstModifier()
     else -> false
+}
+
+fun IrDeclaration.hasConstModifier(): Boolean {
+    val source = psiElement as? KtModifierListOwner ?: return false
+    return source.modifierList?.hasModifier(KtTokens.CONST_KEYWORD) == true
 }

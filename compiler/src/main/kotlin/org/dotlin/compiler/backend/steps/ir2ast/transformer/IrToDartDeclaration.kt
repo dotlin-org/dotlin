@@ -22,10 +22,10 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.*
+import org.dotlin.compiler.backend.util.isDartConst
 import org.dotlin.compiler.dart.ast.`typealias`.DartClassTypeAlias
 import org.dotlin.compiler.dart.ast.`typealias`.DartFunctionTypeAlias
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnitMember
-import org.dotlin.compiler.dart.ast.compilationunit.DartNamedCompilationUnitMember
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartClassDeclaration
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartExtendsClause
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartImplementsClause

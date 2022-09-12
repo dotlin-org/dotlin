@@ -46,6 +46,18 @@ public interface ErrorsDart {
     DiagnosticFactory0<KtExpression> SPECIAL_INHERITANCE_CONSTRUCTOR_MISUSE =
             DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
 
+    DiagnosticFactory0<KtExpression> CONST_INITIALIZED_WITH_NON_CONSTANT_VALUE =
+            DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
+
+    DiagnosticFactory0<KtExpression> ONLY_CONSTRUCTOR_CALLS_CAN_BE_CONST =
+            DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
+
+    DiagnosticFactory0<KtExpression> CONST_WITH_NON_CONST =
+            DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
+
+    DiagnosticFactory0<KtExpression> NON_CONSTANT_DEFAULT_VALUE_IN_CONST_CONSTRUCTOR =
+            DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
+
     @SuppressWarnings("UnusedDeclaration")
     Object _initializer = new Object() {
         {

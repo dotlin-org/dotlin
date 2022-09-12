@@ -25,7 +25,7 @@ package kotlin
  * information on enum classes.
  */
 @DartHideNameFromCore
-abstract class Enum<E : Enum<E>> @DartConst constructor(
+abstract class Enum<E : Enum<E>> const constructor(
     /**
      * Returns the name of this enum constant, exactly as declared in its enum declaration.
      */
