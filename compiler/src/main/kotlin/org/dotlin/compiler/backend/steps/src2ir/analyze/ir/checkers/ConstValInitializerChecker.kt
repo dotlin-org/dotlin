@@ -39,9 +39,9 @@ object ConstValInitializerChecker : IrDeclarationChecker {
         if (!declaration.isDartConst()) return
 
         val initializer = when (declaration) {
+            // This also accounts for IrProperty's backing field.
             is IrField -> declaration.initializer?.expression
             is IrVariable -> declaration.initializer
-            is IrProperty -> declaration.backingField?.initializer?.expression
             else -> null
         } ?: return
 
