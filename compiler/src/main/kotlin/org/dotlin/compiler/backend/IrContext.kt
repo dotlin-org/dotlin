@@ -2,6 +2,7 @@ package org.dotlin.compiler.backend
 
 import org.dotlin.compiler.backend.steps.ir2ast.attributes.ExtraIrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementVisitor
+import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrIfNullExpression
 import org.dotlin.compiler.backend.steps.ir2ast.ir.receiver
 import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
@@ -257,8 +258,7 @@ abstract class IrContext : ExtraIrAttributes {
     fun IrExpression.hasAnnotation(fqName: FqName) = hasAnnotation(fqName, bindingContext)
 
     fun IrExpression.isDartConst(allowImplicit: Boolean = false): Boolean {
-        fun IrExpression.isOperatorCallOnConstPrimitives(): Boolean {
-            if (this !is IrCall) return false
+        fun IrCall.isOperatorCallOnConstPrimitives(): Boolean {
             if (valueArgumentsCount > 0 && valueArguments.all { it?.isDartConst(allowImplicit) != true }) return false
             if (receiver != null && !receiver!!.isDartConst(allowImplicit)) return false
 
@@ -321,7 +321,11 @@ abstract class IrContext : ExtraIrAttributes {
                 }
             }
             is IrTypeOperatorCall -> argument.isDartConst(allowImplicit)
-            else -> isOperatorCallOnConstPrimitives()
+            is IrCall -> when (origin) {
+                GET_PROPERTY, GET_LOCAL_PROPERTY -> symbol.owner.correspondingProperty?.isDartConst() == true
+                else -> isOperatorCallOnConstPrimitives()
+            }
+            else -> false
         }
     }
 

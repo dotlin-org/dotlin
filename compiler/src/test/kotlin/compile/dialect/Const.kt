@@ -241,4 +241,49 @@ class Const : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `const property access`() = assertCompile {
+        kotlin(
+            """
+            class Test const constructor()
+
+            const val x = Test()
+            const val y = x
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {
+              const Test() : super();
+            }
+
+            const Test x = Test();
+            const Test y = x;
+            """
+        )
+    }
+
+    @Test
+    fun `const Int operation with 'Long' literal`() = assertCompile {
+        kotlin(
+            """
+            const val x: Int = -92233720368
+            const val y = x - 1
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            const int x = -92233720368;
+            const int y = x - 1;
+            """
+        )
+    }
 }

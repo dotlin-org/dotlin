@@ -35,12 +35,12 @@ import org.jetbrains.kotlin.psi.KtModifierListOwner
 
 fun IrDeclaration.isDartConst(): Boolean = when (this) {
     is IrConstructor -> hasConstModifier() || parentAsClass.isDartConst()
-    // Enum fields are always const.
     is IrField -> when {
+        // Enum fields are always const.
         origin == IrDeclarationOrigin.FIELD_FOR_ENUM_ENTRY -> true
         correspondingProperty?.isConst == true -> true
         // Instance fields for const objects are always const.
-        origin == IrDeclarationOrigin.FIELD_FOR_OBJECT_INSTANCE -> when (val init = initializer!!.expression) {
+        origin == IrDeclarationOrigin.FIELD_FOR_OBJECT_INSTANCE -> when (val init = initializer?.expression) {
             is IrGetObjectValue -> init.symbol.owner.isDartConst()
             is IrConstructorCall -> init.symbol.owner.isDartConst()
             else -> throw UnsupportedOperationException("Invalid FIELD_FOR_OBJECT_INSTANCE")
