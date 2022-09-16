@@ -76,7 +76,7 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
 
         put(
             ErrorsDart.IMPLICIT_LONG_REFERENCE,
-            "{0} has implicit reference to Long, specify Int type explicitly",
+            "{0} has implicit type of Long, specify Int type explicitly",
             Renderers.STRING
         )
 
