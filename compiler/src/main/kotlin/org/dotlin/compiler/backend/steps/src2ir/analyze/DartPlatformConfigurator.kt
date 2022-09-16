@@ -21,6 +21,7 @@ package org.dotlin.compiler.backend.steps.src2ir.analyze
 
 import org.dotlin.compiler.backend.steps.src2ir.analyze.checkers.annotation.ConstAnnotationChecker
 import org.dotlin.compiler.backend.steps.src2ir.analyze.checkers.call.SpecialInheritanceConstructorCallChecker
+import org.dotlin.compiler.backend.steps.src2ir.analyze.checkers.type.FloatTypeChecker
 import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.resolve.PlatformConfiguratorBase
 import org.jetbrains.kotlin.types.DynamicTypesAllowed
@@ -28,7 +29,8 @@ import org.jetbrains.kotlin.types.DynamicTypesAllowed
 object DartPlatformConfigurator : PlatformConfiguratorBase(
     DynamicTypesAllowed(),
     additionalCallCheckers = listOf(SpecialInheritanceConstructorCallChecker),
-    additionalAnnotationCheckers = listOf(ConstAnnotationChecker)
+    additionalAnnotationCheckers = listOf(ConstAnnotationChecker),
+    additionalTypeCheckers = listOf(FloatTypeChecker)
 ) {
     override fun configureModuleComponents(container: StorageComponentContainer) {}
 }
