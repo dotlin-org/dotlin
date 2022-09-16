@@ -61,6 +61,9 @@ public interface ErrorsDart {
     DiagnosticFactory0<KtExpression> FLOAT_REFERENCE =
             DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
 
+    DiagnosticFactory0<KtExpression> CHAR_REFERENCE =
+            DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
+
     // Dart emulated errors.
     DiagnosticFactory0<KtExpression> CONST_WITH_NON_CONST =
             DiagnosticFactory0.create(Severity.ERROR, DEFAULT);

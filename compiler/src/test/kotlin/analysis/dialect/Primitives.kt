@@ -24,9 +24,7 @@ import assertCanCompile
 import assertCompilesWithError
 import assertCompilesWithErrors
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
-import org.jetbrains.kotlin.diagnostics.DiagnosticFactory
 import org.jetbrains.kotlin.diagnostics.Errors
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
@@ -77,9 +75,8 @@ class Primitives : BaseTest {
         )
     }
 
-    @Disabled
     @Test
-    fun `error if using Char`() = assertCompilesWithErrors(*emptyList<DiagnosticFactory<*>>().toTypedArray()) {
+    fun `error if using Char`() = assertCompilesWithError(ErrorsDart.CHAR_REFERENCE) {
         kotlin(
             """
             fun main() {
@@ -90,7 +87,7 @@ class Primitives : BaseTest {
     }
 
     @Test
-    fun `error if using Float`() = assertCompilesWithErrors(ErrorsDart.FLOAT_REFERENCE) {
+    fun `error if using Float`() = assertCompilesWithError(ErrorsDart.FLOAT_REFERENCE) {
         kotlin(
             """
             fun main() {
