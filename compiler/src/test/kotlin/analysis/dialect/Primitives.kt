@@ -89,9 +89,8 @@ class Primitives : BaseTest {
         )
     }
 
-    @Disabled
     @Test
-    fun `error if using Float`() = assertCompilesWithErrors(*emptyList<DiagnosticFactory<*>>().toTypedArray()) {
+    fun `error if using Float`() = assertCompilesWithErrors(ErrorsDart.FLOAT_REFERENCE) {
         kotlin(
             """
             fun main() {
