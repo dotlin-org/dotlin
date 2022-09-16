@@ -85,6 +85,11 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
             "cannot use Float, use Double instead"
         )
 
+        put(
+            ErrorsDart.CHAR_REFERENCE,
+            "cannot use Char, use String instead"
+        )
+
         // Dart emulated errors.
 
         put(
