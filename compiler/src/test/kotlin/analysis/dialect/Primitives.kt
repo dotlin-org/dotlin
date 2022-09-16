@@ -23,6 +23,7 @@ import BaseTest
 import assertCanCompile
 import assertCompilesWithError
 import assertCompilesWithErrors
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
 import org.jetbrains.kotlin.diagnostics.DiagnosticFactory
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.junit.jupiter.api.Disabled
@@ -78,18 +79,6 @@ class Primitives : BaseTest {
 
     @Disabled
     @Test
-    fun `error if using Long`() = assertCompilesWithErrors(*emptyList<DiagnosticFactory<*>>().toTypedArray()) {
-        kotlin(
-            """
-            fun main() {
-                val x = 9223372036854775807
-            }
-            """
-        )
-    }
-
-    @Disabled
-    @Test
     fun `error if using Char`() = assertCompilesWithErrors(*emptyList<DiagnosticFactory<*>>().toTypedArray()) {
         kotlin(
             """
@@ -112,13 +101,44 @@ class Primitives : BaseTest {
         )
     }
 
-    @Disabled
     @Test
-    fun `error if not specifying type explicitly on "Long" literal`() =
-        assertCanCompile {
+    fun `error if not specifying type explicitly on 'Long' literal`() =
+        assertCompilesWithError(ErrorsDart.IMPLICIT_LONG_REFERENCE) {
             kotlin(
                 """
-                const val x: Int = -9223372036854775807 - 1
+                const val x = -92233720368
+                """
+            )
+        }
+
+    @Test
+    fun `error if using Long type on property`() =
+        assertCompilesWithError(ErrorsDart.LONG_REFERENCE) {
+            kotlin(
+                """
+                const val x: Long = -92233720368
+                """
+            )
+        }
+
+    @Test
+    fun `error if using Long type on variable`() =
+        assertCompilesWithError(ErrorsDart.LONG_REFERENCE) {
+            kotlin(
+                """
+                fun test() {
+                    val x: Long = -92233720368
+                }
+                """
+            )
+        }
+
+    @Test
+    fun `error if using Long type as return type`() =
+        assertCompilesWithError(ErrorsDart.LONG_REFERENCE) {
+            kotlin(
+                """
+                fun test(): Long = 23423423423
                 """
             )
         }

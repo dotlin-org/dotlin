@@ -376,6 +376,9 @@ val IrField.isOverride: Boolean
 val IrField.correspondingProperty: IrProperty?
     get() = correspondingPropertySymbol?.owner
 
+val IrField.isBackingField: Boolean
+    get() = correspondingPropertySymbol != null
+
 val IrField.isExplicitBackingField: Boolean
     get() = (correspondingProperty?.hasImplicitGetter != true ||
             (correspondingProperty?.isVar == true && correspondingProperty?.hasImplicitSetter != true)) &&

@@ -46,12 +46,19 @@ public interface ErrorsDart {
     DiagnosticFactory0<KtExpression> SPECIAL_INHERITANCE_CONSTRUCTOR_MISUSE =
             DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
 
-    DiagnosticFactory0<KtExpression> CONST_INITIALIZED_WITH_NON_CONSTANT_VALUE =
+    DiagnosticFactory0<KtDeclaration> CONST_INITIALIZED_WITH_NON_CONSTANT_VALUE =
             DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
 
     DiagnosticFactory0<KtExpression> ONLY_CONSTRUCTOR_CALLS_CAN_BE_CONST =
             DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
 
+    DiagnosticFactory0<KtExpression> LONG_REFERENCE =
+            DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
+
+    DiagnosticFactory1<KtDeclaration, String> IMPLICIT_LONG_REFERENCE =
+            DiagnosticFactory1.create(Severity.ERROR, DEFAULT);
+
+    // Dart emulated errors.
     DiagnosticFactory0<KtExpression> CONST_WITH_NON_CONST =
             DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
 
