@@ -59,7 +59,8 @@ open class DartIrAnalyzer(
         WrongSetOperatorReturnChecker,
         ImplicitInterfaceOverrideChecker,
         ConstValInitializerChecker,
-        ConstConstructorParameterDefaultValueChecker
+        ConstConstructorParameterDefaultValueChecker,
+        LongTypeReferenceChecker
     ),
 ) {
     private val messageCollector = config[CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY] ?: MessageCollector.NONE

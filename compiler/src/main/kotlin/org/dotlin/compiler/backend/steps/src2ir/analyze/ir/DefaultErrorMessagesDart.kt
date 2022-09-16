@@ -70,6 +70,19 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
         )
 
         put(
+            ErrorsDart.LONG_REFERENCE,
+            "cannot use Long, use Int instead"
+        )
+
+        put(
+            ErrorsDart.IMPLICIT_LONG_REFERENCE,
+            "{0} has implicit reference to Long, specify Int type explicitly",
+            Renderers.STRING
+        )
+
+        // Dart emulated errors.
+
+        put(
             ErrorsDart.CONST_WITH_NON_CONST,
             "the constructor being called isn't a const constructor"
         )
