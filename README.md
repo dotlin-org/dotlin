@@ -139,13 +139,15 @@ similar to Dart.
 
 Kotlin primitives that are not used in Dart and would only complicate code, have been removed. This means that
 `Byte`, `Short`, `Long`, `Float`, and `Char` are not present in Dotlin. This is because Dotlin has the following
-mapping of types:
+mapping of primitives:
 
-| Kotlin   | Dart     |
-| -------- | -------- |
-| `Int`    | `int`    |
-| `Double` | `double` |
-| `String` | `String` |
+| Kotlin    | Dart     |
+| --------- | -------- |
+| `Int`     | `int`    |
+| `Double`  | `double` |
+| `String`  | `String` |
+| `Boolean` | `bool`   |
+| `Nothing` | `Never`  |
 
 This means that `Int` now refers to a 64-bit integer, instead of 32-bit as in Kotlin.
 
