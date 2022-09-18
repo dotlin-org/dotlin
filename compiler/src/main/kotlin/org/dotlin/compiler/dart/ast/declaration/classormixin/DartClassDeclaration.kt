@@ -33,7 +33,6 @@ data class DartClassDeclaration(
     val extendsClause: DartExtendsClause? = null,
     val implementsClause: DartImplementsClause? = null,
     val withClause: DartWithClause? = null,
-    // TODO: typeParameters
     override val members: List<DartClassMember> = listOf(),
     override val annotations: List<DartAnnotation> = listOf(),
     override val documentationComment: String? = null,

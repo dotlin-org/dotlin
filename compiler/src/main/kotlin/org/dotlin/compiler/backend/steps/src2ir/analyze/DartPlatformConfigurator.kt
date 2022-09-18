@@ -21,6 +21,7 @@ package org.dotlin.compiler.backend.steps.src2ir.analyze
 
 import org.dotlin.compiler.backend.steps.src2ir.analyze.checkers.annotation.ConstAnnotationChecker
 import org.dotlin.compiler.backend.steps.src2ir.analyze.checkers.call.SpecialInheritanceConstructorCallChecker
+import org.dotlin.compiler.backend.steps.src2ir.analyze.checkers.declaration.TypeErasureChecker
 import org.dotlin.compiler.backend.steps.src2ir.analyze.checkers.type.CharTypeChecker
 import org.dotlin.compiler.backend.steps.src2ir.analyze.checkers.type.FloatTypeChecker
 import org.jetbrains.kotlin.container.StorageComponentContainer
@@ -29,6 +30,7 @@ import org.jetbrains.kotlin.types.DynamicTypesAllowed
 
 object DartPlatformConfigurator : PlatformConfiguratorBase(
     DynamicTypesAllowed(),
+    additionalDeclarationCheckers = listOf(TypeErasureChecker),
     additionalCallCheckers = listOf(SpecialInheritanceConstructorCallChecker),
     additionalAnnotationCheckers = listOf(ConstAnnotationChecker),
     additionalTypeCheckers = listOf(FloatTypeChecker, CharTypeChecker)

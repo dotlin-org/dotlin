@@ -11,7 +11,8 @@ class DartDiagnosticSuppressor(
     private val subSuppressors = listOf(
         NumberPrimitiveSuppressor, ThrowSuppressor,
         SpecialInheritanceSuppressor(trace),
-        ConstSuppressor
+        ConstSuppressor,
+        TypeErasureSuppressor
     )
 
     override fun isSuppressed(diagnostic: Diagnostic): Boolean = diagnostic.let {
