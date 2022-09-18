@@ -48,7 +48,7 @@ fun test(arg: Any) {
 
 This would've been reported in Kotlin as:
 
-> Cannot check for instance of erased type: MyClass<String>
+> Cannot check for instance of erased type: MyClass\<String\>
 
 ### Implicit interfaces & Mixins
 
@@ -109,7 +109,6 @@ Compiles to:
 ```dart
 class MyClass {
   const MyClass(this._message);
-  @nonVirtual
   final String _message;
 }
 
@@ -133,8 +132,8 @@ the Kotlin compiler does not support keywords in front of expressions at the par
 The difference is easy to remember, with any _declaration_ you must use `const`, and with any
 _invocation_ you must use `@const`.
 
-Note that `@const` is not necessary when it's implied by assigning to a `const val`
-for example.
+Note that `@const` is not necessary when it's implied by e.g. assigning to a `const val`,
+similar to Dart.
 
 ### Primitives
 
@@ -143,6 +142,7 @@ Kotlin primitives that are not used in Dart and would only complicate code, have
 mapping of types:
 
 | Kotlin   | Dart     |
+| -------- | -------- |
 | `Int`    | `int`    |
 | `Double` | `double` |
 | `String` | `String` |
@@ -159,7 +159,7 @@ throw "This works!"
 ```
 
 To integrate better with the Dart runtime, and because Dart has better
-[error](https://api.dart.dev/dart-core/Error-class.html)/[exception](https://api.dart.dev/dart-core/Exception-class.html
+[error](https://api.dart.dev/dart-core/Error-class.html)/[exception](https://api.dart.dev/dart-core/Exception-class.html)
 defintions, they are used instead of the JVM exceptions. This also means `Throwable` is not available, since it doesn't
 server any use anymore.
 
