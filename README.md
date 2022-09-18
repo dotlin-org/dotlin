@@ -126,8 +126,8 @@ If you want to explicitly invoke a `const` constructor, you can use the followin
 @const MyClass("Something")
 ```
 
-Note the `@` before `const`. This is because `@const` is an annotation, not a keyword. This is because
-the Kotlin compiler does not support keywords in front of expressions at the parser level.
+Note the `@` before `const`. This is because `@const` is an annotation, not a keyword.
+The Kotlin compiler does not support keywords in front of expressions at the parser level.
 
 The difference is easy to remember, with any _declaration_ you must use `const`, and with any
 _invocation_ you must use `@const`.
@@ -207,4 +207,4 @@ The Dotlin logo (`docs/assets/dotlin.png`) is licensed under [CC BY-NC-ND 4.0](h
 
 ## Disclaimer
 
-Dotlin is not associated with the Kotlin Foundation.
+Dotlin is not associated with JetBrains or the Kotlin Foundation.
