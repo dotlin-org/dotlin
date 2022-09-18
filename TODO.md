@@ -156,4 +156,4 @@
 
 ### Misc
 - [ ] Remove most if not all JS IR references from compiler
-- [ ] Disable type erasure hints and analysis errors
+- [x] Disable type erasure hints and analysis errors
