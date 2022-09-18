@@ -90,6 +90,11 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
             "cannot use Char, use String instead"
         )
 
+        put(
+            ErrorsDart.UNNECESSARY_REIFIED,
+            "using reified is not necessary, there's no type erasure"
+        )
+
         // Dart emulated errors.
 
         put(

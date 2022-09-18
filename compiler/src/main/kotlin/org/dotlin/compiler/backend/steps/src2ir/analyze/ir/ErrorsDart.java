@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.src2ir.analyze.ir;
 
+import com.intellij.psi.PsiElement;
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor;
 import org.jetbrains.kotlin.diagnostics.*;
 import org.jetbrains.kotlin.psi.KtDeclaration;
@@ -63,6 +64,9 @@ public interface ErrorsDart {
 
     DiagnosticFactory0<KtExpression> CHAR_REFERENCE =
             DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
+
+    DiagnosticFactory0<PsiElement> UNNECESSARY_REIFIED =
+            DiagnosticFactory0.create(Severity.WARNING, DEFAULT);
 
     // Dart emulated errors.
     DiagnosticFactory0<KtExpression> CONST_WITH_NON_CONST =
