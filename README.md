@@ -48,7 +48,7 @@ fun test(arg: Any) {
 
 This would've been reported in Kotlin as:
 
-> Cannot check for instance of erased type: MyClass\<String\>
+> ⚠️ Cannot check for instance of erased type: MyClass\<String\>
 
 ### Implicit interfaces & Mixins
 
@@ -138,6 +138,24 @@ _invocation_ you must use `@const`.
 
 Note that `@const` is not necessary when it's implied by e.g. assigning to a `const val`,
 similar to Dart.
+
+### Lateinit
+
+In Kotlin, `lateinit` is not applicable to properties with nullable or primitive types.
+
+For example, the following code that would fail in Kotlin, works in Dotlin:
+
+```
+lateinit var myNullableVar: String?
+
+lateinit var myPrimitiveVar: Int
+```
+
+This would've been reported respectively in Kotlin as:
+
+> ⚠️ 'lateinit' modifier is not allowed on properties of nullable types
+
+> ⚠️ 'lateinit' modifier is not allowed on properties of primitive types
 
 ### Primitives
 
