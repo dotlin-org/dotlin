@@ -141,7 +141,8 @@ similar to Dart.
 
 ### Lateinit
 
-In Kotlin, `lateinit` is not applicable to properties with nullable or primitive types.
+In Kotlin, `lateinit` is not applicable to properties with nullable or primitive types. In Dotlin,
+this is possible.
 
 For example, the following code that would fail in Kotlin, works in Dotlin:
 
