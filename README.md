@@ -82,7 +82,7 @@ class MyClass with TheirDartClass {}
 ```
 
 This only works if `TheirDartClass` can be used as a mixin, meaing it either is declared with the `mixin` keyword or
-it's a class that has no constructors and extends `Object` (`Any`). If a Dart class is not usable mixin, the
+it's a class that has no constructors and extends `Object` (`Any`). If a Dart class is not a valid mixin, the
 special mixin inheritance syntax is not available.
 
 If you want to _extend_ a Dart class, regular Kotlin syntax can be used.
