@@ -145,13 +145,13 @@ In Kotlin, `lateinit` is not applicable to properties with nullable or primitive
 
 For example, the following code that would fail in Kotlin, works in Dotlin:
 
-```
+```kotlin
 lateinit var myNullableVar: String?
 
 lateinit var myPrimitiveVar: Int
 ```
 
-This would've been reported respectively in Kotlin as:
+Respectively, this would've been reported in Kotlin as:
 
 > ⚠️ 'lateinit' modifier is not allowed on properties of nullable types
 
