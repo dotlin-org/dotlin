@@ -141,15 +141,19 @@ similar to Dart.
 
 ### Lateinit
 
-In Kotlin, `lateinit` is not applicable to properties with nullable or primitive types. In Dotlin,
-this is possible.
+In Kotlin, `lateinit` is not applicable to properties with types that are  nullable, primitive
+or have a nullable upper bound. In Dotlin, this is possible.
 
 For example, the following code that would fail in Kotlin, works in Dotlin:
 
 ```kotlin
-lateinit var myNullableVar: String?
+class Example<T> {
+    lateinit var myNullableVar: String?
 
-lateinit var myPrimitiveVar: Int
+    lateinit var myPrimitiveVar: Int
+
+    lateinit var myGenericVar: T
+}
 ```
 
 Respectively, this would've been reported in Kotlin as:
@@ -157,6 +161,8 @@ Respectively, this would've been reported in Kotlin as:
 > ⚠️ 'lateinit' modifier is not allowed on properties of nullable types
 
 > ⚠️ 'lateinit' modifier is not allowed on properties of primitive types
+
+> ⚠️ 'lateinit' modifier is not allowed on properties of a type with nullable upper bound
 
 ### Primitives
 
