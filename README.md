@@ -143,7 +143,7 @@ similar to Dart.
 
 Kotlin primitives that are not used in Dart and would only complicate code, have been removed. This means that
 `Byte`, `Short`, `Long`, `Float`, and `Char` are not present in Dotlin. This is because Dotlin has the following
-mapping of primitives:
+mapping of built-ins:
 
 | Kotlin    | Dart     |
 | --------- | -------- |
