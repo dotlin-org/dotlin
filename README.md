@@ -74,12 +74,16 @@ as a pure interface (like in Dart), meaning you have to implement the whole inte
 The same can be done for mixins:
 
 ```kotlin
-class MyClass : TheirDartMixin(Mixin)
+class MyClass : TheirDartClass(Mixin)
 ```
 
 ```dart
-class MyClass with TheirDartMixin {}
+class MyClass with TheirDartClass {}
 ```
+
+This only works if `TheirDartClass` can be used as a mixin, meaing it either is declared with the `mixin` keyword or
+it's a class that has no constructors and extends `Object` (`Any`). If a Dart class is not usable mixin, the
+special mixin inheritance syntax is not available.
 
 If you want to _extend_ a Dart class, regular Kotlin syntax can be used.
 
@@ -147,6 +151,7 @@ mapping of primitives:
 | `Double`  | `double` |
 | `String`  | `String` |
 | `Boolean` | `bool`   |
+| `Any`     | `Object` |
 | `Nothing` | `Never`  |
 
 This means that `Int` now refers to a 64-bit integer, instead of 32-bit as in Kotlin.
@@ -163,7 +168,7 @@ throw "This works!"
 To integrate better with the Dart runtime, and because Dart has better
 [error](https://api.dart.dev/dart-core/Error-class.html)/[exception](https://api.dart.dev/dart-core/Exception-class.html)
 defintions, they are used instead of the JVM exceptions. This also means `Throwable` is not available, since it doesn't
-server any use anymore.
+serve any use anymore.
 
 ## Usage
 
