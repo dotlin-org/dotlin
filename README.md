@@ -164,6 +164,18 @@ Respectively, this would've been reported in Kotlin as:
 
 > ⚠️ 'lateinit' modifier is not allowed on properties of a type with nullable upper bound
 
+But with Dotlin, compiles to:
+
+```dart
+class Example<T> {
+  late String? myNullableVar;
+
+  late int myPrimitiveVar;
+
+  late T myGenericVar;
+}
+```
+
 ### Primitives
 
 Kotlin primitives that are not used in Dart and would only complicate code, have been removed. This means that
