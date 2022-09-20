@@ -69,6 +69,11 @@ object DartNameChecker : IrDeclarationChecker {
                 continue
             }
 
+            // We ignore local variables that "clash" with class members.
+            if (declaration.parent is IrFunction && clash.parent !is IrFunction && scope is IrClass) {
+                continue
+            }
+
             trace.report(ErrorsDart.DART_NAME_CLASH.on(source, dartName.value, clash))
         }
     }
