@@ -35,7 +35,6 @@ object DotlinAnnotations {
     val dartName = FqName("dotlin.DartName")
     val dartPositional = FqName("dotlin.DartPositional")
     val dartLibrary = FqName("dotlin.DartLibrary")
-    val dartImplementationOf = FqName("dotlin.DartImplementationOf")
     val dartStatic = FqName("dotlin.DartStatic")
     val dartExtensionName = FqName("dotlin.DartExtensionName")
 
@@ -49,7 +48,6 @@ fun IrDeclaration.hasDartGetterAnnotation() = hasOverriddenAnnotation(DotlinAnno
 fun IrDeclaration.hasDartExtensionAnnotation() = hasOverriddenAnnotation(DotlinAnnotations.dartExtension)
 fun IrFunction.hasDartPositionalAnnotation() = hasOverriddenAnnotation(DotlinAnnotations.dartPositional)
 fun IrDeclaration.hasDartHideNameFromCoreAnnotation() = hasAnnotation(DotlinAnnotations.dartHideNameFromCore)
-fun IrDeclaration.hasDartImplementationOfAnnotation() = hasAnnotation(DotlinAnnotations.dartImplementationOf)
 fun IrDeclaration.hasDartExtensionNameAnnotation() = hasAnnotation(DotlinAnnotations.dartExtensionName)
 private fun IrDeclaration.hasDartStaticAnnotation() = hasAnnotation(DotlinAnnotations.dartStatic)
 
@@ -66,9 +64,6 @@ val IrDeclaration.dartAnnotatedName: String?
 
 val IrValueParameter.isDartPositional: Boolean
     get() = (parent as? IrFunction)?.hasDartPositionalAnnotation() == true
-
-val IrDeclaration.dartImplementationFqName: String?
-    get() = getSingleAnnotationStringArgumentOf(DotlinAnnotations.dartImplementationOf)
 
 val IrDeclaration.isDartStatic: Boolean
     get() = hasDartStaticAnnotation() ||
