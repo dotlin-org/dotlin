@@ -20,11 +20,8 @@
 package analysis
 
 import BaseTest
-import assertCanCompile
 import assertCompilesWithError
-import assertCompilesWithErrors
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
@@ -66,6 +63,19 @@ class NameMangling : BaseTest {
                     get() = field
                 private val `_${'$'}propertyBackingField` = 1
             }
+            """
+        )
+    }
+
+    @Test
+    fun `property and function same name explicit clash`() = assertCompilesWithError(ErrorsDart.DART_NAME_CLASH) {
+        kotlin(
+            """
+            fun test() {}
+
+            val test = 3
+
+            val `test${'$'}property` = 4
             """
         )
     }

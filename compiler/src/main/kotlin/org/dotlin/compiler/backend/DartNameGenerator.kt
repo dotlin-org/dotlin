@@ -206,7 +206,20 @@ class DartNameGenerator {
                 )
             }
 
-            // Built-in identifier and reserved words check. This should _always_ happen last.
+            // If there's a property or field with the same name as a method or function, rename the field/property.
+            // Must happen second to last.
+            if (name != null && (this is IrProperty || this is IrField)) {
+                val clashingMethods =
+                    (parent as? IrDeclarationContainer)?.declarations
+                        ?.filterIsInstance<IrFunction>()
+                        ?.filter { !it.isPropertyAccessor && it.dartNameOrNull == name }
+
+                if (clashingMethods?.isNotEmpty() == true) {
+                    name = name.copy(suffix = "\$property")
+                }
+            }
+
+            // Built-in identifier and reserved words check. This must _always_ happen last.
             if ((this is IrClass && name?.value in builtInIdentifiers) || name?.value in reservedWords) {
                 name = name?.asGenerated()
             }
