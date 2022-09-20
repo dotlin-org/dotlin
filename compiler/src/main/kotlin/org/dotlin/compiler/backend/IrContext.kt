@@ -14,7 +14,6 @@ import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartPrefixedIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.jetbrains.kotlin.backend.jvm.codegen.psiElement
-import org.jetbrains.kotlin.descriptors.findClassAcrossModuleDependencies
 import org.jetbrains.kotlin.ir.IrBuiltIns
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
@@ -25,9 +24,7 @@ import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.types.toKotlinType
 import org.jetbrains.kotlin.ir.util.*
-import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.resolve.BindingContext
@@ -53,49 +50,6 @@ abstract class IrContext : ExtraIrAttributes {
     fun enterFile(file: IrFile) {
         currentFile = file
     }
-
-    /**
-     * If this class has a `@DartImplementationOf` annotation, this will be the value of
-     * the corresponding Dart interface of this implementation.
-     */
-    val IrClass.correspondingDartInterface: IrClass?
-        get() = when {
-            hasDartImplementationOfAnnotation() -> {
-                val (packageName, topLevelName) = dartImplementationFqName!!.let {
-                    var splitIndex: Int? = null
-                    for (i in it.indices) {
-                        val current = it[i]
-                        val next = it.getOrNull(i + 1)
-
-                        if (current == '.' && next?.isUpperCase() == true) {
-                            splitIndex = i
-                            break
-                        }
-                    }
-
-                    when (splitIndex) {
-                        null -> it.split('.').let { split ->
-                            split.dropLast(1).joinToString("") to split.last()
-                        }
-                        else -> {
-                            it.substring(0, splitIndex) to it.substring(splitIndex + 1)
-                        }
-                    }
-                }
-                val descriptor = fileOrNull?.module?.descriptor?.findClassAcrossModuleDependencies(
-                    ClassId(FqName(packageName), Name.identifier(topLevelName))
-                ) ?: throw IllegalStateException("Corresponding Dart interface not found: $packageName.$topLevelName")
-
-                symbolTable.referenceClass(descriptor).owner
-            }
-            else -> null
-        }
-
-    val IrClass.correspondingDartInterfaceOrSelf: IrClass
-        get() = correspondingDartInterface ?: this
-
-    val IrClass.companionObject: IrClass?
-        get() = correspondingDartInterfaceOrSelf.companionObject()
 
     val IrDeclarationWithName.dartName: DartIdentifier
         get() = dartNameGenerator.runWith(this) { dartNameOf(it, currentFile) }

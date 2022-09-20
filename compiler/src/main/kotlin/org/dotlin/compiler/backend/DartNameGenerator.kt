@@ -74,9 +74,6 @@ class DartNameGenerator {
             }
             val annotatedName = dartAnnotatedName?.toDartIdentifier()
 
-            // If this declaration is the implementation of an external Dart interface, return the name of that interface.
-            (this as? IrClass)?.correspondingDartInterface?.dartNameOrNull?.let { return it }
-
             var name = annotatedName ?: when {
                 !name.isSpecial -> name.identifier.toDartIdentifier()
                 this is IrConstructor -> {
