@@ -384,7 +384,10 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
         context: DartTransformContext
     ): DartExpression {
         val expression = irTypeOperatorCall.argument.accept(context)
-        val type = irTypeOperatorCall.typeOperand.accept(context)
+        val type = irTypeOperatorCall.typeOperand.accept(
+            context,
+            useFunctionInterface = irTypeOperatorCall.isFunctionTypeCheck
+        )
 
         fun DartExpression.parenthesize() = possiblyParenthesize(isReceiver = true, inBinaryInfix = true)
 
@@ -540,7 +543,16 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
         }
 }
 
-fun IrExpression.accept(context: DartTransformContext) = accept(IrToDartExpressionTransformer, context)
+fun IrExpression.accept(context: DartTransformContext) = accept(IrToDartExpressionTransformer, context).let {
+    val exp = this
+    with(context) {
+        when {
+            exp.isParenthesized -> it.parenthesize()
+            else -> it
+        }
+    }
+}
+
 fun IrExpressionBody.accept(context: DartTransformContext) = accept(IrToDartExpressionTransformer, context)
 
 private fun IrExpression?.acceptAsReceiverOf(of: IrExpression, context: DartTransformContext) =

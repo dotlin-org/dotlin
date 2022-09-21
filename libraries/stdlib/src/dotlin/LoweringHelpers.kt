@@ -16,4 +16,6 @@
 
 package dotlin
 
+// TODO: Kotlin-only internal (@DartPublic)
+
 internal class `$Return`<T> const constructor(val value: T)
