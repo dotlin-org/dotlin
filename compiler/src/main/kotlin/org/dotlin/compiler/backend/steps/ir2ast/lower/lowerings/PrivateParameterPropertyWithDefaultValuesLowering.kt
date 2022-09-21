@@ -19,7 +19,6 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.attributes.attributeOwner
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrivate
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
@@ -59,7 +58,7 @@ class PrivateParameterPropertyWithDefaultValuesLowering(override val context: Da
         val constructor = declaration.parent as? IrConstructor ?: return noChange()
         val constructorBody = constructor.body as IrBlockBody
 
-        propertiesInitializedInFieldInitializerList.add(property.attributeOwner())
+        property.isInitializedInFieldInitializerList = true
 
         constructorBody.statements.add(
             buildStatement(constructor.symbol) {

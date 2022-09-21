@@ -20,7 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast
 
 import org.dotlin.compiler.backend.IrContext
-import org.dotlin.compiler.backend.steps.ir2ast.attributes.ExtraIrAttributes
+import org.dotlin.compiler.backend.steps.ir2ast.attributes.IrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.accept
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartAnnotations
@@ -34,7 +34,7 @@ import org.jetbrains.kotlin.ir.declarations.IrFunction
 
 class DartTransformContext(
     loweringContext: DartLoweringContext,
-) : IrContext(), ExtraIrAttributes by loweringContext {
+) : IrContext(), IrAttributes by loweringContext {
     override val bindingContext = loweringContext.bindingContext
     override val symbolTable = loweringContext.symbolTable
     override val irBuiltIns = loweringContext.irBuiltIns

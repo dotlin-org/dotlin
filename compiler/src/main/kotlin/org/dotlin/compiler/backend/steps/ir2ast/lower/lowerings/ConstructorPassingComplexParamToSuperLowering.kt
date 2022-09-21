@@ -19,7 +19,6 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.attributes.attributeOwner
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
@@ -89,11 +88,7 @@ class ConstructorPassingComplexParamToSuperLowering(override val context: DartLo
 
                             // Unmark property parameters as to be initialized in the field initializer list,
                             // since a factory doesn't support that.
-                            correspondingProperty?.let { prop ->
-                                if (prop.isInitializedInFieldInitializerList) {
-                                    propertiesInitializedInFieldInitializerList.remove(prop.attributeOwner())
-                                }
-                            }
+                            correspondingProperty?.isInitializedInFieldInitializerList = false
                         }
                     }
                 }
@@ -165,9 +160,8 @@ class ConstructorPassingComplexParamToSuperLowering(override val context: DartLo
                         statement.replaceExpressions { exp ->
                             if (exp !is IrGetField) return@replaceExpressions exp
 
-                            val originalParameterReference = parameterPropertyReferencesInParameterDefaultValue
-                                .firstOrNull { it.attributeOwnerId == exp.attributeOwnerId }
-                                ?: return@replaceExpressions exp
+                            val originalParameterReference =
+                                exp.correspondingConstructorParameterReference ?: return@replaceExpressions exp
 
                             IrGetValueImpl(
                                 UNDEFINED_OFFSET,

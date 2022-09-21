@@ -19,9 +19,11 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.attributes.attributeOwner
 import org.dotlin.compiler.backend.steps.ir2ast.ir.hasReferenceToThis
-import org.dotlin.compiler.backend.steps.ir2ast.lower.*
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
+import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
+import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
 import org.jetbrains.kotlin.ir.builders.irGet
 import org.jetbrains.kotlin.ir.builders.irSetField
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
@@ -41,7 +43,7 @@ class PropertiesReferencingThisLowering(override val context: DartLoweringContex
         // If we have a reference to this in the initializer, backingField is guaranteed to not be null.
         val backingField = declaration.backingField!!
 
-        propertiesInitializedInConstructorBody.add(declaration.attributeOwner())
+        declaration.isInitializedInConstructorBody = true
 
         primaryConstructorBody.statements.add(
             buildStatement(primaryConstructor.symbol) {

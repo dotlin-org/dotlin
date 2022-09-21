@@ -24,7 +24,7 @@ import org.dotlin.compiler.backend.DartIrLinker
 import org.dotlin.compiler.backend.DartNameGenerator
 import org.dotlin.compiler.backend.DartPackage
 import org.dotlin.compiler.backend.steps.ir2ast.IrExpressionSourceMapper
-import org.dotlin.compiler.backend.steps.ir2ast.attributes.ExtraIrAttributes
+import org.dotlin.compiler.backend.steps.ir2ast.attributes.IrAttributes
 import org.dotlin.compiler.backend.steps.src2ir.analyze.DartKotlinAnalyzerReporter
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.DartIrAnalyzer
 import org.jetbrains.kotlin.backend.common.serialization.DeserializationStrategy
@@ -176,7 +176,7 @@ private fun loadIr(
         linkerExtensions = emptyList(),
     )
 
-    val extraIrAttributes = ExtraIrAttributes.default()
+    val extraIrAttributes = IrAttributes.Default()
 
     IrExpressionSourceMapper.run(module.files, extraIrAttributes)
 
@@ -231,7 +231,7 @@ class IrResult(
     val resolvedLibs: KotlinLibraryResolveResult,
     val bindingTrace: BindingTraceContext,
     val symbolTable: SymbolTable,
-    val extraIrAttributes: ExtraIrAttributes,
+    val irAttributes: IrAttributes,
     val dartNameGenerator: DartNameGenerator,
     val sourceRoot: Path,
     val dartPackage: DartPackage

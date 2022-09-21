@@ -1,7 +1,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast
 
 import com.intellij.psi.PsiElement
-import org.dotlin.compiler.backend.steps.ir2ast.attributes.ExtraIrAttributes
+import org.dotlin.compiler.backend.steps.ir2ast.attributes.IrAttributes
 import org.jetbrains.kotlin.backend.jvm.ir.getKtFile
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrFile
@@ -22,7 +22,7 @@ object IrExpressionSourceMapper {
      *
      * Must be run before lowering.
      */
-    fun run(files: Iterable<IrFile>, extraIrAttributes: ExtraIrAttributes) {
+    fun run(files: Iterable<IrFile>, irAttributes: IrAttributes) {
         for (file in files) {
             val ktFile = file.getKtFile() ?: continue
 
@@ -62,7 +62,18 @@ object IrExpressionSourceMapper {
                     .toTypedArray()
             )
 
-            extraIrAttributes.setIrExpressionSources(mapped)
+            ktExpressions
+                .asSequence()
+                .mapNotNull {
+                    when (val key = irExpressions.firstOrNull { ir -> ir.isEquivalentTo(it) }) {
+                        null -> null
+                        else -> key to it
+                    }
+                }.forEach { (irExp, ktExp) ->
+                    with(irAttributes) {
+                        irExp.ktExpression = ktExp
+                    }
+                }
         }
     }
 }

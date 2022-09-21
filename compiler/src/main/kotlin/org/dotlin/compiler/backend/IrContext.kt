@@ -1,6 +1,6 @@
 package org.dotlin.compiler.backend
 
-import org.dotlin.compiler.backend.steps.ir2ast.attributes.ExtraIrAttributes
+import org.dotlin.compiler.backend.steps.ir2ast.attributes.IrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementVisitor
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrIfNullExpression
@@ -31,7 +31,7 @@ import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.bindingContextUtil.getAbbreviatedTypeOrType
 import java.nio.file.Path
 
-abstract class IrContext : ExtraIrAttributes {
+abstract class IrContext : IrAttributes {
     abstract val bindingContext: BindingContext
     abstract val symbolTable: SymbolTable
     abstract val irBuiltIns: IrBuiltIns

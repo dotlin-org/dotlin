@@ -19,7 +19,6 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.attributes.attributeOwner
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartPrimitive
@@ -89,7 +88,7 @@ class ComplexParametersLowering(override val context: DartLoweringContext) : IrD
                                             receiver = irGet(owner.parentClassOrNull!!.thisReceiver!!),
                                         ).also {
                                             it.copyAttributes(exp)
-                                            parameterPropertyReferencesInParameterDefaultValue.add(exp.attributeOwner())
+                                            it.correspondingConstructorParameterReference = exp
                                         }
                                     }
                                 }
@@ -195,7 +194,7 @@ class ComplexParametersLowering(override val context: DartLoweringContext) : IrD
             }
 
             if (isPropertyInitializer) {
-                propertiesInitializedInFieldInitializerList.add(correspondingProperty!!.attributeOwner())
+                correspondingProperty?.isInitializedInFieldInitializerList = true
             }
 
             currentIrFunction.body = irBuilder.irBlockBody {
