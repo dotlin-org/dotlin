@@ -32,10 +32,14 @@ import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
 import org.jetbrains.kotlin.builtins.extractParameterNameFromFunctionTypeArgument
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.types.impl.originalKotlinType
-import org.jetbrains.kotlin.ir.util.isFunctionTypeOrSubtype
+import org.jetbrains.kotlin.ir.util.isFunction
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
-fun IrType.accept(context: DartTransformContext, isConstructorType: Boolean = false): DartTypeAnnotation =
+fun IrType.accept(
+    context: DartTransformContext,
+    isConstructorType: Boolean = false,
+    useFunctionInterface: Boolean = false,
+): DartTypeAnnotation =
     context.runWith(this) {
         if (!isConstructorType && it.isUnit()) {
             return@runWith DartTypeAnnotation.VOID
@@ -43,7 +47,7 @@ fun IrType.accept(context: DartTransformContext, isConstructorType: Boolean = fa
 
         when (it) {
             is IrSimpleType -> when {
-                it.isFunctionTypeOrSubtype() -> DartFunctionType(
+                !useFunctionInterface && it.isFunction() -> DartFunctionType(
                     returnType = it.arguments.last().accept(context),
                     parameters = DartFormalParameterList(
                         it.arguments.dropLast(1).map { arg ->

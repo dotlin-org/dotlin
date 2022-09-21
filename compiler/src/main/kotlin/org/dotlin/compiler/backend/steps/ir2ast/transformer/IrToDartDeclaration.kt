@@ -87,7 +87,7 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
                         !isDefaultValueClass -> superTypes
                             .baseClass()
                             ?.let { if (it.isAny()) null else it }
-                            ?.accept(context)
+                            ?.accept(context, useFunctionInterface = true)
                             ?.let { DartExtendsClause(it as DartNamedType) }
                         else -> null
                     },
@@ -97,8 +97,7 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
                         isDefaultValueClass -> irClass.superTypes
                         else -> superTypes.interfaces()
                     }
-                    // TODO: This should never be a DartFunctionType
-                    .mapNotNull { it.accept(context) as? DartNamedType }
+                    .mapNotNull { it.accept(context, useFunctionInterface = true) as? DartNamedType }
                     .let {
                         when {
                             it.isNotEmpty() -> DartImplementsClause(it)
@@ -106,7 +105,7 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
                         }
                     },
                     withClause = superTypes.mixins()
-                        .mapNotNull { it.accept(context) as? DartNamedType }
+                        .mapNotNull { it.accept(context, useFunctionInterface = true) as? DartNamedType }
                         .let {
                             when {
                                 it.isNotEmpty() -> DartWithClause(it)

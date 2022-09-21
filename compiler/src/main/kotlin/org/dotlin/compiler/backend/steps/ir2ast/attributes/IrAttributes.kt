@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetField
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
+import org.jetbrains.kotlin.ir.expressions.IrTypeOperatorCall
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.psiUtil.getAnnotationEntries
@@ -51,6 +52,10 @@ interface IrAttributes {
         override val IrFile.dartImports by attribute { mutableSetOf<DartImport>() }
 
         override var IrExpression.ktExpression by attribute<KtExpression?>(default = null)
+
+        override var IrExpression.isParenthesized by attribute(default = false)
+
+        override var IrTypeOperatorCall.isFunctionTypeCheck by attribute(default = false)
     }
 
     /**
@@ -82,6 +87,10 @@ interface IrAttributes {
 
         return ktExpression.getAnnotationEntries().any { it.getFqName(bindingContext) == fqName }
     }
+
+    var IrExpression.isParenthesized: Boolean
+
+    var IrTypeOperatorCall.isFunctionTypeCheck: Boolean
 }
 
 @Suppress("UNCHECKED_CAST")
