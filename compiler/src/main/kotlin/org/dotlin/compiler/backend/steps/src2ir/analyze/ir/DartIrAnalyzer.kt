@@ -22,7 +22,7 @@ package org.dotlin.compiler.backend.steps.src2ir.analyze.ir
 import org.dotlin.compiler.backend.DartNameGenerator
 import org.dotlin.compiler.backend.DartPackage
 import org.dotlin.compiler.backend.IrContext
-import org.dotlin.compiler.backend.steps.ir2ast.attributes.ExtraIrAttributes
+import org.dotlin.compiler.backend.steps.ir2ast.attributes.IrAttributes
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.*
 import org.dotlin.compiler.backend.steps.src2ir.reportAll
 import org.dotlin.compiler.backend.util.ktDeclaration
@@ -52,7 +52,7 @@ open class DartIrAnalyzer(
     sourceRoot: Path,
     dartPackage: DartPackage,
     config: CompilerConfiguration,
-    extraIrAttributes: ExtraIrAttributes,
+    irAttributes: IrAttributes,
     private val checkers: List<IrDeclarationChecker> = listOf(
         DartExtensionWithoutProperAnnotationChecker,
         WrongSetOperatorReturnTypeChecker,
@@ -68,7 +68,7 @@ open class DartIrAnalyzer(
     private val context: IrAnalyzerContext = IrAnalyzerContext(
         trace, symbolTable, module.irBuiltins,
         dartNameGenerator, sourceRoot, dartPackage,
-        extraIrAttributes
+        irAttributes
     )
 
     fun analyzeAndReport(): AnalysisResult {
@@ -115,8 +115,8 @@ class IrAnalyzerContext(
     override val dartNameGenerator: DartNameGenerator,
     override val sourceRoot: Path,
     override val dartPackage: DartPackage,
-    extraIrAttributes: ExtraIrAttributes
-) : IrContext(), ExtraIrAttributes by extraIrAttributes {
+    irAttributes: IrAttributes
+) : IrContext(), IrAttributes by irAttributes {
     override val bindingContext = trace.bindingContext
 }
 

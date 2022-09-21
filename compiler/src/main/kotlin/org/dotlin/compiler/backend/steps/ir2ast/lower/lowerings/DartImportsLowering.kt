@@ -175,6 +175,6 @@ class DartImportsLowering(override val context: DartLoweringContext) : IrFileLow
             }
         )
 
-        file.addDartImports(imports)
+        file.dartImports.addAll(imports)
     }
 }

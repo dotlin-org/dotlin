@@ -21,7 +21,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower
 
 import org.dotlin.compiler.backend.*
 import org.dotlin.compiler.backend.steps.ir2ast.DartIrBuiltIns
-import org.dotlin.compiler.backend.steps.ir2ast.attributes.ExtraIrAttributes
+import org.dotlin.compiler.backend.steps.ir2ast.attributes.IrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.util.sentenceCase
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
@@ -62,10 +62,10 @@ class DartLoweringContext(
     override val bindingContext: BindingContext,
     val irModuleFragment: IrModuleFragment,
     override val dartNameGenerator: DartNameGenerator,
-    private val extraIrAttributes: ExtraIrAttributes = ExtraIrAttributes.default(),
+    private val irAttributes: IrAttributes,
     override val sourceRoot: Path,
     override val dartPackage: DartPackage
-) : IrContext(), CommonBackendContext, ExtraIrAttributes by extraIrAttributes {
+) : IrContext(), CommonBackendContext, IrAttributes by irAttributes {
     override val builtIns = irModuleFragment.descriptor.builtIns
     override var inVerbosePhase = false
     override val internalPackageFqn = FqName("kotlin.dart")

@@ -89,7 +89,7 @@ fun IrResult.lower(configuration: CompilerConfiguration): DartLoweringContext {
         dartNameGenerator = dartNameGenerator,
         sourceRoot = sourceRoot,
         dartPackage = dartPackage,
-        extraIrAttributes = extraIrAttributes
+        irAttributes = irAttributes
     )
 
     lowerings.forEach { lowering ->
