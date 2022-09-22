@@ -85,7 +85,7 @@ class DartNameGenerator {
                             isPrivate -> DartSimpleIdentifier("_")
                             else -> null
                         }
-                        // If have multiple constructors (and this is not the primary constructor, which by
+                        // If there are multiple constructors (and this is not the primary constructor, which by
                         // default has no name), they're numbered in the order of appearance,
                         // e.g. `MyClass.$constructor$0`.
                         !isPrimary -> DartSimpleIdentifier("\$constructor$${constructors.indexOf(this)}")
@@ -208,14 +208,23 @@ class DartNameGenerator {
 
             // If there's a property or field with the same name as a method or function, rename the field/property.
             // Must happen second to last.
-            if (name != null && (this is IrProperty || this is IrField)) {
-                val clashingMethods =
-                    (parent as? IrDeclarationContainer)?.declarations
+            if (name != null) {
+                val property = when (this) {
+                    is IrProperty, is IrField -> this
+                    // Handles property constructor parameters.
+                    is IrValueParameter -> correspondingProperty
+                    else -> null
+                }
+
+                if (property != null) {
+                    val clashingMethods = (property.parent as? IrDeclarationContainer)?.declarations
                         ?.filterIsInstance<IrFunction>()
                         ?.filter { !it.isPropertyAccessor && it.dartNameOrNull == name }
+                        .orEmpty()
 
-                if (clashingMethods?.isNotEmpty() == true) {
-                    name = name.copy(suffix = "\$property")
+                    if (clashingMethods.isNotEmpty()) {
+                        name = name.copy(suffix = "\$property")
+                    }
                 }
             }
 
