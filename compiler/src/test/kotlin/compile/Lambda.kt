@@ -24,7 +24,7 @@ import assertCompile
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
-@DisplayName("Compile: Function")
+@DisplayName("Compile: Lambda")
 class Lambda : BaseTest {
     @Test
     fun lambda() = assertCompile {
