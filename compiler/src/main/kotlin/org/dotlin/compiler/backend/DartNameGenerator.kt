@@ -62,6 +62,17 @@ class DartNameGenerator {
         useKotlinAlias: Boolean = true
     ): DartIdentifier? =
         declaration.run {
+            // Property parameters always use the name of their property.
+            // Only if the property is private is this not the case,
+            // because then the parameter is separated from its property.
+            if (this is IrValueParameter) {
+                correspondingProperty?.let {
+                    if (!it.isPrivate) {
+                        return@run dartNameOrNullOf(correspondingProperty!!, currentFile, allowNested, useKotlinAlias)
+                    }
+                }
+            }
+
             val aliasPrefix = dartLibraryAlias?.toDartIdentifier() ?: when {
                 useKotlinAlias -> importAliasIn(currentFile)?.toDartIdentifier()
                 else -> null
@@ -208,23 +219,15 @@ class DartNameGenerator {
 
             // If there's a property or field with the same name as a method or function, rename the field/property.
             // Must happen second to last.
-            if (name != null) {
-                val property = when (this) {
-                    is IrProperty, is IrField -> this
-                    // Handles property constructor parameters.
-                    is IrValueParameter -> correspondingProperty
-                    else -> null
-                }
-
-                if (property != null) {
-                    val clashingMethods = (property.parent as? IrDeclarationContainer)?.declarations
+            if (name != null && (this is IrProperty || this is IrField)) {
+                val clashingMethods =
+                    (parent as? IrDeclarationContainer)?.declarations
                         ?.filterIsInstance<IrFunction>()
                         ?.filter { !it.isPropertyAccessor && it.dartNameOrNull == name }
                         .orEmpty()
 
-                    if (clashingMethods.isNotEmpty()) {
-                        name = name.copy(suffix = "\$property")
-                    }
+                if (clashingMethods.isNotEmpty()) {
+                    name = name.copy(suffix = "\$property")
                 }
             }
 
