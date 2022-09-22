@@ -113,7 +113,7 @@
   - [ ] Callable references
   - [ ] Spread expression
   - [ ] Anonymous functions
-  - [ ] Lambda literals
+  - [x] Lambda literals
   - [ ] Object expressions
   - [ ] This expressions
     - [x] Non-qualified this
