@@ -130,4 +130,36 @@ class NameMangling : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `class with property and method with the same name passed to super constructor`() = assertCompile {
+        kotlin(
+            """
+            open class ExampleBase(number: Int)
+
+            class Example(val test: Int) : ExampleBase(test) {
+                fun test() {}
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            class ExampleBase {
+              ExampleBase(int number) : super();
+            }
+
+            @sealed
+            class Example extends ExampleBase {
+              Example(this.test${'$'}property) : super(test${'$'}property);
+              @nonVirtual
+              final int test${'$'}property;
+              @nonVirtual
+              void test() {}
+            }
+            """
+        )
+    }
 }
