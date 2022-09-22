@@ -26,7 +26,9 @@ import org.dotlin.compiler.backend.steps.src2ir.IrResult
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import kotlin.reflect.KFunction1
 
-private val lowerings: List<KFunction1<DartLoweringContext, IrLowering>> = listOf(
+private typealias Lowering = KFunction1<DartLoweringContext, IrLowering>
+
+private val lowerings: List<Lowering> = listOf(
     ::UnrepresentableDecimalConstsLowering,
     Comparable::PreOperatorsLowering,
     ::DartExtensionsLowering,
@@ -93,7 +95,14 @@ fun IrResult.lower(configuration: CompilerConfiguration): DartLoweringContext {
         irAttributes = irAttributes
     )
 
-    lowerings.forEach { lowering ->
+    val builtInsLowerings = when (module.descriptor) {
+        module.descriptor.builtIns.builtInsModule -> listOf<Lowering>(
+            ::FunctionSubtypeDeclarationsLowering
+        )
+        else -> emptyList()
+    }
+
+    (builtInsLowerings + lowerings).forEach { lowering ->
         module.files.forEach {
             context.enterFile(it)
             lowering(context).lower(it)
