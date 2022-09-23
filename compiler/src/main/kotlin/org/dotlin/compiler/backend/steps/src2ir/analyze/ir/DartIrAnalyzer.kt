@@ -19,10 +19,13 @@
 
 package org.dotlin.compiler.backend.steps.src2ir.analyze.ir
 
+import com.intellij.psi.PsiElement
 import org.dotlin.compiler.backend.DartNameGenerator
 import org.dotlin.compiler.backend.DartPackage
 import org.dotlin.compiler.backend.IrContext
 import org.dotlin.compiler.backend.steps.ir2ast.attributes.IrAttributes
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionContext
+import org.dotlin.compiler.backend.steps.ir2ast.ir.transformExpressions
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.*
 import org.dotlin.compiler.backend.steps.src2ir.reportAll
 import org.dotlin.compiler.backend.util.ktDeclaration
@@ -37,10 +40,12 @@ import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationBase
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.psi.KtDeclaration
+import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.resolve.BindingTraceContext
 import java.nio.file.Path
 
@@ -53,14 +58,15 @@ open class DartIrAnalyzer(
     dartPackage: DartPackage,
     config: CompilerConfiguration,
     irAttributes: IrAttributes,
-    private val checkers: List<IrDeclarationChecker> = listOf(
+    private val checkers: List<IrChecker<*, *, *>> = listOf(
         DartExtensionWithoutProperAnnotationChecker,
         WrongSetOperatorReturnTypeChecker,
         WrongSetOperatorReturnChecker,
         ImplicitInterfaceOverrideChecker,
         ConstValInitializerChecker,
         ConstConstructorParameterDefaultValueChecker,
-        LongTypeReferenceChecker
+        LongTypeReferenceChecker,
+        ConstLambdaChecker
     ),
 ) {
     private val messageCollector = config[CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY] ?: MessageCollector.NONE
@@ -81,15 +87,27 @@ open class DartIrAnalyzer(
                     override fun visitDeclaration(declaration: IrDeclarationBase) {
                         super.visitDeclaration(declaration)
 
-                        checkers.forEach { checker ->
-                            checker.run {
-                                val sourceElement = declaration.ktDeclaration ?: return
-                                context.check(sourceElement, declaration)
-                            }
-                        }
+                        // TODO: Use `_` for all types after IrDeclarationChecker
+                        checkers.checkAll<IrDeclarationChecker, KtDeclaration, IrDeclaration, Nothing?>(
+                            declaration.ktDeclaration,
+                            declaration,
+                            data = null
+                        )
                     }
                 }
             )
+
+            it.transformExpressions { expression, context ->
+                expression.also {
+                    with(this@DartIrAnalyzer.context) {
+                        checkers.checkAll<IrExpressionChecker, KtExpression, IrExpression, IrExpressionContext>(
+                            expression.ktExpression,
+                            expression,
+                            context
+                        )
+                    }
+                }
+            }
         }
 
         return context.trace.bindingContext.let {
@@ -103,6 +121,19 @@ open class DartIrAnalyzer(
             when {
                 diagnosticsToReport.hasErrors -> AnalysisResult.compilationError(it)
                 else -> AnalysisResult.success(it, module.descriptor)
+            }
+        }
+    }
+
+    private inline fun <reified C : IrChecker<S, I, D>, S : PsiElement, I : IrElement, D> Iterable<IrChecker<*, *, *>>.checkAll(
+        source: S?,
+        element: I,
+        data: D
+    ) {
+        filterIsInstance<C>().forEach { checker ->
+            checker.run {
+                val sourceElement = source ?: return
+                context.check(sourceElement, element, data)
             }
         }
     }
@@ -120,8 +151,13 @@ class IrAnalyzerContext(
     override val bindingContext = trace.bindingContext
 }
 
-
-interface IrDeclarationChecker {
+interface IrChecker<S : PsiElement, I : IrElement, D> {
     val reports: List<DiagnosticFactory<*>>
-    fun IrAnalyzerContext.check(source: KtDeclaration, declaration: IrDeclaration)
+    fun IrAnalyzerContext.check(source: S, element: I) {}
+
+    fun IrAnalyzerContext.check(source: S, element: I, data: D) = check(source, element)
 }
+
+interface IrDeclarationChecker : IrChecker<KtDeclaration, IrDeclaration, Nothing?>
+
+interface IrExpressionChecker : IrChecker<KtExpression, IrExpression, IrExpressionContext>

@@ -428,13 +428,6 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
         )
     }
 
-    private fun DartTransformContext.relevantDartNameOf(irField: IrField): DartSimpleIdentifier = irField.let {
-        when {
-            !it.isExplicitBackingField -> it.correspondingProperty?.simpleDartName ?: it.dartName
-            else -> it.dartName
-        }
-    }
-
     override fun DartTransformContext.visitFunctionExpression(
         expression: IrFunctionExpression,
         context: DartTransformContext
@@ -446,6 +439,20 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                 body = expression.function.body.accept(context)
             )
         }
+
+    override fun DartTransformContext.visitFunctionReference(
+        expression: IrFunctionReference,
+        context: DartTransformContext
+    ): DartExpression = expression.let {
+        val irFunction = it.symbol.owner
+        when (val receiver = it.receiver) {
+            null -> irFunction.dartName
+            else -> DartPropertyAccessExpression(
+                target = receiver.accept(context),
+                propertyName = irFunction.dartNameAsSimple
+            )
+        }
+    }
 
     override fun DartTransformContext.visitNullAwareExpression(
         irNullAware: IrNullAwareExpression,
@@ -541,6 +548,13 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
             }
             else -> todo(expression)
         }
+
+    private fun DartTransformContext.relevantDartNameOf(irField: IrField): DartSimpleIdentifier = irField.let {
+        when {
+            !it.isExplicitBackingField -> it.correspondingProperty?.simpleDartName ?: it.dartName
+            else -> it.dartName
+        }
+    }
 }
 
 fun IrExpression.accept(context: DartTransformContext) = accept(IrToDartExpressionTransformer, context).let {

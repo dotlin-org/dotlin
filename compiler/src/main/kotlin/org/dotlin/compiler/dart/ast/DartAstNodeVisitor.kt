@@ -19,8 +19,6 @@
 
 package org.dotlin.compiler.dart.ast
 
-import org.dotlin.compiler.dart.ast.`typealias`.DartClassTypeAlias
-import org.dotlin.compiler.dart.ast.`typealias`.DartFunctionTypeAlias
 import org.dotlin.compiler.dart.ast.`typealias`.DartTypeAlias
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.collection.DartCollectionElementList
@@ -126,6 +124,9 @@ interface DartAstNodeVisitor<R, C> {
     fun visitArgumentList(arguments: DartArgumentList, context: C): R = visitAstNode(arguments, context)
     fun visitFunctionExpression(functionExpression: DartFunctionExpression, context: C): R =
         visitAstNode(functionExpression, context)
+
+    fun visitFunctionReference(functionReference: DartFunctionReference, context: C): R =
+        visitAstNode(functionReference, context)
 
     fun visitIdentifier(identifier: DartIdentifier, context: C): R = visitAstNode(identifier, context)
     fun visitInvocationExpression(invocation: DartInvocationExpression, context: C): R =

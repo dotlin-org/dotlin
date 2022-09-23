@@ -211,6 +211,9 @@ abstract class IrContext : IrAttributes {
 
     fun IrExpression.hasAnnotation(fqName: FqName) = hasAnnotation(fqName, bindingContext)
 
+    fun IrExpression.isDartConst(initializedIn: IrDeclaration?): Boolean =
+        isDartConst(allowImplicit = initializedIn?.isDartConst() == true)
+
     fun IrExpression.isDartConst(allowImplicit: Boolean = false): Boolean {
         fun IrCall.isOperatorCallOnConstPrimitives(): Boolean {
             if (valueArgumentsCount > 0 && valueArguments.all { it?.isDartConst(allowImplicit) != true }) return false

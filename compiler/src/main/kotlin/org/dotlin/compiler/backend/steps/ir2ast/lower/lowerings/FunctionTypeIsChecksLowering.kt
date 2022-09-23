@@ -19,15 +19,13 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrDisjunctionExpression
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.builders.irIs
 import org.jetbrains.kotlin.ir.builders.irNotIs
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
 import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrTypeOperator.INSTANCEOF
-import org.jetbrains.kotlin.ir.expressions.IrTypeOperator.NOT_INSTANCEOF
+import org.jetbrains.kotlin.ir.expressions.IrTypeOperator
 import org.jetbrains.kotlin.ir.expressions.IrTypeOperatorCall
 import org.jetbrains.kotlin.ir.util.isFunctionTypeOrSubtype
 
@@ -39,19 +37,21 @@ import org.jetbrains.kotlin.ir.util.isFunctionTypeOrSubtype
  */
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UnnecessaryVariable")
 class FunctionTypeIsChecksLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun <D> DartLoweringContext.transform(
+    override fun DartLoweringContext.transform(
         expression: IrExpression,
-        container: D
-    ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
-        if (expression !is IrTypeOperatorCall || (expression.operator != INSTANCEOF && expression.operator != NOT_INSTANCEOF)) {
+        context: IrExpressionContext
+    ): Transformation<IrExpression>? {
+        if (expression !is IrTypeOperatorCall ||
+            (expression.operator != IrTypeOperator.INSTANCEOF &&
+                    expression.operator != IrTypeOperator.NOT_INSTANCEOF)) {
             return noChange()
         }
 
         if (!expression.typeOperand.isFunctionTypeOrSubtype()) return noChange()
 
-        val negated = expression.operator == NOT_INSTANCEOF;
+        val negated = expression.operator == IrTypeOperator.NOT_INSTANCEOF;
 
-        val instanceOfFunctionInterface = buildStatement(container.symbol) {
+        val instanceOfFunctionInterface = buildStatement(context.container.symbol) {
             val arg = expression.argument
             val type = expression.typeOperand
 

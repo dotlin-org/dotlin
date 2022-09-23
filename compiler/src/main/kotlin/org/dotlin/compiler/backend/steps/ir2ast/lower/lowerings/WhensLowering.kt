@@ -19,13 +19,8 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementTransformerVoid
-import org.dotlin.compiler.backend.steps.ir2ast.ir.irCall
-import org.dotlin.compiler.backend.steps.ir2ast.ir.isStatementIn
-import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
+import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.types.makeNotNull
@@ -34,10 +29,10 @@ import org.jetbrains.kotlin.ir.types.makeNotNull
  * Since a temporary subject is used, smart cast does not work, so explicit casts are added.
  */
 class WhensWithSubjectCastToNonNullLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun <D> DartLoweringContext.transform(
+    override fun DartLoweringContext.transform(
         expression: IrExpression,
-        container: D
-    ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
+        context: IrExpressionContext
+    ): Transformation<IrExpression>? {
         if (expression !is IrBlock || expression.origin != IrStatementOrigin.WHEN) return noChange()
 
         val originalSubject = (expression.statements.first() as IrVariable).initializer as? IrGetValue
@@ -61,7 +56,7 @@ class WhensWithSubjectCastToNonNullLowering(override val context: DartLoweringCo
                                 return expression
                             }
 
-                            return buildStatement(container.symbol) {
+                            return buildStatement(context.container.symbol) {
                                 irCall(
                                     irBuiltIns.checkNotNullSymbol.owner,
                                     receiver = null,
@@ -91,19 +86,19 @@ class WhensWithSubjectCastToNonNullLowering(override val context: DartLoweringCo
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 class WhensWithSubjectExpressionsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun <D> DartLoweringContext.transform(
+    override fun DartLoweringContext.transform(
         expression: IrExpression,
-        container: D
-    ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
+        context: IrExpressionContext
+    ): Transformation<IrExpression>? {
         if (expression !is IrBlock || expression.origin != IrStatementOrigin.WHEN ||
-            expression.isStatementIn(container)) {
+            expression.isStatementIn(context.container)) {
             return noChange()
         }
 
         val whenExpression = expression.statements.last() as IrWhen
 
         return replaceWith(
-            wrapInAnonymousFunctionInvocation(whenExpression, container) {
+            wrapInAnonymousFunctionInvocation(whenExpression, context.container) {
                 expression.statements.withLastAsReturn(at = it)
             }
         )

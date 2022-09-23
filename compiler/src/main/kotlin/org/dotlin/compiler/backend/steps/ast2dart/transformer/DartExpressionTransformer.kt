@@ -44,6 +44,16 @@ object DartExpressionTransformer : DartAstNodeTransformer {
         return "$typeParameters$parameters$body"
     }
 
+    override fun visitFunctionReference(
+        functionReference: DartFunctionReference,
+        context: DartGenerationContext
+    ) = functionReference.let {
+        val function = it.function.accept(context)
+        val typeArguments = it.typeArguments.accept(context)
+
+        "$function$typeArguments"
+    }
+
     override fun visitInvocationExpression(
         invocation: DartInvocationExpression,
         context: DartGenerationContext,

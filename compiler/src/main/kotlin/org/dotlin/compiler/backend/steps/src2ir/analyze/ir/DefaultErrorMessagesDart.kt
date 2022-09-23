@@ -95,6 +95,11 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
             "using reified is not necessary, there's no type erasure"
         )
 
+        put(
+            ErrorsDart.CONST_LAMBDA_ACCESSING_NON_GLOBAL_VALUE,
+            "const lambdas cannot access values from local or class closure"
+        )
+
         // Dart emulated errors.
 
         put(

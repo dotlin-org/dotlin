@@ -207,6 +207,64 @@ To integrate better with the Dart runtime, and because Dart has better
 defintions, they are used instead of the JVM exceptions. This also means `Throwable` is not available, since it doesn't
 serve any use anymore.
 
+## Differences from Dart
+
+Aside from the obvious differences between the Kotlin language and stdlib, Dotlin adds
+some Dart specific enhancements.
+
+### Const lambdas
+
+In Dart, the following code:
+
+```dart
+class Hobbit {
+  const Hobbit(this._computeName);
+  final String Function() _computeName;
+}
+
+void main() {
+  const bilbo = Hobbit(() => "Bilbo Baggins");
+}
+```
+
+Would throw the following error:
+
+> ⚠️ Arguments of a constant creation must be constant expressions.
+
+Even though, if you'd pass a reference of a _named_ top-level/static function
+with the exact same body, it would work.
+
+Dotlin does this for you, the following code compiles:
+
+```kotlin
+class Hobbit const constructor(private val computeName: () -> String)
+
+fun main() {
+    const val bilbo = Hobbit { "Bilbo Baggins" }
+}
+```
+
+```dart
+class Hobbit {
+  const Hobbit(this._computeName);
+  final String Function() _computeName;
+}
+
+void main() {
+  const Hobbit bilbo = Hobbit(_$11f4);
+}
+
+String _$11f4() {
+  return 'Bilbo Baggins';
+}
+```
+
+As you can see, a named function is generated based on the lambda, and passed to the
+const constructor.
+
+This only works for lambdas that do not capture local or class closure values. You _can_
+use top-level/global values.
+
 ## Usage
 
 Dotlin, at this point in time, should not be used for any production projects. If you want to try

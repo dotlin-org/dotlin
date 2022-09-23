@@ -104,4 +104,20 @@ class Const : BaseTest {
                 """
             )
     }
+
+    @Test
+    fun `const lambda literal accessing non-global closure value`() =
+        assertCompilesWithError(ErrorsDart.CONST_LAMBDA_ACCESSING_NON_GLOBAL_VALUE) {
+            kotlin(
+                """
+                class Zen const constructor(private val maintainMotorcycle: () -> Int)
+
+                fun main() {
+                    val someValue = 1024
+
+                    const val zen = Zen { someValue }
+                }
+                """
+            )
+        }
 }

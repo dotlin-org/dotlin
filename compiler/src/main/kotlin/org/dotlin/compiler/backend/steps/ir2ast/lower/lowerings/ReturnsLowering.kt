@@ -67,9 +67,9 @@ class ReturnsLowering(override val context: DartLoweringContext) : IrDeclaration
             )
         }
 
-        body.transformExpressions(initialParent = declaration) { expression, parent ->
-            expression.transformChildren(parent)
-            if (expression !is IrReturn || expression.isStatementIn(parent)) return@transformExpressions expression
+        body.transformExpressions(initialParent = declaration) { expression, context ->
+            expression.transformChildren(context)
+            if (expression !is IrReturn || expression.isStatementIn(context.container)) return@transformExpressions expression
 
             hasReturnAsExpression = true
 
