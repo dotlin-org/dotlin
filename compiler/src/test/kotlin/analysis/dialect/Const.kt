@@ -106,7 +106,7 @@ class Const : BaseTest {
     }
 
     @Test
-    fun `const lambda literal accessing non-global closure value`() =
+    fun `error if const lambda literal accessing non-global closure value`() =
         assertCompilesWithError(ErrorsDart.CONST_LAMBDA_ACCESSING_NON_GLOBAL_VALUE) {
             kotlin(
                 """
