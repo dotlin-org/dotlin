@@ -245,10 +245,11 @@ class IteratorSubtypeImplementationsLowering(override val context: DartLoweringC
  * All `return`s are updated in `next()` (or `previous()`) of subtypes of `Iterator` to update `current`.
  */
 class IteratorSubtypeReturnsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun <D> DartLoweringContext.transform(
+    override fun DartLoweringContext.transform(
         expression: IrExpression,
-        container: D
-    ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
+        context: IrExpressionContext
+    ): Transformation<IrExpression>? {
+        val container = context.container
         if (expression !is IrReturn) return noChange()
         if (container !is IrSimpleFunction) return noChange()
 

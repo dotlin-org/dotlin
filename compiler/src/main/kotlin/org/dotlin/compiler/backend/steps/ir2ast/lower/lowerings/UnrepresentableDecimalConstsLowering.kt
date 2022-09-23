@@ -19,11 +19,10 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.irCall
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstKind
@@ -40,10 +39,10 @@ import org.jetbrains.kotlin.name.Name
 @Suppress("UnnecessaryVariable")
 class UnrepresentableDecimalConstsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
     @Suppress("ConvertNaNEquality")
-    override fun <D> DartLoweringContext.transform(
+    override fun DartLoweringContext.transform(
         expression: IrExpression,
-        container: D
-    ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
+        context: IrExpressionContext
+    ): Transformation<IrExpression>? {
         if (expression !is IrConst<*>
             || (expression.kind != IrConstKind.Float && expression.kind != IrConstKind.Double)
         ) {
@@ -86,7 +85,7 @@ class UnrepresentableDecimalConstsLowering(override val context: DartLoweringCon
         }
 
         return replaceWith(
-            buildStatement(container.symbol) {
+            buildStatement(context.container.symbol) {
                 fun divide(left: IrExpression, right: IrExpression) =
                     irCall(divideMethod, left, right, origin = IrStatementOrigin.DIV)
 

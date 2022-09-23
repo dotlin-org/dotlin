@@ -260,11 +260,11 @@ private fun IrDeclaration.remapAtRelevantParents(block: (IrElement) -> Unit) =
     fileOrNull.remapAtRelevantParents(block)
 
 fun IrDeclaration.transformExpressionsEverywhere(
-    block: IrExpressionWithParentTransformer.(IrExpression, IrDeclaration) -> IrExpression
+    block: IrExpressionWithContextTransformer.(IrExpression, IrExpressionContext) -> IrExpression
 ) = fileOrNull?.transformExpressionsEverywhere(block)
 
 fun IrFile?.transformExpressionsEverywhere(
-    block: IrExpressionWithParentTransformer.(IrExpression, IrDeclaration) -> IrExpression
+    block: IrExpressionWithContextTransformer.(IrExpression, IrExpressionContext) -> IrExpression
 ) = remapAtRelevantParents { it.transformExpressions(block) }
 
 fun IrDeclaration.remapReferencesEverywhere(mapping: Pair<IrSymbol, IrSymbol>) =

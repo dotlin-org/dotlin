@@ -286,4 +286,160 @@ class Const : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `lambda literal passed to const constructor`() = assertCompile {
+        kotlin(
+            """
+            class Zen const constructor(private val maintainMotorcycle: () -> String)
+
+            fun main() {
+                const val zen = Zen { "Quality" }
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Zen {
+              const Zen(this._maintainMotorcycle) : super();
+              @nonVirtual
+              final String Function() _maintainMotorcycle;
+            }
+
+            void main() {
+              const Zen zen = Zen(_${'$'}11ce);
+            }
+
+            String _${'$'}11ce() {
+              return 'Quality';
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `lambda literal passed to const constructor referencing global val`() = assertCompile {
+        kotlin(
+            """
+            class Zen const constructor(private val maintainMotorcycle: () -> String)
+
+            val quality = "Quality"
+
+            fun main() {
+                const val zen = Zen { quality }
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Zen {
+              const Zen(this._maintainMotorcycle) : super();
+              @nonVirtual
+              final String Function() _maintainMotorcycle;
+            }
+
+            final String quality = 'Quality';
+            void main() {
+              const Zen zen = Zen(_${'$'}14ec);
+            }
+
+            String _${'$'}14ec() {
+              return quality;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `lambda literal passed to const constructor referencing object val`() = assertCompile {
+        kotlin(
+            """
+            class Zen const constructor(private val maintainMotorcycle: () -> String)
+
+            object Good {
+                val QUALITY = "Quality"
+            }
+
+            fun main() {
+                const val zen = Zen { Good.QUALITY }
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Zen {
+              const Zen(this._maintainMotorcycle) : super();
+              @nonVirtual
+              final String Function() _maintainMotorcycle;
+            }
+
+            @sealed
+            class Good {
+              Good._() : super();
+              @nonVirtual
+              final String ${'$'}QUALITY = 'Quality';
+              static final Good ${'$'}instance = Good._();
+              static final String QUALITY = Good.${'$'}instance.${'$'}QUALITY;
+            }
+
+            void main() {
+              const Zen zen = Zen(_${'$'}1771);
+            }
+
+            String _${'$'}1771() {
+              return Good.${'$'}instance.${'$'}QUALITY;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `lambda literal passed to const constructor referencing own local val`() = assertCompile {
+        kotlin(
+            """
+            class Zen const constructor(private val maintainMotorcycle: () -> String)
+
+            fun main() {
+                const val zen = Zen {
+                    val x = "Quality"
+                    x + x
+                }
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Zen {
+              const Zen(this._maintainMotorcycle) : super();
+              @nonVirtual
+              final String Function() _maintainMotorcycle;
+            }
+
+            void main() {
+              const Zen zen = Zen(_${'$'}11f0);
+            }
+
+            String _${'$'}11f0() {
+              final String x = 'Quality';
+              return x + x;
+            }
+            """
+        )
+    }
 }

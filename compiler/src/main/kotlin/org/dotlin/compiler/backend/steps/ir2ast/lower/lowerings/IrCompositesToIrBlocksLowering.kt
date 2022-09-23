@@ -20,8 +20,6 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
 import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrComposite
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -31,10 +29,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
  * [IrComposite]s are converted to [IrBlock].
  */
 class IrCompositesToIrBlocksLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun <D> DartLoweringContext.transform(
-        expression: IrExpression,
-        container: D
-    ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
+    override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
         if (expression !is IrComposite || !expression.isTransparentScope) return noChange()
 
         return replaceWith(

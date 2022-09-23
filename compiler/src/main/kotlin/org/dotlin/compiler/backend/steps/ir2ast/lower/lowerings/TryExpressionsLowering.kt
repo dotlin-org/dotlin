@@ -19,11 +19,10 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isStatementIn
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -33,10 +32,10 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrTryImpl
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 class TryExpressionsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun <D> DartLoweringContext.transform(
+    override fun DartLoweringContext.transform(
         expression: IrExpression,
-        container: D
-    ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
+        context: IrExpressionContext
+    ): Transformation<IrExpression>? {
         if (expression !is IrTry) return noChange()
         if (expression !is IrTryImpl) throw UnsupportedOperationException("IrThrow must be IrThrowImpl")
 
@@ -49,10 +48,10 @@ class TryExpressionsLowering(override val context: DartLoweringContext) : IrExpr
             }
         }
 
-        if (expression.isStatementIn(container)) return noChange()
+        if (expression.isStatementIn(context.container)) return noChange()
 
         return replaceWith(
-            wrapInAnonymousFunctionInvocation(expression, container) {
+            wrapInAnonymousFunctionInvocation(expression, context.container) {
                 listOf(
                     // If we put it in an anonymous function,
                     // the last statements in the try and catch blocks must return.

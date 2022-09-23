@@ -19,18 +19,13 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.irCall
-import org.dotlin.compiler.backend.steps.ir2ast.ir.methodWithName
-import org.dotlin.compiler.backend.steps.ir2ast.ir.typeArguments
-import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
+import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.jetbrains.kotlin.builtins.StandardNames
-import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.declarations.IrDeclaration
+import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.types.classOrNull
-import org.jetbrains.kotlin.ir.types.getPublicSignature
-import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.name.FqName
 
@@ -44,10 +39,10 @@ object EnumValues {
     }
 
     class ReplaceExpressionsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-        override fun <D> DartLoweringContext.transform(
+        override fun DartLoweringContext.transform(
             expression: IrExpression,
-            container: D
-        ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
+            context: IrExpressionContext
+        ): Transformation<IrExpression>? {
             if (expression !is IrCall ||
                 (!expression.symbol.owner.isEnumValues() && !expression.symbol.owner.isEnumValueOf())
             ) {
@@ -59,10 +54,10 @@ object EnumValues {
 
             return replaceWith(
                 when {
-                    function.isEnumValues() -> buildStatement(container.symbol) {
+                    function.isEnumValues() -> buildStatement(context.container.symbol) {
                         irCall(enumClass.methodWithName("values"))
                     }
-                    else -> buildStatement(container.symbol) {
+                    else -> buildStatement(context.container.symbol) {
                         irCall(
                             enumClass.methodWithName("valueOf"),
                             receiver = null,

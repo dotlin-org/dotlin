@@ -68,6 +68,9 @@ public interface ErrorsDart {
     DiagnosticFactory0<PsiElement> UNNECESSARY_REIFIED =
             DiagnosticFactory0.create(Severity.WARNING, DEFAULT);
 
+    DiagnosticFactory0<KtExpression> CONST_LAMBDA_ACCESSING_NON_GLOBAL_VALUE =
+            DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
+
     // Dart emulated errors.
     DiagnosticFactory0<KtExpression> CONST_WITH_NON_CONST =
             DiagnosticFactory0.create(Severity.ERROR, DEFAULT);

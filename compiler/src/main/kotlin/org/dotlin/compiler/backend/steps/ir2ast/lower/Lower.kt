@@ -77,6 +77,7 @@ private val lowerings: List<Lowering> = listOf(
     ::DefaultConstructorsLowering,
     ::TryExpressionsLowering,
     ::InvokeCallsLowering,
+    ::ConstLambdaLiteralsLowering,
     ::IrCompositesToIrBlocksLowering,
     ::ContravariantLowering,
     ::DartCodeLowering,

@@ -19,22 +19,21 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.*
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionContext
+import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrimitiveNumber
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
-import org.jetbrains.kotlin.ir.declarations.IrVariable
-import org.jetbrains.kotlin.ir.expressions.*
-import org.jetbrains.kotlin.ir.types.makeNotNull
+import org.jetbrains.kotlin.ir.expressions.IrBlock
+import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 
 /**
  * Since a temporary subject is used, smart cast does not work, so explicit casts are added.
  */
 class PostfixIncrementsDecrementsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun <D> DartLoweringContext.transform(
+    override fun DartLoweringContext.transform(
         expression: IrExpression,
-        container: D
-    ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
+        context: IrExpressionContext
+    ): Transformation<IrExpression>? {
         if (expression !is IrBlock ||
             (expression.origin != IrStatementOrigin.POSTFIX_INCR &&
                     expression.origin != IrStatementOrigin.POSTFIX_DECR) ||
@@ -44,7 +43,10 @@ class PostfixIncrementsDecrementsLowering(override val context: DartLoweringCont
         }
 
         return replaceWith(
-            wrapInAnonymousFunctionInvocation(expression, container) { expression.statements.withLastAsReturn(at = it) }
+            wrapInAnonymousFunctionInvocation(
+                expression,
+                context.container
+            ) { expression.statements.withLastAsReturn(at = it) }
         )
     }
 }

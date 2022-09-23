@@ -27,8 +27,6 @@ import org.dotlin.compiler.backend.steps.ir2ast.lower.IrExpressionLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformation
 import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
@@ -36,10 +34,7 @@ import org.jetbrains.kotlin.ir.util.primaryConstructor
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UnnecessaryVariable")
 class ConflictingExtensionCallsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun <D> DartLoweringContext.transform(
-        expression: IrExpression,
-        container: D
-    ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
+    override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
         if (expression !is IrCall) return noChange()
 
         val receiver = expression.extensionReceiverOrNull ?: return noChange()

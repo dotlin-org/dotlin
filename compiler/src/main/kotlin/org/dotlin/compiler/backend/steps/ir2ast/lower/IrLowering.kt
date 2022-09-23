@@ -21,7 +21,8 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionWithParentTransformer
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionContext
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionWithContextTransformer
 import org.dotlin.compiler.backend.util.replace
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
@@ -35,6 +36,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrBlockBodyImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionExpressionImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrReturnImpl
+import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.name.Name
 
 typealias Transformations<E> = Sequence<Transformation<E>>
@@ -86,14 +88,14 @@ interface IrFileLowering : IrLowering {
 
 interface IrExpressionLowering : IrSingleLowering<IrExpression> {
     override fun lower(irFile: IrFile) {
-        irFile.transformChildren(
-            object : IrExpressionWithParentTransformer() {
-                override fun <P> visitExpressionWithParent(
+        irFile.transformChildrenSafe(
+            object : IrExpressionWithContextTransformer() {
+                override fun visitExpressionWithContext(
                     expression: IrExpression,
-                    parent: P
-                ): IrExpression where P : IrDeclaration, P : IrDeclarationParent {
-                    expression.transformChildren(parent)
-                    return expression.transformBy { context.transform(it, parent) }
+                    expContext: IrExpressionContext
+                ): IrExpression {
+                    expression.transformChildren(expContext)
+                    return expression.transformBy { context.transform(it, expContext) }
                 }
             },
             null
@@ -101,22 +103,22 @@ interface IrExpressionLowering : IrSingleLowering<IrExpression> {
     }
 
     override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? = noChange()
-    fun <D> DartLoweringContext.transform(
+    fun DartLoweringContext.transform(
         expression: IrExpression,
-        container: D
-    ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent =
+        context: IrExpressionContext
+    ): Transformation<IrExpression>? =
         transform(expression)
 
-    fun <D> DartLoweringContext.wrapInAnonymousFunctionInvocation(
+    fun DartLoweringContext.wrapInAnonymousFunctionInvocation(
         exp: IrExpression,
-        container: D,
+        container: IrDeclaration,
         statements: (IrSimpleFunction) -> List<IrStatement> = { listOf(exp) }
-    ): IrCall where D : IrDeclaration, D : IrDeclarationParent {
+    ): IrCall {
         val anonymousFunction = context.irFactory.buildFun {
             name = Name.special("<anonymous>")
             returnType = exp.type
         }.apply {
-            parent = container
+            parent = container as IrDeclarationParent
 
             body = IrBlockBodyImpl(
                 UNDEFINED_OFFSET,
@@ -167,6 +169,12 @@ interface IrExpressionLowering : IrSingleLowering<IrExpression> {
                 value = it
             )
         }
+}
+
+private fun <D> IrFile.transformChildrenSafe(transformer: IrElementTransformer<D>, data: D) {
+    declarations.toList().forEachIndexed { i, irDeclaration ->
+        declarations[i] = irDeclaration.transform(transformer, data) as IrDeclaration
+    }
 }
 
 fun <E : IrElement> MutableList<E>.transformBy(

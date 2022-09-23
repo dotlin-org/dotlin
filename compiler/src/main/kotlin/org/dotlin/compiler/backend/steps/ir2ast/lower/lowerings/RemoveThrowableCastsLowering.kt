@@ -19,10 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrimitiveInteger
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
 import org.jetbrains.kotlin.ir.declarations.copyAttributes
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrTypeOperator
@@ -33,10 +30,7 @@ import org.jetbrains.kotlin.ir.util.isThrowable
  * No casts are necessary to `Throwable`, it does not exist.
  */
 class RemoveThrowableCastsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun <D> DartLoweringContext.transform(
-        expression: IrExpression,
-        container: D
-    ): Transformation<IrExpression>? where D : IrDeclaration, D : IrDeclarationParent {
+    override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
         if (expression !is IrTypeOperatorCall ||
             !expression.type.isThrowable() ||
             expression.operator != IrTypeOperator.IMPLICIT_CAST) {
