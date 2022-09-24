@@ -215,8 +215,8 @@ some Dart specific enhancements.
 ### Const lambdas
 
 In Dart, you cannot pass lambda literals (function expressions) as
-arguments to const constructors, only top-level/static named references
-of functions.
+arguments to const constructors, only references
+of top-level/static named functions.
 
 In Dart, the following code:
 
