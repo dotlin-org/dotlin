@@ -106,7 +106,7 @@ class Const : BaseTest {
     }
 
     @Test
-    fun `error if const lambda literal accessing non-global closure value`() =
+    fun `error if const lambda literal accessing non-global closure variable`() =
         assertCompilesWithError(ErrorsDart.CONST_LAMBDA_ACCESSING_NON_GLOBAL_VALUE) {
             kotlin(
                 """
@@ -116,6 +116,28 @@ class Const : BaseTest {
                     val someValue = 1024
 
                     const val zen = Zen { someValue }
+                }
+                """
+            )
+        }
+
+
+    @Test
+    fun `error if const lambda literal accessing non-global closure anonymous object`() =
+        assertCompilesWithError(ErrorsDart.CONST_LAMBDA_ACCESSING_NON_GLOBAL_VALUE) {
+            kotlin(
+                """
+                class Zen const constructor(private val maintainMotorcycle: () -> String)
+
+                fun main() {
+                    val someObject = object {
+                        fun maintain() {}
+                    }
+
+                    const val zen = Zen {
+                        someObject
+                        "Quality"
+                    }
                 }
                 """
             )
