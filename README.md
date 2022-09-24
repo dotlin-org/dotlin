@@ -214,6 +214,10 @@ some Dart specific enhancements.
 
 ### Const lambdas
 
+In Dart, you cannot pass lambda literals (function expressions) as
+arguments to const constructors, only top-level/static named references
+of functions.
+
 In Dart, the following code:
 
 ```dart
@@ -227,7 +231,7 @@ void main() {
 }
 ```
 
-Would throw the following error:
+Would throw the following error, because of the lambda literal argument:
 
 > ⚠️ Arguments of a constant creation must be constant expressions.
 
@@ -262,7 +266,7 @@ String _$11f4() {
 As you can see, a named function is generated based on the lambda, and passed to the
 const constructor.
 
-This only works for lambdas that do not capture local or class closure values. You _can_
+This is only possible if the lambda does not capture local or class closure values. You _can_
 use top-level/global values.
 
 ## Usage
