@@ -233,7 +233,7 @@ Would throw the following error, because of the lambda literal argument:
 
 > ⚠️ Arguments of a constant creation must be constant expressions.
 
-Even though if you'd passed a reference of a _named_ top-level/static function
+Even though if you passed a reference of a _named_ top-level/static function
 with the exact same body, it would work.
 
 Dotlin does this for you, so the following code compiles:
