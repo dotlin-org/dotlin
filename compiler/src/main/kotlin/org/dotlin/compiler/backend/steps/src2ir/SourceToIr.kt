@@ -211,24 +211,6 @@ private fun loadIr(
     )
 }
 
-private val ModuleDescriptorImpl.dependencies: Set<ModuleDescriptorImpl>
-    get() {
-        val allDependencies = mutableSetOf<ModuleDescriptorImpl>()
-        fun add(module: ModuleDescriptorImpl) {
-            val dependencies = module.allDependencyModules
-            dependencies.forEach {
-                if (it !in allDependencies) {
-                    add(it as ModuleDescriptorImpl)
-                }
-            }
-            allDependencies += dependencies.cast<ModuleDescriptorImpl>()
-        }
-
-        add(this)
-
-        return allDependencies
-    }
-
 class IrResult(
     val module: IrModuleFragment,
     val resolvedLibs: KotlinLibraryResolveResult,
