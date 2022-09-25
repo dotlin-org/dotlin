@@ -21,7 +21,6 @@ package compile
 
 import BaseTest
 import assertCompile
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -1908,6 +1907,47 @@ class Expression : BaseTest {
               int add(int other) {
                 return this + other;
               }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `constructor call with type arguments`() = assertCompile {
+        kotlin(
+            """
+            interface WritingSurface
+            interface Stone : WritingSurface
+            interface Paper : WritingSurface
+
+            class Scribe<T : WritingSurface> {
+                fun write() {}
+            }
+
+            fun writeDown() {
+                val scribe = Scribe<Paper>()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            abstract class WritingSurface {}
+
+            abstract class Stone implements WritingSurface {}
+
+            abstract class Paper implements WritingSurface {}
+
+            @sealed
+            class Scribe<T extends WritingSurface> {
+              @nonVirtual
+              void write() {}
+            }
+
+            void writeDown() {
+              final Scribe<Paper> scribe = Scribe<Paper>();
             }
             """
         )
