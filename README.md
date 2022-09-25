@@ -136,7 +136,7 @@ The Kotlin compiler does not support keywords in front of expressions at the par
 The difference is easy to remember: with any _declaration_ you must use `const`, and with any
 _invocation_ you must use `@const`.
 
-Note that similar to in Dart, `@const` is not necessary when it's implied, e.g. by assigning to a `const val`.
+Note that as in Dart, `@const` is not necessary when it's implied, e.g. by assigning to a `const val`.
 
 ### Lateinit
 
