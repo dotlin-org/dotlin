@@ -7,8 +7,8 @@ and the Dart ecosystem & build system.
 ## About Dotlin
 
 Dotlin makes use of Kotlin's IR (Immediate Representation) compiler, and uses that to generate Dart source code.
-At the moment some but not all of Kotlin's features are supported, to see what exactly, you can
-look at the [TODO](TODO.md).
+At the moment not all of Kotlin's features are supported; to see what exactly is or isn't implemented, you can
+look at the [TODO](TODO.md) list.
 
 ## Goals
 
@@ -24,9 +24,9 @@ look at the [TODO](TODO.md).
 ## Differences from Kotlin
 
 Dotlin is a _dialect_ of Kotlin. Some changes have been made to better integrate into the Dart runtime, and
-also to remove some JVM legacy Kotlin contained.
+also to remove some JVM-centric legacy traits.
 
-Note that because of these changes, Dotlin code is not compatible with Kotlin/JVM, or other official Kotlin
+Note that because of these changes, Dotlin code is _not_ compatible with Kotlin/JVM, or other official Kotlin
 variants. Dotlin aims to intergrate the Kotlin language (and stdlib) into Dart, not the full Kotlin ecosystem.
 
 ### No type erasure
@@ -34,7 +34,7 @@ variants. Dotlin aims to intergrate the Kotlin language (and stdlib) into Dart, 
 Because of the Dart runtime, there is no type erasure. This means that you will never need to use `reified`
 in Dotlin.
 
-For example, the following code that would fail in Kotlin, works in Dotlin:
+For example, the following code, which would fail in Kotlin, works in Dotlin:
 
 ```kotlin
 class MyClass<T>
@@ -54,7 +54,7 @@ This would've been reported in Kotlin as:
 
 In Dart, any class can be implemented as an interface. In Kotlin, you either have an interface or a class.
 
-Since you can use any Dart library in Dotlin, there's also the ability to implement any Dart class as an
+Since you can use any Dart library in Dotlin, you can also implement any Dart class as an
 interface or mixin, just like in Dart. The syntax for that is as follows:
 
 ```kotlin
@@ -68,7 +68,7 @@ class MyClass implements TheirDartClass, AnotherDartClass {}
 ```
 
 Even though `TheirDartClass` is a `class` in Dotlin (not an `interface`) you can implement
-these classes as interfaces. When you implement a Dart class like this, it's imlemented
+it as an interface. When you implement a Dart class like this, it's implemented
 as a pure interface (like in Dart), meaning you have to implement the whole interface yourself.
 
 The same can be done for mixins:
@@ -81,8 +81,8 @@ class MyClass : TheirDartClass(Mixin)
 class MyClass with TheirDartClass {}
 ```
 
-This only works if `TheirDartClass` can be used as a mixin, meaing it either is declared with the `mixin` keyword or
-it's a class that has no constructors and extends `Object` (`Any`). If a Dart class is not a valid mixin, the
+This only works if `TheirDartClass` can be used as a mixin, meaing it either is declared with the `mixin` keyword, or
+has no constructors and extends `Object` (`Any`). If a Dart class is not a valid mixin, the
 special mixin inheritance syntax is not available.
 
 If you want to _extend_ a Dart class, regular Kotlin syntax can be used.
@@ -93,7 +93,7 @@ Dotlin declarations for them. If there are Dotlin declarations, regular Kotlin `
 ### Const
 
 Kotlin has a very strict concept of `const`. Only a few primitives can be declared `const`, and only as
-top-level or `object` properties. In Dart on the other hand, it's possible to have `const` constructors
+top-level values or properties on `object`s. In Dart, on the other hand, it's possible to have `const` constructors
 for classes and collection literals, and have local `const` variables.
 
 To facilitate this, `const` is also more lenient and Dart-like in Dotlin. This means that the following Dotlin code:
@@ -133,18 +133,16 @@ If you want to explicitly invoke a `const` constructor, you can use the followin
 Note the `@` before `const`. This is because `@const` is an annotation, not a keyword.
 The Kotlin compiler does not support keywords in front of expressions at the parser level.
 
-The difference is easy to remember, with any _declaration_ you must use `const`, and with any
+The difference is easy to remember: with any _declaration_ you must use `const`, and with any
 _invocation_ you must use `@const`.
 
-Note that `@const` is not necessary when it's implied by e.g. assigning to a `const val`,
-similar to Dart.
+Note that as in Dart, `@const` is not necessary when it's implied, e.g. by assigning to a `const val`.
 
 ### Lateinit
 
-In Kotlin, `lateinit` is not applicable to properties with types that are  nullable, primitive
-or have a nullable upper bound. In Dotlin, this is possible.
+In Kotlin, `lateinit` is not applicable to properties with types that are primitive or nullable/have a nullable upper bound. In Dotlin, this is possible.
 
-For example, the following code that would fail in Kotlin, works in Dotlin:
+For example, the following code, which would fail in Kotlin, works in Dotlin:
 
 ```kotlin
 class Example<T> {
@@ -156,7 +154,7 @@ class Example<T> {
 }
 ```
 
-Respectively, this would've been reported in Kotlin as:
+Respectively, these declarations would've been reported in Kotlin with the following errors:
 
 > ⚠️ 'lateinit' modifier is not allowed on properties of nullable types
 
@@ -164,7 +162,7 @@ Respectively, this would've been reported in Kotlin as:
 
 > ⚠️ 'lateinit' modifier is not allowed on properties of a type with nullable upper bound
 
-But with Dotlin, compiles to:
+But with Dotlin, this compiles to:
 
 ```dart
 class Example<T> {
@@ -178,8 +176,8 @@ class Example<T> {
 
 ### Primitives
 
-Kotlin primitives that are not used in Dart and would only complicate code, have been removed. This means that
-`Byte`, `Short`, `Long`, `Float`, and `Char` are not present in Dotlin. This is because Dotlin has the following
+Kotlin primitives that are not used in Dart and would only complicate code have been removed, meaning that
+`Byte`, `Short`, `Long`, `Float`, and `Char` are not present. This is because Dotlin has the following
 mapping of built-ins:
 
 | Kotlin    | Dart     |
@@ -191,7 +189,7 @@ mapping of built-ins:
 | `Any`     | `Object` |
 | `Nothing` | `Never`  |
 
-This means that `Int` now refers to a 64-bit integer, instead of 32-bit as in Kotlin.
+This also means that `Int` now refers to a 64-bit integer, instead of 32-bit as in Kotlin.
 
 ### Errors & Exceptions
 
@@ -204,19 +202,19 @@ throw "This works!"
 
 To integrate better with the Dart runtime, and because Dart has better
 [error](https://api.dart.dev/dart-core/Error-class.html)/[exception](https://api.dart.dev/dart-core/Exception-class.html)
-defintions, they are used instead of the JVM exceptions. This also means `Throwable` is not available, since it doesn't
+defintions, they are used instead of the JVM exception classes. This also means `Throwable` is not available, since it doesn't
 serve any use anymore.
 
 ## Differences from Dart
 
 Aside from the obvious differences between the Kotlin language and stdlib, Dotlin adds
-some Dart specific enhancements.
+some Dart-specific enhancements.
 
 ### Const lambdas
 
 In Dart, you cannot pass lambda literals (function expressions) as
 arguments to const constructors, only references
-of top-level/static named functions.
+to top-level or static named functions.
 
 In Dart, the following code:
 
@@ -235,10 +233,10 @@ Would throw the following error, because of the lambda literal argument:
 
 > ⚠️ Arguments of a constant creation must be constant expressions.
 
-Even though, if you'd pass a reference of a _named_ top-level/static function
+Even though if you passed a reference of a _named_ top-level/static function
 with the exact same body, it would work.
 
-Dotlin does this for you, the following code compiles:
+Dotlin does this for you, so the following code compiles:
 
 ```kotlin
 class Hobbit const constructor(private val computeName: () -> String)
@@ -248,6 +246,7 @@ fun main() {
 }
 ```
 
+And results in:
 ```dart
 class Hobbit {
   const Hobbit(this._computeName);
@@ -264,10 +263,10 @@ String _$11f4() {
 ```
 
 As you can see, a named function is generated based on the lambda, and passed to the
-const constructor.
+`const` constructor.
 
 This is only possible if the lambda does not capture local or class closure values. You _can_
-use top-level/global values.
+use top-level/global values, however.
 
 ## Usage
 
@@ -283,7 +282,7 @@ In there, there's a `bin/dotlin` executable you can try out.
 ## Contributing
 
 Since the project is at an early stage, a lot is still changing and therefore — **for now** — code contributions
-are not encouraged. However, in the future when Dotlin is in a more stable state this will definitely change.
+are not encouraged. However, in the future when Dotlin is in a more stable state, this will definitely change.
 
 When code contributions are encouraged, you are required to sign off all of your commits:
 ```
