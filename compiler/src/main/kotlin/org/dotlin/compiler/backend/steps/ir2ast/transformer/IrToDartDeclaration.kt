@@ -23,6 +23,8 @@ import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.*
 import org.dotlin.compiler.backend.util.isDartConst
+import org.dotlin.compiler.backend.util.isDartGetter
+import org.dotlin.compiler.backend.util.isDartSetter
 import org.dotlin.compiler.dart.ast.`typealias`.DartClassTypeAlias
 import org.dotlin.compiler.dart.ast.`typealias`.DartFunctionTypeAlias
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnitMember
@@ -56,6 +58,8 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
                     parameters = parameters,
                     body = irFunction.body.accept(context)
                 ),
+                isGetter = irFunction.isDartGetter(),
+                isSetter = irFunction.isDartSetter(),
                 annotations = annotations,
                 documentationComment = documentationComment,
             )

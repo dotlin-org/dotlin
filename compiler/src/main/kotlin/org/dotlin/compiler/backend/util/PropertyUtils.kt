@@ -19,9 +19,16 @@
 
 package org.dotlin.compiler.backend.util
 
+import org.dotlin.compiler.backend.hasDartGetterAnnotation
 import org.dotlin.compiler.backend.steps.ir2ast.ir.hasImplicitGetter
 import org.dotlin.compiler.backend.steps.ir2ast.ir.hasImplicitSetter
+import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrProperty
+import org.jetbrains.kotlin.ir.util.isGetter
+import org.jetbrains.kotlin.ir.util.isSetter
 
 val IrProperty.isSimple: Boolean
     get() = hasImplicitGetter && (!isVar || hasImplicitSetter)
+
+fun IrFunction.isDartGetter() = isGetter || hasDartGetterAnnotation()
+fun IrFunction.isDartSetter() = isSetter

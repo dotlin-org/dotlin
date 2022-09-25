@@ -19,12 +19,13 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
-import org.dotlin.compiler.backend.hasDartGetterAnnotation
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartAnnotations
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartFactory
 import org.dotlin.compiler.backend.util.isDartConst
+import org.dotlin.compiler.backend.util.isDartGetter
+import org.dotlin.compiler.backend.util.isDartSetter
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartClassMember
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartMethodDeclaration
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.*
@@ -38,8 +39,6 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrBlockBody
 import org.jetbrains.kotlin.ir.expressions.IrDelegatingConstructorCall
 import org.jetbrains.kotlin.ir.util.defaultType
-import org.jetbrains.kotlin.ir.util.isGetter
-import org.jetbrains.kotlin.ir.util.isSetter
 import org.jetbrains.kotlin.ir.util.parentAsClass
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
@@ -54,8 +53,8 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?>()
                     parameters = parameters,
                     body = irFunction.body.accept(context)
                 ),
-                isGetter = irFunction.isGetter || irFunction.hasDartGetterAnnotation(),
-                isSetter = irFunction.isSetter,
+                isGetter = irFunction.isDartGetter(),
+                isSetter = irFunction.isDartSetter(),
                 isOperator = irFunction.isOperator,
                 isStatic = irFunction.isStatic,
                 annotations = annotations,

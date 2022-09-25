@@ -834,4 +834,24 @@ class Property {
             """
         )
     }
+
+    @Test
+    fun `top-level property with explicit getter`() = assertCompile {
+        kotlin(
+            """
+            val x: Boolean
+                get() = false
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            bool get x {
+              return false;
+            }
+            """
+        )
+    }
 }

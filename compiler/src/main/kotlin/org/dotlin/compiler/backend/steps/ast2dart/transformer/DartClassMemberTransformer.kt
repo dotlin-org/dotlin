@@ -20,7 +20,6 @@
 package org.dotlin.compiler.backend.steps.ast2dart.transformer
 
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
-import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext.Flag.GETTER
 import org.dotlin.compiler.dart.ast.accept
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartClassMember
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartMethodDeclaration
@@ -31,34 +30,7 @@ object DartClassMemberTransformer : DartAstNodeTransformer {
     override fun visitMethodDeclaration(
         methodDeclaration: DartMethodDeclaration,
         context: DartGenerationContext,
-    ) = methodDeclaration.let {
-        val annotations = it.annotations.accept(context)
-        val name = it.name.accept(context)
-        val returnType = it.returnType.accept(context)
-        val function: String
-
-        val getOrSet =
-            when {
-                it.isGetter -> {
-                    function = context.withFlag(GETTER) {
-                        it.function.accept(context)
-                    }
-                    "get "
-                }
-                else -> {
-                    function = it.function.accept(context)
-                    when {
-                        it.isSetter -> "set "
-                        else -> ""
-                    }
-                }
-            }
-
-        val operator = if (it.isOperator) "operator " else ""
-        val static = if (it.isStatic) "static " else ""
-
-        "$annotations$static$returnType $operator$getOrSet$name$function"
-    }
+    ) = methodDeclaration.let { it.acceptCommon(context, it.name, it.isOperator, it.isStatic) }
 
     override fun visitConstructorDeclaration(
         constructorDeclaration: DartConstructorDeclaration,

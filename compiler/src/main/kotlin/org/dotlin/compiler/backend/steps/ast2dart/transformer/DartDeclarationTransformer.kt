@@ -20,27 +20,23 @@
 package org.dotlin.compiler.backend.steps.ast2dart.transformer
 
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
+import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext.Flag.GETTER
 import org.dotlin.compiler.dart.ast.`typealias`.DartTypeAlias
 import org.dotlin.compiler.dart.ast.declaration.DartDeclaration
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartClassDeclaration
 import org.dotlin.compiler.dart.ast.declaration.extension.DartExtensionDeclaration
+import org.dotlin.compiler.dart.ast.declaration.function.DartFunctionDeclaration
 import org.dotlin.compiler.dart.ast.declaration.function.DartTopLevelFunctionDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartTopLevelVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
+import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 
 object DartDeclarationTransformer : DartAstNodeTransformer {
     override fun visitTopLevelFunctionDeclaration(
         functionDeclaration: DartTopLevelFunctionDeclaration,
         context: DartGenerationContext,
-    ): String {
-        val annotations = functionDeclaration.annotations.accept(context)
-        val name = functionDeclaration.name.accept(context)
-        val returnType = functionDeclaration.returnType.accept(context)
-        val function = functionDeclaration.function.accept(context)
-
-        return "$annotations$returnType $name$function"
-    }
+    ) = functionDeclaration.let { it.acceptCommon(context, it.name) }
 
     override fun visitClassDeclaration(
         classDeclaration: DartClassDeclaration,
@@ -145,3 +141,37 @@ fun DartDeclaration.accept(context: DartGenerationContext) =
 
 fun DartVariableDeclarationList.accept(context: DartGenerationContext) =
     accept(DartDeclarationTransformer, context)
+
+fun DartFunctionDeclaration.acceptCommon(
+    context: DartGenerationContext,
+    identifier: DartIdentifier,
+    isOperator: Boolean = false,
+    isStatic: Boolean = false
+) = let {
+    val annotations = it.annotations.accept(context)
+    val name = identifier.accept(context)
+    val returnType = it.returnType.accept(context)
+    val function: String
+
+    val getOrSet =
+        when {
+            it.isGetter -> {
+                function = context.withFlag(GETTER) {
+                    it.function.accept(context)
+                }
+                "get "
+            }
+            else -> {
+                function = it.function.accept(context)
+                when {
+                    it.isSetter -> "set "
+                    else -> ""
+                }
+            }
+        }
+
+    val operator = if (isOperator) "operator " else ""
+    val static = if (isStatic) "static " else ""
+
+    "$annotations$static$returnType $operator$getOrSet$name$function"
+}
