@@ -156,16 +156,19 @@ private fun loadIr(
             irLinker.deserializeIrModuleHeader(
                 moduleDescriptor = mainModule.builtIns.builtInsModule,
                 kotlinLibrary = it,
-                // TODO: Optimize?
+                // TODO: Performance: Find out if we can deserialize specific
+                // declarations only (in addition to referenced).
                 // For built-ins, we want everything.
-                deserializationStrategy = DeserializationStrategy.ONLY_REFERENCED
+                deserializationStrategy = DeserializationStrategy.ALL
             )
         }
     }
 
-    resolvedModules.resolvedDescriptors.forEach {
-        irLinker.deserializeIrModuleHeader(it, it.kotlinLibrary)
-    }
+    resolvedModules.resolvedDescriptors
+        .filter { !it.kotlinLibrary.isBuiltIns }
+        .forEach {
+            irLinker.deserializeIrModuleHeader(it, it.kotlinLibrary)
+        }
 
     // TODO: IrPlugins
 

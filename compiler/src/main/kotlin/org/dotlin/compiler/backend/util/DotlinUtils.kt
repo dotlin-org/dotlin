@@ -19,8 +19,8 @@
 
 package org.dotlin.compiler.backend.util
 
-import org.dotlin.compiler.backend.steps.ir2ast.DartIrBuiltIns
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classFqName
+import org.jetbrains.kotlin.name.FqName
 
-fun IrType.isDotlinReturn(): Boolean = classFqName == DartIrBuiltIns.FqNames.DOTLIN_RETURN
+fun IrType.isDotlinReturn(): Boolean = classFqName == FqName("dotlin.\$Return") // TODO: Use global FqName mapping
