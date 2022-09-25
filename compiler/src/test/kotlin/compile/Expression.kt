@@ -1952,4 +1952,34 @@ class Expression : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `set top-level property with explicit setter`() = assertCompile {
+        kotlin(
+            """
+            var x: Boolean
+                get() = false
+                set(value) {}
+
+            fun main () {
+                x = true
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            bool get x {
+              return false;
+            }
+
+            void set x(bool value) {}
+            void main() {
+              x = true;
+            }
+            """
+        )
+    }
 }

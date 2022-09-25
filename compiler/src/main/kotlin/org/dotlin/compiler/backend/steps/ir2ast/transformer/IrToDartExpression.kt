@@ -74,7 +74,8 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
         val receiver by lazy { optionalReceiver!! }
         val singleArgument by lazy { irSingleArgument.accept(context) }
 
-        val infixReceiver by lazy { receiver.possiblyParenthesize(inBinaryInfix = true) }
+        val optionalInfixReceiver by lazy { optionalReceiver?.possiblyParenthesize(inBinaryInfix = true) }
+        val infixReceiver by lazy { optionalInfixReceiver!! }
         val infixSingleArgument by lazy { singleArgument.possiblyParenthesize(inBinaryInfix = true) }
 
         fun methodInvocation(methodName: DartSimpleIdentifier): DartMethodInvocation {
@@ -198,13 +199,20 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                         ),
                         right = irCallLike.valueArguments.first()!!.accept(context)
                     )
-                    origin == EQ && !irCallLike.isSet() -> DartAssignmentExpression(
-                        left = DartPropertyAccessExpression(
-                            target = infixReceiver,
-                            propertyName = (irCallLike.symbol.owner as IrSimpleFunction).dartNameAsSimple
-                        ),
-                        right = singleArgument,
-                    )
+                    origin == EQ && !irCallLike.isSetOperator() -> run {
+                        val propertyName = (irCallLike.symbol.owner as IrSimpleFunction).dartNameAsSimple
+
+                        DartAssignmentExpression(
+                            left = when (optionalInfixReceiver) {
+                                null -> propertyName
+                                else -> DartPropertyAccessExpression(
+                                    target = infixReceiver,
+                                    propertyName
+                                )
+                            },
+                            right = singleArgument,
+                        )
+                    }
                     // Some non-operator methods on primitive integers (Int, Long) are operators in Dart,
                     // such as `xor` or `ushr`.
                     irCallLike.symbol.owner.parentClassOrNull?.defaultType?.isPrimitiveInteger() == true &&
@@ -612,7 +620,7 @@ private fun IrFunctionAccessExpression.isDartIndexed(get: Boolean): Boolean {
 private fun IrFunctionAccessExpression.isDartIndexedGet() = isDartIndexed(get = true)
 private fun IrFunctionAccessExpression.isDartIndexedSet() = isDartIndexed(get = false)
 
-private fun IrFunctionAccessExpression.isSet() =
+private fun IrFunctionAccessExpression.isSetOperator() =
     (symbol.owner as IrSimpleFunction?)?.let {
         (it.isOperator || it.origin == IrDartDeclarationOrigin.WAS_OPERATOR) &&
                 it.name == Name.identifier("set")
