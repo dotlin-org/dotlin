@@ -47,17 +47,18 @@ class DartIrLinker(
         symbolTable,
         DartIrMangler,
         IrTypeSystemContextImpl(builtIns),
+        friendModules = emptyMap()
     )
 
     override fun createModuleDeserializer(
         moduleDescriptor: ModuleDescriptor,
         klib: KotlinLibrary?,
-        strategy: DeserializationStrategy
+        strategyResolver: (String) -> DeserializationStrategy
     ): IrModuleDeserializer =
         DartModuleDeserializer(
             moduleDescriptor,
             klib ?: error("klib cannot be null"),
-            strategy,
+            strategyResolver,
             libraryAbiVersion = klib.versions.abiVersion ?: KotlinAbiVersion.CURRENT,
             allowErrorCode = klib.containsErrorCode,
         )
@@ -68,14 +69,14 @@ class DartIrLinker(
     private inner class DartModuleDeserializer(
         moduleDescriptor: ModuleDescriptor,
         klib: IrLibrary,
-        strategy: DeserializationStrategy,
+        strategyResolver: (String) -> DeserializationStrategy,
         libraryAbiVersion: KotlinAbiVersion,
         allowErrorCode: Boolean,
     ) : BasicIrModuleDeserializer(
         this,
         moduleDescriptor,
         klib,
-        strategy,
+        strategyResolver,
         libraryAbiVersion,
         allowErrorCode
     )

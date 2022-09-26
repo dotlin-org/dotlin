@@ -20,7 +20,6 @@
 package org.dotlin.compiler.backend.steps.src2ir.analyze
 
 import org.jetbrains.kotlin.analyzer.AnalysisResult
-import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.functions.functionInterfacePackageFragmentProvider
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
@@ -37,13 +36,13 @@ import org.jetbrains.kotlin.diagnostics.Severity
 import org.jetbrains.kotlin.frontend.di.configureModule
 import org.jetbrains.kotlin.frontend.di.configureStandardResolveComponents
 import org.jetbrains.kotlin.incremental.components.ExpectActualTracker
+import org.jetbrains.kotlin.incremental.components.InlineConstTracker
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.platform.js.JsPlatforms
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.*
 import org.jetbrains.kotlin.resolve.lazy.KotlinCodeAnalyzer
 import org.jetbrains.kotlin.resolve.lazy.declarations.FileBasedDeclarationProviderFactory
-import org.jetbrains.kotlin.storage.StorageManager
 
 class DartKotlinAnalyzer(
     private val env: KotlinCoreEnvironment,
@@ -51,7 +50,7 @@ class DartKotlinAnalyzer(
 ) {
     fun analyze(
         files: List<KtFile>,
-        modules: List<ModuleDescriptorImpl>,
+        dependencies: List<ModuleDescriptorImpl>,
         isBuiltInsModule: Boolean = false,
         builtIns: KotlinBuiltIns,
         targetEnvironment: TargetEnvironment,
@@ -72,7 +71,7 @@ class DartKotlinAnalyzer(
         }
 
         thisModule.setDependencies(
-            (setOf(thisModule) + modules + builtIns.builtInsModule).toList()
+            (setOf(thisModule) + dependencies).toList()
         )
 
         val container = createContainer(
@@ -92,6 +91,7 @@ class DartKotlinAnalyzer(
             useInstance(
                 FileBasedDeclarationProviderFactory(moduleContext.storageManager, files)
             )
+            useInstance(InlineConstTracker.DoNothing)
             targetEnvironment.configure(this)
         }.apply {
             thisModule.initialize(

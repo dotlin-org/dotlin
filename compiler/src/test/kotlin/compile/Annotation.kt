@@ -21,7 +21,6 @@ package compile
 
 import BaseTest
 import assertCompile
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
@@ -41,7 +40,7 @@ class Annotation : BaseTest {
 
             @sealed
             class Test implements Annotation {
-              const Test();
+              const Test() : super();
             }
             """
         )

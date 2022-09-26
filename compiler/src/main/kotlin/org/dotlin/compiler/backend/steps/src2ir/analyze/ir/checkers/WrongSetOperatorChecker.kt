@@ -22,8 +22,6 @@ package org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
-import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.on
-import org.jetbrains.kotlin.diagnostics.DiagnosticFactory
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
@@ -77,7 +75,7 @@ object WrongSetOperatorReturnChecker : WrongSetOperatorChecker() {
                     val returnValue = expression.value
 
                     if (returnValue !is IrGetValue || returnValue.symbol != valueParameter.symbol) {
-                        trace.report(ErrorsDart.WRONG_SET_OPERATOR_RETURN.on(source, valueParameter))
+                        trace.report(ErrorsDart.WRONG_SET_OPERATOR_RETURN.on(source, valueParameter.name.toString()))
                     }
                 }
             }

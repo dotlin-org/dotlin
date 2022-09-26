@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.0"
+    kotlin("jvm") version "1.6.20"
     application
 }
 
@@ -20,7 +20,7 @@ dependencies {
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
-    implementation("org.jetbrains.kotlin:kotlin-compiler:1.6.0")
+    implementation("org.jetbrains.kotlin:kotlin-compiler:1.6.20")
     implementation("com.github.ajalt.clikt:clikt:3.1.0")
 }
 

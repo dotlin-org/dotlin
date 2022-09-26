@@ -74,7 +74,7 @@ object DartNameChecker : IrDeclarationChecker {
                 continue
             }
 
-            trace.report(ErrorsDart.DART_NAME_CLASH.on(source, dartName.value, clash))
+            trace.report(ErrorsDart.DART_NAME_CLASH.on(source, dartName.value, clash.name.toString()))
         }
     }
 }

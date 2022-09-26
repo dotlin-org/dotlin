@@ -33,8 +33,8 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
         put(
             ErrorsDart.DART_NAME_CLASH,
             "Dart name ''{0}'' generated for this declaration clashes with another declaration: {1}",
-            Renderers.STRING,
-            Renderers.COMPACT
+            Renderers.TO_STRING,
+            Renderers.TO_STRING
         )
 
         put(
@@ -51,7 +51,7 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
         put(
             ErrorsDart.WRONG_SET_OPERATOR_RETURN,
             "set operator must return its value parameter: {0}",
-            Renderers.NAME
+            Renderers.TO_STRING
         )
 
         put(
@@ -77,7 +77,7 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
         put(
             ErrorsDart.IMPLICIT_LONG_REFERENCE,
             "{0} has implicit type of Long, specify Int type explicitly",
-            Renderers.STRING
+            Renderers.TO_STRING
         )
 
         put(

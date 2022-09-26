@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Modality.FINAL
 import org.jetbrains.kotlin.descriptors.Modality.SEALED
 import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.util.isAnnotationClass
 
 val IrDeclaration.dartAnnotations: List<DartAnnotation>
     get() {
@@ -80,6 +81,11 @@ private val IrDeclaration.modality: Modality?
     get() = when (this) {
         is IrOverridableDeclaration<*> -> modality
         is IrField -> correspondingProperty?.modality
-        is IrClass -> modality
+        is IrClass -> when {
+            // For some reason, annotation classes are now marked as "open" in the IR,
+            // even though that's not possible.
+            isAnnotationClass -> FINAL
+            else -> modality
+        }
         else -> null
     }

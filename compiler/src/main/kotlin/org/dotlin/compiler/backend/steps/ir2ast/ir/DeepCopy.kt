@@ -527,6 +527,7 @@ class DeepCopier(
                 override val name = builder.name
                 override var origin = builder.origin
                 override var parent = it.parent
+                override var sealedSubclasses = it.sealedSubclasses
                 override val source = it.source
                 override val startOffset = builder.startOffset
                 override var superTypes = it.superTypes
@@ -548,6 +549,7 @@ class DeepCopier(
                 override var attributeOwnerId = it.attributeOwnerId
                 override var body = it.body
                 override val containerSource = builder.containerSource
+                override var contextReceiverParametersCount = it.contextReceiverParametersCount
                 override var correspondingPropertySymbol = it.correspondingPropertySymbol
 
                 @ObsoleteDescriptorBasedAPI
@@ -589,6 +591,7 @@ class DeepCopier(
                 override var annotations = it.annotations
                 override var body = it.body
                 override val containerSource = builder.containerSource
+                override var contextReceiverParametersCount = it.contextReceiverParametersCount
 
                 @ObsoleteDescriptorBasedAPI
                 override val descriptor = it.descriptor

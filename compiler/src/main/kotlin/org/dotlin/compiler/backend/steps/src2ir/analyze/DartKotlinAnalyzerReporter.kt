@@ -19,9 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.src2ir.analyze
 
-import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ApplicationManager.getApplication
 import com.intellij.openapi.extensions.ExtensionPointName
 import org.dotlin.compiler.backend.steps.src2ir.analyze.suppress.DartDiagnosticSuppressor
 import org.dotlin.compiler.backend.steps.src2ir.throwIfHasErrors
@@ -32,10 +30,8 @@ import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.resolve.*
+import org.jetbrains.kotlin.resolve.BindingTraceContext
 import org.jetbrains.kotlin.resolve.diagnostics.DiagnosticSuppressor
-import org.jetbrains.kotlin.serialization.konan.KotlinResolvedModuleDescriptors
-import org.jetbrains.kotlin.storage.StorageManager
 
 class DartKotlinAnalyzerReporter(
     private val env: KotlinCoreEnvironment,
@@ -43,7 +39,7 @@ class DartKotlinAnalyzerReporter(
 ) {
     fun analyzeAndReport(
         files: List<KtFile>,
-        modules: KotlinResolvedModuleDescriptors,
+        dependencies: List<ModuleDescriptorImpl>,
         isBuiltInsModule: Boolean,
         builtIns: KotlinBuiltIns,
         trace: BindingTraceContext
@@ -57,7 +53,7 @@ class DartKotlinAnalyzerReporter(
             it.analyzeAndReport(files) {
                 DartKotlinAnalyzer(env, config).analyze(
                     files,
-                    modules = modules.resolvedDescriptors,
+                    dependencies,
                     isBuiltInsModule,
                     builtIns,
                     it.targetEnvironment,

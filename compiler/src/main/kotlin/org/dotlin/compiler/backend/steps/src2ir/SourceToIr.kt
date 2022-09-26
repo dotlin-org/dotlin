@@ -33,6 +33,7 @@ import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.DartIrAnalyzer
 import org.jetbrains.kotlin.backend.common.serialization.DeserializationStrategy
 import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDescriptor
 import org.jetbrains.kotlin.builtins.DefaultBuiltIns
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
@@ -47,7 +48,6 @@ import org.jetbrains.kotlin.ir.util.IrMessageLogger
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.konan.util.KlibMetadataFactories
 import org.jetbrains.kotlin.library.resolver.KotlinLibraryResolveResult
-import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi2ir.Psi2IrConfiguration
 import org.jetbrains.kotlin.psi2ir.Psi2IrTranslator
@@ -99,35 +99,44 @@ private fun loadIr(
     sourceRoot: Path,
     dartPackage: DartPackage
 ): IrResult {
-    val builtIns = DefaultBuiltIns(loadBuiltInsFromCurrentClassLoader = false)
+    val isCompilingBuiltIns = resolvedLibs.getFullList().none { it.isBuiltIns }
 
-    val resolvedModules = KlibMetadataFactories({ builtIns }, DynamicTypeDeserializer)
-        .DefaultResolvedDescriptorsFactory
-        .createResolved(
+    val createBuiltIns = { DefaultBuiltIns(loadBuiltInsFromCurrentClassLoader = false) }
+
+    lateinit var builtIns: KotlinBuiltIns
+
+    if (isCompilingBuiltIns) {
+        builtIns = createBuiltIns()
+        config.put(CommonConfigurationKeys.MODULE_NAME, "kotlin")
+    }
+
+    val dependencyModules = when {
+        !isCompilingBuiltIns -> KlibMetadataFactories(
+            // TODO?: It might be possible that this is called for just the first module instead of the built-ins one,
+            // if that's the case, resolve the built-ins module separately.
+            createBuiltIns = { createBuiltIns().also { builtIns = it } },
+            DynamicTypeDeserializer
+        ).DefaultResolvedDescriptorsFactory.createResolved(
             resolvedLibs,
             storageManager = LockBasedStorageManager("ResolvedModules"),
-            builtIns = builtIns,
+            builtIns = when {
+                isCompilingBuiltIns -> builtIns
+                else -> null
+            },
             config.languageVersionSettings,
             additionalDependencyModules = listOf(),
-        )
-
-    val foundBuiltInsModule = resolvedModules.resolvedDescriptors
-        .firstOrNull { it.name == Name.special("<kotlin>") }
-
-    val compilingBuiltIns = foundBuiltInsModule == null
-
-    if (compilingBuiltIns) {
-        config.put(CommonConfigurationKeys.MODULE_NAME, "kotlin")
-    } else {
-        builtIns.builtInsModule = foundBuiltInsModule!!
+            friendModuleFiles = emptySet(),
+            includedLibraryFiles = emptySet()
+        ).resolvedDescriptors
+        else -> emptyList()
     }
 
     val trace = BindingTraceContext()
 
     val analysisResult = DartKotlinAnalyzerReporter(env, config).analyzeAndReport(
         files,
-        resolvedModules,
-        compilingBuiltIns,
+        dependencyModules,
+        isCompilingBuiltIns,
         builtIns,
         trace
     )
@@ -160,18 +169,18 @@ private fun loadIr(
         frontEndContext,
     )
 
-    if (!compilingBuiltIns) {
-        resolvedLibs.getFullList().find { it.isBuiltIns }?.let {
+    if (!isCompilingBuiltIns) {
+        mainModule.builtIns.builtInsModule.let {
             irLinker.deserializeIrModuleHeader(
-                moduleDescriptor = mainModule.builtIns.builtInsModule,
-                kotlinLibrary = it,
+                moduleDescriptor = it,
+                kotlinLibrary = it.kotlinLibrary,
                 // For built-ins, we want everything.
-                deserializationStrategy = DeserializationStrategy.ALL
+                deserializationStrategy = { DeserializationStrategy.ALL }
             )
         }
     }
 
-    resolvedModules.resolvedDescriptors
+    dependencyModules
         .filter { !it.kotlinLibrary.isBuiltIns }
         .forEach {
             irLinker.deserializeIrModuleHeader(it, it.kotlinLibrary)

@@ -29,7 +29,12 @@ import org.jetbrains.kotlin.ir.util.IrMessageLogger
 class DartIrModuleSerializer(
     messageLogger: IrMessageLogger,
     builtIns: IrBuiltIns,
-) : IrModuleSerializer<IrFileSerializer>(messageLogger, CompatibilityMode.CURRENT) {
+) : IrModuleSerializer<IrFileSerializer>(
+    messageLogger,
+    CompatibilityMode.CURRENT,
+    normalizeAbsolutePaths = false,
+    sourceBaseDirs = emptyList()
+) {
 
     private val declarationTable = DeclarationTable(DartGlobalDeclarationTable(builtIns))
 
@@ -39,7 +44,8 @@ class DartIrModuleSerializer(
             declarationTable,
             expectDescriptorToSymbol = mutableMapOf(),
             skipExpects = true,
-            compatibilityMode = compatibilityMode
+            compatibilityMode = compatibilityMode,
+            sourceBaseDirs = emptyList()
         )
 }
 

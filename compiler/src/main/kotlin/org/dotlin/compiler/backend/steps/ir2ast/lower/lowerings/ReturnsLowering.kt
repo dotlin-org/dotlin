@@ -34,6 +34,7 @@ import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
 import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.types.impl.originalKotlinType
 import org.jetbrains.kotlin.ir.types.isUnit
+import org.jetbrains.kotlin.ir.util.SYNTHETIC_OFFSET
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.primaryConstructor
 import org.jetbrains.kotlin.types.Variance
@@ -112,6 +113,8 @@ class ReturnsLowering(override val context: DartLoweringContext) : IrDeclaration
                                     irType = returnClassType,
                                     nameHint = "return",
                                     isMutable = false,
+                                    startOffset = SYNTHETIC_OFFSET,
+                                    endOffset = SYNTHETIC_OFFSET
                                 )
 
                                 this += irCatch(

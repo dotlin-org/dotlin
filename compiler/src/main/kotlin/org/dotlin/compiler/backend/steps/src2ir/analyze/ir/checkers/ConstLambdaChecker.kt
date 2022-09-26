@@ -37,6 +37,7 @@ import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionExpression
 import org.jetbrains.kotlin.ir.util.isAnonymousObject
 import org.jetbrains.kotlin.ir.util.isObject
+import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.psi.KtExpression
 
@@ -79,6 +80,12 @@ object ConstLambdaChecker : IrExpressionChecker {
     }
 
     private fun IrDeclaration.isDartConstAccessibleIn(function: IrFunction): Boolean {
+        // Methods are always considered reachable, the receiver will have been checked
+        // separately.
+        if (this is IrFunction && parentClassOrNull != null) {
+            return true
+        }
+
         val parent = this.parent
         return parent == function || isTopLevel || isDartStatic ||
                 (parent is IrClass && parent.isObject && !parent.isAnonymousObject)
