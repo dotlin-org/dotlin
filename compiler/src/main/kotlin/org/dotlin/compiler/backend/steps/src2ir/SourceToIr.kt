@@ -25,6 +25,9 @@ import org.dotlin.compiler.backend.DartNameGenerator
 import org.dotlin.compiler.backend.DartPackage
 import org.dotlin.compiler.backend.steps.ir2ast.IrExpressionSourceMapper
 import org.dotlin.compiler.backend.steps.ir2ast.attributes.IrAttributes
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.lower.lower
+import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.output.DartConstDeclarationsLowering
 import org.dotlin.compiler.backend.steps.src2ir.analyze.DartKotlinAnalyzerReporter
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.DartIrAnalyzer
 import org.jetbrains.kotlin.backend.common.serialization.DeserializationStrategy
@@ -34,7 +37,6 @@ import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.languageVersionSettings
-import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.descriptors.konan.kotlinLibrary
 import org.jetbrains.kotlin.ir.backend.js.isBuiltIns
 import org.jetbrains.kotlin.ir.builders.TranslationPluginContext
@@ -52,7 +54,6 @@ import org.jetbrains.kotlin.psi2ir.Psi2IrTranslator
 import org.jetbrains.kotlin.resolve.BindingTraceContext
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.util.DummyLogger
-import org.jetbrains.kotlin.utils.addToStdlib.cast
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 
@@ -70,7 +71,7 @@ fun sourceToIr(
         DummyLogger,
     )
 
-    return loadIr(
+    var ir = loadIr(
         env,
         config,
         sourceFiles,
@@ -79,6 +80,14 @@ fun sourceToIr(
         sourceRoot,
         dartPackage
     )
+
+    // If the Dart package is a library, we must annotate const declarations
+    // that are not normally const in Kotlin. Otherwise this information is lost in the output IR.
+    if (dartPackage.isLibrary) {
+        ir = ir.copy(loweringContext = ir.lower(config, context = null, listOf(::DartConstDeclarationsLowering)))
+    }
+
+    return ir
 }
 
 private fun loadIr(
@@ -205,11 +214,12 @@ private fun loadIr(
         extraIrAttributes,
         dartNameGenerator,
         sourceRoot,
-        dartPackage
+        dartPackage,
+        loweringContext = null
     )
 }
 
-class IrResult(
+data class IrResult(
     val module: IrModuleFragment,
     val resolvedLibs: KotlinLibraryResolveResult,
     val bindingTrace: BindingTraceContext,
@@ -217,5 +227,9 @@ class IrResult(
     val irAttributes: IrAttributes,
     val dartNameGenerator: DartNameGenerator,
     val sourceRoot: Path,
-    val dartPackage: DartPackage
+    val dartPackage: DartPackage,
+    /**
+     * A lowering context might be available if the IR output was already (partially) lowered.
+     */
+    val loweringContext: DartLoweringContext?
 )

@@ -84,8 +84,23 @@ private val lowerings: List<Lowering> = listOf(
     ::DartImportsLowering
 )
 
-fun IrResult.lower(configuration: CompilerConfiguration): DartLoweringContext {
-    val context = DartLoweringContext(
+fun IrResult.lower(configuration: CompilerConfiguration, context: DartLoweringContext?): DartLoweringContext {
+    val builtInsLowerings = when (module.descriptor) {
+        module.descriptor.builtIns.builtInsModule -> listOf<Lowering>(
+            ::FunctionSubtypeDeclarationsLowering
+        )
+        else -> emptyList()
+    }
+
+    return lower(configuration, context, builtInsLowerings + lowerings)
+}
+
+fun IrResult.lower(
+    configuration: CompilerConfiguration,
+    context: DartLoweringContext?,
+    lowerings: List<Lowering>
+): DartLoweringContext {
+    val actualContext = context ?: DartLoweringContext(
         configuration,
         irModuleFragment = module,
         symbolTable = symbolTable,
@@ -96,19 +111,12 @@ fun IrResult.lower(configuration: CompilerConfiguration): DartLoweringContext {
         irAttributes = irAttributes
     )
 
-    val builtInsLowerings = when (module.descriptor) {
-        module.descriptor.builtIns.builtInsModule -> listOf<Lowering>(
-            ::FunctionSubtypeDeclarationsLowering
-        )
-        else -> emptyList()
-    }
-
-    (builtInsLowerings + lowerings).forEach { lowering ->
+    lowerings.forEach { lowering ->
         module.files.forEach {
-            context.enterFile(it)
-            lowering(context).lower(it)
+            actualContext.enterFile(it)
+            lowering(actualContext).lower(it)
         }
     }
 
-    return context
+    return actualContext
 }

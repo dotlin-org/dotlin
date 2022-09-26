@@ -442,4 +442,27 @@ class Const : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `call const constructor from dependency`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                const val d = Duration(seconds = 2)
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              const Duration d = Duration(seconds: 2);
+            }
+            """
+        )
+    }
+
+    // TODO: Add `get non-primitive const top-level property from dependency` test
 }

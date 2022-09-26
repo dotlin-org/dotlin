@@ -19,8 +19,6 @@
 
 package org.dotlin.compiler
 
-import com.intellij.core.CoreApplicationEnvironment
-import com.intellij.core.CoreProjectEnvironment
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.util.Disposer
 import org.dotlin.compiler.backend.DartPackage
@@ -38,12 +36,10 @@ import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
 import org.jetbrains.kotlin.cli.common.messages.PrintingMessageCollector
 import org.jetbrains.kotlin.cli.common.setupCommonArguments
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
-import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreApplicationEnvironment
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.diagnostics.Diagnostic
-import org.jetbrains.kotlin.resolve.diagnostics.DiagnosticSuppressor
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.*
@@ -97,7 +93,8 @@ object KotlinToDartCompiler {
                 dependencies,
                 sourceRoot.toRealPath().absolute(),
                 DartPackage(
-                    isPublic = isPublicPackage
+                    isPublic = isPublicPackage,
+                    isLibrary = isKlib
                 )
             )
 

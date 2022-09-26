@@ -40,6 +40,7 @@ class DartIrBuiltIns(context: DartLoweringContext) {
     val bidirectionalIterator = classSymbolAt("dart.core", "BidirectionalIterator")
 
     inner class Dotlin {
+        val const = classSymbolAt("dotlin", "const")
         val dart = functionSymbolAt("dotlin", "dart")
         val returnClass = classSymbolAt("dotlin", "\$Return")
     }

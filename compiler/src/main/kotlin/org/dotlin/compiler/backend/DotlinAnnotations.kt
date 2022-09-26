@@ -44,11 +44,13 @@ object DotlinAnnotations {
     val dartHideNameFromCore = FqName("dotlin.DartHideNameFromCore")
 }
 
+fun IrDeclaration.hasDartConstAnnotation() = hasAnnotation(DotlinAnnotations.const)
 fun IrDeclaration.hasDartGetterAnnotation() = hasOverriddenAnnotation(DotlinAnnotations.dartGetter)
 fun IrDeclaration.hasDartExtensionAnnotation() = hasOverriddenAnnotation(DotlinAnnotations.dartExtension)
 fun IrFunction.hasDartPositionalAnnotation() = hasOverriddenAnnotation(DotlinAnnotations.dartPositional)
 fun IrDeclaration.hasDartHideNameFromCoreAnnotation() = hasAnnotation(DotlinAnnotations.dartHideNameFromCore)
 fun IrDeclaration.hasDartExtensionNameAnnotation() = hasAnnotation(DotlinAnnotations.dartExtensionName)
+
 private fun IrDeclaration.hasDartStaticAnnotation() = hasAnnotation(DotlinAnnotations.dartStatic)
 
 val IrDeclaration.dartAnnotatedName: String?

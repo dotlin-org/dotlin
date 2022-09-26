@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.util
 
+import org.dotlin.compiler.backend.hasDartConstAnnotation
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.backend.steps.ir2ast.ir.hasExplicitBackingField
@@ -34,7 +35,9 @@ import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtModifierListOwner
 
 fun IrDeclaration.isDartConst(): Boolean = when (this) {
-    is IrConstructor -> hasConstModifier() || parentAsClass.isDartConst()
+    // Constructors can be annotated with `@const` by the `DartConstDeclarationsLowering`. This happens
+    // for libraries' outputted IR, because source information is not available for dependencies.
+    is IrConstructor -> hasConstModifier() || parentAsClass.isDartConst() || hasDartConstAnnotation()
     is IrField -> when {
         // Enum fields are always const.
         origin == IrDeclarationOrigin.FIELD_FOR_ENUM_ENTRY -> true
