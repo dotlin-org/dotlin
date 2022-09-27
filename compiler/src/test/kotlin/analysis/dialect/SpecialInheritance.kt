@@ -22,11 +22,8 @@ package analysis.dialect
 import BaseTest
 import assertCanCompile
 import assertCompilesWithError
-import assertCompilesWithErrors
-import assertCompilesWithWarning
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
 import org.jetbrains.kotlin.diagnostics.Errors
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
@@ -86,7 +83,7 @@ class SpecialInheritance : BaseTest {
 
     // TODO: Raise more specific error ("class should be first in super type list")
     @Test
-    fun `raise error if regular class inheritance is not first in list`() =
+    fun `error if regular class inheritance is not first in list`() =
         assertCompilesWithError(Errors.MANY_CLASSES_IN_SUPERTYPE_LIST) {
             kotlin(
                 """
@@ -113,7 +110,7 @@ class SpecialInheritance : BaseTest {
     }
 
     @Test
-    fun `raise error if fake interface marker is used`() =
+    fun `error if fake interface marker is used`() =
         assertCompilesWithError(Errors.MANY_CLASSES_IN_SUPERTYPE_LIST) {
             kotlin(
                 """
@@ -142,7 +139,7 @@ class SpecialInheritance : BaseTest {
         }
 
     @Test
-    fun `raise error when missing implementation from implicit interface`() =
+    fun `error if missing implementation from implicit interface`() =
         assertCompilesWithError(Errors.ABSTRACT_MEMBER_NOT_IMPLEMENTED) {
             kotlin(
                 """
@@ -158,7 +155,7 @@ class SpecialInheritance : BaseTest {
         }
 
     @Test
-    fun `raise error when missing implementation from transitive implicit interface`() =
+    fun `error if missing implementation from transitive implicit interface`() =
         assertCompilesWithError(Errors.ABSTRACT_MEMBER_NOT_IMPLEMENTED) {
             kotlin(
                 """
@@ -192,7 +189,7 @@ class SpecialInheritance : BaseTest {
         }
 
     @Test
-    fun `raise error when using special inheritance constructor in non-inheritance context`() =
+    fun `error if using special inheritance constructor in non-inheritance context`() =
         assertCompilesWithError(ErrorsDart.SPECIAL_INHERITANCE_CONSTRUCTOR_MISUSE) {
             kotlin(
                 """
