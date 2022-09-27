@@ -20,222 +20,207 @@
 package org.dotlin.compiler.backend.steps.ast2dart.transformer
 
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
-import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext.Flag.GETTER
+import org.dotlin.compiler.dart.ast.declaration.function.DartFunctionDeclaration
 import org.dotlin.compiler.dart.ast.expression.*
 import org.dotlin.compiler.dart.ast.expression.DartAssignmentOperator.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.dotlin.compiler.dart.ast.expression.invocation.DartInvocationExpression
 import org.dotlin.compiler.dart.ast.expression.literal.*
 
-object DartExpressionTransformer : DartAstNodeTransformer {
-    override fun visitArgumentList(arguments: DartArgumentList, context: DartGenerationContext): String {
-        return arguments.joinToString(prefix = "(", postfix = ")") { it.accept(context) }
+object DartExpressionTransformer : DartAstNodeTransformer() {
+    override fun DartGenerationContext.visitArgumentList(arguments: DartArgumentList): String {
+        return arguments.accept(separator = ", ", prefix = "(", suffix = ")")
     }
 
-    override fun visitFunctionExpression(
-        functionExpression: DartFunctionExpression,
-        context: DartGenerationContext,
-    ): String {
-        val isGetter = context.consume(GETTER)
-        val parameters = if (!isGetter) functionExpression.parameters.accept(context) else ""
-        val typeParameters = if (!isGetter) functionExpression.typeParameters.accept(context) else ""
-        val body = functionExpression.body.accept(context)
+    override fun DartGenerationContext.visitFunctionExpression(functionExpression: DartFunctionExpression) =
+        functionExpression.run {
+            val isGetter = when (val parent = parent) {
+                is DartFunctionDeclaration -> parent.isGetter
+                else -> false
+            }
+            val parameters = if (!isGetter) acceptChild { parameters } else ""
+            val typeParameters = if (!isGetter) acceptChild { typeParameters } else ""
+            val body = acceptChild { body }
 
-        return "$typeParameters$parameters$body"
-    }
+            "$typeParameters$parameters$body"
+        }
 
-    override fun visitFunctionReference(
-        functionReference: DartFunctionReference,
-        context: DartGenerationContext
-    ) = functionReference.let {
-        val function = it.function.accept(context)
-        val typeArguments = it.typeArguments.accept(context)
+    override fun DartGenerationContext.visitFunctionReference(functionReference: DartFunctionReference) =
+        functionReference.run {
+            val function = acceptChild { function }
+            val typeArguments = acceptChild { typeArguments }
 
-        "$function$typeArguments"
-    }
+            "$function$typeArguments"
+        }
 
-    override fun visitInvocationExpression(
-        invocation: DartInvocationExpression,
-        context: DartGenerationContext,
-    ): String {
-        val arguments = invocation.arguments.accept(context)
-        val typeArguments = invocation.typeArguments.accept(context)
-        val function = invocation.function.accept(context)
+    override fun DartGenerationContext.visitInvocationExpression(invocation: DartInvocationExpression) =
+        invocation.run {
+            val arguments = acceptChild { arguments }
+            val typeArguments = acceptChild { typeArguments }
+            val function = acceptChild { function }
 
-        return "$function$typeArguments$arguments"
-    }
+            "$function$typeArguments$arguments"
+        }
 
-    override fun visitPropertyAccess(propertyAccess: DartPropertyAccessExpression, context: DartGenerationContext) =
-        propertyAccess.let {
-            val target = it.target.accept(context)
-            val property = it.propertyName.accept(context)
-            val dot = if (it.isNullAware) "?." else "."
+    override fun DartGenerationContext.visitPropertyAccess(propertyAccess: DartPropertyAccessExpression) =
+        propertyAccess.run {
+            val target = acceptChild { target }
+            val property = acceptChild { propertyName }
+            val dot = if (isNullAware) "?." else "."
 
             "$target$dot$property"
         }
 
-    override fun visitInstanceCreationExpression(
-        instanceCreation: DartInstanceCreationExpression,
-        context: DartGenerationContext,
-    ) = instanceCreation.let {
-        val const = if (it.isConst) "const " else ""
-        val type = it.type.accept(context)
-        val name =
-            if (it.constructorName != null)
-                "." + it.constructorName.accept(context)
-            else
-                ""
-        val arguments = it.arguments.accept(context)
+    override fun DartGenerationContext.visitInstanceCreationExpression(instanceCreation: DartInstanceCreationExpression) =
+        instanceCreation.run {
+            val const = if (isConst) "const " else ""
+            val type = acceptChild { type }
+            val name = acceptChild(prefix = ".") { constructorName }
+            val arguments = acceptChild { arguments }
 
-        "$const$type$name$arguments"
-    }
-
-    override fun visitAssignmentExpression(
-        assignment: DartAssignmentExpression,
-        context: DartGenerationContext,
-    ): String {
-        val operator = when (assignment.operator) {
-            ASSIGN -> "="
-            NULL_SHORTED -> "??="
-            ADD -> "+="
-            SUBTRACT -> "-="
-            MULTIPLY -> "*="
-            DIVIDE -> "/="
-            INTEGER_DIVIDE -> "~/="
+            "$const$type$name$arguments"
         }
 
-        val left = assignment.left.accept(context)
-        val right = assignment.right.accept(context)
+    override fun DartGenerationContext.visitAssignmentExpression(assignment: DartAssignmentExpression) =
+        assignment.run {
+            val operator = when (operator) {
+                ASSIGN -> "="
+                NULL_SHORTED -> "??="
+                ADD -> "+="
+                SUBTRACT -> "-="
+                MULTIPLY -> "*="
+                DIVIDE -> "/="
+                INTEGER_DIVIDE -> "~/="
+            }
 
-        return "$left $operator $right"
-    }
-
-    override fun visitNamedExpression(namedExpression: DartNamedExpression, context: DartGenerationContext): String {
-        val name = namedExpression.label.accept(context)
-        val expression = namedExpression.expression.accept(context)
-
-        return "$name$expression"
-    }
-
-    override fun visitIndexExpression(indexExpression: DartIndexExpression, context: DartGenerationContext) =
-        indexExpression.let {
-            val target = it.target.accept(context)
-            val index = it.index.accept(context)
-
-            "$target[$index]"
-        }
-
-    override fun visitParenthesizedExpression(
-        parenthesizedExpression: DartParenthesizedExpression,
-        context: DartGenerationContext
-    ) = parenthesizedExpression.let { "(${it.expression.accept(context)})" }
-
-    override fun visitPrefixExpression(prefixExpression: DartPrefixExpression, context: DartGenerationContext) =
-        prefixExpression.let { it.operator.token + it.expression.accept(context) }
-
-    override fun visitPostfixExpression(postfixExpression: DartPostfixExpression, context: DartGenerationContext) =
-        postfixExpression.let { it.expression.accept(context) + it.operator.token }
-
-    override fun visitConditionalExpression(
-        conditional: DartConditionalExpression,
-        context: DartGenerationContext,
-    ) = conditional.let {
-        val condition = it.condition.accept(context)
-        val thenExp = it.thenExpression.accept(context)
-        val elseExp = it.elseExpression.accept(context)
-
-        "$condition ? $thenExp : $elseExp"
-    }
-
-    override fun visitIsExpression(isExpression: DartIsExpression, context: DartGenerationContext) = isExpression.let {
-        val expression = it.expression.accept(context)
-        val type = it.type.accept(context)
-        val negation = if (it.isNegated) "!" else ""
-
-        "$expression is${negation} $type"
-    }
-
-    override fun visitAsExpression(asExpression: DartAsExpression, context: DartGenerationContext) = asExpression.let {
-        val expression = it.expression.accept(context)
-        val type = it.type.accept(context)
-
-        "$expression as $type"
-    }
-
-    override fun visitThisExpression(thisExpression: DartThisExpression, context: DartGenerationContext) = "this"
-
-    override fun visitSuperExpression(superExpression: DartSuperExpression, context: DartGenerationContext) = "super"
-
-    override fun visitBinaryInfixExpression(binaryInfix: DartBinaryInfixExpression, context: DartGenerationContext) =
-        binaryInfix.let {
-            val left = it.left.accept(context)
-            val operator = it.operator.token
-            val right = it.right.accept(context)
+            val left = acceptChild { left }
+            val right = acceptChild { right }
 
             "$left $operator $right"
         }
 
-    override fun visitThrowExpression(throwExpression: DartThrowExpression, context: DartGenerationContext) =
-        throwExpression.let {
-            val exp = it.expression.accept(context)
+    override fun DartGenerationContext.visitNamedExpression(namedExpression: DartNamedExpression) =
+        namedExpression.run {
+            val name = acceptChild { label }
+            val expression = acceptChild { expression }
+
+            "$name$expression"
+        }
+
+    override fun DartGenerationContext.visitIndexExpression(indexExpression: DartIndexExpression) =
+        indexExpression.run {
+            val target = acceptChild { target }
+            val index = acceptChild { index }
+
+            "$target[$index]"
+        }
+
+    override fun DartGenerationContext.visitParenthesizedExpression(parenthesizedExpression: DartParenthesizedExpression) =
+        parenthesizedExpression.run { "(${acceptChild { expression }})" }
+
+    override fun DartGenerationContext.visitPrefixExpression(prefixExpression: DartPrefixExpression) =
+        prefixExpression.run { operator.token + acceptChild { expression } }
+
+    override fun DartGenerationContext.visitPostfixExpression(postfixExpression: DartPostfixExpression) =
+        postfixExpression.run { acceptChild { expression } + operator.token }
+
+    override fun DartGenerationContext.visitConditionalExpression(conditional: DartConditionalExpression) =
+        conditional.run {
+            val condition = acceptChild { condition }
+            val thenExp = acceptChild { thenExpression }
+            val elseExp = acceptChild { elseExpression }
+
+            "$condition ? $thenExp : $elseExp"
+        }
+
+    override fun DartGenerationContext.visitIsExpression(isExpression: DartIsExpression) = isExpression.run {
+        val expression = acceptChild { expression }
+        val type = acceptChild { type }
+        val negation = if (isNegated) "!" else ""
+
+        "$expression is${negation} $type"
+    }
+
+    override fun DartGenerationContext.visitAsExpression(asExpression: DartAsExpression) = asExpression.run {
+        val expression = acceptChild { expression }
+        val type = acceptChild { type }
+
+        "$expression as $type"
+    }
+
+    override fun DartGenerationContext.visitThisExpression(thisExpression: DartThisExpression) = "this"
+
+    override fun DartGenerationContext.visitSuperExpression(superExpression: DartSuperExpression) = "super"
+
+    override fun DartGenerationContext.visitBinaryInfixExpression(binaryInfix: DartBinaryInfixExpression) =
+        binaryInfix.run {
+            val left = acceptChild { left }
+            val operator = operator.token
+            val right = acceptChild { right }
+
+            "$left $operator $right"
+        }
+
+    override fun DartGenerationContext.visitThrowExpression(throwExpression: DartThrowExpression) =
+        throwExpression.run {
+            val exp = acceptChild { expression }
 
             "throw $exp"
         }
 
     // Literals
-    override fun visitSimpleStringLiteral(literal: DartSimpleStringLiteral, context: DartGenerationContext) =
-        literal.transformBy {
-            val value = literal.value
+    override fun DartGenerationContext.visitSimpleStringLiteral(literal: DartSimpleStringLiteral) =
+        literal.run {
+            transformBy { (rawToken, quoteToken) ->
+                val value = literal.value
 
-            // TODO: Handle multiline
+                // TODO: Handle multiline
 
-            "$rawToken$quoteToken$value$quoteToken"
+                "$rawToken$quoteToken$value$quoteToken"
+            }
         }
 
-    override fun visitStringInterpolation(literal: DartStringInterpolation, context: DartGenerationContext) =
-        literal.transformBy {
-            val elements = literal.elements.joinToString(separator = "") { it.accept(context) }
+    override fun DartGenerationContext.visitStringInterpolation(literal: DartStringInterpolation) =
+        literal.run {
+            transformBy { (rawToken, quoteToken) ->
+                val elements = acceptChild(separator = "") { elements }
 
-            "$rawToken$quoteToken$elements$quoteToken"
+                "$rawToken$quoteToken$elements$quoteToken"
+            }
         }
 
-    override fun visitInterpolationString(
-        interpolationString: DartInterpolationString,
-        context: DartGenerationContext
-    ) =
+    override fun DartGenerationContext.visitInterpolationString(interpolationString: DartInterpolationString) =
         interpolationString.value
 
-    override fun visitInterpolationExpression(
-        element: DartInterpolationExpression,
-        context: DartGenerationContext
-    ) = "\${${element.expression.accept(context)}}"
+    override fun DartGenerationContext.visitInterpolationExpression(element: DartInterpolationExpression) =
+        element.run { "\${${acceptChild { expression }}}" }
 
-    override fun visitNullLiteral(literal: DartNullLiteral, context: DartGenerationContext) = "null"
+    override fun DartGenerationContext.visitNullLiteral(literal: DartNullLiteral) = "null"
 
-    override fun visitIntegerLiteral(literal: DartIntegerLiteral, context: DartGenerationContext) =
+    override fun DartGenerationContext.visitIntegerLiteral(literal: DartIntegerLiteral) =
         literal.value.toString()
 
-    override fun visitDoubleLiteral(literal: DartDoubleLiteral, context: DartGenerationContext) =
+    override fun DartGenerationContext.visitDoubleLiteral(literal: DartDoubleLiteral) =
         literal.value.toString()
 
-    override fun visitBooleanLiteral(literal: DartBooleanLiteral, context: DartGenerationContext) =
+    override fun DartGenerationContext.visitBooleanLiteral(literal: DartBooleanLiteral) =
         literal.value.toString()
 
-    override fun visitListLiteral(literal: DartListLiteral, context: DartGenerationContext): String {
+    override fun DartGenerationContext.visitListLiteral(literal: DartListLiteral) = literal.run {
         val const = if (literal.isConst) "const " else ""
-        val typeArguments = literal.typeArguments.accept(context)
-        val elements = "[${literal.elements.accept(context)}]"
+        val typeArguments = acceptChild { typeArguments }
+        val elements = "[${acceptChild { elements }}]"
 
-        return "$const$typeArguments$elements"
+        "$const$typeArguments$elements"
     }
 
-    override fun visitIdentifier(identifier: DartIdentifier, context: DartGenerationContext) =
+    override fun DartGenerationContext.visitIdentifier(identifier: DartIdentifier) =
         identifier.value
 
-    override fun visitCode(code: DartCode, context: DartGenerationContext) = code.value
+    override fun DartGenerationContext.visitCode(code: DartCode) = code.value
 
     private fun DartSingleStringLiteral.transformBy(
-        block: DartSingleStringLiteralDefaults.() -> String
+        block: (DartSingleStringLiteralDefaults) -> String
     ) = DartSingleStringLiteralDefaults(
         rawToken = if (isRaw) "r" else "",
         quoteToken = if (isSingleQuoted) "'" else "\""
@@ -243,7 +228,3 @@ object DartExpressionTransformer : DartAstNodeTransformer {
 
     private data class DartSingleStringLiteralDefaults(val rawToken: String, val quoteToken: String)
 }
-
-fun DartExpression.accept(context: DartGenerationContext) = accept(DartExpressionTransformer, context)
-fun DartArgumentList.accept(context: DartGenerationContext) = accept(DartExpressionTransformer, context)
-fun DartInterpolationElement.accept(context: DartGenerationContext) = accept(DartExpressionTransformer, context)

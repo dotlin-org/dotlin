@@ -22,13 +22,13 @@ package org.dotlin.compiler.dart.ast.declaration.classormixin.member
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 import org.dotlin.compiler.dart.ast.accept
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
-import org.dotlin.compiler.dart.ast.declaration.function.DartFunctionDeclaration
+import org.dotlin.compiler.dart.ast.declaration.function.DartNamedFunctionDeclaration
 import org.dotlin.compiler.dart.ast.expression.DartFunctionExpression
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
 
 class DartMethodDeclaration(
-    val name: DartSimpleIdentifier,
+    override val name: DartSimpleIdentifier,
     override val returnType: DartTypeAnnotation,
     override val function: DartFunctionExpression = DartFunctionExpression(),
     override val isGetter: Boolean = false,
@@ -38,7 +38,7 @@ class DartMethodDeclaration(
     val isStatic: Boolean = false,
     override val annotations: List<DartAnnotation> = listOf(),
     override val documentationComment: String? = null,
-) : DartClassMember, DartFunctionDeclaration, Cloneable {
+) : DartClassMember, DartNamedFunctionDeclaration {
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
         visitor.visitMethodDeclaration(this, data)
 

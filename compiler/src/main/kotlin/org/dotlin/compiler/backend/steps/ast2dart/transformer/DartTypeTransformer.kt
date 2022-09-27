@@ -22,52 +22,39 @@ package org.dotlin.compiler.backend.steps.ast2dart.transformer
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
 import org.dotlin.compiler.dart.ast.type.DartFunctionType
 import org.dotlin.compiler.dart.ast.type.DartNamedType
-import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
 import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
 import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameter
 import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameterList
 
-object DartTypeAnnotationTransformer : DartAstNodeTransformer {
-    override fun visitTypeArgumentList(typeArguments: DartTypeArgumentList, context: DartGenerationContext): String {
-        return when {
-            typeArguments.isNotEmpty() -> typeArguments.joinToString(prefix = "<", postfix = ">") { it.accept(context) }
-            else -> ""
-        }
-    }
+object DartTypeAnnotationTransformer : DartAstNodeTransformer() {
+    override fun DartGenerationContext.visitTypeArgumentList(typeArguments: DartTypeArgumentList) =
+        typeArguments.accept(separator = ", ", prefix = "<", suffix = ">", ifEmpty = "")
 
-    override fun visitNamedType(type: DartNamedType, context: DartGenerationContext): String {
-        val name = type.name.accept(context)
-        val typeArguments = type.typeArguments.accept(context)
+    override fun DartGenerationContext.visitNamedType(type: DartNamedType) = type.run {
+        val name = acceptChild { name }
+        val typeArguments = acceptChild { typeArguments }
         val questionMark = if (type.isNullable) "?" else ""
 
-        return "$name$typeArguments$questionMark"
+        "$name$typeArguments$questionMark"
     }
 
-    override fun visitFunctionType(type: DartFunctionType, context: DartGenerationContext) = type.let {
-        val returnType = it.returnType.accept(context)
-        val typeParameters = it.typeParameters.accept(context)
-        val parameters = it.parameters.accept(context)
+    override fun DartGenerationContext.visitFunctionType(type: DartFunctionType) = type.run {
+        val returnType = acceptChild { returnType }
+        val typeParameters = acceptChild { typeParameters }
+        val parameters = acceptChild { parameters }
         val questionMark = if (type.isNullable) "?" else ""
 
         "$returnType Function$typeParameters$parameters$questionMark"
     }
 
-    override fun visitTypeParameter(typeParameter: DartTypeParameter, context: DartGenerationContext) =
-        typeParameter.let {
-            val name = it.name
-            val bound = if (it.bound != null) " extends ${it.bound.accept(context)}" else ""
+    override fun DartGenerationContext.visitTypeParameter(typeParameter: DartTypeParameter) =
+        typeParameter.run {
+            val name = acceptChild { name }
+            val bound = acceptChild(prefix = " extends ") { bound }
 
             "$name$bound"
         }
 
-    override fun visitTypeParameterList(typeParameters: DartTypeParameterList, context: DartGenerationContext) =
-        if (typeParameters.isNotEmpty())
-            typeParameters.joinToString(prefix = "<", postfix = ">") { it.accept(context) }
-        else
-            ""
+    override fun DartGenerationContext.visitTypeParameterList(typeParameters: DartTypeParameterList) =
+        typeParameters.accept(separator = ", ", prefix = "<", suffix = ">", ifEmpty = "")
 }
-
-fun DartTypeAnnotation.accept(context: DartGenerationContext) = accept(DartTypeAnnotationTransformer, context)
-fun DartTypeArgumentList.accept(context: DartGenerationContext) = accept(DartTypeAnnotationTransformer, context)
-fun DartTypeParameter.accept(context: DartGenerationContext) = accept(DartTypeAnnotationTransformer, context)
-fun DartTypeParameterList.accept(context: DartGenerationContext) = accept(DartTypeAnnotationTransformer, context)

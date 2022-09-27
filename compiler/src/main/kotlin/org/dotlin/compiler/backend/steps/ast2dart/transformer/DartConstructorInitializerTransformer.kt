@@ -21,36 +21,23 @@ package org.dotlin.compiler.backend.steps.ast2dart.transformer
 
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartConstructorFieldInitializer
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartConstructorInitializer
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartConstructorInvocation
 
-object DartConstructorInitializerTransformer : DartAstNodeTransformer {
-    override fun visitConstructorInvocation(
-        invocation: DartConstructorInvocation,
-        context: DartGenerationContext,
-    ): String {
-        val keyword = invocation.keyword.value
+object DartConstructorInitializerTransformer : DartAstNodeTransformer() {
+    override fun DartGenerationContext.visitConstructorInvocation(invocation: DartConstructorInvocation) =
+        invocation.run {
+            val keyword = keyword.value
+            val name = acceptChild(prefix = ".") { name }
+            val arguments = acceptChild { arguments }
 
-        val name = if (invocation.name != null)
-            "." + invocation.name!!.accept(context)
-        else
-            ""
+            "$keyword$name$arguments"
+        }
 
-        val arguments = invocation.arguments.accept(context)
+    override fun DartGenerationContext.visitConstructorFieldInitializer(initializer: DartConstructorFieldInitializer) =
+        initializer.run {
+            val field = acceptChild { fieldName }
+            val value = acceptChild { expression }
 
-        return "$keyword$name$arguments"
-    }
-
-    override fun visitConstructorFieldInitializer(
-        initializer: DartConstructorFieldInitializer,
-        context: DartGenerationContext,
-    ): String {
-        val field = initializer.fieldName.accept(context)
-        val value = initializer.expression.accept(context)
-
-        return "$field = $value"
-    }
+            "$field = $value"
+        }
 }
-
-fun DartConstructorInitializer.accept(context: DartGenerationContext) =
-    accept(DartConstructorInitializerTransformer, context)

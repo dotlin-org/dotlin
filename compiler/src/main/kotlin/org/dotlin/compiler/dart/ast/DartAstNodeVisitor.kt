@@ -33,6 +33,7 @@ import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartConstructorInvocation
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartFieldDeclaration
 import org.dotlin.compiler.dart.ast.declaration.extension.DartExtensionDeclaration
+import org.dotlin.compiler.dart.ast.declaration.function.DartNamedFunctionDeclaration
 import org.dotlin.compiler.dart.ast.declaration.function.DartTopLevelFunctionDeclaration
 import org.dotlin.compiler.dart.ast.declaration.function.body.DartBlockFunctionBody
 import org.dotlin.compiler.dart.ast.declaration.function.body.DartEmptyFunctionBody
@@ -74,8 +75,11 @@ interface DartAstNodeVisitor<R, C> {
         visitAstNode(typeAlias, context)
 
     // Declarations
-    fun visitTopLevelFunctionDeclaration(functionDeclaration: DartTopLevelFunctionDeclaration, context: C): R =
+    fun visitNamedFunctionDeclaration(functionDeclaration: DartNamedFunctionDeclaration, context: C): R =
         visitAstNode(functionDeclaration, context)
+
+    fun visitTopLevelFunctionDeclaration(functionDeclaration: DartTopLevelFunctionDeclaration, context: C): R =
+        visitNamedFunctionDeclaration(functionDeclaration, context)
 
     fun visitClassDeclaration(classDeclaration: DartClassDeclaration, context: C): R =
         visitAstNode(classDeclaration, context)
@@ -84,7 +88,7 @@ interface DartAstNodeVisitor<R, C> {
         visitAstNode(extensionDeclaration, context)
 
     fun visitMethodDeclaration(methodDeclaration: DartMethodDeclaration, context: C): R =
-        visitAstNode(methodDeclaration, context)
+        visitNamedFunctionDeclaration(methodDeclaration, context)
 
     fun visitConstructorDeclaration(constructorDeclaration: DartConstructorDeclaration, context: C): R =
         visitAstNode(constructorDeclaration, context)

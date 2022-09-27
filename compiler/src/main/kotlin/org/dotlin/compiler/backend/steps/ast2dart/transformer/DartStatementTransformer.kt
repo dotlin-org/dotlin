@@ -24,107 +24,83 @@ import org.dotlin.compiler.dart.ast.statement.*
 import org.dotlin.compiler.dart.ast.statement.trycatch.DartCatchClause
 import org.dotlin.compiler.dart.ast.statement.trycatch.DartTryStatement
 
-object DartStatementTransformer : DartAstNodeTransformer {
-    override fun visitBlock(block: DartBlock, context: DartGenerationContext): String {
-        return block.statements.joinToString(separator = "", prefix = "{", postfix = "}") { it.accept(context) }
+object DartStatementTransformer : DartAstNodeTransformer() {
+    override fun DartGenerationContext.visitBlock(block: DartBlock) =
+        block.acceptChild(separator = "", prefix = "{", suffix = "}") { statements }
+
+    override fun DartGenerationContext.visitExpressionStatement(statement: DartExpressionStatement) =
+        statement.acceptChild { expression } + ";"
+
+    override fun DartGenerationContext.visitVariableDeclarationStatement(statement: DartVariableDeclarationStatement) =
+        statement.acceptChild { variables } + ";"
+
+
+    override fun DartGenerationContext.visitReturnStatement(statement: DartReturnStatement) = statement.run {
+        val value = acceptChild(prefix = " ") { expression }
+        "return$value;"
     }
 
-    override fun visitExpressionStatement(statement: DartExpressionStatement, context: DartGenerationContext): String {
-        return statement.expression.accept(context) + ";"
-    }
-
-    override fun visitVariableDeclarationStatement(
-        statement: DartVariableDeclarationStatement,
-        context: DartGenerationContext,
-    ) = statement.variables.accept(context) + ";"
-
-    override fun visitReturnStatement(statement: DartReturnStatement, context: DartGenerationContext): String {
-        val value = when (statement.expression) {
-            null -> ""
-            else -> " " + statement.expression.accept(context)
-        }
-
-        return "return$value;"
-    }
-
-    override fun visitIfStatement(statement: DartIfStatement, context: DartGenerationContext) = statement.let {
-        val condition = "if (${it.condition.accept(context)})"
-        val thenStatement = it.thenStatement.accept(context)
-        val elseStatement = it.elseStatement?.accept(context)?.let { "else $it" } ?: ""
+    override fun DartGenerationContext.visitIfStatement(statement: DartIfStatement) = statement.run {
+        val condition = "if (${acceptChild { condition }})"
+        val thenStatement = acceptChild { thenStatement }
+        val elseStatement = acceptChild(prefix = "else ") { elseStatement }
 
         "$condition$thenStatement$elseStatement"
     }
 
-    override fun visitTryStatement(statement: DartTryStatement, context: DartGenerationContext) = statement.let {
-        val body = it.body.accept(context)
-        val catchClauses = when {
-            it.catchClauses.isNotEmpty() -> it.catchClauses.joinToString(" ") { clause -> clause.accept(context) }
-            else -> ""
-        }
-        val finallyClause = when (it.finallyBlock) {
-            null -> ""
-            else -> "finally ${it.finallyBlock.accept(context)}"
-        }
+    override fun DartGenerationContext.visitTryStatement(statement: DartTryStatement) = statement.run {
+        val body = acceptChild { body }
+        val catchClauses = acceptChild(separator = " ") { catchClauses }
+        val finallyClause = acceptChild(prefix = "finally ") { finallyBlock }
 
         "try $body$catchClauses $finallyClause"
     }
 
-    override fun visitCatchClause(catchClause: DartCatchClause, context: DartGenerationContext) = catchClause.let {
-        val catchPart = when (it.exceptionParameter) {
-            null -> ""
-            else -> listOfNotNull(it.exceptionParameter, it.stackTraceParameter)
-                .joinToString(prefix = "catch (", postfix = ")") { param -> param.accept(context) }
+    override fun DartGenerationContext.visitCatchClause(catchClause: DartCatchClause) = catchClause.run {
+        val catchPart = acceptChild(separator = ", ", "catch (", suffix = ")") {
+            listOfNotNull(
+                exceptionParameter,
+                stackTraceParameter
+            )
         }
 
-        val onPart = when (it.exceptionType) {
-            null -> ""
-            else -> "on ${it.exceptionType.accept(context)}"
-        }
-
-        val body = it.body.accept(context)
+        val onPart = acceptChild(prefix = "on ") { exceptionType }
+        val body = acceptChild { body }
 
         "$onPart $catchPart$body"
     }
 
-    override fun visitWhileStatement(statement: DartWhileStatement, context: DartGenerationContext) = statement.let {
-        val condition = it.condition.accept(context)
-        val body = it.body.accept(context)
+    override fun DartGenerationContext.visitWhileStatement(statement: DartWhileStatement) = statement.run {
+        val condition = acceptChild { condition }
+        val body = acceptChild { body }
 
         when {
-            it.isDoWhile() -> "do $body while ($condition);"
+            isDoWhile() -> "do $body while ($condition);"
             else -> "while ($condition) $body"
         }
     }
 
-    override fun visitForStatement(statement: DartForStatement, context: DartGenerationContext) = statement.let {
-        val parts = it.loopParts.accept(context)
-        val body = it.body.accept(context)
+    override fun DartGenerationContext.visitForStatement(statement: DartForStatement) = statement.run {
+        val parts = acceptChild { loopParts }
+        val body = acceptChild { body }
 
         "for ($parts) $body"
     }
 
-    override fun visitForPartsWithDeclarations(
-        forParts: DartForPartsWithDeclarations,
-        context: DartGenerationContext
-    ) = forParts.let {
-        val variables = it.variables.accept(context)
-        val condition = it.condition.accept(context)
-        val updaters = it.updaters.joinToString(";") { u -> u.accept(context) }
+    override fun DartGenerationContext.visitForPartsWithDeclarations(forParts: DartForPartsWithDeclarations) =
+        forParts.run {
+            val variables = acceptChild { variables }
+            val condition = acceptChild { condition }
+            val updaters = acceptChild(separator = ";") { updaters }
 
-        "$variables; $condition; $updaters"
-    }
+            "$variables; $condition; $updaters"
+        }
 
-    override fun visitForEachPartsWithDeclarations(
-        forParts: DartForEachPartsWithDeclarations,
-        context: DartGenerationContext
-    ) = forParts.let {
-        val variables = it.variables.accept(context)
-        val iterable = it.iterable.accept(context)
+    override fun DartGenerationContext.visitForEachPartsWithDeclarations(forParts: DartForEachPartsWithDeclarations) =
+        forParts.run {
+            val variables = acceptChild { variables }
+            val iterable = acceptChild { iterable }
 
-        "$variables in $iterable"
-    }
+            "$variables in $iterable"
+        }
 }
-
-fun DartStatement.accept(context: DartGenerationContext) = accept(DartStatementTransformer, context)
-fun DartCatchClause.accept(context: DartGenerationContext) = accept(DartStatementTransformer, context)
-fun DartForLoopParts.accept(context: DartGenerationContext) = accept(DartStatementTransformer, context)

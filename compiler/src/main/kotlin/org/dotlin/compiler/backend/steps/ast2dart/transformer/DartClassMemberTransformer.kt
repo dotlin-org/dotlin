@@ -20,64 +20,48 @@
 package org.dotlin.compiler.backend.steps.ast2dart.transformer
 
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
-import org.dotlin.compiler.dart.ast.accept
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartClassMember
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartMethodDeclaration
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartConstructorDeclaration
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartFieldDeclaration
 
-object DartClassMemberTransformer : DartAstNodeTransformer {
-    override fun visitMethodDeclaration(
-        methodDeclaration: DartMethodDeclaration,
-        context: DartGenerationContext,
-    ) = methodDeclaration.let { it.acceptCommon(context, it.name, it.isOperator, it.isStatic) }
-
-    override fun visitConstructorDeclaration(
-        constructorDeclaration: DartConstructorDeclaration,
-        context: DartGenerationContext,
-    ) = constructorDeclaration.let {
-        val annotations = it.annotations.accept(context)
-        val keyword = when {
-            it.isConst -> "const "
-            it.isFactory -> "factory "
-            else -> ""
-        }
-
-        val type = it.returnType.accept(context)
-        val name = it.name?.accept(context)
-        val constructorName = if (name != null) "$type.$name" else type
-
-        val parameters = it.function.parameters.accept(context)
-        val body = it.function.body.accept(context)
-
-        val initializers = when {
-            it.initializers.isNotEmpty() -> " : " + it.initializers.joinToString { init -> init.accept(context) }
-            else -> ""
-        }
-
-        "$annotations$keyword $constructorName$parameters$initializers$body"
-
-    }
-
-    override fun visitFieldDeclaration(fieldDeclaration: DartFieldDeclaration, context: DartGenerationContext) =
-        fieldDeclaration.let {
-            val annotations = it.annotations.accept(context)
-
-            val keywords = when {
-                it.isStatic -> "static "
-                it.isAbstract -> when {
-                    it.isCovariant -> "abstract covariant "
-                    else -> "abstract "
-                }
-                it.isCovariant -> "covariant "
+object DartClassMemberTransformer : DartAstNodeTransformer() {
+    override fun DartGenerationContext.visitConstructorDeclaration(constructorDeclaration: DartConstructorDeclaration) =
+        constructorDeclaration.run {
+            val annotations = acceptChildAnnotations()
+            val keyword = when {
+                isConst -> "const "
+                isFactory -> "factory "
                 else -> ""
             }
 
-            val fields = it.fields.accept(context)
+            val type = acceptChild { returnType }
+            val name = acceptChildOrNull { name }
+            val constructorName = if (name != null) "$type.$name" else type
+
+            val parameters = acceptChild { function.parameters }
+            val body = acceptChild { function.body }
+
+            val initializers = acceptChild(separator = ", ", prefix = " : ", ifEmpty = "") { initializers }
+
+            "$annotations$keyword $constructorName$parameters$initializers$body"
+
+    }
+
+    override fun DartGenerationContext.visitFieldDeclaration(fieldDeclaration: DartFieldDeclaration) =
+        fieldDeclaration.run {
+            val annotations = acceptChildAnnotations()
+
+            val keywords = when {
+                isStatic -> "static "
+                isAbstract -> when {
+                    isCovariant -> "abstract covariant "
+                    else -> "abstract "
+                }
+                isCovariant -> "covariant "
+                else -> ""
+            }
+
+            val fields = acceptChild { fields }
 
             "$annotations$keywords$fields;"
         }
 }
-
-fun DartClassMember.accept(context: DartGenerationContext) = accept(DartClassMemberTransformer, context)
-fun Collection<DartClassMember>.accept(context: DartGenerationContext) = accept(DartClassMemberTransformer, context)

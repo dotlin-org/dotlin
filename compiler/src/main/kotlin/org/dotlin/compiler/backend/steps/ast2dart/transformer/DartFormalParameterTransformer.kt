@@ -22,8 +22,8 @@ package org.dotlin.compiler.backend.steps.ast2dart.transformer
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
 import org.dotlin.compiler.dart.ast.parameter.*
 
-object DartFormalParameterTransformer : DartAstNodeTransformer {
-    override fun visitFormalParameterList(parameters: DartFormalParameterList, context: DartGenerationContext): String {
+object DartFormalParameterTransformer : DartAstNodeTransformer() {
+    override fun DartGenerationContext.visitFormalParameterList(parameters: DartFormalParameterList) = parameters.run {
         var output = "("
 
         val (defaultBlockOpen, defaultBlockClose) = when {
@@ -37,7 +37,7 @@ object DartFormalParameterTransformer : DartAstNodeTransformer {
                 output += defaultBlockOpen
             }
 
-            output += param.accept(context)
+            output += acceptChild { param }
 
             // If we have more than 2 parameters, we add a trailing comma for formatting.
             if (parameters.size >= 2) {
@@ -51,43 +51,29 @@ object DartFormalParameterTransformer : DartAstNodeTransformer {
 
         output += ")"
 
-        return output
+        output
     }
 
-    override fun visitDefaultFormalParameter(
-        defaultParameter: DartDefaultFormalParameter,
-        context: DartGenerationContext,
-    ): String {
-        val defaultValue = defaultParameter.defaultValue?.accept(context)
+    override fun DartGenerationContext.visitDefaultFormalParameter(defaultParameter: DartDefaultFormalParameter) =
+        defaultParameter.run {
+            val defaultValueAssignment = acceptChild(prefix = " = ") { defaultValue }
 
-        val parameter = defaultParameter.parameter.accept(context)
-        val defaultValueAssignment = when {
-            defaultValue != null -> " = $defaultValue"
-            else -> ""
+            val parameter = acceptChild { parameter }
+
+            "$parameter$defaultValueAssignment"
         }
 
-        return "$parameter$defaultValueAssignment"
-    }
+    override fun DartGenerationContext.visitSimpleFormalParameter(parameter: DartSimpleFormalParameter) =
+        parameter.run {
+            val type = acceptChild { type }
+            val identifier = acceptChild { identifier }
 
-    override fun visitSimpleFormalParameter(
-        parameter: DartSimpleFormalParameter,
-        context: DartGenerationContext,
-    ): String {
-        val type = parameter.type.accept(context)
-        val identifier = parameter.identifier?.accept(context) ?: ""
+            "$type $identifier"
+        }
 
-        return "$type $identifier"
-    }
+    override fun DartGenerationContext.visitFieldFormalParameter(parameter: DartFieldFormalParameter) = parameter.run {
+        val identifier = acceptChild { identifier }
 
-    override fun visitFieldFormalParameter(
-        parameter: DartFieldFormalParameter,
-        context: DartGenerationContext
-    ): String {
-        val identifier = parameter.identifier.accept(context)
-
-        return "this.$identifier"
+        "this.$identifier"
     }
 }
-
-fun DartFormalParameter.accept(context: DartGenerationContext) = accept(DartFormalParameterTransformer, context)
-fun DartFormalParameterList.accept(context: DartGenerationContext) = accept(DartFormalParameterTransformer, context)

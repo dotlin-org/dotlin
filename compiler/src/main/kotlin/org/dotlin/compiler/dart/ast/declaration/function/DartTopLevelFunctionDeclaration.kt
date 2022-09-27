@@ -36,7 +36,7 @@ data class DartTopLevelFunctionDeclaration(
     override val isExternal: Boolean = false,
     override val annotations: List<DartAnnotation> = emptyList(),
     override val documentationComment: String? = null,
-) : DartFunctionDeclaration, DartNamedCompilationUnitMember {
+) : DartNamedFunctionDeclaration, DartNamedCompilationUnitMember {
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
         visitor.visitTopLevelFunctionDeclaration(this, data)
 

@@ -30,7 +30,7 @@ import org.dotlin.compiler.dart.ast.type.DartNamedType
 
 data class DartConstructorDeclaration(
     override val returnType: DartNamedType,
-    val name: DartSimpleIdentifier? = null,
+    override val name: DartSimpleIdentifier? = null,
     override val function: DartFunctionExpression = DartFunctionExpression(),
     val initializers: List<DartConstructorInitializer> = listOf(),
     override val isExternal: Boolean = false,

@@ -20,22 +20,9 @@
 package org.dotlin.compiler.backend.steps.ast2dart.transformer
 
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
-import org.dotlin.compiler.dart.ast.collection.DartCollectionElement
 import org.dotlin.compiler.dart.ast.collection.DartCollectionElementList
-import org.dotlin.compiler.dart.ast.expression.DartExpression
 
-object DartCollectionElementTransformer : DartAstNodeTransformer {
-    override fun visitCollectionElementList(
-        collectionElementList: DartCollectionElementList,
-        context: DartGenerationContext
-    ) = collectionElementList.let { list ->
-        list.joinToString(separator = ", ") { it.accept(context) }
-    }
+object DartCollectionElementTransformer : DartAstNodeTransformer() {
+    override fun DartGenerationContext.visitCollectionElementList(collectionElementList: DartCollectionElementList) =
+        collectionElementList.accept(separator = ", ")
 }
-
-fun DartCollectionElement.accept(context: DartGenerationContext) = when (this) {
-    is DartExpression -> accept(DartExpressionTransformer, context)
-    else -> accept(DartCollectionElementTransformer, context)
-}
-
-fun DartCollectionElementList.accept(context: DartGenerationContext) = accept(DartCollectionElementTransformer, context)

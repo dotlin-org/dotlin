@@ -21,9 +21,11 @@ package org.dotlin.compiler.dart.ast.declaration.function
 
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotatedNode
 import org.dotlin.compiler.dart.ast.expression.DartFunctionExpression
+import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
 
 interface DartFunctionDeclaration : DartAnnotatedNode {
+    val name: DartSimpleIdentifier?
     val isGetter: Boolean
     val isSetter: Boolean
     val isExternal: Boolean
@@ -31,4 +33,8 @@ interface DartFunctionDeclaration : DartAnnotatedNode {
     val returnType: DartTypeAnnotation
 
     val function: DartFunctionExpression
+}
+
+interface DartNamedFunctionDeclaration : DartFunctionDeclaration {
+    override val name: DartSimpleIdentifier
 }

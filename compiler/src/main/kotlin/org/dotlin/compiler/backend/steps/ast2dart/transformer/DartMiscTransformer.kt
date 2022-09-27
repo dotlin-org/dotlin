@@ -26,40 +26,31 @@ import org.dotlin.compiler.dart.ast.declaration.classormixin.DartExtendsClause
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartImplementsClause
 import org.dotlin.compiler.dart.ast.declaration.classormixin.DartWithClause
 
-object DartMiscTransformer : DartAstNodeTransformer {
-    override fun visitLabel(label: DartLabel, context: DartGenerationContext) = "${label.value.accept(context)}: "
+object DartMiscTransformer : DartAstNodeTransformer() {
+    override fun DartGenerationContext.visitLabel(label: DartLabel) = "${label.acceptChild { value }}: "
 
-    override fun visitExtendsClause(extendsClause: DartExtendsClause, context: DartGenerationContext): String {
-        val type = extendsClause.type.accept(context)
-        return "extends $type"
+    override fun DartGenerationContext.visitExtendsClause(extendsClause: DartExtendsClause) = extendsClause.run {
+        val type = acceptChild { type }
+        "extends $type"
     }
 
-    override fun visitImplementsClause(implementsClause: DartImplementsClause, context: DartGenerationContext): String {
-        val types = implementsClause.interfaces.joinToString { it.accept(context) }
-        return "implements $types"
+    override fun DartGenerationContext.visitImplementsClause(implementsClause: DartImplementsClause) =
+        implementsClause.run {
+            val types = acceptChild(separator = ", ") { interfaces }
+            "implements $types"
+        }
+
+    override fun DartGenerationContext.visitWithClause(withClause: DartWithClause) = withClause.run {
+        val types = acceptChild(separator = ", ") { mixins }
+        "with $types"
     }
 
-    override fun visitWithClause(withClause: DartWithClause, context: DartGenerationContext): String {
-        val types = withClause.mixins.joinToString { it.accept(context) }
-        return "with $types"
-    }
-
-    override fun visitAnnotation(annotation: DartAnnotation, context: DartGenerationContext) = annotation.let {
-        val name = it.name.accept(context)
-        val constructorName = if (it.constructorName != null) "." + it.constructorName.accept(context) else ""
-        val typeArguments = if (!it.typeArguments.isNullOrEmpty()) it.typeArguments.accept(context) else ""
-        val arguments = if (!it.arguments.isNullOrEmpty()) it.arguments.accept(context) else ""
+    override fun DartGenerationContext.visitAnnotation(annotation: DartAnnotation) = annotation.run {
+        val name = acceptChild { name }
+        val constructorName = acceptChild(prefix = ".") { constructorName }
+        val typeArguments = acceptChild { typeArguments }
+        val arguments = acceptChild { arguments }
 
         "@$name$constructorName$typeArguments$arguments"
     }
-}
-
-fun DartLabel.accept(context: DartGenerationContext) = accept(DartMiscTransformer, context)
-fun DartExtendsClause.accept(context: DartGenerationContext) = accept(DartMiscTransformer, context)
-fun DartImplementsClause.accept(context: DartGenerationContext) = accept(DartMiscTransformer, context)
-fun DartWithClause.accept(context: DartGenerationContext) = accept(DartMiscTransformer, context)
-fun DartAnnotation.accept(context: DartGenerationContext) = accept(DartMiscTransformer, context)
-fun Collection<DartAnnotation>.accept(context: DartGenerationContext) = when {
-    isEmpty() -> ""
-    else -> joinToString(separator = "", postfix = " ") { it.accept(context) }
 }
