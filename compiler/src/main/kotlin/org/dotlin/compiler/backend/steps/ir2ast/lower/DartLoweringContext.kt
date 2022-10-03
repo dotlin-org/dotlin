@@ -45,7 +45,10 @@ import org.jetbrains.kotlin.ir.builders.irSetField
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrFactoryImpl
 import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.expressions.impl.IrBlockBodyImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionExpressionImpl
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
 import org.jetbrains.kotlin.ir.types.*
@@ -307,6 +310,79 @@ class DartLoweringContext(
      * Create backing field first.
      */
     fun IrProperty.createDefaultSetter(type: IrType) = createDefaultGetterOrSetter(type, isGetter = false)
+
+    fun wrapInAnonymousFunctionInvocation(
+        exp: IrExpression,
+        container: IrDeclaration,
+        statements: (IrSimpleFunction) -> List<IrStatement> = { listOf(exp) }
+    ): IrCall {
+        val anonymousFunction = irFactory.buildFun {
+            name = Name.special("<anonymous>")
+            returnType = exp.type
+        }.apply {
+            parent = container as IrDeclarationParent
+
+            body = IrBlockBodyImpl(
+                UNDEFINED_OFFSET,
+                UNDEFINED_OFFSET,
+                statements(this)
+            )
+        }
+
+        return IrFunctionExpressionImpl(
+            UNDEFINED_OFFSET,
+            UNDEFINED_OFFSET,
+            type = exp.type,
+            function = anonymousFunction,
+            origin = IrStatementOrigin.INVOKE
+        ).irCall()
+    }
+
+    fun IrFunctionExpression.irCall(): IrCall {
+        val invokeMethod = irFactory.buildFun {
+            name = Name.identifier("invoke")
+            isOperator = true
+            returnType = function.returnType
+        }.apply {
+            parent = function
+            dispatchReceiverParameter = irBuiltIns.functionN(0).thisReceiver
+        }
+
+        return IrCallImpl(
+            UNDEFINED_OFFSET,
+            UNDEFINED_OFFSET,
+            type = function.returnType,
+            symbol = invokeMethod.symbol,
+            typeArgumentsCount = 0,
+            valueArgumentsCount = 0,
+            origin = IrStatementOrigin.INVOKE,
+        ).apply {
+            dispatchReceiver = this@irCall
+        }
+    }
+
+    fun IrFunction.remapLocalPropertyAccessors(
+        getter: IrSingleStatementBuilder.(IrCall) -> IrExpression,
+        setter: IrSingleStatementBuilder.(IrCall) -> IrExpression
+    ) {
+        transformExpressions(initialParent = this) { exp, _ ->
+            when (exp) {
+                is IrCall -> when (exp.origin) {
+                    IrStatementOrigin.GET_LOCAL_PROPERTY -> buildStatement(symbol) {
+                        getter(this, exp)
+                    }
+                    else -> when (exp.symbol.owner.origin) {
+                        // Must be a 'set' in this case.
+                        IrDeclarationOrigin.DELEGATED_PROPERTY_ACCESSOR -> buildStatement(symbol) {
+                            setter(this, exp)
+                        }
+                        else -> exp
+                    }
+                }
+                else -> exp
+            }
+        }
+    }
 
     private fun DartIdentifier.escapedValue() = value.replace(".", "").sentenceCase()
 }

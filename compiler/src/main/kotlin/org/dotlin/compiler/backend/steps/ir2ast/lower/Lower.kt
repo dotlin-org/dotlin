@@ -41,6 +41,7 @@ private val lowerings: List<Lowering> = listOf(
     EnumValues::RemoveDeclarationsLowering,
     ::ConjunctionsDisjunctionsLowering,
     ::ComplexParametersLowering,
+    ::LazyPropertiesLowering,
     ::DelegatedPropertiesLowering,
     DelegatedPropertiesLowering::Local,
     ::PropertiesReferencingThisLowering,

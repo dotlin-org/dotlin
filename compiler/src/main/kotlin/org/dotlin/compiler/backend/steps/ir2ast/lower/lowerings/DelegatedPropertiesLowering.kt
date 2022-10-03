@@ -21,11 +21,11 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.deepCopyWith
 import org.dotlin.compiler.backend.steps.ir2ast.ir.irCall
-import org.dotlin.compiler.backend.steps.ir2ast.ir.transformExpressions
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.expressions.IrCall
-import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
+import org.jetbrains.kotlin.ir.declarations.IrDeclaration
+import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.declarations.IrLocalDelegatedProperty
+import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.name.Name
 
 /**
@@ -63,25 +63,10 @@ class DelegatedPropertiesLowering(override val context: DartLoweringContext) : I
                 transformations += add(it)
             }
 
-            (declaration.parent as IrFunction).let { parent ->
-                parent.transformExpressions(initialParent = parent) { exp, _ ->
-                    when (exp) {
-                        is IrCall -> when (exp.origin) {
-                            IrStatementOrigin.GET_LOCAL_PROPERTY -> buildStatement(parent.symbol) {
-                                irCall(getter)
-                            }
-                            else -> when (exp.symbol.owner.origin) {
-                                // Must be a 'set' in this case.
-                                IrDeclarationOrigin.DELEGATED_PROPERTY_ACCESSOR -> buildStatement(parent.symbol) {
-                                    irCall(setter!!, receiver = null, exp.getValueArgument(0)!!)
-                                }
-                                else -> exp
-                            }
-                        }
-                        else -> exp
-                    }
-                }
-            }
+            (declaration.parent as IrFunction).remapLocalPropertyAccessors(
+                getter = { irCall(getter) },
+                setter = { irCall(setter!!, receiver = null, it.getValueArgument(0)!!) }
+            )
 
             return transformations
         }

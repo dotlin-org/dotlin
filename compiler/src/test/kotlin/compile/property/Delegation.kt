@@ -414,4 +414,98 @@ class Delegation : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `single expression lazy property`() = assertCompile {
+        kotlin(
+            """
+            val myLazy by lazy { 100 }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            late final int myLazy = 100;
+            """
+        )
+    }
+
+    @Test
+    fun `multiple expressions lazy property`() = assertCompile {
+        kotlin(
+            """
+            val myLazy by lazy {
+                val x = 340
+                x + x * 8
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            late final int myLazy = () {
+              final int x = 340;
+              return x + x * 8;
+            }.call();
+            """
+        )
+    }
+
+    @Test
+    fun `single expression local lazy property`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                val myLazy by lazy { 100 }
+
+                myLazy
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              late final int myLazy = 100;
+              myLazy;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `multiple expressions local lazy property`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                val myLazy by lazy {
+                    val x = 340
+                    x + x * 8
+                }
+
+                myLazy
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              late final int myLazy = () {
+                final int x = 340;
+                return x + x * 8;
+              }.call();
+              myLazy;
+            }
+            """
+        )
+    }
 }
