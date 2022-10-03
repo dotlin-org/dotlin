@@ -261,7 +261,7 @@ fun IrType.isNullableDouble() = isNullableType(IdSignatureValues._double)
 fun IrType.isNullableChar() = isNullableType(IdSignatureValues._char)
 
 val IrDeclarationWithVisibility.isPrivate
-    get() = visibility == DescriptorVisibilities.PRIVATE
+    get() = visibility == DescriptorVisibilities.PRIVATE || visibility == DescriptorVisibilities.PRIVATE_TO_THIS
 
 inline fun <reified T : IrDeclarationWithName> Iterable<IrDeclaration>.withNameOrNull(name: String): T? =
     filterIsInstance<T>().firstOrNull { it.name == Name.identifier(name) }

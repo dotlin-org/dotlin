@@ -162,4 +162,31 @@ class NameMangling : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `class with lateinit property and method with the same name`() = assertCompile {
+        kotlin(
+            """
+            class Test<out T> {
+                private lateinit var next: T
+
+                fun next() {}
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test<T> {
+              @nonVirtual
+              late T _next;
+              @nonVirtual
+              void next() {}
+            }
+            """
+        )
+    }
 }
