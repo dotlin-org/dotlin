@@ -1774,7 +1774,7 @@ class Expression : BaseTest {
                 }
 
                 void main() {
-                  Test()[true] = 4;
+                  Test()[4] = true;
                 }
                 """
             )

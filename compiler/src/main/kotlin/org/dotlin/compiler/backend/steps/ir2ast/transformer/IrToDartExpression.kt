@@ -195,9 +195,9 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                     irCallLike.isDartIndexedSet() -> DartAssignmentExpression(
                         left = DartIndexExpression(
                             target = receiver,
-                            index = irCallLike.valueArguments.last()!!.accept(context)
+                            index = irCallLike.valueArguments.first()!!.accept(context)
                         ),
-                        right = irCallLike.valueArguments.first()!!.accept(context)
+                        right = irCallLike.valueArguments.last()!!.accept(context)
                     )
                     origin == EQ && !irCallLike.isSetOperator() -> run {
                         val propertyName = (irCallLike.symbol.owner as IrSimpleFunction).dartNameAsSimple
