@@ -50,7 +50,7 @@ class QualifiedSuperCallsLowering(override val context: DartLoweringContext) : I
 
         // Gather all super calls that are qualified.
         val qualifiedSuperCalls = irFunction.body?.statements
-            ?.map { statement -> statement.filter<IrCall> { it.isQualifiedSuperCall(declaration.parentAsClass) } }
+            ?.map { statement -> statement.filter<IrCall> { it.isQualifiedSuperCall(declaration.parent as? IrClass) } }
             ?.flatten()
             .orEmpty()
 

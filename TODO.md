@@ -58,7 +58,7 @@
       - [x] Getters
       - [x] Setters
       - [x] Properties with backing fields
-      - [ ] Delegated properties
+      - [x] Delegated properties
       - [ ] Inline properties
     - [x] Methods
   - [x] Inheritance

@@ -39,10 +39,20 @@ class DartIrBuiltIns(context: DartLoweringContext) {
     val iterator = classSymbolAt("dart.core", "Iterator")
     val bidirectionalIterator = classSymbolAt("dart.core", "BidirectionalIterator")
 
+    val unsupportedError = classSymbolAt("dart.core", "UnsupportedError")
+
     inner class Dotlin {
         val const = classSymbolAt("dotlin", "const")
         val dart = functionSymbolAt("dotlin", "dart")
         val returnClass = classSymbolAt("dotlin", "\$Return")
+
+        // Reflect
+        val kProperty0Impl = classSymbolAt("dotlin.reflect", "KProperty0Impl")
+        val kMutableProperty0Impl = classSymbolAt("dotlin.reflect", "KMutableProperty0Impl")
+        val kProperty1Impl = classSymbolAt("dotlin.reflect", "KProperty1Impl")
+        val kMutableProperty1Impl = classSymbolAt("dotlin.reflect", "KMutableProperty1Impl")
+        val kProperty2Impl = classSymbolAt("dotlin.reflect", "KProperty2Impl")
+        val kMutableProperty2Impl = classSymbolAt("dotlin.reflect", "KMutableProperty2Impl")
     }
 
     private inline fun <reified S : IrSymbol> symbolAt(

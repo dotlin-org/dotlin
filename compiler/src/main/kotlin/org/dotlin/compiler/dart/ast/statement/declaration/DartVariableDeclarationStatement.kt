@@ -17,10 +17,11 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.dart.ast.statement
+package org.dotlin.compiler.dart.ast.statement.declaration
 
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
+import org.dotlin.compiler.dart.ast.statement.DartStatement
 
 data class DartVariableDeclarationStatement(
     val variables: DartVariableDeclarationList,

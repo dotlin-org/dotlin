@@ -47,5 +47,10 @@ sealed class IrDartStatementOrigin(private val name: String) : IrStatementOrigin
      */
     object EXTENSION_CONSTRUCTOR_CALL : IrDartStatementOrigin("EXTENSION_CONSTRUCTOR")
 
+    /**
+     * Related to [PropertyReferenceLowering].
+     */
+    object PROPERTY_REFERENCE : IrDartStatementOrigin("PROPERTY_REFERENCE")
+
     override fun toString() = name
 }

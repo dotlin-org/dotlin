@@ -32,10 +32,13 @@ import org.dotlin.compiler.dart.ast.expression.*
 import org.dotlin.compiler.dart.ast.expression.DartComparisonExpression.*
 import org.dotlin.compiler.dart.ast.expression.literal.DartIntegerLiteral
 import org.dotlin.compiler.dart.ast.statement.*
+import org.dotlin.compiler.dart.ast.statement.declaration.DartLocalFunctionDeclaration
+import org.dotlin.compiler.dart.ast.statement.declaration.DartVariableDeclarationStatement
 import org.dotlin.compiler.dart.ast.statement.trycatch.DartCatchClause
 import org.dotlin.compiler.dart.ast.statement.trycatch.DartTryStatement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
+import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin.*
@@ -51,6 +54,19 @@ import kotlin.contracts.contract
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
+    override fun DartTransformContext.visitSimpleFunction(
+        irFunction: IrSimpleFunction,
+        context: DartTransformContext
+    ) = irFunction.transformBy(context) {
+        DartLocalFunctionDeclaration(
+            name,
+            returnType,
+            function,
+            annotations,
+            documentationComment,
+        )
+    }
+
     override fun DartTransformContext.visitReturn(expression: IrReturn, context: DartTransformContext) =
         DartReturnStatement(
             expression = expression.value.let {
@@ -96,7 +112,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
                     type = irVariable.type.accept(context),
                     isConst = it.isDartConst(),
                     isFinal = !it.isVar,
-                    isLate = false
+                    isLate = it.isLateinit
                 )
             )
         }
@@ -139,12 +155,6 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
                 val irWhileLoop = irBlock.statements.last() as IrWhileLoop
                 val irBody = irWhileLoop.body as IrBlock
 
-                /**
-                 * Note: Removes the variable from the loop block.
-                 */
-                /**
-                 * Note: Removes the variable from the loop block.
-                 */
                 /**
                  * Note: Removes the variable from the loop block.
                  */

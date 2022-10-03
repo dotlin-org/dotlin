@@ -19,6 +19,8 @@
 
 package org.dotlin.compiler.dart.ast.declaration.function
 
+import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
+import org.dotlin.compiler.dart.ast.accept
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotatedNode
 import org.dotlin.compiler.dart.ast.expression.DartFunctionExpression
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
@@ -37,4 +39,11 @@ interface DartFunctionDeclaration : DartAnnotatedNode {
 
 interface DartNamedFunctionDeclaration : DartFunctionDeclaration {
     override val name: DartSimpleIdentifier
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        name.accept(visitor, data)
+        returnType.accept(visitor, data)
+        function.accept(visitor, data)
+        annotations.accept(visitor, data)
+    }
 }

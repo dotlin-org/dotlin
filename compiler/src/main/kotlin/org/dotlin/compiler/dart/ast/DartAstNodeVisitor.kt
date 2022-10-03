@@ -52,6 +52,8 @@ import org.dotlin.compiler.dart.ast.parameter.DartFieldFormalParameter
 import org.dotlin.compiler.dart.ast.parameter.DartFormalParameterList
 import org.dotlin.compiler.dart.ast.parameter.DartSimpleFormalParameter
 import org.dotlin.compiler.dart.ast.statement.*
+import org.dotlin.compiler.dart.ast.statement.declaration.DartLocalFunctionDeclaration
+import org.dotlin.compiler.dart.ast.statement.declaration.DartVariableDeclarationStatement
 import org.dotlin.compiler.dart.ast.statement.trycatch.DartCatchClause
 import org.dotlin.compiler.dart.ast.statement.trycatch.DartTryStatement
 import org.dotlin.compiler.dart.ast.type.DartFunctionType
@@ -79,6 +81,9 @@ interface DartAstNodeVisitor<R, C> {
         visitAstNode(functionDeclaration, context)
 
     fun visitTopLevelFunctionDeclaration(functionDeclaration: DartTopLevelFunctionDeclaration, context: C): R =
+        visitNamedFunctionDeclaration(functionDeclaration, context)
+
+    fun visitLocalFunctionDeclaration(functionDeclaration: DartLocalFunctionDeclaration, context: C): R =
         visitNamedFunctionDeclaration(functionDeclaration, context)
 
     fun visitClassDeclaration(classDeclaration: DartClassDeclaration, context: C): R =

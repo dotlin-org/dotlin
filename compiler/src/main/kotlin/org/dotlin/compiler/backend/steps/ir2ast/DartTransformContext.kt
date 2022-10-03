@@ -24,13 +24,18 @@ import org.dotlin.compiler.backend.steps.ir2ast.attributes.IrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.accept
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartAnnotations
+import org.dotlin.compiler.backend.util.isDartGetter
+import org.dotlin.compiler.backend.util.isDartSetter
 import org.dotlin.compiler.dart.ast.DartAstNode
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
+import org.dotlin.compiler.dart.ast.expression.DartFunctionExpression
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.dotlin.compiler.dart.ast.parameter.DartFormalParameterList
 import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
 import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameterList
+import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 
 class DartTransformContext(
     loweringContext: DartLoweringContext,
@@ -42,27 +47,83 @@ class DartTransformContext(
     override val sourceRoot = loweringContext.sourceRoot
     override val dartPackage = loweringContext.dartPackage
 
-    fun <N : DartAstNode> IrFunction.transformBy(
+    private fun <N : DartAstNode> IrFunction.transformBy(
         context: DartTransformContext,
+        isNamed: Boolean,
+        isLocal: Boolean,
         block: DartFunctionDeclarationDefaults.() -> N
     ): N {
+        val name = simpleDartNameOrNull
+        val returnType = returnType.accept(context)
+        val typeParameters = typeParameters.accept(context)
+        val parameters = valueParameters.accept(context)
+        val annotations = dartAnnotations
+
         return block(
-            DartFunctionDeclarationDefaults(
-                name = simpleDartNameOrNull,
-                returnType = returnType.accept(context),
-                typeParameters = typeParameters.accept(context),
-                parameters = valueParameters.accept(context),
-                annotations = dartAnnotations
-            )
+            when {
+                isNamed -> DartFunctionDeclarationDefaults.Named(
+                    name!!,
+                    returnType,
+                    function = DartFunctionExpression(
+                        typeParameters,
+                        parameters,
+                        body = body.accept(context)
+                    ),
+                    annotations,
+                    documentationComment = null,
+                    isGetter = !isLocal && isDartGetter(),
+                    isSetter = !isLocal && isDartSetter(),
+                )
+                else -> DartFunctionDeclarationDefaults.PossiblyNamed(
+                    name,
+                    returnType,
+                    parameters,
+                    typeParameters,
+                    annotations,
+                    documentationComment = null
+                )
+            }
         )
     }
+
+    fun <N : DartAstNode> IrSimpleFunction.transformBy(
+        context: DartTransformContext,
+        isLocal: Boolean = false,
+        block: DartFunctionDeclarationDefaults.Named.() -> N
+    ): N = transformBy(context, isNamed = true, isLocal) { block(this as DartFunctionDeclarationDefaults.Named) }
+
+    fun <N : DartAstNode> IrConstructor.transformBy(
+        context: DartTransformContext,
+        block: DartFunctionDeclarationDefaults.PossiblyNamed.() -> N
+    ): N = transformBy(
+        context,
+        isNamed = false,
+        isLocal = false
+    ) { block(this as DartFunctionDeclarationDefaults.PossiblyNamed) }
 }
 
-data class DartFunctionDeclarationDefaults(
-    val name: DartSimpleIdentifier?,
-    val returnType: DartTypeAnnotation,
-    val parameters: DartFormalParameterList,
-    val typeParameters: DartTypeParameterList,
-    val annotations: List<DartAnnotation> = listOf(),
-    val documentationComment: String? = null,
-)
+sealed interface DartFunctionDeclarationDefaults {
+    val name: DartSimpleIdentifier?
+    val returnType: DartTypeAnnotation
+    val annotations: List<DartAnnotation>
+    val documentationComment: String?
+
+    data class Named(
+        override val name: DartSimpleIdentifier,
+        override val returnType: DartTypeAnnotation,
+        val function: DartFunctionExpression,
+        override val annotations: List<DartAnnotation>,
+        override val documentationComment: String?,
+        val isGetter: Boolean,
+        val isSetter: Boolean,
+    ) : DartFunctionDeclarationDefaults
+
+    data class PossiblyNamed(
+        override val name: DartSimpleIdentifier?,
+        override val returnType: DartTypeAnnotation,
+        val parameters: DartFormalParameterList,
+        val typeParameters: DartTypeParameterList,
+        override val annotations: List<DartAnnotation>,
+        override val documentationComment: String?
+    ) : DartFunctionDeclarationDefaults
+}

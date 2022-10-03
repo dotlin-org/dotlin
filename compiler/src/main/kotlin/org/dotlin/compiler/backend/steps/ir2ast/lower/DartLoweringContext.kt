@@ -39,9 +39,13 @@ import org.jetbrains.kotlin.ir.builders.declarations.buildClass
 import org.jetbrains.kotlin.ir.builders.declarations.buildConstructor
 import org.jetbrains.kotlin.ir.builders.declarations.buildFun
 import org.jetbrains.kotlin.ir.builders.declarations.buildValueParameter
+import org.jetbrains.kotlin.ir.builders.irGet
+import org.jetbrains.kotlin.ir.builders.irGetField
+import org.jetbrains.kotlin.ir.builders.irSetField
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrFactoryImpl
 import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
 import org.jetbrains.kotlin.ir.types.*
@@ -235,47 +239,74 @@ class DartLoweringContext(
                 }
         }
 
-    fun IrProperty.createDefaultGetter(type: IrType, initializeParentAndReceiver: Boolean = true): IrSimpleFunction {
+    private fun IrProperty.createDefaultGetterOrSetter(type: IrType, isGetter: Boolean): IrSimpleFunction {
         val property = this
         return irFactory.buildFun {
-            name = Name.special("<get-${property.name}>")
-            returnType = type
+            name = when {
+                isGetter -> Name.special("<get-${property.name}>")
+                else -> Name.special("<set-${property.name}>")
+            }
+            returnType = when {
+                isGetter -> type
+                else -> irBuiltIns.unitType
+            }
             origin = IrDeclarationOrigin.DEFAULT_PROPERTY_ACCESSOR
+            visibility = property.visibility
         }.apply {
             correspondingPropertySymbol = property.symbol
 
-            if (initializeParentAndReceiver) {
-                parent = property.parentClassOrNull!!
+            if (!isGetter) {
+                valueParameters = listOf(
+                    buildValueParameter(this) {
+                        name = Name.identifier("value")
+                        this.type = type
+                    }
+                )
+            }
+
+            val parentClass = property.parentClassOrNull
+            val thisReceiver = parentClass?.thisReceiver
+
+            parent = parentClass ?: property.parent
+
+            if (parentClass != null) {
                 createDispatchReceiverParameter()
             }
-        }.also {
-            getter = it
-        }
-    }
 
-    fun IrProperty.createDefaultSetter(type: IrType, initializeParentAndReceiver: Boolean = true): IrSimpleFunction {
-        val property = this
-        return irFactory.buildFun {
-            name = Name.special("<set-${property.name}>")
-            returnType = irBuiltIns.unitType
-            origin = IrDeclarationOrigin.DEFAULT_PROPERTY_ACCESSOR
-        }.apply {
-            correspondingPropertySymbol = property.symbol
-            valueParameters = listOf(
-                buildValueParameter(this) {
-                    name = Name.identifier("value")
-                    this.type = type
+            body = IrExpressionBodyImpl(
+                buildStatement(symbol) {
+                    val getThis = thisReceiver?.let { irGet(it) }
+
+                    when {
+                        isGetter -> irGetField(
+                            receiver = getThis,
+                            field = backingField!!
+                        )
+                        else -> irSetField(
+                            receiver = getThis,
+                            field = backingField!!,
+                            value = irGet(valueParameters[0])
+                        )
+                    }
                 }
             )
-
-            if (initializeParentAndReceiver) {
-                parent = property.parentClassOrNull!!
-                createDispatchReceiverParameter()
-            }
         }.also {
-            setter = it
+            when {
+                isGetter -> getter = it
+                else -> setter = it
+            }
         }
     }
+
+    /**
+     * Create backing field first.
+     */
+    fun IrProperty.createDefaultGetter(type: IrType) = createDefaultGetterOrSetter(type, isGetter = true)
+
+    /**
+     * Create backing field first.
+     */
+    fun IrProperty.createDefaultSetter(type: IrType) = createDefaultGetterOrSetter(type, isGetter = false)
 
     private fun DartIdentifier.escapedValue() = value.replace(".", "").sentenceCase()
 }

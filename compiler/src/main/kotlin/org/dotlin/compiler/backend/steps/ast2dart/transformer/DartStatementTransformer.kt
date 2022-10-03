@@ -21,6 +21,7 @@ package org.dotlin.compiler.backend.steps.ast2dart.transformer
 
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
 import org.dotlin.compiler.dart.ast.statement.*
+import org.dotlin.compiler.dart.ast.statement.declaration.DartVariableDeclarationStatement
 import org.dotlin.compiler.dart.ast.statement.trycatch.DartCatchClause
 import org.dotlin.compiler.dart.ast.statement.trycatch.DartTryStatement
 

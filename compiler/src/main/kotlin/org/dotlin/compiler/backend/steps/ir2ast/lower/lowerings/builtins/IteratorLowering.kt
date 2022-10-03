@@ -25,14 +25,15 @@ import org.jetbrains.kotlin.backend.common.ir.createDispatchReceiverParameter
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.builders.declarations.buildField
 import org.jetbrains.kotlin.ir.builders.declarations.buildFun
 import org.jetbrains.kotlin.ir.builders.declarations.buildProperty
+import org.jetbrains.kotlin.ir.builders.irGet
+import org.jetbrains.kotlin.ir.builders.irIfThen
+import org.jetbrains.kotlin.ir.builders.irReturn
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrReturn
-import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrReturnImpl
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
@@ -108,27 +109,11 @@ class IteratorSubtypeImplementationsLowering(override val context: DartLoweringC
 
                     createDefaultGetter(elementType).apply {
                         overriddenSymbols = listOf(dartIteratorCurrentProp.getter!!.symbol)
-                        body = IrExpressionBodyImpl(
-                            expression = buildStatement(symbol) {
-                                irGetField(
-                                    receiver = irGet(thisReceiver),
-                                    field = backingField!!
-                                )
-                            }
-                        )
                     }
 
                     createDefaultSetter(elementType).apply {
                         visibility = DescriptorVisibilities.PRIVATE
-                        body = IrExpressionBodyImpl(
-                            expression = buildStatement(symbol) {
-                                irSetField(
-                                    receiver = irGet(thisReceiver),
-                                    field = backingField!!,
-                                    value = irGet(valueParameters[0])
-                                )
-                            }
-                        )
+
                     }
                 }.also { add(it) }
 

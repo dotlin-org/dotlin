@@ -23,8 +23,6 @@ import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.*
 import org.dotlin.compiler.backend.util.isDartConst
-import org.dotlin.compiler.backend.util.isDartGetter
-import org.dotlin.compiler.backend.util.isDartSetter
 import org.dotlin.compiler.dart.ast.`typealias`.DartClassTypeAlias
 import org.dotlin.compiler.dart.ast.`typealias`.DartFunctionTypeAlias
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnitMember
@@ -37,7 +35,6 @@ import org.dotlin.compiler.dart.ast.declaration.function.DartTopLevelFunctionDec
 import org.dotlin.compiler.dart.ast.declaration.variable.DartTopLevelVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
-import org.dotlin.compiler.dart.ast.expression.DartFunctionExpression
 import org.dotlin.compiler.dart.ast.type.DartFunctionType
 import org.dotlin.compiler.dart.ast.type.DartNamedType
 import org.jetbrains.kotlin.descriptors.ClassKind
@@ -48,18 +45,14 @@ import org.jetbrains.kotlin.ir.util.*
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnitMember>() {
-    override fun DartTransformContext.visitFunction(irFunction: IrFunction, context: DartTransformContext) =
+    override fun DartTransformContext.visitSimpleFunction(irFunction: IrSimpleFunction, context: DartTransformContext) =
         irFunction.transformBy(context) {
             DartTopLevelFunctionDeclaration(
-                name = name!!,
-                returnType = returnType,
-                function = DartFunctionExpression(
-                    typeParameters = typeParameters,
-                    parameters = parameters,
-                    body = irFunction.body.accept(context)
-                ),
-                isGetter = irFunction.isDartGetter(),
-                isSetter = irFunction.isDartSetter(),
+                name,
+                returnType,
+                function,
+                isGetter,
+                isSetter,
                 annotations = annotations,
                 documentationComment = documentationComment,
             )

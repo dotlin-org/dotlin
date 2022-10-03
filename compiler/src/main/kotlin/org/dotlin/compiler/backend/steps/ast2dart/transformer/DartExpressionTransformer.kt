@@ -21,6 +21,7 @@ package org.dotlin.compiler.backend.steps.ast2dart.transformer
 
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
 import org.dotlin.compiler.dart.ast.declaration.function.DartFunctionDeclaration
+import org.dotlin.compiler.dart.ast.declaration.function.body.DartExpressionFunctionBody
 import org.dotlin.compiler.dart.ast.expression.*
 import org.dotlin.compiler.dart.ast.expression.DartAssignmentOperator.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
@@ -34,15 +35,24 @@ object DartExpressionTransformer : DartAstNodeTransformer() {
 
     override fun DartGenerationContext.visitFunctionExpression(functionExpression: DartFunctionExpression) =
         functionExpression.run {
-            val isGetter = when (val parent = parent) {
-                is DartFunctionDeclaration -> parent.isGetter
-                else -> false
+            var isGetter = false
+            var semicolon = ""
+
+            when (val parent = parent) {
+                is DartFunctionDeclaration -> {
+                    isGetter = parent.isGetter
+
+                    when (body) {
+                        is DartExpressionFunctionBody -> semicolon = ";"
+                    }
+                }
             }
+
             val parameters = if (!isGetter) acceptChild { parameters } else ""
             val typeParameters = if (!isGetter) acceptChild { typeParameters } else ""
             val body = acceptChild { body }
 
-            "$typeParameters$parameters$body"
+            "$typeParameters$parameters$body$semicolon"
         }
 
     override fun DartGenerationContext.visitFunctionReference(functionReference: DartFunctionReference) =

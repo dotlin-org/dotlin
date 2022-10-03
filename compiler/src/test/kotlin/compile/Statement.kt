@@ -641,5 +641,29 @@ class Statement : BaseTest {
                 """
             )
         }
+
+        @Test
+        fun `lateinit var`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    lateinit var test: Int
+
+                    test = 3
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                void main() {
+                  late int test;
+                  test = 3;
+                }
+                """
+            )
+        }
     }
 }

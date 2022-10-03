@@ -64,5 +64,10 @@ sealed class IrDartDeclarationOrigin(private val name: String) : IrDeclarationOr
      */
     object COPIED_OVERRIDE : IrDartDeclarationOrigin("COPIED_OVERRIDE")
 
+    /**
+     * Variable was created because of a property reference. The `KProperty` instance is cached in a variable.
+     */
+    object PROPERTY_REFERENCE : IrDartDeclarationOrigin("PROPERTY_REFERENCE")
+
     override fun toString() = name
 }

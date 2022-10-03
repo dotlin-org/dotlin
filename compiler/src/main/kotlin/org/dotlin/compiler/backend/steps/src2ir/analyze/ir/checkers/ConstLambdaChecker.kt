@@ -19,25 +19,18 @@
 
 package org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers
 
-import org.dotlin.compiler.backend.isDartStatic
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementVisitorVoid
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrExpressionChecker
-import org.jetbrains.kotlin.backend.common.ir.isTopLevel
+import org.dotlin.compiler.backend.util.isAccessibleInDartConstLambda
 import org.jetbrains.kotlin.ir.IrElement
-import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.expressions.IrDeclarationReference
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionExpression
-import org.jetbrains.kotlin.ir.util.isAnonymousObject
-import org.jetbrains.kotlin.ir.util.isObject
-import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.psi.KtExpression
 
@@ -64,9 +57,7 @@ object ConstLambdaChecker : IrExpressionChecker {
                     override fun visitDeclarationReference(expression: IrDeclarationReference) {
                         super.visitDeclarationReference(expression)
 
-                        val declaration = expression.symbol.owner as? IrDeclaration ?: return
-
-                        if (!declaration.isDartConstAccessibleIn(arg.function)) {
+                        if (!expression.isAccessibleInDartConstLambda(arg.function)) {
                             trace.report(
                                 ErrorsDart.CONST_LAMBDA_ACCESSING_NON_GLOBAL_VALUE.on(
                                     expression.ktExpression ?: arg.ktExpression ?: source
@@ -77,17 +68,5 @@ object ConstLambdaChecker : IrExpressionChecker {
                 }
             )
         }
-    }
-
-    private fun IrDeclaration.isDartConstAccessibleIn(function: IrFunction): Boolean {
-        // Methods are always considered reachable, the receiver will have been checked
-        // separately.
-        if (this is IrFunction && parentClassOrNull != null) {
-            return true
-        }
-
-        val parent = this.parent
-        return parent == function || isTopLevel || isDartStatic ||
-                (parent is IrClass && parent.isObject && !parent.isAnonymousObject)
     }
 }

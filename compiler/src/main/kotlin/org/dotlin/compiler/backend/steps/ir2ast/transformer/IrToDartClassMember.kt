@@ -24,8 +24,6 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartAnnotations
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartFactory
 import org.dotlin.compiler.backend.util.isDartConst
-import org.dotlin.compiler.backend.util.isDartGetter
-import org.dotlin.compiler.backend.util.isDartSetter
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartClassMember
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartMethodDeclaration
 import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.*
@@ -46,15 +44,11 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?>()
     override fun DartTransformContext.visitSimpleFunction(irFunction: IrSimpleFunction, context: DartTransformContext) =
         irFunction.transformBy(context) {
             DartMethodDeclaration(
-                name!!,
+                name,
                 returnType,
-                DartFunctionExpression(
-                    typeParameters = typeParameters,
-                    parameters = parameters,
-                    body = irFunction.body.accept(context)
-                ),
-                isGetter = irFunction.isDartGetter(),
-                isSetter = irFunction.isDartSetter(),
+                function,
+                isGetter,
+                isSetter,
                 isOperator = irFunction.isOperator,
                 isStatic = irFunction.isStatic,
                 annotations = annotations,
@@ -66,8 +60,8 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?>()
         context.run {
             irConstructor.transformBy(context) {
                 val initializers = (irConstructor.body as? IrBlockBody)?.run {
-                    // Constructor parameters with complex default values are initialized in the body. We move them to the
-                    // Dart field initializer list, if possible.
+                    // Constructor parameters with complex default values are initialized in the body.
+                    // We move them to the  Dart field initializer list, if possible.
                     statements
                         .filter { it.propertyItAssignsTo?.isInitializedInFieldInitializerList == true }
                         .also { statements.removeAll(it) }
@@ -85,22 +79,23 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?>()
                                 ?.let { irDelegatingConstructorCall ->
                                     val delegateIrConstructor = irDelegatingConstructorCall.symbol.owner
 
-                                val name = delegateIrConstructor.dartNameOrNull
-                                val arguments =
-                                    irDelegatingConstructorCall.accept(IrToDartArgumentListTransformer, context)
+                                    val name = delegateIrConstructor.dartNameOrNull
+                                    val arguments =
+                                        irDelegatingConstructorCall.accept(IrToDartArgumentListTransformer, context)
 
-                                statements.remove(irDelegatingConstructorCall)
+                                    statements.remove(irDelegatingConstructorCall)
 
-                                val delegateIsOurs = irConstructor
-                                    .parentAsClass
-                                    .declarations
-                                    .any { it.symbol == delegateIrConstructor.symbol }
+                                    val delegateIsOurs = irConstructor
+                                        .parentAsClass
+                                        .declarations
+                                        .any { it.symbol == delegateIrConstructor.symbol }
 
-                                // If the delegate constructor is in our class, we call `this`, otherwise we call `super`.
-                                when {
-                                    delegateIsOurs -> DartRedirectingConstructorInvocation(name, arguments)
-                                    else -> DartSuperConstructorInvocation(name, arguments)
-                                }
+                                    // If the delegate constructor is in our class, we call `this`
+                                    // otherwise we call `super`.
+                                    when {
+                                        delegateIsOurs -> DartRedirectingConstructorInvocation(name, arguments)
+                                        else -> DartSuperConstructorInvocation(name, arguments)
+                                    }
                             }
                     )
             }?.filterNotNull() ?: emptyList()

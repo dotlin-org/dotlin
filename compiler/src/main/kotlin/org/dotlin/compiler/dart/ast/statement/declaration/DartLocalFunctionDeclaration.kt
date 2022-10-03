@@ -17,28 +17,27 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.dart.ast.declaration.classormixin.member
+package org.dotlin.compiler.dart.ast.statement.declaration
 
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
-import org.dotlin.compiler.dart.ast.accept
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.declaration.function.DartNamedFunctionDeclaration
 import org.dotlin.compiler.dart.ast.expression.DartFunctionExpression
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
+import org.dotlin.compiler.dart.ast.statement.DartStatement
 import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
 
-class DartMethodDeclaration(
+data class DartLocalFunctionDeclaration(
     override val name: DartSimpleIdentifier,
     override val returnType: DartTypeAnnotation,
-    override val function: DartFunctionExpression = DartFunctionExpression(),
-    override val isGetter: Boolean = false,
-    override val isSetter: Boolean = false,
-    override val isExternal: Boolean = false,
-    val isOperator: Boolean = false,
-    val isStatic: Boolean = false,
-    override val annotations: List<DartAnnotation> = listOf(),
+    override val function: DartFunctionExpression,
+    override val annotations: List<DartAnnotation> = emptyList(),
     override val documentationComment: String? = null,
-) : DartClassMember, DartNamedFunctionDeclaration {
+) : DartNamedFunctionDeclaration, DartStatement {
+    override val isExternal = false
+    override val isGetter = false
+    override val isSetter = false
+
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
-        visitor.visitMethodDeclaration(this, data)
+        visitor.visitLocalFunctionDeclaration(this, data)
 }

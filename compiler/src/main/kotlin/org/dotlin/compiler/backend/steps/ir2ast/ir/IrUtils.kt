@@ -70,7 +70,8 @@ val IrValueParameter.isOverride: Boolean
 
 fun IrCall.isSuperCall() = superQualifierSymbol != null
 
-fun IrCall.isQualifiedSuperCall(parentClass: IrClass): Boolean {
+fun IrCall.isQualifiedSuperCall(parentClass: IrClass?): Boolean {
+    if (parentClass == null) return false
     if (superQualifierSymbol == null) return false
 
     return parentClass.hasAnyChildren<IrSimpleFunction> {
@@ -262,26 +263,49 @@ fun IrType.isNullableChar() = isNullableType(IdSignatureValues._char)
 val IrDeclarationWithVisibility.isPrivate
     get() = visibility == DescriptorVisibilities.PRIVATE
 
-inline fun <reified T : IrDeclarationWithName> List<IrDeclaration>.withName(name: String): T =
+inline fun <reified T : IrDeclarationWithName> Iterable<IrDeclaration>.withNameOrNull(name: String): T? =
     filterIsInstance<T>().firstOrNull { it.name == Name.identifier(name) }
-        ?: error("Declaration with name '$name' not found")
 
-fun List<IrDeclaration>.constructorWithName(name: String) = withName<IrConstructor>(name)
-fun List<IrDeclaration>.methodWithName(name: String) = withName<IrSimpleFunction>(name)
-fun List<IrDeclaration>.propertyWithName(name: String) = withName<IrProperty>(name)
-fun List<IrDeclaration>.getterWithName(name: String) = propertyWithName(name).getter!!
-fun List<IrDeclaration>.setterWithName(name: String) = propertyWithName(name).setter!!
-fun List<IrDeclaration>.fieldWithName(name: String) = withName<IrField>(name)
+inline fun <reified T : IrDeclarationWithName> Iterable<IrDeclaration>.withName(name: String): T =
+    withNameOrNull(name) ?: error("Declaration with name '$name' not found")
+
+fun Iterable<IrDeclaration>.constructorWithNameOrNull(name: String) = withNameOrNull<IrConstructor>(name)
+fun Iterable<IrDeclaration>.methodWithNameOrNull(name: String) = withNameOrNull<IrSimpleFunction>(name)
+fun Iterable<IrDeclaration>.propertyWithNameOrNull(name: String) = withNameOrNull<IrProperty>(name)
+fun Iterable<IrDeclaration>.getterWithNameOrNull(name: String) = propertyWithNameOrNull(name)?.getter
+fun Iterable<IrDeclaration>.setterWithNameOrNull(name: String) = propertyWithNameOrNull(name)?.setter
+fun Iterable<IrDeclaration>.fieldWithNameOrNull(name: String) = withNameOrNull<IrField>(name)
+fun Iterable<IrDeclaration>.variableWithNameOrNull(name: String) = withNameOrNull<IrVariable>(name)
+
+fun Iterable<IrDeclaration>.constructorWithName(name: String) = constructorWithNameOrNull(name)!!
+fun Iterable<IrDeclaration>.methodWithName(name: String) = methodWithNameOrNull(name)!!
+fun Iterable<IrDeclaration>.propertyWithName(name: String) = propertyWithNameOrNull(name)!!
+fun Iterable<IrDeclaration>.getterWithName(name: String) = propertyWithNameOrNull(name)!!.getter!!
+fun Iterable<IrDeclaration>.setterWithName(name: String) = propertyWithNameOrNull(name)!!.setter!!
+fun Iterable<IrDeclaration>.fieldWithName(name: String) = fieldWithNameOrNull(name)!!
+fun Iterable<IrDeclaration>.variableWithName(name: String) = variableWithNameOrNull(name)!!
+
+inline fun <reified T : IrDeclarationWithName> IrDeclarationContainer.declarationWithNameOrNull(name: String) =
+    declarations.withNameOrNull<T>(name)
 
 inline fun <reified T : IrDeclarationWithName> IrDeclarationContainer.declarationWithName(name: String) =
     declarations.withName<T>(name)
 
-fun IrDeclarationContainer.constructorWithName(name: String) = declarationWithName<IrConstructor>(name)
-fun IrDeclarationContainer.methodWithName(name: String) = declarationWithName<IrSimpleFunction>(name)
-fun IrDeclarationContainer.propertyWithName(name: String) = declarationWithName<IrProperty>(name)
-fun IrDeclarationContainer.getterWithName(name: String) = propertyWithName(name).getter!!
-fun IrDeclarationContainer.setterWithName(name: String) = propertyWithName(name).setter!!
-fun IrDeclarationContainer.fieldWithName(name: String) = declarationWithName<IrField>(name)
+fun IrDeclarationContainer.constructorWithNameOrNull(name: String) = declarationWithNameOrNull<IrConstructor>(name)
+fun IrDeclarationContainer.methodWithNameOrNull(name: String) = declarationWithNameOrNull<IrSimpleFunction>(name)
+fun IrDeclarationContainer.propertyWithNameOrNull(name: String) = declarationWithNameOrNull<IrProperty>(name)
+fun IrDeclarationContainer.getterWithNameOrNull(name: String) = propertyWithNameOrNull(name)?.getter
+fun IrDeclarationContainer.setterWithNameOrNull(name: String) = propertyWithNameOrNull(name)?.setter
+fun IrDeclarationContainer.fieldWithNameOrNull(name: String) = declarationWithNameOrNull<IrField>(name)
+fun IrDeclarationContainer.variableWithNameOrNull(name: String) = declarationWithNameOrNull<IrVariable>(name)
+
+fun IrDeclarationContainer.constructorWithName(name: String) = constructorWithNameOrNull(name)!!
+fun IrDeclarationContainer.methodWithName(name: String) = methodWithNameOrNull(name)!!
+fun IrDeclarationContainer.propertyWithName(name: String) = propertyWithNameOrNull(name)!!
+fun IrDeclarationContainer.getterWithName(name: String) = getterWithNameOrNull(name)!!
+fun IrDeclarationContainer.setterWithName(name: String) = setterWithNameOrNull(name)!!
+fun IrDeclarationContainer.fieldWithName(name: String) = fieldWithNameOrNull(name)!!
+fun IrDeclarationContainer.variableWithName(name: String) = variableWithNameOrNull(name)!!
 
 inline fun <reified T : IrDeclarationWithName> MutableList<IrDeclaration>.addIfNotExists(declaration: T): T {
     val found = filterIsInstanceAnd<T> { it.name == declaration.name }.firstOrNull()
@@ -312,7 +336,7 @@ val IrProperty.isOverride: Boolean
     get() = getter?.isOverride.falseIfNull() || setter?.isOverride.falseIfNull()
 
 val IrProperty.type: IrType
-    get() = backingField?.type ?: getter?.returnType!!
+    get() = getter?.returnType ?: backingField?.type!!
 
 val IrStatement.leftHandOfSet: IrDeclaration?
     get() = when (this) {
@@ -612,3 +636,6 @@ fun IrType.parametersByArguments(): Map<IrTypeParameter, IrTypeArgument> {
 
 val IrMemberAccessExpression<*>.receiver: IrExpression?
     get() = extensionReceiver ?: dispatchReceiver
+
+val IrDeclaration.containerParent: IrDeclarationContainer?
+    get() = parent as? IrDeclarationContainer ?: (parent as? IrDeclaration)?.containerParent

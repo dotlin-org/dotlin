@@ -53,22 +53,28 @@ open class IrExpressionWithContextTransformer : IrCustomElementTransformer<IrExp
         declaration: IrDeclarationBase,
         context: IrExpressionContext?
     ): IrStatement {
-        val newContext = when (declaration) {
-            is IrDeclarationParent -> IrExpressionContext(declaration)
-            else -> context
+        val newContext = context.run {
+            val newContainer = when (declaration) {
+                is IrDeclarationParent -> declaration
+                else -> this?.container
+            }
+
+            val newInitializerContainer = when (declaration) {
+                is IrField -> IrInitializable.Field(declaration)
+                is IrVariable -> IrInitializable.Variable(declaration)
+                else -> this?.initializerContainer
+            }
+
+            when {
+                this?.container != newContainer || this?.initializerContainer != newInitializerContainer ->
+                    newContainer?.let {
+                        IrExpressionContext(it, newInitializerContainer)
+                    }
+                else -> context
+            }
         }
+
         return super.visitDeclaration(declaration, newContext)
-    }
-
-    final override fun visitField(declaration: IrField, context: IrExpressionContext?): IrStatement {
-        return super.visitField(declaration, context?.copy(initializerContainer = IrInitializable.Field(declaration)))
-    }
-
-    final override fun visitVariable(declaration: IrVariable, context: IrExpressionContext?): IrStatement {
-        return super.visitVariable(
-            declaration,
-            context?.copy(initializerContainer = IrInitializable.Variable(declaration))
-        )
     }
 
     final override fun visitExpression(expression: IrExpression, context: IrExpressionContext?): IrExpression {
@@ -83,7 +89,7 @@ open class IrExpressionWithContextTransformer : IrCustomElementTransformer<IrExp
         expression: IrExpression,
         context: IrExpressionContext
     ): IrExpression{
-        expression.transformChildren(this, context)
+        expression.transformChildren(context)
         return expression
     }
 

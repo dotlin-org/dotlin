@@ -66,6 +66,6 @@ object DartFunctionDeclarationTransformer : DartAstNodeTransformer() {
         val expression = acceptChild { expression }
         val async = if (body.isAsync) "async " else ""
 
-        "$async=> $expression;"
+        "$async=> $expression"
     }
 }

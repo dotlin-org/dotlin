@@ -439,14 +439,13 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
     override fun DartTransformContext.visitFunctionExpression(
         expression: IrFunctionExpression,
         context: DartTransformContext
-    ): DartExpression =
-        expression.function.transformBy(context) {
-            DartFunctionExpression(
-                typeParameters = typeParameters,
-                parameters = parameters,
-                body = expression.function.body.accept(context)
-            )
-        }
+    ): DartExpression = expression.function.let {
+        DartFunctionExpression(
+            typeParameters = it.typeParameters.accept(context),
+            parameters = it.valueParameters.accept(context),
+            body = it.body.accept(context)
+        )
+    }
 
     override fun DartTransformContext.visitFunctionReference(
         expression: IrFunctionReference,

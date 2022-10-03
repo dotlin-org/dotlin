@@ -29,6 +29,7 @@ import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.declarations.buildFun
 import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.expressions.IrBlockBody
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
@@ -70,6 +71,17 @@ interface IrDeclarationLowering : IrMultipleLowering<IrDeclaration> {
                         .apply {
                             transformBy(transform = { p -> transform(context, p) })
                         } as List<IrValueParameter>
+
+                    when (val body = body) {
+                        is IrBlockBody -> body.statements.transformBy(
+                            transform = { statement ->
+                                when (statement) {
+                                    is IrDeclaration -> transform(context, statement) as Transformations<IrStatement>
+                                    else -> emptySequence()
+                                }
+                            }
+                        )
+                    }
                 }
             }
         })
@@ -188,14 +200,19 @@ fun <E : IrElement> MutableList<E>.transformBy(
         transform(childElement).forEach {
             when (it) {
                 is Transformation.Add -> {
-                    add(i + 1, it.element)
+                    add(
+                        index = when {
+                            it.before -> i
+                            else -> i + 1
+                        },
+                        it.element
+                    )
                     i += 1
                 }
                 is Transformation.Replace -> when (it.old) {
                     null -> this[i] = it.new
                     else -> replace(it.old, it.new)
                 }
-
                 is Transformation.Remove -> {
                     remove(it.element ?: childElement)
                     i -= 1
@@ -224,7 +241,7 @@ fun <E : IrExpression> E.transformBy(transform: (E) -> Transformation<E>?): E {
 
 sealed class Transformation<E : IrElement> {
     class Replace<E : IrElement>(val old: E?, val new: E) : Transformation<E>()
-    class Add<E : IrElement>(val element: E) : Transformation<E>()
+    class Add<E : IrElement>(val element: E, val before: Boolean) : Transformation<E>()
     class Remove<E : IrElement>(val element: E? = null) : Transformation<E>()
 }
 
@@ -254,7 +271,9 @@ fun <E : IrElement> IrTransformerLowering<E, *>.replace(element: E, with: E) =
 fun <E : IrElement> IrTransformerLowering<E, *>.replaceWith(element: E) =
     Transformation.Replace(old = null, new = element)
 
-fun <E : IrElement> IrTransformerLowering<E, *>.add(element: E) = Transformation.Add(element)
+fun <E : IrElement> IrTransformerLowering<E, *>.add(element: E, before: Boolean = false) =
+    Transformation.Add(element, before)
+
 fun <E : IrElement> IrTransformerLowering<E, *>.remove(element: E? = null) = Transformation.Remove(element)
 
 fun <E : IrElement> IrSingleLowering<E>.noChange(): Transformation<E>? = null

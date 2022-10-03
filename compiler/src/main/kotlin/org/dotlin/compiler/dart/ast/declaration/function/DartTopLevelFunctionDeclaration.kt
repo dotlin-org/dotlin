@@ -20,7 +20,6 @@
 package org.dotlin.compiler.dart.ast.declaration.function
 
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
-import org.dotlin.compiler.dart.ast.accept
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.compilationunit.DartNamedCompilationUnitMember
 import org.dotlin.compiler.dart.ast.expression.DartFunctionExpression
@@ -39,11 +38,4 @@ data class DartTopLevelFunctionDeclaration(
 ) : DartNamedFunctionDeclaration, DartNamedCompilationUnitMember {
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
         visitor.visitTopLevelFunctionDeclaration(this, data)
-
-    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
-        name.accept(visitor, data)
-        returnType.accept(visitor, data)
-        function.accept(visitor, data)
-        annotations.accept(visitor, data)
-    }
 }

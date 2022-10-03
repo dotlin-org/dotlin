@@ -20,17 +20,16 @@
 package org.dotlin.compiler.backend.util
 
 import org.dotlin.compiler.backend.hasDartConstAnnotation
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
-import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
-import org.dotlin.compiler.backend.steps.ir2ast.ir.hasExplicitBackingField
+import org.dotlin.compiler.backend.isDartStatic
+import org.dotlin.compiler.backend.steps.ir2ast.ir.*
+import org.jetbrains.kotlin.backend.common.ir.isTopLevel
 import org.jetbrains.kotlin.backend.jvm.ir.psiElement
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
+import org.jetbrains.kotlin.ir.expressions.IrDeclarationReference
 import org.jetbrains.kotlin.ir.expressions.IrGetObjectValue
-import org.jetbrains.kotlin.ir.util.isAnnotationClass
-import org.jetbrains.kotlin.ir.util.isEnumClass
-import org.jetbrains.kotlin.ir.util.isObject
-import org.jetbrains.kotlin.ir.util.parentAsClass
+import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
+import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtModifierListOwner
 
@@ -48,6 +47,7 @@ fun IrDeclaration.isDartConst(): Boolean = when (this) {
             is IrConstructorCall -> init.symbol.owner.isDartConst()
             else -> throw UnsupportedOperationException("Invalid FIELD_FOR_OBJECT_INSTANCE")
         }
+        isBackingField -> correspondingProperty?.isDartConst() == true
         else -> false
     }
     is IrProperty -> isConst
@@ -72,4 +72,21 @@ fun IrDeclaration.isDartConst(): Boolean = when (this) {
 fun IrDeclaration.hasConstModifier(): Boolean {
     val source = psiElement as? KtModifierListOwner ?: return false
     return source.modifierList?.hasModifier(KtTokens.CONST_KEYWORD) == true
+}
+
+fun IrDeclarationReference.isAccessibleInDartConstLambda(function: IrFunction): Boolean {
+    // For instance members, we check the instance (receiver) itself.
+    if (this is IrMemberAccessExpression<*>) {
+        receiver?.let {
+            return it is IrDeclarationReference && it.isAccessibleInDartConstLambda(function)
+        }
+    }
+
+    val declaration = symbol.owner as? IrDeclaration ?: return false
+
+    return declaration.run {
+        val parent = this.parent
+        parent == function || isTopLevel || isDartStatic ||
+                (parent is IrClass && parent.isObject && !parent.isAnonymousObject)
+    }
 }

@@ -1,4 +1,4 @@
-package compile
+package compile.property
 
 import DefaultValue
 import assertCompile
