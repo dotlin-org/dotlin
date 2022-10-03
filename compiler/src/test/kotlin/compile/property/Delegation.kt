@@ -322,7 +322,6 @@ class Delegation : BaseTest {
 
             void main() {
               final Delegate x${'$'}delegate = Delegate();
-              @nonVirtual
               String get${'$'}x() {
                 late final KProperty0Impl<String> x${'$'}kProperty = KProperty0Impl<String>(
                     'x',
@@ -387,7 +386,6 @@ class Delegation : BaseTest {
 
             void main() {
               final Delegate x${'$'}delegate = Delegate();
-              @nonVirtual
               String get${'$'}x() {
                 late final KMutableProperty0Impl<String> x${'$'}kProperty =
                     KMutableProperty0Impl<String>(
@@ -399,7 +397,6 @@ class Delegation : BaseTest {
                 return x${'$'}delegate.getValue(null, x${'$'}kProperty);
               }
 
-              @nonVirtual
               void set${'$'}x(String value) {
                 late final KMutableProperty0Impl<String> x${'$'}kProperty =
                     KMutableProperty0Impl<String>(

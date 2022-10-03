@@ -28,6 +28,7 @@ import org.jetbrains.kotlin.descriptors.Modality.FINAL
 import org.jetbrains.kotlin.descriptors.Modality.SEALED
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.util.isAnnotationClass
+import org.jetbrains.kotlin.ir.util.isLocal
 
 val IrDeclaration.dartAnnotations: List<DartAnnotation>
     get() {
@@ -65,8 +66,8 @@ val IrDeclaration.dartAnnotations: List<DartAnnotation>
                 SEALED, FINAL -> when {
                     // Sealed as well as final classes get marked @sealed.
                     this is IrClass && !isDartExtensionContainer -> DartAnnotation.SEALED
-                    // Non-static, non-top-level final declarations get marked @nonVirtual.
-                    parent !is IrFile && !isStatic -> DartAnnotation.NON_VIRTUAL
+                    // Non-top-level, non-static and non-local final declarations get marked @nonVirtual.
+                    parent !is IrFile && !isStatic && !isLocal -> DartAnnotation.NON_VIRTUAL
                     else -> null
                 }
                 else -> null

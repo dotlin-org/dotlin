@@ -1477,4 +1477,26 @@ class Function : BaseTest {
                 """
             )
         }
+
+    @Test
+    fun `local function`() =
+        assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    fun localFun() {}
+                }
+                """
+            )
+
+            dart(
+                """
+                import 'package:meta/meta.dart';
+
+                void main() {
+                  void localFun() {}
+                }
+                """
+            )
+        }
 }
