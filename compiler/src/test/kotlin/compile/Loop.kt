@@ -282,7 +282,7 @@ class Loop : BaseTest {
             import 'package:meta/meta.dart';
 
             void main() {
-              final core.List<int> elements = arrayOf(<int>[1, 2, 3, 4, 5]);
+              final core.List<int> elements = arrayOf<int>(<int>[1, 2, 3, 4, 5]);
               for (int i in elements) process(i);
             }
 

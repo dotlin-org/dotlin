@@ -20,8 +20,10 @@ import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin.*
+import org.jetbrains.kotlin.ir.types.IrDynamicType
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classOrNull
+import org.jetbrains.kotlin.ir.types.impl.IrDynamicTypeImpl
 import org.jetbrains.kotlin.ir.types.toKotlinType
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.FqName
@@ -29,6 +31,7 @@ import org.jetbrains.kotlin.psi.KtAnnotationEntry
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.bindingContextUtil.getAbbreviatedTypeOrType
+import org.jetbrains.kotlin.types.Variance
 import java.nio.file.Path
 
 abstract class IrContext : IrAttributes {
@@ -50,6 +53,8 @@ abstract class IrContext : IrAttributes {
     fun enterFile(file: IrFile) {
         currentFile = file
     }
+
+    val dynamicType: IrDynamicType = IrDynamicTypeImpl(null, emptyList(), Variance.INVARIANT)
 
     val IrDeclarationWithName.dartName: DartIdentifier
         get() = dartNameGenerator.runWith(this) { dartNameOf(it, currentFile) }

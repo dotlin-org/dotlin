@@ -1982,4 +1982,59 @@ class Expression : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `call function with type arguments`() = assertCompile {
+        kotlin(
+            """
+            fun <T> generic(obj: T) {}
+
+            fun main () {
+                generic<String>("asd")
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void generic<T>(T obj) {}
+            void main() {
+              generic<String>('asd');
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call method with type arguments`() = assertCompile {
+        kotlin(
+            """
+            class Test {
+                fun <T> generic(obj: T) {}
+            }
+
+            fun main () {
+                Test().generic<String>("asd")
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {
+              @nonVirtual
+              void generic<T>(T obj) {}
+            }
+
+            void main() {
+              Test().generic<String>('asd');
+            }
+            """
+        )
+    }
 }

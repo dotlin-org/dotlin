@@ -51,6 +51,7 @@ private val lowerings: List<Lowering> = listOf(
     ::DefaultInterfaceImplementationsLowering,
     ::OperatorsLowering,
     Comparable::PostOperatorsLowering,
+    ExtensionsLowering::RemoveReceiverTypeArguments,
     ::ExtensionsLowering,
     ::ConflictingExtensionCallsLowering,
     ::SortStatementsLowering,

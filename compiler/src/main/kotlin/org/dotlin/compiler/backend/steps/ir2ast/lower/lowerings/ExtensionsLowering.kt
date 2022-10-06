@@ -19,7 +19,8 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.extensionReceiverOrNull
+import org.dotlin.compiler.backend.steps.ir2ast.ir.extensionReceiverParameterOrNull
+import org.dotlin.compiler.backend.steps.ir2ast.ir.typeArguments
 import org.dotlin.compiler.backend.steps.ir2ast.ir.typeParameterOrNull
 import org.dotlin.compiler.backend.steps.ir2ast.ir.typeParametersOrSelf
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
@@ -27,9 +28,13 @@ import org.jetbrains.kotlin.backend.common.ir.addChild
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrTypeParametersContainer
+import org.jetbrains.kotlin.ir.expressions.IrCall
+import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.TypeRemapper
+import org.jetbrains.kotlin.ir.util.copyValueArgumentsFrom
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.remapTypes
 
@@ -48,7 +53,7 @@ class ExtensionsLowering(override val context: DartLoweringContext) : IrDeclarat
             addChild(declaration)
         }
 
-        val oldReceiverTypeParameters = declaration.extensionReceiverOrNull!!.type.typeParametersOrSelf
+        val oldReceiverTypeParameters = declaration.extensionReceiverParameterOrNull!!.type.typeParametersOrSelf
         if (oldReceiverTypeParameters.isNotEmpty()) {
             if (declaration is IrFunction) {
                 declaration.typeParameters -= oldReceiverTypeParameters
@@ -75,9 +80,40 @@ class ExtensionsLowering(override val context: DartLoweringContext) : IrDeclarat
             )
         }
 
-
-
-
         return just { remove() }
+    }
+
+    /**
+     * Removes the receiver type parameter from function calls.
+     */
+    class RemoveReceiverTypeArguments(override val context: DartLoweringContext) : IrExpressionLowering {
+        override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
+            if (expression !is IrCall) return noChange()
+
+            val receiverParameter = expression.symbol.owner.extensionReceiverParameterOrNull ?: return noChange()
+            val receiverTypeParameter = receiverParameter.type.typeParameterOrNull ?: return noChange()
+
+            return replaceWith(
+                IrCallImpl(
+                    expression.startOffset, expression.endOffset,
+                    expression.type,
+                    expression.symbol,
+                    typeArgumentsCount = expression.typeArgumentsCount - 1,
+                    expression.valueArgumentsCount,
+                    expression.origin,
+                    expression.superQualifierSymbol,
+                ).apply {
+                    copyValueArgumentsFrom(expression, destFunction = symbol.owner)
+
+                    var newIndex = 0
+                    expression.typeArguments.forEachIndexed { originalIndex, arg ->
+                        if (originalIndex != receiverTypeParameter.index) {
+                            putTypeArgument(newIndex, arg)
+                        }
+                        newIndex++
+                    }
+                }
+            )
+        }
     }
 }

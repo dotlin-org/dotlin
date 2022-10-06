@@ -59,20 +59,32 @@ fun IrType.accept(
                                     ?.let { name -> DartSimpleIdentifier(name) },
                                 type = arg.accept(context),
                             )
-                    }
+                        }
+                    )
                 )
-            )
-            else -> DartNamedType(
-                name = it.owner.dartName,
-                isNullable = it.hasQuestionMark,
-                typeArguments = DartTypeArgumentList(it.arguments.map { arg -> arg.accept(context) }.toMutableList()),
-            )
+                else -> DartNamedType(
+                    name = it.owner.dartName,
+                    isNullable = it.hasQuestionMark,
+                    typeArguments = it.arguments.accept(context),
+                )
+            }
+            is IrDynamicType -> DartTypeAnnotation.DYNAMIC
+            else -> throw UnsupportedOperationException()
         }
-        is IrDynamicType -> DartTypeAnnotation.DYNAMIC
-        else -> throw UnsupportedOperationException()
     }
-}
 
 // If typeOrNull returns null, it's a star projection, which corresponds best to dynamic in Dart.
+// TODO: Not true if type parameter has bound
+private fun IrTypeArgument.toIrType(context: DartTransformContext) = typeOrNull ?: context.dynamicType
+
 fun IrTypeArgument.accept(context: DartTransformContext): DartTypeAnnotation =
-    typeOrNull?.accept(context) ?: DartTypeAnnotation.DYNAMIC
+    toIrType(context).accept(context)
+
+@JvmName("acceptTypeArguments")
+fun Iterable<IrTypeArgument>.accept(context: DartTransformContext) =
+    map { it.toIrType(context) }.accept(context)
+
+fun Iterable<IrType?>.accept(context: DartTransformContext) =
+    DartTypeArgumentList(
+        arguments = map { it?.accept(context) ?: DartTypeAnnotation.DYNAMIC /* TODO */ }
+    )

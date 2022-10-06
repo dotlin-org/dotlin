@@ -453,8 +453,8 @@ val IrValueParameter.wasComplex: Boolean
 val IrFunctionAccessExpression.valueArguments: List<IrExpression?>
     get() = (0 until valueArgumentsCount).map { getValueArgument(it) }
 
-val IrFunctionAccessExpression.typeArguments: List<IrType>
-    get() = (0 until typeArgumentsCount).map { getTypeArgument(it)!! }
+val IrFunctionAccessExpression.typeArguments: List<IrType?>
+    get() = (0 until typeArgumentsCount).map { getTypeArgument(it) }
 
 fun IrElement.replaceExpressions(block: (IrExpression) -> IrExpression) {
     transformChildren(
@@ -564,18 +564,18 @@ val IrDeclaration.isAbstract: Boolean
 /**
  * Accounts for the `@DartExtension` annotation.
  */
-val IrDeclaration.extensionReceiverOrNull: IrValueParameter?
+val IrDeclaration.extensionReceiverParameterOrNull: IrValueParameter?
     get() = when (this) {
         is IrFunction -> when {
             !isAbstract && hasDartExtensionAnnotation() -> dispatchReceiverParameter ?: extensionReceiverParameter
             else -> extensionReceiverParameter
         }
-        is IrProperty -> getter?.extensionReceiverOrNull
+        is IrProperty -> getter?.extensionReceiverParameterOrNull
         else -> null
     }
 
 val IrDeclaration.isExtension: Boolean
-    get() = extensionReceiverOrNull != null
+    get() = extensionReceiverParameterOrNull != null
 
 /**
  * Accounts for the `@DartExtension` annotation.

@@ -234,6 +234,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                     else -> {
                         val arguments = irCallLike.accept(IrToDartArgumentListTransformer, context)
 
+
                         when (irCallLike) {
                             is IrConstructorCall, is IrEnumConstructorCall -> {
                                 val type = irCallLike.type.accept(context, isConstructorType = true) as DartNamedType
@@ -248,16 +249,19 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                             }
                             else -> {
                                 val functionName = irCallLike.symbol.owner.dartName
+                                val typeArguments = irCallLike.typeArguments.accept(context)
 
                                 when (optionalReceiver) {
                                     null -> DartFunctionExpressionInvocation(
                                         function = functionName,
-                                        arguments = arguments
+                                        arguments,
+                                        typeArguments,
                                     )
                                     else -> DartMethodInvocation(
                                         target = receiver.possiblyParenthesize(isReceiver = true),
                                         methodName = functionName as DartSimpleIdentifier,
-                                        arguments = arguments
+                                        arguments,
+                                        typeArguments
                                     )
                                 }
                             }

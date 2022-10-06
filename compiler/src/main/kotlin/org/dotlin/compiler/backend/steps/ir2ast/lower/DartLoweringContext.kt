@@ -52,12 +52,10 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionExpressionImpl
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
 import org.jetbrains.kotlin.ir.types.*
-import org.jetbrains.kotlin.ir.types.impl.IrDynamicTypeImpl
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.BindingContext
-import org.jetbrains.kotlin.types.Variance
 import java.nio.file.Path
 
 class DartLoweringContext(
@@ -80,8 +78,6 @@ class DartLoweringContext(
     override val typeSystem: IrTypeSystemContext = IrTypeSystemContextImpl(irBuiltIns)
 
     val dartBuiltIns = DartIrBuiltIns(this)
-
-    val dynamicType: IrDynamicType = IrDynamicTypeImpl(null, emptyList(), Variance.INVARIANT)
 
     override val ir: Ir<CommonBackendContext> = object : Ir<DartLoweringContext>(this, irModuleFragment) {
         override val symbols = object : Symbols<DartLoweringContext>(
@@ -163,7 +159,7 @@ class DartLoweringContext(
      */
     val IrDeclaration.extensionContainer: IrClass?
         get() {
-            val receiver = extensionReceiverOrNull ?: return null
+            val receiver = extensionReceiverParameterOrNull ?: return null
             val receiverType = receiver.type
             val receiverTypeParameters = receiverType.typeParametersOrSelf
 
