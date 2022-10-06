@@ -73,9 +73,10 @@ fun IrType.accept(
         }
     }
 
-// If typeOrNull returns null, it's a star projection, which corresponds best to dynamic in Dart.
-// TODO: Not true if type parameter has bound
-private fun IrTypeArgument.toIrType(context: DartTransformContext) = typeOrNull ?: context.dynamicType
+// If the type is null, it's a star projection, which corresponds to dynamic in Dart.
+private fun IrType?.asArgument(context: DartTransformContext) = this ?: context.dynamicType
+
+private fun IrTypeArgument.toIrType(context: DartTransformContext) = typeOrNull.asArgument(context)
 
 fun IrTypeArgument.accept(context: DartTransformContext): DartTypeAnnotation =
     toIrType(context).accept(context)
@@ -86,5 +87,5 @@ fun Iterable<IrTypeArgument>.accept(context: DartTransformContext) =
 
 fun Iterable<IrType?>.accept(context: DartTransformContext) =
     DartTypeArgumentList(
-        arguments = map { it?.accept(context) ?: DartTypeAnnotation.DYNAMIC /* TODO */ }
+        arguments = map { it.asArgument(context).accept(context) }
     )
