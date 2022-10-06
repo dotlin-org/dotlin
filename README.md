@@ -270,7 +270,7 @@ use top-level/global values, however.
 
 ### Type literals
 
-Kotlin does not have type literals as Dart does. To accomodate for this, Dotlin
+Kotlin does not have type literals like Dart does. To accomodate for this, Dotlin
 has a `typeOf` function, which compiles to a Dart type literal. For example, the following statement:
 ```kotlin
 typeOf<String>()
