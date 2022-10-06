@@ -20,6 +20,5 @@ package kotlin.reflect
 /**
  * Returns a runtime representation of the given reified type [T] as an instance of [KType].
  */
-@SinceKotlin("1.6")
-inline fun <reified T> typeOf(): KType =
+/*inline*/ fun <T> kTypeOf(): KType =
     throw UnsupportedError("This function is implemented as an intrinsic on all supported platforms.")

@@ -26,6 +26,21 @@ external fun dart(code: String): dynamic
 external val definedExternally: Nothing
 
 /**
+ * Returns a [Type] instance of the given type [T].
+ *
+ * Functions exactly like a type literal in Dart. For example,
+ * the call of
+ * ```kotlin
+ * typeOf<String>()
+ * ```
+ * translates directly to
+ * ```dart
+ * String
+ * ```
+ */
+inline fun <T> typeOf(): Type = definedExternally
+
+/**
  * Marker interface to indicate that a class can be either implement the implicit interface or be mixed in.
  *
  * @see Interface

@@ -60,4 +60,9 @@ external open class Any {
      * Returns a string representation of the object.
      */
     open fun toString(): String
+
+    /**
+     * A representation of the runtime type of the object.
+     */
+    open val runtimeType: Type
 }

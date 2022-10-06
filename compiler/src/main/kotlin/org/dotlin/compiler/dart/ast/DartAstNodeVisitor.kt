@@ -191,6 +191,7 @@ interface DartAstNodeVisitor<R, C> {
         visitAstNode(element, context)
 
     fun visitNullLiteral(literal: DartNullLiteral, context: C): R = visitAstNode(literal, context)
+    fun visitTypeLiteral(literal: DartTypeLiteral, context: C): R = visitAstNode(literal, context)
     fun visitBooleanLiteral(literal: DartBooleanLiteral, context: C): R = visitAstNode(literal, context)
     fun visitIntegerLiteral(literal: DartIntegerLiteral, context: C): R = visitAstNode(literal, context)
     fun visitDoubleLiteral(literal: DartDoubleLiteral, context: C): R = visitAstNode(literal, context)

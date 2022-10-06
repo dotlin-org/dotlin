@@ -208,7 +208,7 @@ serve any use anymore.
 ## Differences from Dart
 
 Aside from the obvious differences between the Kotlin language and stdlib, Dotlin adds
-some Dart-specific enhancements.
+some Dart-specific enhancements. Also some other additions, because of differences between the Dart and Kotlin languages.
 
 ### Const lambdas
 
@@ -267,6 +267,20 @@ As you can see, a named function is generated based on the lambda, and passed to
 
 This is only possible if the lambda does not capture local or class closure values. You _can_
 use top-level/global values, however.
+
+### Type literals
+
+Kotlin does not have type literals as Dart does. To accomodate for this, Dotlin
+has a `typeOf` function, which compiles to a Dart type literal. For example, the following statement:
+```kotlin
+typeOf<String>()
+```
+
+Compiles to:
+
+```dart
+String;
+```
 
 ## Usage
 

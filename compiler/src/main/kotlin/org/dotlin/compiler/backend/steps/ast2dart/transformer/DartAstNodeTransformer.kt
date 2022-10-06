@@ -406,6 +406,11 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
 
     open fun DartGenerationContext.visitNullLiteral(literal: DartNullLiteral) = super.visitNullLiteral(literal, this)
 
+    final override fun visitTypeLiteral(literal: DartTypeLiteral, context: DartGenerationContext): String =
+        with(context) { visitTypeLiteral(literal) }
+
+    open fun DartGenerationContext.visitTypeLiteral(literal: DartTypeLiteral) = super.visitTypeLiteral(literal, this)
+
     final override fun visitBooleanLiteral(literal: DartBooleanLiteral, context: DartGenerationContext): String =
         with(context) { visitBooleanLiteral(literal) }
 

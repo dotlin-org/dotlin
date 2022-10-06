@@ -207,6 +207,9 @@ object DartExpressionTransformer : DartAstNodeTransformer() {
 
     override fun DartGenerationContext.visitNullLiteral(literal: DartNullLiteral) = "null"
 
+    override fun DartGenerationContext.visitTypeLiteral(literal: DartTypeLiteral) =
+        literal.acceptChild { type }
+
     override fun DartGenerationContext.visitIntegerLiteral(literal: DartIntegerLiteral) =
         literal.value.toString()
 

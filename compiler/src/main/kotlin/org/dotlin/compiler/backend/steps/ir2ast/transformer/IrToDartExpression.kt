@@ -50,8 +50,10 @@ import org.jetbrains.kotlin.ir.types.isChar
 import org.jetbrains.kotlin.ir.types.isInt
 import org.jetbrains.kotlin.ir.types.isString
 import org.jetbrains.kotlin.ir.util.defaultType
+import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
 import org.jetbrains.kotlin.ir.util.isEnumClass
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
@@ -213,6 +215,9 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                             right = singleArgument,
                         )
                     }
+                    irCallLike.isTypeOfCall() -> DartTypeLiteral(
+                        type = irCallLike.typeArguments.single()!!.accept(context)
+                    )
                     // Some non-operator methods on primitive integers (Int, Long) are operators in Dart,
                     // such as `xor` or `ushr`.
                     irCallLike.symbol.owner.parentClassOrNull?.defaultType?.isPrimitiveInteger() == true &&
@@ -233,7 +238,6 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                     }
                     else -> {
                         val arguments = irCallLike.accept(IrToDartArgumentListTransformer, context)
-
 
                         when (irCallLike) {
                             is IrConstructorCall, is IrEnumConstructorCall -> {
@@ -628,3 +632,6 @@ private fun IrFunctionAccessExpression.isSetOperator() =
         (it.isOperator || it.origin == IrDartDeclarationOrigin.WAS_OPERATOR) &&
                 it.name == Name.identifier("set")
     } == true
+
+// TODO: Use FqName syntax
+private fun IrFunctionAccessExpression.isTypeOfCall() = symbol.owner.fqNameWhenAvailable == FqName("dotlin.typeOf")

@@ -17,21 +17,33 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package compile.klib
+package compile.dialect
 
 import BaseTest
-import assertCanCompileLib
+import assertCompile
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import stdlibSrc
-import kotlin.io.path.ExperimentalPathApi
 
-@OptIn(ExperimentalPathApi::class)
-@DisplayName("Compile: Klib: Standard Library")
-class StandardLibrary : BaseTest {
+@DisplayName("Compile: Dialect: Type")
+class Type : BaseTest {
     @Test
-    fun stdlib() = assertCanCompileLib {
-        path = stdlibSrc
-        dependencies = setOf()
+    fun typeOf() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                val myType = typeOf<String>()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              final Type myType = String;
+            }
+            """
+        )
     }
 }

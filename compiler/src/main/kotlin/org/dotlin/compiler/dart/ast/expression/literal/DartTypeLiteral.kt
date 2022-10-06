@@ -17,21 +17,15 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package compile.klib
+package org.dotlin.compiler.dart.ast.expression.literal
 
-import BaseTest
-import assertCanCompileLib
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
-import stdlibSrc
-import kotlin.io.path.ExperimentalPathApi
+import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
+import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
 
-@OptIn(ExperimentalPathApi::class)
-@DisplayName("Compile: Klib: Standard Library")
-class StandardLibrary : BaseTest {
-    @Test
-    fun stdlib() = assertCanCompileLib {
-        path = stdlibSrc
-        dependencies = setOf()
-    }
+@JvmInline
+value class DartTypeLiteral(val type: DartTypeAnnotation) : DartLiteral {
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
+        visitor.visitTypeLiteral(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {}
 }
