@@ -63,19 +63,20 @@ class PropertyReferencesLowering(override val context: DartLoweringContext) : Ir
         val property = reference.symbol.owner
         val propertyContainer = property.containerParent ?: return noChange()
 
-        val receiver1 = reference.receiver ?: when (propertyContainer) {
-            // It's possible that the receiver is null when the receiver should've been `this`.
-            is IrClass -> buildStatement(propertyContainer.symbol) {
-                irGet(propertyContainer.thisReceiver!!)
-            }
+        val boundThisReceiver = when (propertyContainer) {
+            // Use explicit `this` receiver if it's a bound KProperty0.
+            is IrClass -> propertyContainer.thisReceiver!!
             else -> null
         }
+
+        val receiver1 = reference.receiver
         val receiver2: IrExpression? = null // TODO
 
         val kPropertyConstructorCall by lazy {
             createKPropertyConstructorCall(
                 context,
                 containerSymbol = context.container.symbol,
+                boundThisReceiver,
                 propertyReference = reference,
                 propertyGetter = reference.getter,
                 propertySetter = reference.setter,
@@ -88,6 +89,7 @@ class PropertyReferencesLowering(override val context: DartLoweringContext) : Ir
         val kPropertyPropertyName = reference.referencedName.kPropertyVarName
 
         val kPropertyProperty =
+            // TODO: Don't get the bound KPRoperty from the container if receiver1 and/or receiver2 are not null.
             propertyContainer.propertyWithNameOrNull(kPropertyPropertyName) ?: irFactory.buildProperty {
                 name = Name.identifier(kPropertyPropertyName)
                 visibility = property.visibility
@@ -115,7 +117,11 @@ class PropertyReferencesLowering(override val context: DartLoweringContext) : Ir
 
         return replaceWith(
             buildStatement(context.container.symbol) {
-                irCall(kPropertyProperty.getter!!, receiver1, origin = IrStatementOrigin.GET_PROPERTY)
+                irCall(
+                    kPropertyProperty.getter!!,
+                    receiver1 ?: boundThisReceiver?.let { irGet(it) },
+                    origin = IrStatementOrigin.GET_PROPERTY
+                )
             }
         )
     }
@@ -210,6 +216,7 @@ private val Name.kPropertyVarName: String
 private fun DartLoweringContext.createKPropertyConstructorCall(
     context: IrExpressionContext,
     containerSymbol: IrSymbol,
+    boundThisReceiver: IrValueParameter? = null,
     propertyReference: IrCallableReference<*>,
     propertyGetter: IrSimpleFunctionSymbol?,
     propertySetter: IrSimpleFunctionSymbol?,
@@ -258,7 +265,12 @@ private fun DartLoweringContext.createKPropertyConstructorCall(
             }
         }
 
-        val getReceiver1 = buildReceiverParameter(receiver1, ordinal = 1)
+        val getReceiver1 = buildReceiverParameter(receiver1, ordinal = 1) ?: when (boundThisReceiver) {
+            null -> null
+            else -> buildStatement(symbol) {
+                irGet(boundThisReceiver)
+            }
+        }
         val getReceiver2 = buildReceiverParameter(receiver2, ordinal = 2)
 
         block(this, getReceiver1, getReceiver2)

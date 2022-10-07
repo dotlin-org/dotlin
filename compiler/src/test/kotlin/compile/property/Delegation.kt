@@ -197,8 +197,8 @@ class Delegation : BaseTest {
 
               final Delegate _x${'$'}delegate = Delegate();
               @nonVirtual
-              late final KProperty1Impl<Test, String> x${'$'}kProperty =
-                  KProperty1Impl<Test, String>('x', (Test ${'$'}receiver1) => ${'$'}receiver1.x);
+              late final KProperty0Impl<String> x${'$'}kProperty =
+                  KProperty0Impl<String>('x', () => this.x);
             }
             """
         )
@@ -264,15 +264,9 @@ class Delegation : BaseTest {
 
               final Delegate _x${'$'}delegate = Delegate();
               @nonVirtual
-              late final KMutableProperty1Impl<Test, String> x${'$'}kProperty =
-                  KMutableProperty1Impl<Test, String>(
-                      'x',
-                      (Test ${'$'}receiver1) => ${'$'}receiver1.x,
-                      (
-                        Test ${'$'}receiver1,
-                        String ${'$'}value,
-                      ) =>
-                          ${'$'}receiver1.x = ${'$'}value);
+              late final KMutableProperty0Impl<String> x${'$'}kProperty =
+                  KMutableProperty0Impl<String>(
+                      'x', () => this.x, (String ${'$'}value) => this.x = ${'$'}value);
             }
             """
         )
