@@ -31,10 +31,7 @@ import org.jetbrains.kotlin.ir.builders.declarations.buildProperty
 import org.jetbrains.kotlin.ir.builders.declarations.buildValueParameter
 import org.jetbrains.kotlin.ir.builders.irCallConstructor
 import org.jetbrains.kotlin.ir.builders.irGet
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
-import org.jetbrains.kotlin.ir.declarations.IrFunction
-import org.jetbrains.kotlin.ir.declarations.IrVariable
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrVariableImpl
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
@@ -63,11 +60,17 @@ class PropertyReferencesLowering(override val context: DartLoweringContext) : Ir
     ): Transformation<IrExpression>? {
         if (reference !is IrPropertyReference) return noChange()
 
-        val receiver1 = reference.receiver
-        val receiver2: IrExpression? = null // TODO
-
         val property = reference.symbol.owner
         val propertyContainer = property.containerParent ?: return noChange()
+
+        val receiver1 = reference.receiver ?: when (propertyContainer) {
+            // It's possible that the receiver is null when the receiver should've been `this`.
+            is IrClass -> buildStatement(propertyContainer.symbol) {
+                irGet(propertyContainer.thisReceiver!!)
+            }
+            else -> null
+        }
+        val receiver2: IrExpression? = null // TODO
 
         val kPropertyConstructorCall by lazy {
             createKPropertyConstructorCall(
@@ -233,25 +236,45 @@ private fun DartLoweringContext.createKPropertyConstructorCall(
         }
     }.owner
 
-    fun getterOrSetterFunc() = irFactory.buildFun {
+    fun buildGetterOrSetterFunc(
+        block: IrSimpleFunction.(getReceiver1: IrGetValue?, getReceiver2: IrGetValue?) -> Unit
+    ) = irFactory.buildFun {
         name = Name.special("<anonymous>")
         returnType = propertyType
     }.apply {
         parent = context.container as IrDeclarationParent
+
+        fun buildReceiverParameter(receiver: IrExpression?, ordinal: Int) = when (receiver) {
+            null -> null
+            else -> buildValueParameter(this) {
+                name = Name.identifier("\$receiver$ordinal")
+                type = receiver.type
+            }.let {
+                valueParameters = valueParameters + it
+
+                buildStatement(symbol) {
+                    irGet(it)
+                }
+            }
+        }
+
+        val getReceiver1 = buildReceiverParameter(receiver1, ordinal = 1)
+        val getReceiver2 = buildReceiverParameter(receiver2, ordinal = 2)
+
+        block(this, getReceiver1, getReceiver2)
     }
 
-    val kPropertyGetterLambda = getterOrSetterFunc().apply {
+    val kPropertyGetterLambda = buildGetterOrSetterFunc { getReceiver1, _ /* TODO */ ->
         body = IrExpressionBodyImpl(
             buildStatement(symbol) {
                 createGetterLambdaBody?.invoke(this) ?: irCall(
                     propertyGetter!!.owner,
-                    receiver1,
+                    getReceiver1,
                     origin = IrStatementOrigin.GET_PROPERTY
                 )
             }
         )
     }
-
     val kPropertyType = kPropertyClass.defaultType.buildSimpleType {
         arguments = listOfNotNull(
             when (receiver1) {
@@ -327,19 +350,19 @@ private fun DartLoweringContext.createKPropertyConstructorCall(
                                     annotations = emptyList()
                                 )
                             },
-                            function = getterOrSetterFunc().apply {
+                            function = buildGetterOrSetterFunc { getReceiver1, _ /* TODO */ ->
                                 val valueParameter = buildValueParameter(this) {
                                     name = Name.identifier("\$value")
                                     type = propertyType
                                 }
 
-                                valueParameters = listOf(valueParameter)
+                                valueParameters = valueParameters + valueParameter
 
                                 body = IrExpressionBodyImpl(
                                     buildStatement(symbol) {
                                         createSetterLambdaBody?.invoke(this) ?: irCall(
                                             propertySetter!!.owner,
-                                            receiver1,
+                                            getReceiver1,
                                             irGet(valueParameter),
                                             origin = IrStatementOrigin.EQ
                                         )

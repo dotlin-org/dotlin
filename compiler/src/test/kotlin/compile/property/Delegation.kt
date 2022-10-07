@@ -192,13 +192,13 @@ class Delegation : BaseTest {
             class Test {
               @nonVirtual
               String get x {
-                return this._x${'$'}delegate.getValue(this, x${'$'}kProperty);
+                return this._x${'$'}delegate.getValue(this, this.x${'$'}kProperty);
               }
-            
+
               final Delegate _x${'$'}delegate = Delegate();
               @nonVirtual
-              late final KProperty0Impl<String> x${'$'}kProperty =
-                  KProperty0Impl<String>('x', () => x);
+              late final KProperty1Impl<Test, String> x${'$'}kProperty =
+                  KProperty1Impl<Test, String>('x', (Test ${'$'}receiver1) => ${'$'}receiver1.x);
             }
             """
         )
@@ -254,19 +254,25 @@ class Delegation : BaseTest {
             class Test {
               @nonVirtual
               String get x {
-                return this._x${'$'}delegate.getValue(this, x${'$'}kProperty);
+                return this._x${'$'}delegate.getValue(this, this.x${'$'}kProperty);
               }
 
               @nonVirtual
               void set x(String ${'$'}value) {
-                return this._x${'$'}delegate.setValue(this, x${'$'}kProperty, ${'$'}value);
+                return this._x${'$'}delegate.setValue(this, this.x${'$'}kProperty, ${'$'}value);
               }
 
               final Delegate _x${'$'}delegate = Delegate();
               @nonVirtual
-              late final KMutableProperty0Impl<String> x${'$'}kProperty =
-                  KMutableProperty0Impl<String>(
-                      'x', () => x, (String ${'$'}value) => x = ${'$'}value);
+              late final KMutableProperty1Impl<Test, String> x${'$'}kProperty =
+                  KMutableProperty1Impl<Test, String>(
+                      'x',
+                      (Test ${'$'}receiver1) => ${'$'}receiver1.x,
+                      (
+                        Test ${'$'}receiver1,
+                        String ${'$'}value,
+                      ) =>
+                          ${'$'}receiver1.x = ${'$'}value);
             }
             """
         )
