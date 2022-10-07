@@ -69,5 +69,11 @@ sealed class IrDartDeclarationOrigin(private val name: String) : IrDeclarationOr
      */
     object PROPERTY_REFERENCE : IrDartDeclarationOrigin("PROPERTY_REFERENCE")
 
+    /**
+     * Local accessor function created for local delegated properties.
+     */
+    object LOCAL_DELEGATED_PROPERTY_REFERENCE_ACCESSOR :
+        IrDartDeclarationOrigin("LOCAL_DELEGATED_PROPERTY_REFERENCE_ACCESSOR")
+
     override fun toString() = name
 }

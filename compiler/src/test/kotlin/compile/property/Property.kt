@@ -854,4 +854,70 @@ class Property {
             """
         )
     }
+
+    @Test
+    fun `top-level lateinit property call isInitialized`() = assertCompile {
+        kotlin(
+            """
+            lateinit var test: Boolean
+
+            fun main() {
+                ::test.isInitialized
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            late bool test;
+            void main() {
+              test${'$'}kProperty0.isInitialized;
+            }
+
+            const KMutableProperty0Impl<bool> test${'$'}kProperty0 =
+                KMutableProperty0Impl<bool>('test', _${'$'}381, _${'$'}381With${'$'}value);
+            bool _${'$'}381() => test;
+            bool _${'$'}381With${'$'}value(bool ${'$'}value) => test = ${'$'}value;
+            """
+        )
+    }
+
+    @Test
+    fun `class lateinit property call isInitialized`() = assertCompile {
+        kotlin(
+            """
+            class Test {
+                lateinit var enabled: Boolean
+            }
+
+            fun main() {
+                val x = Test()
+                x::enabled.isInitialized
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {
+              @nonVirtual
+              late bool enabled;
+              @nonVirtual
+              late final KMutableProperty0Impl<bool> enabled${'$'}kProperty0 =
+                  KMutableProperty0Impl<bool>(
+                      'enabled', () => enabled, (bool ${'$'}value) => enabled = ${'$'}value);
+            }
+
+            void main() {
+              final Test x = Test();
+              x.enabled${'$'}kProperty0.isInitialized;
+            }
+            """
+        )
+    }
 }

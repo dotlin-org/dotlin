@@ -174,6 +174,27 @@ class Example<T> {
 }
 ```
 
+#### Lateinit `isInitialized` outside class
+
+In Kotlin, `lateinit var`s cannot be checked whether they're initialized from outside the containing class. For example, the following code:
+```kotlin
+class Example {
+    lateinit var lateVar: String
+}
+
+fun main() {
+    if (Example()::lateVar.isInitialized) {
+        // Do something.
+    }
+}
+```
+
+The call would've been reported as:
+
+> ⚠️ Backing field of 'var lateVar: String' is not accessible at this point
+
+However, in Dotlin, this compiles with no issues.
+
 ### Primitives
 
 Kotlin primitives that are not used in Dart and would only complicate code have been removed, meaning that

@@ -41,6 +41,7 @@ import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrVariableSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
 import org.jetbrains.kotlin.ir.types.impl.buildSimpleType
 import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
@@ -63,39 +64,37 @@ class PropertyReferencesLowering(override val context: DartLoweringContext) : Ir
         val property = reference.symbol.owner
         val propertyContainer = property.containerParent ?: return noChange()
 
-        val boundThisReceiver = when (propertyContainer) {
-            // Use explicit `this` receiver if it's a bound KProperty0.
-            is IrClass -> propertyContainer.thisReceiver!!
+        val thisReceiver = when (propertyContainer) {
+            is IrClass -> buildStatement(context.container.symbol) {
+                irGet(propertyContainer.thisReceiver!!)
+            }
             else -> null
         }
 
-        val receiver1 = reference.receiver
-        val receiver2: IrExpression? = null // TODO
+        val kPropertyMetadata = reference.type.kPropertyMetadata
 
-        val kPropertyConstructorCall by lazy {
-            createKPropertyConstructorCall(
+        val kPropertyInfo by lazy {
+            createKPropertyInfo(
                 context,
                 containerSymbol = context.container.symbol,
-                boundThisReceiver,
+                thisReceiver,
                 propertyReference = reference,
                 propertyGetter = reference.getter,
                 propertySetter = reference.setter,
                 propertyType = property.type,
-                receiver1,
-                receiver2
+                metadata = kPropertyMetadata
             )
         }
 
-        val kPropertyPropertyName = reference.referencedName.kPropertyVarName
+        val kPropertyPropertyName = reference.referencedName.getKPropertyVarName(kPropertyMetadata.receiverCount)
 
         val kPropertyProperty =
-            // TODO: Don't get the bound KPRoperty from the container if receiver1 and/or receiver2 are not null.
             propertyContainer.propertyWithNameOrNull(kPropertyPropertyName) ?: irFactory.buildProperty {
                 name = Name.identifier(kPropertyPropertyName)
                 visibility = property.visibility
                 isVar = false
                 isLateinit = true
-                isConst = kPropertyConstructorCall.isConst
+                isConst = kPropertyInfo.isConst
             }.apply {
                 val kPropertyProp = this
 
@@ -106,10 +105,10 @@ class PropertyReferencesLowering(override val context: DartLoweringContext) : Ir
                     name = kPropertyProp.name
                     visibility = kPropertyProp.visibility
 
-                    type = kPropertyConstructorCall.constructorCall.type
+                    type = kPropertyInfo.constructorCall.type
                 }.apply {
                     parent = kPropertyProp.parent
-                    initializer = IrExpressionBodyImpl(kPropertyConstructorCall.constructorCall)
+                    initializer = IrExpressionBodyImpl(kPropertyInfo.constructorCall)
                 }
 
                 getter = createDefaultGetter(type)
@@ -119,7 +118,7 @@ class PropertyReferencesLowering(override val context: DartLoweringContext) : Ir
             buildStatement(context.container.symbol) {
                 irCall(
                     kPropertyProperty.getter!!,
-                    receiver1 ?: boundThisReceiver?.let { irGet(it) },
+                    reference.receiver ?: thisReceiver,
                     origin = IrStatementOrigin.GET_PROPERTY
                 )
             }
@@ -139,7 +138,18 @@ class PropertyReferencesLowering(override val context: DartLoweringContext) : Ir
                 context: IrExpressionContext,
                 reference: IrLocalDelegatedPropertyReference
             ): IrVariable {
-                val kPropertyVarName = reference.referencedName.kPropertyVarName
+                // For runtime caching purposes, if we are in a local delegated property accessor (e.g. `get$x`), we put
+                // the KProperty variable _outside_ of that accessor, otherwise the KProperty would be created
+                // everytime an accessor is invoked.
+                val relevantBody = when (declaration.origin) {
+                    IrDartDeclarationOrigin.LOCAL_DELEGATED_PROPERTY_REFERENCE_ACCESSOR -> {
+                        // TODO: Support IrExpressionBody
+                        (declaration.parent as IrFunction).body as IrBlockBody
+                    }
+                    else -> body
+                }
+
+                val kPropertyVarName = reference.referencedName.getKPropertyVarName()
 
                 val kPropertyConstructorCall by lazy {
                     fun IrSingleStatementBuilder.irThrowUnsupported(message: String) =
@@ -152,21 +162,19 @@ class PropertyReferencesLowering(override val context: DartLoweringContext) : Ir
                             }
                         )
 
-                    createKPropertyConstructorCall(
+                    createKPropertyInfo(
                         context,
                         declaration.symbol,
                         propertyReference = reference,
                         propertyGetter = reference.getter,
                         propertySetter = reference.setter,
                         propertyType = reference.getter.owner.returnType,
-                        receiver1 = reference.receiver,
-                        receiver2 = null, // TODO
                         createGetterLambdaBody = { irThrowUnsupported("Cannot call getter for this declaration") },
                         createSetterLambdaBody = { irThrowUnsupported("Cannot call setter for this declaration") }
                     )
                 }
 
-                return body
+                return relevantBody
                     .statements
                     .filterIsInstance<IrDeclaration>()
                     .variableWithNameOrNull(kPropertyVarName)
@@ -184,7 +192,7 @@ class PropertyReferencesLowering(override val context: DartLoweringContext) : Ir
 
                         initializer = kPropertyConstructorCall.constructorCall
 
-                        body.statements.add(index = kPropertyVarsCount, this).also {
+                        relevantBody.statements.add(index = kPropertyVarsCount, this).also {
                             kPropertyVarsCount++
                         }
                     }
@@ -208,43 +216,62 @@ class PropertyReferencesLowering(override val context: DartLoweringContext) : Ir
     }
 }
 
+private fun Name.getKPropertyVarName(receiverCount: Int = 0): String = "$this\$kProperty$receiverCount"
 
-private val Name.kPropertyVarName: String
-    get() = "$this\$kProperty"
+private val IrType.kPropertyMetadata: KPropertyMetadata
+    get() = classFqName.toString().let {
+        KPropertyMetadata(
+            receiverCount = it.last().toString().toInt(),
+            isMutable = it.contains("Mutable")
+        )
+    }
 
-
-private fun DartLoweringContext.createKPropertyConstructorCall(
+private fun DartLoweringContext.createKPropertyInfo(
     context: IrExpressionContext,
     containerSymbol: IrSymbol,
-    boundThisReceiver: IrValueParameter? = null,
+    thisReceiver: IrExpression? = null,
     propertyReference: IrCallableReference<*>,
     propertyGetter: IrSimpleFunctionSymbol?,
     propertySetter: IrSimpleFunctionSymbol?,
     propertyType: IrType,
-    receiver1: IrExpression?,
-    receiver2: IrExpression?,
+    metadata: KPropertyMetadata = propertyReference.type.kPropertyMetadata,
     createGetterLambdaBody: (IrSingleStatementBuilder.() -> IrExpression)? = null,
     createSetterLambdaBody: (IrSingleStatementBuilder.() -> IrExpression)? = null,
-): KPropertyConstructorCall {
-    val receiverCount: Int = listOf(receiver1, receiver2).map { if (it != null) 1 else 0 }.sum()
+): KPropertyInfo {
+    val (receiverCount, isMutable) = metadata
 
-    var isMutable = false
     val kPropertyClass = with(dartBuiltIns.dotlin) {
-        when (receiver1) {
-            null -> when (propertySetter) {
-                null -> kProperty0Impl
-                else -> kMutableProperty0Impl.also { isMutable = true }
+        when (receiverCount) {
+            0 -> when {
+                isMutable -> kMutableProperty0Impl
+                else -> kProperty0Impl
             }
-            else -> when (propertySetter) {
-                null -> kProperty1Impl
-                else -> kMutableProperty1Impl.also { isMutable = true }
+            1 -> when {
+                isMutable -> kMutableProperty1Impl
+                else -> kProperty1Impl
             }
-
+            2 -> when {
+                isMutable -> kMutableProperty2Impl
+                else -> kProperty2Impl
+            }
+            else -> throw UnsupportedOperationException(
+                "Unsupported receiver count: $receiverCount"
+            )
         }
     }.owner
 
+    val receiver1 = when (receiverCount) {
+        in 1..2 -> propertyReference.receiver ?: thisReceiver
+        else -> null
+    }
+
+    val receiver2: IrExpression? = when (receiverCount) {
+        2 -> null // TODO
+        else -> null
+    }
+
     fun buildGetterOrSetterFunc(
-        block: IrSimpleFunction.(getReceiver1: IrGetValue?, getReceiver2: IrGetValue?) -> Unit
+        block: IrSimpleFunction.(getReceiver1: IrExpression?, getReceiver2: IrExpression?) -> Unit
     ) = irFactory.buildFun {
         name = Name.special("<anonymous>")
         returnType = propertyType
@@ -265,12 +292,7 @@ private fun DartLoweringContext.createKPropertyConstructorCall(
             }
         }
 
-        val getReceiver1 = buildReceiverParameter(receiver1, ordinal = 1) ?: when (boundThisReceiver) {
-            null -> null
-            else -> buildStatement(symbol) {
-                irGet(boundThisReceiver)
-            }
-        }
+        val getReceiver1 = buildReceiverParameter(receiver1, ordinal = 1)
         val getReceiver2 = buildReceiverParameter(receiver2, ordinal = 2)
 
         block(this, getReceiver1, getReceiver2)
@@ -287,19 +309,24 @@ private fun DartLoweringContext.createKPropertyConstructorCall(
             }
         )
     }
+
+    val receiver1TypeArg = receiver1?.let {
+        makeTypeProjection(it.type, Variance.INVARIANT)
+    }
+
+    val receiver2TypeArg = receiver2?.let {
+        makeTypeProjection(it.type, Variance.INVARIANT)
+    }
+
     val kPropertyType = kPropertyClass.defaultType.buildSimpleType {
         arguments = listOfNotNull(
-            when (receiver1) {
-                null -> null
-                else -> makeTypeProjection(
-                    receiver1.type, Variance.INVARIANT
-                )
-            },
+            receiver1TypeArg,
+            receiver2TypeArg,
             makeTypeProjection(propertyType, Variance.INVARIANT)
         )
     }
 
-    return KPropertyConstructorCall(
+    return KPropertyInfo(
         constructorCall = buildStatement(containerSymbol) {
             irCallConstructor(
                 kPropertyClass.primaryConstructor!!.symbol,
@@ -325,12 +352,8 @@ private fun DartLoweringContext.createKPropertyConstructorCall(
                                 hasQuestionMark = false,
                                 arguments = listOfNotNull(
                                     getterFuncReturnType,
-                                    receiver1?.let {
-                                        makeTypeProjection(
-                                            it.type,
-                                            variance = Variance.INVARIANT
-                                        )
-                                    }
+                                    receiver1TypeArg,
+                                    receiver2TypeArg
                                 ),
                                 annotations = emptyList()
                             )
@@ -351,12 +374,8 @@ private fun DartLoweringContext.createKPropertyConstructorCall(
                                     hasQuestionMark = false,
                                     arguments = listOfNotNull(
                                         makeTypeProjection(irBuiltIns.unitType, Variance.OUT_VARIANCE),
-                                        receiver1?.let {
-                                            makeTypeProjection(
-                                                receiver1.type,
-                                                variance = Variance.INVARIANT
-                                            )
-                                        },
+                                        receiver1TypeArg,
+                                        receiver2TypeArg,
                                         makeTypeProjection(propertyType, Variance.INVARIANT)
                                     ),
                                     annotations = emptyList()
@@ -387,8 +406,20 @@ private fun DartLoweringContext.createKPropertyConstructorCall(
                 }
             }
         },
-        isConst = propertyReference.isAccessibleInDartConstLambda(kPropertyGetterLambda)
+        isConst = propertyReference.isAccessibleInDartConstLambda(kPropertyGetterLambda),
+        receiver1,
+        receiver2
     )
 }
 
-private data class KPropertyConstructorCall(val constructorCall: IrConstructorCall, val isConst: Boolean)
+private data class KPropertyMetadata(
+    val receiverCount: Int,
+    val isMutable: Boolean
+)
+
+private class KPropertyInfo(
+    val constructorCall: IrConstructorCall,
+    val isConst: Boolean,
+    val receiver1: IrExpression?,
+    val receiver2: IrExpression?
+)

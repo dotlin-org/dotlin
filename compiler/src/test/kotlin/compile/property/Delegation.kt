@@ -71,11 +71,11 @@ class Delegation : BaseTest {
             }
 
             String get x {
-              return _x${'$'}delegate.getValue(null, x${'$'}kProperty);
+              return _x${'$'}delegate.getValue(null, x${'$'}kProperty0);
             }
             
             final Delegate _x${'$'}delegate = Delegate();
-            const KProperty0Impl<String> x${'$'}kProperty = KProperty0Impl<String>('x', _${'$'}381);
+            const KProperty0Impl<String> x${'$'}kProperty0 = KProperty0Impl<String>('x', _${'$'}381);
             String _${'$'}381() => x;
             """
         )
@@ -126,15 +126,15 @@ class Delegation : BaseTest {
             }
 
             String get x {
-              return _x${'$'}delegate.getValue(null, x${'$'}kProperty);
+              return _x${'$'}delegate.getValue(null, x${'$'}kProperty0);
             }
 
             void set x(String ${'$'}value) {
-              return _x${'$'}delegate.setValue(null, x${'$'}kProperty, ${'$'}value);
+              return _x${'$'}delegate.setValue(null, x${'$'}kProperty0, ${'$'}value);
             }
 
             final Delegate _x${'$'}delegate = Delegate();
-            const KMutableProperty0Impl<String> x${'$'}kProperty =
+            const KMutableProperty0Impl<String> x${'$'}kProperty0 =
                 KMutableProperty0Impl<String>('x', _${'$'}381, _${'$'}381With${'$'}value);
             String _${'$'}381() => x;
             String _${'$'}381With${'$'}value(String ${'$'}value) => x = ${'$'}value;
@@ -192,13 +192,13 @@ class Delegation : BaseTest {
             class Test {
               @nonVirtual
               String get x {
-                return this._x${'$'}delegate.getValue(this, this.x${'$'}kProperty);
+                return this._x${'$'}delegate.getValue(this, this.x${'$'}kProperty1);
               }
 
               final Delegate _x${'$'}delegate = Delegate();
               @nonVirtual
-              late final KProperty0Impl<String> x${'$'}kProperty =
-                  KProperty0Impl<String>('x', () => this.x);
+              late final KProperty1Impl<Test, String> x${'$'}kProperty1 =
+                  KProperty1Impl<Test, String>('x', (Test ${'$'}receiver1) => ${'$'}receiver1.x);
             }
             """
         )
@@ -254,19 +254,25 @@ class Delegation : BaseTest {
             class Test {
               @nonVirtual
               String get x {
-                return this._x${'$'}delegate.getValue(this, this.x${'$'}kProperty);
+                return this._x${'$'}delegate.getValue(this, this.x${'$'}kProperty1);
               }
 
               @nonVirtual
               void set x(String ${'$'}value) {
-                return this._x${'$'}delegate.setValue(this, this.x${'$'}kProperty, ${'$'}value);
+                return this._x${'$'}delegate.setValue(this, this.x${'$'}kProperty1, ${'$'}value);
               }
 
               final Delegate _x${'$'}delegate = Delegate();
               @nonVirtual
-              late final KMutableProperty0Impl<String> x${'$'}kProperty =
-                  KMutableProperty0Impl<String>(
-                      'x', () => this.x, (String ${'$'}value) => this.x = ${'$'}value);
+              late final KMutableProperty1Impl<Test, String> x${'$'}kProperty1 =
+                  KMutableProperty1Impl<Test, String>(
+                      'x',
+                      (Test ${'$'}receiver1) => ${'$'}receiver1.x,
+                      (
+                        Test ${'$'}receiver1,
+                        String ${'$'}value,
+                      ) =>
+                          ${'$'}receiver1.x = ${'$'}value);
             }
             """
         )
@@ -321,13 +327,11 @@ class Delegation : BaseTest {
             }
 
             void main() {
+              late final KProperty0Impl<String> x${'$'}kProperty0 = KProperty0Impl<String>('x',
+                  () => throw UnsupportedError('Cannot call getter for this declaration'));
               final Delegate x${'$'}delegate = Delegate();
               String get${'$'}x() {
-                late final KProperty0Impl<String> x${'$'}kProperty = KProperty0Impl<String>(
-                    'x',
-                    () =>
-                        throw UnsupportedError('Cannot call getter for this declaration'));
-                return x${'$'}delegate.getValue(null, x${'$'}kProperty);
+                return x${'$'}delegate.getValue(null, x${'$'}kProperty0);
               }
 
               final String y = get${'$'}x();
@@ -385,27 +389,19 @@ class Delegation : BaseTest {
             }
 
             void main() {
+              late final KMutableProperty0Impl<String> x${'$'}kProperty0 = KMutableProperty0Impl<
+                      String>(
+                  'x',
+                  () => throw UnsupportedError('Cannot call getter for this declaration'),
+                  (String ${'$'}value) =>
+                      throw UnsupportedError('Cannot call setter for this declaration'));
               final Delegate x${'$'}delegate = Delegate();
               String get${'$'}x() {
-                late final KMutableProperty0Impl<String> x${'$'}kProperty =
-                    KMutableProperty0Impl<String>(
-                        'x',
-                        () => throw UnsupportedError(
-                            'Cannot call getter for this declaration'),
-                        (String ${'$'}value) => throw UnsupportedError(
-                            'Cannot call setter for this declaration'));
-                return x${'$'}delegate.getValue(null, x${'$'}kProperty);
+                return x${'$'}delegate.getValue(null, x${'$'}kProperty0);
               }
 
               void set${'$'}x(String value) {
-                late final KMutableProperty0Impl<String> x${'$'}kProperty =
-                    KMutableProperty0Impl<String>(
-                        'x',
-                        () => throw UnsupportedError(
-                            'Cannot call getter for this declaration'),
-                        (String ${'$'}value) => throw UnsupportedError(
-                            'Cannot call setter for this declaration'));
-                return x${'$'}delegate.setValue(null, x${'$'}kProperty, value);
+                return x${'$'}delegate.setValue(null, x${'$'}kProperty0, value);
               }
 
               final String y = get${'$'}x();

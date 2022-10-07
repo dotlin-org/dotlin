@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.deepCopyWith
 import org.dotlin.compiler.backend.steps.ir2ast.ir.irCall
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
@@ -53,12 +54,14 @@ class DelegatedPropertiesLowering(override val context: DartLoweringContext) : I
 
             val getter = declaration.getter.deepCopyWith(remapReferences = false) {
                 name = Name.identifier("get\$${declaration.name}")
+                origin = IrDartDeclarationOrigin.LOCAL_DELEGATED_PROPERTY_REFERENCE_ACCESSOR
             }.also {
                 transformations += add(it)
             }
 
             val setter = declaration.setter?.deepCopyWith(remapReferences = false) {
                 name = Name.identifier("set\$${declaration.name}")
+                origin = IrDartDeclarationOrigin.LOCAL_DELEGATED_PROPERTY_REFERENCE_ACCESSOR
             }?.also {
                 transformations += add(it)
             }
