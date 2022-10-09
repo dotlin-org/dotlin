@@ -100,6 +100,11 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
             "const lambdas cannot access values from local or class closure"
         )
 
+        put(
+            ErrorsDart.KOTLIN_ITERATOR_METHOD_USAGE,
+            "use 'moveNext' and 'current'"
+        )
+
         // Dart emulated errors.
 
         put(

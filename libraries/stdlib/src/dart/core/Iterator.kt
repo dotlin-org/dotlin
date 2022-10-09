@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("INAPPLICABLE_OPERATOR_MODIFIER")
+
 package dart.core
 
 /**
@@ -34,8 +36,9 @@ package dart.core
  * The [current] value must not be accessed before calling [moveNext]
  * or after a call to [moveNext] has returned false.
  */
-@DartLibrary("dart:core", aliased = true)
-internal external interface Iterator<out E> {
+external abstract class Iterator<out E>() {
+    constructor(useAs: InterfaceOrMixin)
+
     /**
      * Advances the iterator to the next element of the iteration.
      *
@@ -55,7 +58,7 @@ internal external interface Iterator<out E> {
      * state, and any further behavior of the iterator is unspecified,
      * including the effect of reading [current].
      */
-    fun moveNext(): Boolean
+    open fun moveNext(): Boolean
 
     /**
      * The current element.
@@ -73,20 +76,17 @@ internal external interface Iterator<out E> {
      * After a successful call to `moveNext`, the user doesn't need to cache
      * the current value, but can keep reading it from the iterator.
      */
-    val current: E
-}
+    open val current: E
 
-/**
- * An [Iterator] that allows moving backwards as well as forwards.
- */
-@DartLibrary("dart:core", aliased = true)
-internal external interface BidirectionalIterator<out E> : Iterator<E> {
+    // Kotlin iterator overrides. Only here to make the Kotlin compiler happy.
+
     /**
-     * Move back to the previous element.
-     *
-     * Returns true and updates [current] if successful. Returns false
-     * and updates [current] to an implementation defined state if there is no
-     * previous element
+     * Do not use. Use `moveNext` and `current` instead.
      */
-    fun movePrevious(): Boolean
+    final operator fun hasNext(): Boolean = throw UnsupportedError("Use moveNext and current")
+
+    /**
+     * Do not use. Use `moveNext` and `current` instead.
+     */
+    final operator fun next(): E = throw UnsupportedError("Use moveNext and current")
 }

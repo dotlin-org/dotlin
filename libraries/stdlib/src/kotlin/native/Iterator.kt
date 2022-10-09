@@ -17,56 +17,36 @@
 
 package kotlin.collections
 
-/**
- * An iterator over a collection or another entity that can be represented as a sequence of elements.
- * Allows to sequentially access the elements.
- *
- * Equivalent to `dart:core`'s `Iterator`. Any subtypes of [kotlin.Iterator] will implement
- * `dart:core`'s `Iterator` automatically.
- *
- * In Dart, `current` is updated everytime [next] (and in [BidirectionalIterator], [previous]) returns a value.
- */
-interface Iterator<out T> {
-    /**
-     * Returns the next element in the iteration.
-     */
-    operator fun next(): T
-
-    /**
-     * Returns `true` if the iteration has more elements.
-     */
-    operator fun hasNext(): Boolean
-}
+import kotlin.collections.Iterator as KtIterator
 
 /**
  * An iterator over a mutable collection. Provides the ability to remove elements while iterating.
  * @see MutableCollection.iterator
  */
-interface MutableIterator<out T> : Iterator<T> {
+interface MutableIterator<out T> : Iterator<T>(Interface) {
     /**
-     * Removes from the underlying collection the last element returned by this iterator.
+     * Removes from the underlying collection the [current] element.
+     *
+     * The [current] won't change, unless [moveNext] (or in the case of [BidirectionalIterator], [movePrevious]) is
+     * called.
      */
     fun remove(): Unit
 }
 
 /**
  * An iterator over a collection that supports back-and-forth sequential access to elements.
- *
- * Any subtypes of [kotlin.BidirectionalIterator] will implement `dart:core`'s `BidirectionalIterator` automatically.
  */
-interface BidirectionalIterator<out T> : Iterator<T> {
-    override fun next(): T
-    override fun hasNext(): Boolean
-
+interface BidirectionalIterator<out T> : Iterator<T>(Interface) {
     /**
-     * Returns `true` if there are elements in the iteration before the current element.
+     * Move back to the previous element.
+     *
+     * Returns true and updates [current] if successful. Returns false
+     * and updates [current] to an implementation defined state if there is no
+     * previous element.
      */
-    fun hasPrevious(): Boolean
-
-    /**
-     * Returns the previous element in the iteration and moves the cursor position backwards.
-     */
-    fun previous(): T
+    fun movePrevious(): Boolean
+    override fun moveNext(): Boolean
+    override val current: T
 }
 
 /**
@@ -75,22 +55,14 @@ interface BidirectionalIterator<out T> : Iterator<T> {
  * @see List.listIterator
  */
 interface ListIterator<out T> : BidirectionalIterator<T> {
-    // Query Operations
-    override fun next(): T
-    override fun hasNext(): Boolean
-
-    override fun hasPrevious(): Boolean
-    override fun previous(): T
+    override fun movePrevious(): Boolean
+    override fun moveNext(): Boolean
+    override val current: T
 
     /**
-     * Returns the index of the element that would be returned by a subsequent call to [next].
+     * T index of the [current] element.
      */
-    fun nextIndex(): Int
-
-    /**
-     * Returns the index of the element that would be returned by a subsequent call to [previous].
-     */
-    fun previousIndex(): Int
+    val currentIndex: Int
 }
 
 /**
@@ -98,25 +70,23 @@ interface ListIterator<out T> : BidirectionalIterator<T> {
  * to add, modify and remove elements while iterating.
  */
 interface MutableListIterator<T> : ListIterator<T>, MutableIterator<T> {
-    // Query Operations
-    override fun next(): T
-    override fun hasNext(): Boolean
+    override fun movePrevious(): Boolean
+    override fun moveNext(): Boolean
+    override val current: T
 
-    // Modification Operations
     override fun remove(): Unit
 
     /**
-     * Replaces the last element returned by [next] or [previous] with the specified element [element].
+     * Replaces the [current] element with the specified [element].
+     *
+     * The [current] element won't change, only after a call to [moveNext] or [movePrevious] will the value
+     * be up to date.
      */
     fun set(element: T): Unit
 
     /**
-     * Adds the specified element [element] into the underlying collection immediately before the element that would be
-     * returned by [next], if any, and after the element that would be returned by [previous], if any.
+     * Adds the specified [element] into the underlying collection immediately before the [current] element, if any,
      * (If the collection contains no elements, the new element becomes the sole element in the collection.)
-     * The new element is inserted before the implicit cursor: a subsequent call to [next] would be unaffected,
-     * and a subsequent call to [previous] would return the new element. (This call increases by one the value \
-     * that would be returned by a call to [nextIndex] or [previousIndex].)
      */
     fun add(element: T): Unit
 }

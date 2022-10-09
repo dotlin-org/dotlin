@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
+import org.dotlin.compiler.backend.dart
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartStatementOrigin.*
 import org.dotlin.compiler.backend.steps.ir2ast.ir.extensionReceiverOrNull
@@ -311,7 +312,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
     }
 
     private fun IrType.isDartIterable(): Boolean =
-        classFqName == FqName("dart.core.Iterable") ||
+        classFqName == dart.core.Iterable ||
                 isArray() || isByteArray() || isShortArray() || isIntArray() || isLongArray() ||
                 superTypes().any { it.isDartIterable() }
 

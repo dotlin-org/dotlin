@@ -19,6 +19,8 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast
 
+import org.dotlin.compiler.backend.dart
+import org.dotlin.compiler.backend.dotlin
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -27,45 +29,40 @@ import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.name.Name
 
 class DartIrBuiltIns(context: DartLoweringContext) {
     private val builtInsModule = context.irModuleFragment.descriptor.builtIns.builtInsModule
     private val symbolTable = context.symbolTable
 
-    val dotlin = Dotlin()
+    val dotlin = Dotlin(this)
 
-    val identical = functionSymbolAt("dart.core", "identical")
-    val iterator = classSymbolAt("dart.core", "Iterator")
-    val bidirectionalIterator = classSymbolAt("dart.core", "BidirectionalIterator")
+    val identical = functionSymbolAt(dart.core.identical)
+    val iterator = classSymbolAt(dart.core.Iterator)
 
-    val unsupportedError = classSymbolAt("dart.core", "UnsupportedError")
+    val unsupportedError = classSymbolAt(dart.core.UnsupportedError)
 
-    inner class Dotlin {
-        val const = classSymbolAt("dotlin", "const")
-        val dart = functionSymbolAt("dotlin", "dart")
-        val returnClass = classSymbolAt("dotlin", "\$Return")
+    class Dotlin(builtIns: DartIrBuiltIns) {
+        val const = builtIns.classSymbolAt(dotlin.const)
+        val dart = builtIns.functionSymbolAt(dotlin.dart)
+        val returnClass = builtIns.classSymbolAt(dotlin.`$Return`)
 
         // Reflect
-        val kProperty0Impl = classSymbolAt("dotlin.reflect", "KProperty0Impl")
-        val kMutableProperty0Impl = classSymbolAt("dotlin.reflect", "KMutableProperty0Impl")
-        val kProperty1Impl = classSymbolAt("dotlin.reflect", "KProperty1Impl")
-        val kMutableProperty1Impl = classSymbolAt("dotlin.reflect", "KMutableProperty1Impl")
-        val kProperty2Impl = classSymbolAt("dotlin.reflect", "KProperty2Impl")
-        val kMutableProperty2Impl = classSymbolAt("dotlin.reflect", "KMutableProperty2Impl")
+        val kProperty0Impl = builtIns.classSymbolAt(dotlin.reflect.KProperty0Impl)
+        val kMutableProperty0Impl = builtIns.classSymbolAt(dotlin.reflect.KMutableProperty0Impl)
+        val kProperty1Impl = builtIns.classSymbolAt(dotlin.reflect.KProperty1Impl)
+        val kMutableProperty1Impl = builtIns.classSymbolAt(dotlin.reflect.KMutableProperty1Impl)
+        val kProperty2Impl = builtIns.classSymbolAt(dotlin.reflect.KProperty2Impl)
+        val kMutableProperty2Impl = builtIns.classSymbolAt(dotlin.reflect.KMutableProperty2Impl)
     }
 
-    private inline fun <reified S : IrSymbol> symbolAt(
-        packageName: String,
-        memberName: String
-    ): S {
-        val packageFqName = FqName(packageName)
-        val memberIdentifier = Name.identifier(memberName)
+    private inline fun <reified S : IrSymbol> symbolAt(name: FqName): S {
+        val packageFqName = name.parent()
+        val memberIdentifier = name.shortName()
         val descriptor = builtInsModule.getPackage(packageFqName)
             .memberScope
             .getContributedDescriptors {
                 it == memberIdentifier
-            }.firstOrNull() ?: error("Classifier not found: $packageName.$memberName")
+            }.firstOrNull() ?: error("Classifier not found: $name")
 
         return symbolTable.run {
             when (S::class) {
@@ -76,13 +73,7 @@ class DartIrBuiltIns(context: DartLoweringContext) {
         }
     }
 
-    private fun functionSymbolAt(
-        packageName: String,
-        memberName: String
-    ): IrSimpleFunctionSymbol = symbolAt(packageName, memberName)
+    private fun functionSymbolAt(name: FqName): IrSimpleFunctionSymbol = symbolAt(name)
 
-    private fun classSymbolAt(
-        packageName: String,
-        memberName: String
-    ): IrClassSymbol = symbolAt(packageName, memberName)
+    private fun classSymbolAt(name: FqName): IrClassSymbol = symbolAt(name)
 }

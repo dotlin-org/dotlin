@@ -21,22 +21,22 @@ package kotlin.ranges
  * An iterator over a progression of values of type `Int`.
  * @property step the number by which the value is incremented on each step.
  */
-internal class IntProgressionIterator(first: Int, last: Int, val step: Int) : kotlin.collections.Iterator<Int> {
-    private val finalElement: Int = last
+// TODO: Add behavior test
+internal class IntProgressionIterator(private val first: Int, private val last: Int, val step: Int) : Iterator<Int>() {
     private var hasNext: Boolean = if (step > 0) first <= last else first >= last
-    private var next: Int = if (hasNext) first else finalElement
 
-    override fun hasNext(): Boolean = hasNext
+    override fun moveNext(): Boolean {
+        _current = when (val current = _current) {
+            null -> first
+            last -> return false
+            else -> current + step
+        }
 
-    override fun next(): Int {
-        val value = next
-        if (value == finalElement) {
-            if (!hasNext) throw StateError("No such element")
-            hasNext = false
-        }
-        else {
-            next += step
-        }
-        return value
+        return true
     }
+
+    private var _current: Int? = null
+
+    override val current: Int
+        get() = _current!!
 }

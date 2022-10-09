@@ -103,13 +103,14 @@ external open class Array<T> {
     /**
      * Returns the number of elements in the array.
      */
+    @DartName("length")
     open val size: Int
 
     /**
      * Creates an [Iterator] for iterating over the elements of the array.
      */
     @DartExtension
-    /*inline*/ operator fun iterator(): kotlin.collections.Iterator<T>
+    /*inline*/ operator fun iterator(): Iterator<T>
 
     /**
      * Returns a new array containing the elements between [start] and [end].

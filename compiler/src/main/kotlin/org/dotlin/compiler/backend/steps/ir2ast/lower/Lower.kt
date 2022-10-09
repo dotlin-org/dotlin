@@ -20,8 +20,9 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.*
-import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.Comparable
+import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.EnumLowering
+import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.EnumValues
 import org.dotlin.compiler.backend.steps.src2ir.IrResult
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import kotlin.reflect.KFunction1
@@ -59,8 +60,6 @@ private val lowerings: List<Lowering> = listOf(
     ::CompareToCallsLowering,
     ::RemoveInstanceInitializersLowering,
     ::SecondaryRedirectingConstructorsWithBodiesLowering,
-    ::IteratorSubtypeImplementationsLowering,
-    ::IteratorSubtypeReturnsLowering,
     ::ObjectLowering,
     ::NestedClassLowering,
     ::ReturnsLowering,

@@ -16,7 +16,7 @@ val IrDeclaration.isExplicitlyExternal: Boolean
 
 /**
  * Whether this declaration is external by Dotlin standards. This means that companion objects are only
- * considered external if they explicitely had the `external` keyword in front of them.
+ * considered external if they explicitly had the `external` keyword in front of them.
  */
 val IrDeclaration.isActuallyExternal: Boolean
     get() = when {

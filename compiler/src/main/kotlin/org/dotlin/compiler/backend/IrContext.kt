@@ -132,7 +132,7 @@ abstract class IrContext : IrAttributes {
     )
 
     private fun IrAnnotationContainer.unresolvedImportFromAnnotationFor(declaration: IrDeclarationWithName) =
-        getTwoAnnotationArgumentsOf<String, Boolean>(DotlinAnnotations.dartLibrary)
+        getTwoAnnotationArgumentsOf<String, Boolean>(dotlin.DartLibrary)
             ?.let { (library, aliased) ->
                 DartUnresolvedImport(
                     library,
@@ -279,7 +279,7 @@ abstract class IrContext : IrAttributes {
                     parentClass.defaultType.isDotlinReturn() -> {
                         valueArguments.all { it?.isDartConst(allowImplicit) == true }
                     }
-                    else -> hasAnnotation(DotlinAnnotations.const)
+                    else -> hasAnnotation(dotlin.const)
                 }
             }
             is IrTypeOperatorCall -> argument.isDartConst(allowImplicit)

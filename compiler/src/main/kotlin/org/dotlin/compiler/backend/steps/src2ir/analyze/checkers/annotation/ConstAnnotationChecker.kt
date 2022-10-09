@@ -1,6 +1,6 @@
 package org.dotlin.compiler.backend.steps.src2ir.analyze.checkers.annotation
 
-import org.dotlin.compiler.backend.DotlinAnnotations
+import org.dotlin.compiler.backend.dotlin
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
 import org.dotlin.compiler.backend.util.getFqName
 import org.jetbrains.kotlin.config.LanguageVersionSettings
@@ -25,7 +25,7 @@ object ConstAnnotationChecker : AdditionalAnnotationChecker {
         annotated: KtAnnotated?,
         languageVersionSettings: LanguageVersionSettings
     ) {
-        if (entries.none { it.getFqName(trace.bindingContext) == DotlinAnnotations.const }) return
+        if (entries.none { it.getFqName(trace.bindingContext) == dotlin.const }) return
         val expression = annotated?.children?.last { it is KtExpression } as? KtExpression ?: return
 
         when (val calledConstructor = expression.getCalledConstructorDescriptor(trace.bindingContext)) {

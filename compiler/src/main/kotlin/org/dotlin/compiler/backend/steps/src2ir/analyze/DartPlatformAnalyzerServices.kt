@@ -19,7 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.src2ir.analyze
 
-import org.jetbrains.kotlin.name.FqName
+import org.dotlin.compiler.backend.kotlin
 import org.jetbrains.kotlin.resolve.ImportPath
 import org.jetbrains.kotlin.resolve.PlatformDependentAnalyzerServices
 import org.jetbrains.kotlin.storage.StorageManager
@@ -38,5 +38,5 @@ object DartPlatformAnalyzerServices : PlatformDependentAnalyzerServices() {
     }
 
     override val platformConfigurator = DartPlatformConfigurator
-    override val excludedImports: List<FqName> = emptyList()
+    override val excludedImports = listOf(kotlin.collections.Iterator)
 }

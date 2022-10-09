@@ -17,6 +17,8 @@
 
 package kotlin.collections
 
+import kotlin.collections.Iterator as KtIterator
+
 import kotlin.internal.PlatformDependent
 
 /**

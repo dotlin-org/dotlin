@@ -212,6 +212,18 @@ mapping of built-ins:
 
 This also means that `Int` now refers to a 64-bit integer, instead of 32-bit as in Kotlin.
 
+### Iterator
+
+In Kotlin, any class that implements `hasNext()` and `next()` is considered an iterator. In Dotlin,
+this is not the case. Instead, it's more like Dart: A class is only an considered an iterator if it
+implements `dart.core.Iterator`. This means the the Dart `Iterator` API is used: instead of
+`hasNext()` and `next()`, `moveNext()` and `current` are used.
+
+
+`kotlin.collections.Iterator` is not available. However, the `kotlin.collections.Iterator`
+subtypes are, changed to fit `dart.core.Iterator`: `MutableIterator`, `BidirectionalIterator`,
+`ListIterator`, and `MutableListIterator.
+
 ### Errors & Exceptions
 
 In Kotlin, you can only throw `Throwable` or its subtypes. In Dotlin, this

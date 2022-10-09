@@ -41,7 +41,7 @@ external val definedExternally: Nothing
 inline fun <T> typeOf(): Type = definedExternally
 
 /**
- * Marker interface to indicate that a class can be either implement the implicit interface or be mixed in.
+ * Marker interface to indicate that a class can either implement the implicit interface or be mixed in.
  *
  * @see Interface
  * @see Mixin

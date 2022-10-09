@@ -25,14 +25,14 @@ import org.dotlin.compiler.hasErrors
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.cli.common.messages.DefaultDiagnosticReporter
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticFactory
 import org.jetbrains.kotlin.diagnostics.rendering.DefaultErrorMessages
-import org.jetbrains.kotlin.diagnostics.reportDiagnosticOnce
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTraceContext
-import org.jetbrains.kotlin.resolve.calls.model.DiagnosticReporter
-import org.jetbrains.kotlin.resolve.diagnostics.Diagnostics
 import org.jetbrains.kotlin.util.slicedMap.BasicWritableSlice
 import org.jetbrains.kotlin.util.slicedMap.RewritePolicy
 
@@ -81,3 +81,6 @@ fun Iterable<Diagnostic>.reportOnly(messageCollector: MessageCollector, vararg d
         reporter.report(it)
     }
 }
+
+fun DeclarationDescriptor.isIteratorMethod() = this is FunctionDescriptor && isOperator &&
+        (name == Name.identifier("next") || name == Name.identifier("hasNext"))

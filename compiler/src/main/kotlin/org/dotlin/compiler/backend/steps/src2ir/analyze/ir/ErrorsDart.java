@@ -74,6 +74,9 @@ public interface ErrorsDart {
     DiagnosticFactory0<KtExpression> CONST_LAMBDA_ACCESSING_NON_GLOBAL_VALUE =
             DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
 
+    DiagnosticFactory0<KtExpression> KOTLIN_ITERATOR_METHOD_USAGE =
+            DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
+
     // Dart emulated errors.
     DiagnosticFactory0<KtExpression> CONST_WITH_NON_CONST =
             DiagnosticFactory0.create(Severity.ERROR, DEFAULT);

@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
+import org.dotlin.compiler.backend.kotlin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.deepCopyWith
 import org.dotlin.compiler.backend.steps.ir2ast.ir.type
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
@@ -39,7 +40,6 @@ import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.util.SYNTHETIC_OFFSET
 import org.jetbrains.kotlin.ir.util.statements
-import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.utils.addToStdlib.lastIsInstanceOrNull
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
@@ -121,5 +121,5 @@ class LazyPropertiesLowering(override val context: DartLoweringContext) : IrDecl
         get() = isDelegated && backingField!!.type.isLazy
 
     private val IrType.isLazy: Boolean
-        get() = classFqName == FqName("kotlin.Lazy") // TODO: Use FqName syntax
+        get() = classFqName == kotlin.Lazy
 }

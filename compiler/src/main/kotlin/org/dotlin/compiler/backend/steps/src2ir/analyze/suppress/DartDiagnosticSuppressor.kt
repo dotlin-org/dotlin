@@ -13,7 +13,8 @@ class DartDiagnosticSuppressor(
         SpecialInheritanceSuppressor(trace),
         ConstSuppressor,
         TypeErasureSuppressor,
-        LateInitSuppressor
+        LateInitSuppressor,
+        KotlinIteratorSuppressor
     )
 
     override fun isSuppressed(diagnostic: Diagnostic): Boolean = diagnostic.let {

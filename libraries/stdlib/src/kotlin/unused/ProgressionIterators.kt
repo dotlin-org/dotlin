@@ -17,14 +17,5 @@
 
 package kotlin.ranges
 
-/**
- * An iterator over a progression of values of type `Char`.
- * @property step the number by which the value is incremented on each step.
- */
-internal external interface CharProgressionIterator : CharIterator
-
-/**
- * An iterator over a progression of values of type `Long`.
- * @property step the number by which the value is incremented on each step.
- */
-internal external interface LongProgressionIterator : LongIterator
+private external interface CharProgressionIterator
+private external interface LongProgressionIterator

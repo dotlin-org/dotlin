@@ -49,7 +49,7 @@ open class IntProgression
      */
     val step: Int = step
 
-    override fun iterator(): kotlin.collections.Iterator<Int> = IntProgressionIterator(first, last, step)
+    override fun iterator(): Iterator<Int> = IntProgressionIterator(first, last, step)
 
     /**
      * Checks if the progression is empty.

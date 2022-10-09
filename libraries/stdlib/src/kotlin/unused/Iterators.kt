@@ -19,11 +19,12 @@
 
 package kotlin.collections
 
-internal external interface ByteIterator : Iterator<Byte>
-internal external interface CharIterator : Iterator<Char>
-internal external interface ShortIterator : Iterator<Short>
-internal external interface IntIterator : Iterator<Int>
-internal external interface LongIterator : Iterator<Long>
-internal external interface FloatIterator : Iterator<Float>
-internal external interface DoubleIterator : Iterator<Double>
-internal external interface BooleanIterator : Iterator<Boolean>
+internal external interface Iterator
+private external interface ByteIterator
+private external interface CharIterator
+private external interface ShortIterator
+private external interface IntIterator
+private external interface LongIterator
+private external interface FloatIterator
+private external interface DoubleIterator
+private external interface BooleanIterator
