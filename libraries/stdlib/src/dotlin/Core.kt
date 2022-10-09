@@ -38,7 +38,7 @@ external val definedExternally: Nothing
  * String
  * ```
  */
-inline fun <T> typeOf(): Type = definedExternally
+inline external fun <T> typeOf(): Type = definedExternally
 
 /**
  * Marker interface to indicate that a class can either implement the implicit interface or be mixed in.
