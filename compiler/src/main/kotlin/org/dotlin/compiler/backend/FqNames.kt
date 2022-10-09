@@ -65,6 +65,14 @@ object kotlin : PackageFqNameWrapper {
 
         val Iterator = self.child("Iterator")
     }
+
+    object ranges : PackageFqNameWrapper {
+        override val self = kotlin.self.child("ranges")
+
+        val step = self.child("step")
+        val until = self.child("until")
+        val downTo = self.child("downTo")
+    }
 }
 
 private fun FqName.child(name: String) = child(Name.identifier(name))

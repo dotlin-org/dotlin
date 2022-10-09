@@ -20,8 +20,8 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionContext
-import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrimitiveNumber
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartNumberPrimitive
 import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
@@ -37,7 +37,7 @@ class PostfixIncrementsDecrementsLowering(override val context: DartLoweringCont
         if (expression !is IrBlock ||
             (expression.origin != IrStatementOrigin.POSTFIX_INCR &&
                     expression.origin != IrStatementOrigin.POSTFIX_DECR) ||
-            expression.type.isPrimitiveNumber()
+            expression.type.isDartNumberPrimitive()
         ) {
             return noChange()
         }

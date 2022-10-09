@@ -20,12 +20,13 @@
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.dart
+import org.dotlin.compiler.backend.kotlin
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartStatementOrigin.*
 import org.dotlin.compiler.backend.steps.ir2ast.ir.extensionReceiverOrNull
-import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrimitiveInteger
 import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.createDartAssignment
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartInt
 import org.dotlin.compiler.backend.util.isDartConst
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
@@ -50,8 +51,6 @@ import org.jetbrains.kotlin.ir.util.superTypes
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.addToStdlib.cast
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
@@ -299,16 +298,17 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
             }
         }
 
-    private fun IrExpression?.findCallWithNameInReceivers(fqName: String): IrCall? =
+    private fun IrExpression?.findCallWithNameInReceivers(fqName: FqName): IrCall? =
         findCallInReceivers { if (it.callsWithName(fqName)) it as IrCall else null }
 
-    @OptIn(ExperimentalContracts::class)
-    private fun IrExpression?.callsWithName(fqName: String): Boolean {
-        contract {
-            returns(true) implies (this@callsWithName is IrCall)
-        }
+    private fun IrExpression?.callsWithName(fqName: FqName): Boolean {
+        val ownerFqName = (this as? IrCall)?.symbol?.owner?.fqNameWhenAvailable?.toString() ?: return false
+        val packageName = fqName.parent().toString()
+        val memberName = fqName.shortName().toString()
 
-        return (this as? IrCall)?.symbol?.owner?.fqNameWhenAvailable == FqName(fqName)
+        // When compiling the stdlib, the kotlin.ranges extensions will be in an extension container class.
+        // So only check if the fqName is in the same package and has the same member, ignoring middle parts.
+        return ownerFqName.startsWith(packageName) && ownerFqName.endsWith(memberName)
     }
 
     private fun IrType.isDartIterable(): Boolean =
@@ -317,15 +317,15 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
                 superTypes().any { it.isDartIterable() }
 
     private fun IrExpression?.isStepCall() =
-        callsWithName("kotlin.ranges.step")
+        callsWithName(kotlin.ranges.step)
 
     private fun IrExpression?.untilCall(): IrCall? =
-        findCallWithNameInReceivers("kotlin.ranges.until")
+        findCallWithNameInReceivers(kotlin.ranges.until)
 
     private fun IrExpression?.hasOrIsUntilCall(): Boolean = untilCall() != null
 
     private fun IrExpression?.downToCall(): IrCall? =
-        findCallWithNameInReceivers("kotlin.ranges.downTo")
+        findCallWithNameInReceivers(kotlin.ranges.downTo)
 
     private fun IrExpression?.hasOrIsDownToCall(): Boolean = downToCall() != null
 
@@ -333,7 +333,8 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
         findCallInReceivers {
             when {
                 it !is IrCall -> null
-                it.dispatchReceiver?.type?.isPrimitiveInteger() == true && it.symbol.owner.name == Name.identifier("rangeTo") -> it
+                it.dispatchReceiver?.type?.isDartInt() == true &&
+                        it.symbol.owner.name == Name.identifier("rangeTo") -> it
                 else -> null
             }
         }

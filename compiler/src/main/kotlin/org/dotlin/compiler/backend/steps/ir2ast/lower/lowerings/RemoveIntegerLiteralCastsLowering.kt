@@ -19,8 +19,8 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrimitiveInteger
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartInt
 import org.jetbrains.kotlin.ir.declarations.copyAttributes
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrTypeOperator
@@ -32,8 +32,8 @@ import org.jetbrains.kotlin.ir.expressions.IrTypeOperatorCall
 class RemoveIntegerLiteralCastsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
     override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
         if (expression !is IrTypeOperatorCall ||
-            !expression.type.isPrimitiveInteger() ||
-            !expression.argument.type.isPrimitiveInteger() ||
+            !expression.type.isDartInt() ||
+            !expression.argument.type.isDartInt() ||
             expression.operator != IrTypeOperator.IMPLICIT_CAST) {
             return noChange()
         }

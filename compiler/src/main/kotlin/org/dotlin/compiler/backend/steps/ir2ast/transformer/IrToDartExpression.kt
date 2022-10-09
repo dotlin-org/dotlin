@@ -27,6 +27,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.element.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.ObjectLowering
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.createDartAssignment
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartInt
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartNumberPrimitive
 import org.dotlin.compiler.backend.util.component6
 import org.dotlin.compiler.backend.util.component7
 import org.dotlin.compiler.backend.util.runWith
@@ -220,7 +221,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                     )
                     // Some non-operator methods on primitive integers (Int, Long) are operators in Dart,
                     // such as `xor` or `ushr`.
-                    irCallLike.symbol.owner.parentClassOrNull?.defaultType?.isPrimitiveInteger() == true &&
+                    irCallLike.symbol.owner.parentClassOrNull?.defaultType?.isDartInt() == true &&
                             irFunction.name.identifier in primitiveNumberOperatorNames -> {
                         val left by lazy { infixReceiver }
                         val right by lazy { infixSingleArgument }
@@ -540,7 +541,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                 val variable = irSetValue.symbol.owner.dartName
 
                 when {
-                    expression.type.isPrimitiveNumber() -> when (origin) {
+                    expression.type.isDartNumberPrimitive() -> when (origin) {
                         PREFIX_INCR -> DartPrefixIncrementExpression(variable)
                         else -> DartPrefixDecrementExpression(variable)
                     }
@@ -553,7 +554,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
             }
             POSTFIX_INCR, POSTFIX_DECR -> {
                 // Non-primitive number types are handled in a lowering.
-                require(expression.type.isPrimitiveNumber())
+                require(expression.type.isDartNumberPrimitive())
                 val receiver = (expression.statements.first() as IrVariable).initializer!!.accept(context)
 
                 when (origin) {

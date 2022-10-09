@@ -21,11 +21,11 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartStatementOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.extensionReceiverOrNull
-import org.dotlin.compiler.backend.steps.ir2ast.ir.isPrimitiveNumber
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrExpressionLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformation
 import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartNumberPrimitive
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -42,7 +42,7 @@ class ConflictingExtensionCallsLowering(override val context: DartLoweringContex
         val function = expression.symbol.owner
         val extensionContainer = function.extensionContainer ?: return noChange()
 
-        if (!receiver.type.isPrimitiveNumber()) return noChange()
+        if (!receiver.type.isDartNumberPrimitive()) return noChange()
 
         expression.apply {
             dispatchReceiver = extensionContainer.primaryConstructor!!.let { constructor ->

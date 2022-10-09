@@ -23,6 +23,7 @@ import org.dotlin.compiler.backend.*
 import org.dotlin.compiler.backend.steps.ir2ast.DartIrBuiltIns
 import org.dotlin.compiler.backend.steps.ir2ast.attributes.IrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartNumberPrimitive
 import org.dotlin.compiler.backend.util.sentenceCase
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
@@ -167,8 +168,9 @@ class DartLoweringContext(
             val containerName = dartExtensionName ?: run {
                 val (file, mainName) = when (val classifier = receiverType.classifierOrNull?.owner) {
                     is IrClass -> classifier.file to classifier.defaultType.let {
+                        // TODO: Not necessary anymore: Only Int and Double can be used.
                         when {
-                            it.isPrimitiveNumber() -> classifier.name.identifier
+                            it.isDartNumberPrimitive() -> classifier.name.identifier
                             else -> classifier.dartName.escapedValue()
                         }
                     }
