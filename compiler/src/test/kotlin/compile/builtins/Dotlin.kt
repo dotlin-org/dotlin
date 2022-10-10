@@ -260,6 +260,200 @@ class Dotlin : BaseTest {
     }
 
     @Test
+    fun `@DartName with overridden method`() = assertCompile {
+        kotlin(
+            """
+            open class Processor {
+                @DartName("dartProcess")
+                open fun process() {}
+            }
+
+            class SubProcessor : Processor() {
+                override fun process() {}
+            }
+
+            fun main() {
+                SubProcessor().process()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            class Processor {
+              void dartProcess() {}
+            }
+
+            @sealed
+            class SubProcessor extends Processor {
+              @override
+              void dartProcess() {}
+            }
+
+            void main() {
+              SubProcessor().dartProcess();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartName with overridden property`() = assertCompile {
+        kotlin(
+            """
+            open class Processor {
+                @DartName("dartAmount")
+                open val amount: Int = 4
+            }
+
+            class SubProcessor : Processor() {
+                override val amount = 3
+            }
+
+            fun main() {
+                SubProcessor().amount
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            class Processor {
+              final int dartAmount = 4;
+            }
+
+            @sealed
+            class SubProcessor extends Processor {
+              @override
+              final int dartAmount = 3;
+            }
+
+            void main() {
+              SubProcessor().dartAmount;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartName on value parameter`() = assertCompile {
+        kotlin(
+            """
+            fun process(@DartName("test") predicate: (Int) -> Boolean) {
+                predicate(0)
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void process(bool Function(int) test) {
+              test.call(0);
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartName on value parameter with default value`() = assertCompile {
+        kotlin(
+            """
+            fun process(@DartName("test") predicate: (Int) -> Boolean = { false }) {
+                predicate(0)
+            }
+
+            fun main() {
+                process { it == 1 }
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void process({bool Function(int) test = null}) {
+              test = test == null
+                  ? (int it) {
+                      return false;
+                    }
+                  : test;
+              test.call(0);
+            }
+
+            void main() {
+              process(test: (int it) {
+                return it == 1;
+              });
+            }
+            """
+        )
+    }
+
+    // TODO: Make default value of lambda parameters const if possible.
+    @Test
+    fun `@DartName on overridden value parameter`() = assertCompile {
+        kotlin(
+            """
+            open class Processor {
+                open fun process(@DartName("test") predicate: (Int) -> Boolean = { false }) {
+                    predicate(0)
+                }
+            }
+
+            class ProcessorImpl : Processor() {
+                override fun process(predicate: (Int) -> Boolean) {}
+            }
+
+            fun main() {
+                ProcessorImpl().process { it == 1 }
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            class Processor {
+              void process({bool Function(int) test = null}) {
+                test = test == null
+                    ? (int it) {
+                        return false;
+                      }
+                    : test;
+                test.call(0);
+              }
+            }
+
+            @sealed
+            class ProcessorImpl extends Processor {
+              @override
+              void process({bool Function(int) test = null}) {
+                test = test == null
+                    ? (int it) {
+                        return false;
+                      }
+                    : test;
+              }
+            }
+
+            void main() {
+              ProcessorImpl().process(test: (int it) {
+                return it == 1;
+              });
+            }
+            """
+        )
+    }
+
+    @Test
     fun `@DartGetter`() = assertCompile {
         kotlin(
             """

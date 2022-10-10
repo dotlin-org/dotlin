@@ -23,6 +23,7 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor;
 import org.jetbrains.kotlin.diagnostics.*;
 import org.jetbrains.kotlin.psi.KtDeclaration;
+import org.jetbrains.kotlin.psi.KtElement;
 import org.jetbrains.kotlin.psi.KtExpression;
 import org.jetbrains.kotlin.types.KotlinType;
 
@@ -76,6 +77,9 @@ public interface ErrorsDart {
 
     DiagnosticFactory0<KtExpression> KOTLIN_ITERATOR_METHOD_USAGE =
             DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
+
+    DiagnosticFactory0<KtElement> DART_NAME_ON_OVERRIDE =
+            DiagnosticFactory0.create(Severity.ERROR, DECLARATION_SIGNATURE_OR_DEFAULT);
 
     // Dart emulated errors.
     DiagnosticFactory0<KtExpression> CONST_WITH_NON_CONST =

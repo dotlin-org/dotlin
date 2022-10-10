@@ -24,6 +24,7 @@ package dotlin
     AnnotationTarget.CONSTRUCTOR,
     AnnotationTarget.FUNCTION,
     AnnotationTarget.PROPERTY,
+    AnnotationTarget.VALUE_PARAMETER,
     AnnotationTarget.FILE
 )
 @Retention(AnnotationRetention.SOURCE)

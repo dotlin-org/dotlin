@@ -20,25 +20,56 @@
 package analysis
 
 import BaseTest
-import assertCanCompile
 import assertCompilesWithError
-import assertCompilesWithErrors
 import assertCompilesWithWarning
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 @DisplayName("Analysis: Dotlin")
 class Dotlin : BaseTest {
     @Test
-    fun `warning when declaring extension without @DartExtensionName in public package`() =
+    fun `warning if declaring extension without @DartExtensionName in public package`() =
         assertCompilesWithWarning(ErrorsDart.EXTENSION_WITHOUT_EXPLICIT_DART_EXTENSION_NAME_IN_PUBLIC_PACKAGE) {
             isPublicPackage = true
 
             kotlin(
                 """
                 fun Int.negate() = -this
+                """
+            )
+        }
+
+    @Test
+    fun `error if using @DartName on overridden method`() =
+        assertCompilesWithError(ErrorsDart.DART_NAME_ON_OVERRIDE) {
+            kotlin(
+                """
+                interface Test {
+                    fun test() {}
+                }
+
+                class Test2 : Test {
+                    @DartName("myTest")
+                    override fun test() {}
+                }
+                """
+            )
+        }
+
+    @Test
+    fun `error if using @DartName on overridden property`() =
+        assertCompilesWithError(ErrorsDart.DART_NAME_ON_OVERRIDE) {
+            kotlin(
+                """
+                interface Test {
+                    val test: Int
+                }
+
+                class Test2 : Test {
+                    @DartName("myTest")
+                    override val test: Int = 3
+                }
                 """
             )
         }

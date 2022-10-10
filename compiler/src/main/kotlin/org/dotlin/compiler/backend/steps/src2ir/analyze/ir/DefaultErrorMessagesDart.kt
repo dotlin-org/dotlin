@@ -105,6 +105,11 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
             "use 'moveNext' and 'current'"
         )
 
+        put(
+            ErrorsDart.DART_NAME_ON_OVERRIDE,
+            "cannot use @DartName on overridden member"
+        )
+
         // Dart emulated errors.
 
         put(

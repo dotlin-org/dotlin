@@ -21,6 +21,7 @@ package org.dotlin.compiler.backend
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.backend.util.getSingleAnnotationStringArgumentOf
+import org.dotlin.compiler.backend.util.getSingleOverriddenAnnotationStringArgumentOf
 import org.dotlin.compiler.backend.util.hasAnnotation
 import org.dotlin.compiler.backend.util.hasOverriddenAnnotation
 import org.jetbrains.kotlin.ir.declarations.*
@@ -47,7 +48,7 @@ val IrDeclaration.dartAnnotatedName: String?
             else -> this
         }
         else -> this
-    }.run { getSingleAnnotationStringArgumentOf(dotlin.DartName) }
+    }.run { getSingleOverriddenAnnotationStringArgumentOf(dotlin.DartName) }
 
 val IrValueParameter.isDartPositional: Boolean
     get() = (parent as? IrFunction)?.hasDartPositionalAnnotation() == true

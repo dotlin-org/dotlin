@@ -20,9 +20,7 @@
 package org.dotlin.compiler.backend.util
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.getValueArgumentOrDefault
-import org.jetbrains.kotlin.ir.declarations.IrAnnotationContainer
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrOverridableDeclaration
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.util.getAnnotation
 import org.jetbrains.kotlin.ir.util.hasAnnotation
@@ -34,6 +32,26 @@ fun <T> IrAnnotationContainer.getAnnotationArgumentOf(fqName: FqName): T? =
         ?.getValueArgumentOrDefault(0)
         ?.let { it as IrConst<T> }
         ?.value
+
+
+@Suppress("UNCHECKED_CAST")
+fun <T> IrAnnotationContainer.getOverriddenAnnotationArgumentOf(fqName: FqName): T? =
+    getAnnotationArgumentOf(fqName) ?: when (this) {
+        // For value parameters, we look at the parent function.
+        is IrValueParameter -> when (val parent = this.parent) {
+            is IrSimpleFunction -> parent.overriddenSymbols.map {
+                (it.owner as? IrSimpleFunction)
+                    ?.valueParameters
+                    ?.get(this.index)
+                    ?.getOverriddenAnnotationArgumentOf<T>(fqName)
+            }.firstOrNull()
+            else -> null
+        }
+        is IrOverridableDeclaration<*> -> overriddenSymbols.map {
+            (it.owner as? IrDeclaration)?.getOverriddenAnnotationArgumentOf<T>(fqName)
+        }.firstOrNull()
+        else -> null
+    }
 
 @Suppress("UNCHECKED_CAST")
 fun <T0, T1> IrAnnotationContainer.getTwoAnnotationArgumentsOf(fqName: FqName): Pair<T0, T1>? =
@@ -50,6 +68,9 @@ fun <T0, T1, T2> IrAnnotationContainer.getThreeAnnotationArgumentsOf(fqName: FqN
         ?.let { Triple(it[0].value as T0, it[1].value as T1, it[2].value as T2) }
 
 fun IrAnnotationContainer.getSingleAnnotationStringArgumentOf(fqName: FqName) = getAnnotationArgumentOf<String>(fqName)
+
+fun IrAnnotationContainer.getSingleOverriddenAnnotationStringArgumentOf(fqName: FqName) =
+    getOverriddenAnnotationArgumentOf<String>(fqName)
 
 fun IrAnnotationContainer.getSingleAnnotationTypeArgumentOf(fqName: FqName) =
     getAnnotation(fqName)?.getTypeArgument(0)
