@@ -22,6 +22,7 @@ package org.dotlin.compiler.backend.steps.src2ir.analyze.ir;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor;
 import org.jetbrains.kotlin.diagnostics.*;
+import org.jetbrains.kotlin.psi.KtAnnotationEntry;
 import org.jetbrains.kotlin.psi.KtDeclaration;
 import org.jetbrains.kotlin.psi.KtElement;
 import org.jetbrains.kotlin.psi.KtExpression;
@@ -79,6 +80,12 @@ public interface ErrorsDart {
             DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
 
     DiagnosticFactory0<KtElement> DART_NAME_ON_OVERRIDE =
+            DiagnosticFactory0.create(Severity.ERROR, DECLARATION_SIGNATURE_OR_DEFAULT);
+
+    DiagnosticFactory1<KtAnnotationEntry, Integer> DART_INDEX_OUT_OF_BOUNDS =
+            DiagnosticFactory1.create(Severity.ERROR, DECLARATION_SIGNATURE_OR_DEFAULT);
+
+    DiagnosticFactory0<KtAnnotationEntry> DART_INDEX_CONFLICT =
             DiagnosticFactory0.create(Severity.ERROR, DECLARATION_SIGNATURE_OR_DEFAULT);
 
     // Dart emulated errors.

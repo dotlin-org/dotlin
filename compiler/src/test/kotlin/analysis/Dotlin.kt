@@ -73,4 +73,34 @@ class Dotlin : BaseTest {
                 """
             )
         }
+
+    @Test
+    fun `error if using @DartIndex below zero`() =
+        assertCompilesWithError(ErrorsDart.DART_INDEX_OUT_OF_BOUNDS) {
+            kotlin(
+                """
+                fun process(@DartIndex(-1) first: Int, @DartIndex(1) second: Int) {}
+                """
+            )
+        }
+
+    @Test
+    fun `error if using @DartIndex above parameter max index`() =
+        assertCompilesWithError(ErrorsDart.DART_INDEX_OUT_OF_BOUNDS) {
+            kotlin(
+                """
+                fun process(@DartIndex(2) first: Int, @DartIndex(1) second: Int) {}
+                """
+            )
+        }
+
+    @Test
+    fun `error if using duplicate @DartIndex`() =
+        assertCompilesWithError(ErrorsDart.DART_INDEX_CONFLICT) {
+            kotlin(
+                """
+                fun process(@DartIndex(1) first: Int, @DartIndex(1) second: Int) {}
+                """
+            )
+        }
 }

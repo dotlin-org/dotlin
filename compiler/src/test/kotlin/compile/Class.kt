@@ -1098,7 +1098,7 @@ class Class : BaseTest {
                         length == const _$DefaultValue() ? complexValue(0) : length as int?;
                     r = r == const _$DefaultValue() ? z : r as int?;
                     o = o == null ? y * 2 : o;
-                    return VectorImpl._${'$'}(y, length, r, o, x: x, z: z, v: v);
+                    return VectorImpl._${'$'}(x: x, y, z: z, length, r, o, v: v);
                   }
                   @override
                   final int x;

@@ -66,7 +66,8 @@ open class DartIrAnalyzer(
         ConstValInitializerChecker,
         ConstConstructorParameterDefaultValueChecker,
         LongTypeReferenceChecker,
-        ConstLambdaChecker
+        ConstLambdaChecker,
+        DartIndexChecker
     ),
 ) {
     private val messageCollector = config[CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY] ?: MessageCollector.NONE

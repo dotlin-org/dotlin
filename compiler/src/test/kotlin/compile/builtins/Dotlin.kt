@@ -1236,4 +1236,66 @@ class Dotlin : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `@DartIndex`() = assertCompile {
+        kotlin(
+            """
+            fun test(@DartIndex(1) firstParam: Int, secondParam: Int) = firstParam + secondParam
+
+            fun main() {
+                test(1, 2)
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            int test(
+              int secondParam,
+              int firstParam,
+            ) {
+              return firstParam + secondParam;
+            }
+
+            void main() {
+              test(2, 1);
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartIndex with default value`() = assertCompile {
+        kotlin(
+            """
+            fun test(@DartIndex(1) firstParam: Int = 9, secondParam: Int) = firstParam + secondParam
+
+            fun main() {
+                test(secondParam = 2)
+                test(firstParam = 2, 4)
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            int test(
+              int secondParam, {
+              int firstParam = 9,
+            }) {
+              return firstParam + secondParam;
+            }
+
+            void main() {
+              test(2);
+              test(4, firstParam: 2);
+            }
+            """
+        )
+    }
 }

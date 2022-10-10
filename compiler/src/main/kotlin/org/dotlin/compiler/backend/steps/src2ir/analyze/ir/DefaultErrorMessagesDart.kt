@@ -110,6 +110,17 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
             "cannot use @DartName on overridden member"
         )
 
+        put(
+            ErrorsDart.DART_INDEX_OUT_OF_BOUNDS,
+            "index out of bounds: must be in range of 0..{0}",
+            Renderers.TO_STRING
+        )
+
+        put(
+            ErrorsDart.DART_INDEX_CONFLICT,
+            "index is equal to that of another @DartIndex",
+        )
+
         // Dart emulated errors.
 
         put(

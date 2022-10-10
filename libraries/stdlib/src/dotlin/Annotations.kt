@@ -58,6 +58,27 @@ annotation class const
 annotation class DartPositional
 
 /**
+ * Specifies the index of a value parameter in Dart.
+ *
+ * For example, the following code:
+ * ```kotlin
+ * fun process(@DartIndex(1) firstParameter: Int, secondParameter: Int) {}
+ * ```
+ * Compiles to:
+ * ```dart
+ * void process(int secondParameter, int firstParameter) {}
+ * ```
+ *
+ * This can be useful to move lambda parameters to the end, to make use of Kotlin's
+ * lambda expression syntax.
+ *
+ * Also applies to methods that override this method.
+ */
+@Target(AnnotationTarget.VALUE_PARAMETER)
+@Retention(AnnotationRetention.SOURCE)
+annotation class DartIndex(val index: Int)
+
+/**
  * Specifies that whenever this declaration is referenced, [library] should be imported in the file this declaration
  * was referenced in. Can only be used on `external` declarations.
  *

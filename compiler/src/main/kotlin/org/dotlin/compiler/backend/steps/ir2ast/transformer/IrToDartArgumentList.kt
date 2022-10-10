@@ -20,6 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
+import org.dotlin.compiler.backend.util.dartIndex
 import org.dotlin.compiler.dart.ast.DartLabel
 import org.dotlin.compiler.dart.ast.expression.DartArgumentList
 import org.dotlin.compiler.dart.ast.expression.DartNamedExpression
@@ -35,6 +36,7 @@ object IrToDartArgumentListTransformer : IrDartAstTransformer<DartArgumentList>(
         context: DartTransformContext
     ) = DartArgumentList(
         irCallLike.symbol.owner.valueParameters
+            .sortedBy { it.dartIndex }
             .associateWith { it.accept(context) }
             .entries
             .mapNotNull map@{ (irParameter, dartParameter) ->
@@ -47,6 +49,5 @@ object IrToDartArgumentListTransformer : IrDartAstTransformer<DartArgumentList>(
                     else -> irArgument.accept(context)
                 }
             }
-            .sortedBy { it is DartNamedExpression }
     )
 }
