@@ -121,6 +121,16 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
             "index is equal to that of another @DartIndex",
         )
 
+        put(
+            ErrorsDart.DART_DIFFERENT_DEFAULT_VALUE_ON_PARAMETER_WITHOUT_DEFAULT_VALUE,
+            "parameter must have a default value",
+        )
+
+        put(
+            ErrorsDart.DART_DIFFERENT_DEFAULT_VALUE_ON_NON_EXTERNAL,
+            "parameter must be in external function",
+        )
+
         // Dart emulated errors.
 
         put(

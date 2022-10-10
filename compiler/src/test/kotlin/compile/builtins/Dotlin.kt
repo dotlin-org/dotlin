@@ -1268,6 +1268,57 @@ class Dotlin : BaseTest {
     }
 
     @Test
+    fun `@DartIndex on overridden method`() = assertCompile {
+        kotlin(
+            """
+            open class Test {
+                open fun test(@DartIndex(1) firstParam: Int, secondParam: Int) = firstParam + secondParam
+            }
+
+            class SubTest : Test() {
+                override fun test(firstParam: Int, secondParam: Int): Int = 0
+            }
+
+            fun main() {
+                Test().test(1, 2)
+                SubTest().test(2, 3)
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            class Test {
+              int test(
+                int secondParam,
+                int firstParam,
+              ) {
+                return firstParam + secondParam;
+              }
+            }
+
+            @sealed
+            class SubTest extends Test {
+              @override
+              int test(
+                int secondParam,
+                int firstParam,
+              ) {
+                return 0;
+              }
+            }
+
+            void main() {
+              Test().test(2, 1);
+              SubTest().test(3, 2);
+            }
+            """
+        )
+    }
+
+    @Test
     fun `@DartIndex with default value`() = assertCompile {
         kotlin(
             """
@@ -1294,6 +1345,128 @@ class Dotlin : BaseTest {
             void main() {
               test(2);
               test(4, firstParam: 2);
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartIndex on overridden method with default value`() = assertCompile {
+        kotlin(
+            """
+            open class Test {
+                open fun test(@DartIndex(1) firstParam: Int = 12, secondParam: Int) = firstParam + secondParam
+            }
+
+            class SubTest : Test() {
+                override fun test(firstParam: Int, secondParam: Int): Int = 0
+            }
+
+            fun main() {
+                Test().test(secondParam = 2)
+                Test().test(firstParam = 2, 4)
+                SubTest().test(secondParam = 2)
+                SubTest().test(firstParam = 2, 4)
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            class Test {
+              int test(
+                int secondParam, {
+                int firstParam = 12,
+              }) {
+                return firstParam + secondParam;
+              }
+            }
+
+            @sealed
+            class SubTest extends Test {
+              @override
+              int test(
+                int secondParam, {
+                int firstParam = 12,
+              }) {
+                return 0;
+              }
+            }
+
+            void main() {
+              Test().test(2);
+              Test().test(4, firstParam: 2);
+              SubTest().test(2);
+              SubTest().test(4, firstParam: 2);
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartDifferentDefaultValue`() = assertCompile {
+        kotlin(
+            """
+            external fun test(@DartDifferentDefaultValue param: Int = 3) {}
+
+            fun main() {
+                test(5)
+                test()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              test(param: 5);
+              test(param: 3);
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartDifferentDefaultValue on overridden method`() = assertCompile {
+        kotlin(
+            """
+            open external class Test {
+                open fun difference(@DartDifferentDefaultValue param: Int = 5) {}
+            }
+
+            class SubTest : Test() {
+                override fun difference(param: Int) {}
+            }
+
+            fun main() {
+                Test().difference(10)
+                Test().difference()
+
+                SubTest().difference(15)
+                SubTest().difference()
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class SubTest extends Test {
+              @override
+              void difference({int param = 5}) {}
+            }
+
+            void main() {
+              Test().difference(param: 10);
+              Test().difference(param: 5);
+              SubTest().difference(param: 15);
+              SubTest().difference(param: 5);
             }
             """
         )

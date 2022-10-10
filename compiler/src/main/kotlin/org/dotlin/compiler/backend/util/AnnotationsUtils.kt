@@ -36,22 +36,7 @@ fun <T> IrAnnotationContainer.getAnnotationArgumentOf(fqName: FqName): T? =
 
 @Suppress("UNCHECKED_CAST")
 fun <T> IrAnnotationContainer.getOverriddenAnnotationArgumentOf(fqName: FqName): T? =
-    getAnnotationArgumentOf(fqName) ?: when (this) {
-        // For value parameters, we look at the parent function.
-        is IrValueParameter -> when (val parent = this.parent) {
-            is IrSimpleFunction -> parent.overriddenSymbols.map {
-                (it.owner as? IrSimpleFunction)
-                    ?.valueParameters
-                    ?.get(this.index)
-                    ?.getOverriddenAnnotationArgumentOf<T>(fqName)
-            }.firstOrNull()
-            else -> null
-        }
-        is IrOverridableDeclaration<*> -> overriddenSymbols.map {
-            (it.owner as? IrDeclaration)?.getOverriddenAnnotationArgumentOf<T>(fqName)
-        }.firstOrNull()
-        else -> null
-    }
+    getAnnotationArgumentOf(fqName) ?: getFromOverride { it.getOverriddenAnnotationArgumentOf<T>(fqName) }
 
 @Suppress("UNCHECKED_CAST")
 fun <T0, T1> IrAnnotationContainer.getTwoAnnotationArgumentsOf(fqName: FqName): Pair<T0, T1>? =
@@ -80,9 +65,20 @@ fun IrAnnotationContainer.getAnnotation(fqName: FqName) = getAnnotation(fqName)
 fun IrAnnotationContainer.hasAnnotation(fqName: FqName) = hasAnnotation(fqName)
 
 fun IrDeclaration.hasOverriddenAnnotation(fqName: FqName): Boolean =
-    hasAnnotation(fqName) || when (this) {
-        is IrOverridableDeclaration<*> -> overriddenSymbols.any {
-            (it.owner as? IrDeclaration)?.hasOverriddenAnnotation(fqName) == true
+    hasAnnotation(fqName) || getFromOverride { it.hasOverriddenAnnotation(fqName) } == true
+
+private fun <R> Any.getFromOverride(block: (IrDeclaration) -> R): R? {
+    return when (this) {
+        // For value parameters, we look at the parent function.
+        is IrValueParameter -> when (val parent = this.parent) {
+            is IrSimpleFunction -> parent.overriddenSymbols.map {
+                ((it.owner as? IrSimpleFunction)?.valueParameters?.get(this.index))?.let(block)
+            }.firstOrNull()
+            else -> null
         }
-        else -> false
+        is IrOverridableDeclaration<*> -> overriddenSymbols.map {
+            (it.owner as? IrDeclaration)?.let(block)
+        }.firstOrNull()
+        else -> null
     }
+}

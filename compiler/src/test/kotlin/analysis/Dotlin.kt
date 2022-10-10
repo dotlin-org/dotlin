@@ -103,4 +103,24 @@ class Dotlin : BaseTest {
                 """
             )
         }
+
+    @Test
+    fun `error if using @DartDifferentDefaultValue on parameter without default value`() =
+        assertCompilesWithError(ErrorsDart.DART_DIFFERENT_DEFAULT_VALUE_ON_PARAMETER_WITHOUT_DEFAULT_VALUE) {
+            kotlin(
+                """
+                fun process(@DartDifferentDefaultValue first: Int) {}
+                """
+            )
+        }
+
+    @Test
+    fun `error if using @DartDifferentDefaultValue on parameter in non-external function`() =
+        assertCompilesWithError(ErrorsDart.DART_DIFFERENT_DEFAULT_VALUE_ON_NON_EXTERNAL) {
+            kotlin(
+                """
+                fun process(@DartDifferentDefaultValue first: Int = 3) {}
+                """
+            )
+        }
 }

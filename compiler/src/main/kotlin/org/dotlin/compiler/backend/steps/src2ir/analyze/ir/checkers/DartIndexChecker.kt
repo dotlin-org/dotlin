@@ -23,6 +23,7 @@ import org.dotlin.compiler.backend.dotlin
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.getAnnotation
 import org.dotlin.compiler.backend.util.dartIndex
 import org.jetbrains.kotlin.backend.jvm.ir.psiElement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
@@ -40,8 +41,7 @@ object DartIndexChecker : IrDeclarationChecker {
 
         val paramDartIndexesToAnnotationSources = declaration.valueParameters.map {
             it.dartIndex to when (val s = it.psiElement) {
-                is KtParameter -> s.annotationEntries
-                    .firstOrNull { entry -> entry.getFqName() == dotlin.DartIndex }
+                is KtParameter -> s.getAnnotation(dotlin.DartIndex, trace.bindingContext)
                 // If the source is not a KtParameter, it's something else like the `this` parameter of a class.
                 else -> null
             }

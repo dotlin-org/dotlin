@@ -85,6 +85,7 @@ private val lowerings: List<Lowering> = listOf(
     ::ConstLambdaLiteralsLowering,
     ::IrCompositesToIrBlocksLowering,
     ::ContravariantLowering,
+    ::DartDifferentDefaultValueArgumentsLowering,
     ::DartCodeLowering,
     ::DartImportsLowering
 )

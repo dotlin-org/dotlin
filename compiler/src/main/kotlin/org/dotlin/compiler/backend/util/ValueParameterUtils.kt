@@ -43,3 +43,6 @@ val IrValueParameter.dartIndex: Int
 
         return paramWithOurIndex?.index ?: index
     }
+
+fun IrValueParameter.hasDifferentDefaultValueInDart(): Boolean =
+    hasOverriddenAnnotation(dotlin.DartDifferentDefaultValue)

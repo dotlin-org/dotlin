@@ -72,11 +72,39 @@ annotation class DartPositional
  * This can be useful to move lambda parameters to the end, to make use of Kotlin's
  * lambda expression syntax.
  *
- * Also applies to methods that override this method.
+ * Also applies to parameters whose overridden paramter equivalents have this annotation.
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
 annotation class DartIndex(val index: Int)
+
+/**
+ * Specifies that the default value of this parameter is different in Dart.
+ *
+ * For example, the following code:
+ * ```kotlin
+ * external fun process(@DartDifferentDefaultValue firstParameter: Int = 2) {}
+ *
+ * fun main() {
+ *     process()
+ * }
+ * ```
+ * Compiles to:
+ * ```dart
+ * void main() {
+ *   process(firstParameter: 2)
+ * }
+ * ```
+ *
+ * As you can see, the default value is added explicitely when calling the function.
+ *
+ * Can only be used on value parameters of `external` functions.
+ *
+ * Also applies to parameters whose overridden paramter equivalents have this annotation.
+ */
+@Target(AnnotationTarget.VALUE_PARAMETER)
+@Retention(AnnotationRetention.SOURCE)
+annotation class DartDifferentDefaultValue
 
 /**
  * Specifies that whenever this declaration is referenced, [library] should be imported in the file this declaration

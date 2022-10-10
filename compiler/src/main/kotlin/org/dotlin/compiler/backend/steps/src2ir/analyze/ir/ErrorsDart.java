@@ -88,6 +88,12 @@ public interface ErrorsDart {
     DiagnosticFactory0<KtAnnotationEntry> DART_INDEX_CONFLICT =
             DiagnosticFactory0.create(Severity.ERROR, DECLARATION_SIGNATURE_OR_DEFAULT);
 
+    DiagnosticFactory0<KtAnnotationEntry> DART_DIFFERENT_DEFAULT_VALUE_ON_PARAMETER_WITHOUT_DEFAULT_VALUE =
+            DiagnosticFactory0.create(Severity.ERROR, DECLARATION_SIGNATURE_OR_DEFAULT);
+
+    DiagnosticFactory0<KtAnnotationEntry> DART_DIFFERENT_DEFAULT_VALUE_ON_NON_EXTERNAL =
+            DiagnosticFactory0.create(Severity.ERROR, DECLARATION_SIGNATURE_OR_DEFAULT);
+
     // Dart emulated errors.
     DiagnosticFactory0<KtExpression> CONST_WITH_NON_CONST =
             DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
