@@ -44,6 +44,11 @@ interface IrTransformerLowering<E : IrElement, R> : IrLowering {
     fun DartLoweringContext.transform(element: E): R
 }
 
+// TODO?: Simplify lowerings, just make it return the transformed declaration or null, and add helper
+// methods for adding/removing declarations.
+// In that case, simplify ReturnsLowering (can just make it a single lowering and
+// move `transformReturnExpressionsIn` into the lowering function)
+
 interface IrSingleLowering<E : IrElement> : IrTransformerLowering<E, Transformation<E>?>
 
 interface IrMultipleLowering<E : IrElement> : IrTransformerLowering<E, Transformations<E>>

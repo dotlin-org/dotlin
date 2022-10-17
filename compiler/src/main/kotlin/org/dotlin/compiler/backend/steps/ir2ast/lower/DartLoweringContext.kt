@@ -35,14 +35,11 @@ import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.builders.IrSingleStatementBuilder
+import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.builders.declarations.buildClass
 import org.jetbrains.kotlin.ir.builders.declarations.buildConstructor
 import org.jetbrains.kotlin.ir.builders.declarations.buildFun
 import org.jetbrains.kotlin.ir.builders.declarations.buildValueParameter
-import org.jetbrains.kotlin.ir.builders.irGet
-import org.jetbrains.kotlin.ir.builders.irGetField
-import org.jetbrains.kotlin.ir.builders.irSetField
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrFactoryImpl
 import org.jetbrains.kotlin.ir.expressions.*
@@ -77,6 +74,9 @@ class DartLoweringContext(
     override val mapping = DefaultMapping()
     override val scriptMode = false
     override val typeSystem: IrTypeSystemContext = IrTypeSystemContextImpl(irBuiltIns)
+
+    @PublishedApi
+    internal val irBuilders = mutableMapOf<IrSymbol, IrBuilderWithScope>()
 
     val dartBuiltIns = DartIrBuiltIns(this)
 
@@ -147,7 +147,8 @@ class DartLoweringContext(
         symbol: IrSymbol,
         origin: IrStatementOrigin? = null,
         builder: IrSingleStatementBuilder.() -> T
-    ) = createIrBuilder(symbol, UNDEFINED_OFFSET, UNDEFINED_OFFSET).buildStatement(origin, builder)
+    ) = irBuilders.computeIfAbsent(symbol) { createIrBuilder(symbol, UNDEFINED_OFFSET, UNDEFINED_OFFSET) }
+        .buildStatement(origin, builder)
 
     private val extensionContainers = mutableMapOf<IrFile, MutableMap<String, IrClass>>()
 
@@ -336,7 +337,7 @@ class DartLoweringContext(
         ).irCall()
     }
 
-    fun IrFunctionExpression.irCall(): IrCall {
+    fun IrFunctionExpression.irCall(vararg arguments: IrExpression): IrCall {
         val invokeMethod = irFactory.buildFun {
             name = Name.identifier("invoke")
             isOperator = true
@@ -344,6 +345,14 @@ class DartLoweringContext(
         }.apply {
             parent = function
             dispatchReceiverParameter = irBuiltIns.functionN(0).thisReceiver
+
+            valueParameters = arguments.indices.map { i ->
+                buildValueParameter(this) {
+                    name = Name.identifier("p$i")
+                    type = arguments[i].type
+                    index = i
+                }
+            }
         }
 
         return IrCallImpl(
@@ -352,10 +361,12 @@ class DartLoweringContext(
             type = function.returnType,
             symbol = invokeMethod.symbol,
             typeArgumentsCount = 0,
-            valueArgumentsCount = 0,
+            valueArgumentsCount = arguments.size,
             origin = IrStatementOrigin.INVOKE,
         ).apply {
             dispatchReceiver = this@irCall
+
+            arguments.forEachIndexed { i, arg -> putValueArgument(i, arg) }
         }
     }
 

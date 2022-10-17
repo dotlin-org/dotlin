@@ -885,9 +885,13 @@ class Expression : BaseTest {
 
             void main() {
               try {
-                null ?? (throw const ${'$'}Return<void>(null));
+                null ?? (throw const ${'$'}Return<void>(null, 3343801));
               } on ${'$'}Return<void> catch (tmp0_return) {
-                return;
+                if (tmp0_return.target == 3343801) {
+                  return;
+                } else {
+                  throw tmp0_return;
+                }
               }
             }
             """
@@ -919,10 +923,14 @@ class Expression : BaseTest {
 
             int test(int? x) {
               try {
-                final int y = x ?? (throw const ${'$'}Return<int>(-1));
+                final int y = x ?? (throw const ${'$'}Return<int>(-1, 3556498));
                 return y;
               } on ${'$'}Return<int> catch (tmp0_return) {
-                return tmp0_return.value;
+                if (tmp0_return.target == 3556498) {
+                  return tmp0_return.value;
+                } else {
+                  throw tmp0_return;
+                }
               }
             }
             """
@@ -957,10 +965,14 @@ class Expression : BaseTest {
               int fallback,
             ) {
               try {
-                final int y = x ?? (throw ${'$'}Return<int>(fallback));
+                final int y = x ?? (throw ${'$'}Return<int>(fallback, 3556498));
                 return y;
               } on ${'$'}Return<int> catch (tmp0_return) {
-                return tmp0_return.value;
+                if (tmp0_return.target == 3556498) {
+                  return tmp0_return.value;
+                } else {
+                  throw tmp0_return;
+                }
               }
             }
             """
@@ -1005,7 +1017,7 @@ class Expression : BaseTest {
                 final int y = () {
                   final int? tmp0_subject = x;
                   return tmp0_subject == null
-                      ? throw ${'$'}Return<int>(fallback)
+                      ? throw ${'$'}Return<int>(fallback, 3556498)
                       : tmp0_subject == 1
                           ? x! * x!
                           : tmp0_subject == 2
@@ -1016,7 +1028,11 @@ class Expression : BaseTest {
                 }.call();
                 return y;
               } on ${'$'}Return<int> catch (tmp0_return) {
-                return tmp0_return.value;
+                if (tmp0_return.target == 3556498) {
+                  return tmp0_return.value;
+                } else {
+                  throw tmp0_return;
+                }
               }
             }
             """

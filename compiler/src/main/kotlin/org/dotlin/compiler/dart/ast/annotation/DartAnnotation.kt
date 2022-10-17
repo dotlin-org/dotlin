@@ -29,6 +29,7 @@ import org.dotlin.compiler.dart.ast.expression.DartArgumentList
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.toDartIdentifier
+import org.dotlin.compiler.dart.ast.expression.literal.DartSimpleStringLiteral
 
 data class DartAnnotation(
     val name: DartIdentifier,
@@ -54,6 +55,12 @@ data class DartAnnotation(
         val PROTECTED = DartAnnotation("protected".toDartIdentifier())
         val NON_VIRTUAL = DartAnnotation("nonVirtual".toDartIdentifier())
         val SEALED = DartAnnotation("sealed".toDartIdentifier())
+
+        fun pragma(name: String) =
+            DartAnnotation(
+                "pragma".toDartIdentifier(),
+                arguments = DartArgumentList(DartSimpleStringLiteral(name))
+            )
     }
 }
 

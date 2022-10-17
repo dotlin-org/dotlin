@@ -30,7 +30,6 @@ import org.jetbrains.kotlin.ir.expressions.*
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 abstract class IrDartAstTransformer<N : DartAstNode?> : IrCustomElementVisitor<N, DartTransformContext> {
-
     final override fun visitElement(element: IrElement, context: DartTransformContext): N {
         todo(element)
     }

@@ -39,7 +39,7 @@
   - [x] Abstract classes
   - [x] Nested classes
   - [ ] Inner classes
-  - [ ] Inline (value) classes
+  - [ ] Value classes
   - [ ] Data classes
   - [ ] Sealed classes
   - [x] Enum classes
@@ -59,16 +59,16 @@
       - [x] Setters
       - [x] Properties with backing fields
       - [x] Delegated properties
-      - [ ] Inline properties
+      - [x] Inline properties
     - [x] Methods
   - [x] Inheritance
   - [x] Overrides
   - [ ] Delegation
 - [x] Function types
-- [ ] Inline
-  - [ ] Inline functions
+- [x] Inline
+  - [x] Inline functions
   - [ ] `noinline`
-  - [ ] Non-local returns
+  - [x] Non-local returns
 - [ ] Expressions
   - [x] Literals
     - [x] Int literals

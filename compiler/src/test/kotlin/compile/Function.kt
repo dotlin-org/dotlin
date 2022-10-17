@@ -1499,4 +1499,415 @@ class Function : BaseTest {
                 """
             )
         }
+
+    @Test
+    fun `inline function`() = assertCompile {
+        kotlin(
+            """
+            inline fun add(x: Int) = x + 6
+
+            fun main() {
+                add(56)
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @pragma('vm:always-consider-inlining')
+            int add(int x) {
+              return x + 6;
+            }
+
+            void main() {
+              add(56);
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `inline function with multiple statements`() = assertCompile {
+        kotlin(
+            """
+            inline fun add(x: Int, y: Int = 2, z: Int): Int {
+                val intermediate = x + x * x * 34
+                z * y * x
+                return intermediate + y * y * z
+            }
+
+            fun main() {
+                val test = add(1, z = 3)
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @pragma('vm:always-consider-inlining')
+            int add(
+              int x,
+              int z, {
+              int y = 2,
+            }) {
+              final int intermediate = x + x * x * 34;
+              z * y * x;
+              return intermediate + y * y * z;
+            }
+
+            void main() {
+              final int test = add(1, 3);
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `inline function with lambda parameter`() = assertCompile {
+        kotlin(
+            """
+            inline fun add(compute: (Int) -> Int) = compute(34 * 2)
+
+            fun main() {
+                add { it + 123 }
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @pragma('vm:always-consider-inlining')
+            int add(int Function(int) compute) {
+              return compute.call(34 * 2);
+            }
+
+            void main() {
+              add((int it) {
+                return it + 123;
+              });
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `inline function with multiple statements and lambda`() = assertCompile {
+        kotlin(
+            """
+            inline fun process(x: Int, y: Int = 2, z: (Int) -> Int): Int {
+                val intermediate = x + z(200) * x * 34
+                z(636) * y * x
+                return intermediate + y * y * z(274)
+            }
+
+            fun main() {
+                val test = process(1) {
+                    val x = 34
+                    it * x
+                }
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @pragma('vm:always-consider-inlining')
+            int process(
+              int x,
+              int Function(int) z, {
+              int y = 2,
+            }) {
+              final int intermediate = x + z.call(200) * x * 34;
+              z.call(636) * y * x;
+              return intermediate + y * y * z.call(274);
+            }
+
+            void main() {
+              final int test = process(1, (int it) {
+                final int x = 34;
+                return it * x;
+              });
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `function with non-local return`() = assertCompile {
+        kotlin(
+            """
+            inline fun process(x: Int, y: Int = 2, z: (Int) -> Int): Int {
+                val intermediate = x + z(200) * x * 34
+                z(636) * y * x
+                return intermediate + y * y * z(274)
+            }
+
+            fun main() {
+                val test = process(1) {
+                    val x = 34
+                    
+                    if (x == 100) return
+
+                    it * x
+                }
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @pragma('vm:always-consider-inlining')
+            int process(
+              int x,
+              int Function(int) z, {
+              int y = 2,
+            }) {
+              final int intermediate = x + z.call(200) * x * 34;
+              z.call(636) * y * x;
+              return intermediate + y * y * z.call(274);
+            }
+
+            void main() {
+              try {
+                final int test = process(1, (int it) {
+                  final int x = 34;
+                  if (x == 100) {
+                    throw const ${'$'}Return<void>(null, 3343801);
+                  }
+                  return it * x;
+                });
+              } on ${'$'}Return<void> catch (tmp0_return) {
+                if (tmp0_return.target == 3343801) {
+                  return;
+                } else {
+                  throw tmp0_return;
+                }
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `function with non-local return and local return in lambda`() = assertCompile {
+        kotlin(
+            """
+            inline fun process(x: Int, y: Int = 2, z: (Int) -> Int): Int {
+                val intermediate = x + z(200) * x * 34
+                z(636) * y * x
+                return intermediate + y * y * z(274)
+            }
+
+            fun main() {
+                val test = process(1) {
+                    val x = 34
+                    
+                    when (x) {
+                        100 -> return
+                        101 -> return@process 0
+                    }
+
+                    it * x
+                }
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @pragma('vm:always-consider-inlining')
+            int process(
+              int x,
+              int Function(int) z, {
+              int y = 2,
+            }) {
+              final int intermediate = x + z.call(200) * x * 34;
+              z.call(636) * y * x;
+              return intermediate + y * y * z.call(274);
+            }
+
+            void main() {
+              try {
+                final int test = process(1, (int it) {
+                  try {
+                    final int x = 34;
+                    {
+                      final int tmp0_subject = x;
+                      if (tmp0_subject == 100) {
+                        throw const ${'$'}Return<void>(null, 3343801);
+                      } else if (tmp0_subject == 101) {
+                        throw const ${'$'}Return<int>(0, 6798);
+                      }
+                    }
+                    return it * x;
+                  } on ${'$'}Return<int> catch (tmp0_return) {
+                    if (tmp0_return.target == 6798) {
+                      return tmp0_return.value;
+                    } else {
+                      throw tmp0_return;
+                    }
+                  }
+                });
+              } on ${'$'}Return<void> catch (tmp0_return) {
+                if (tmp0_return.target == 3343801) {
+                  return;
+                } else {
+                  throw tmp0_return;
+                }
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `function with non-local return and return expression`() = assertCompile {
+        kotlin(
+            """
+            inline fun process(x: Int, y: Int = 2, z: (Int) -> Int): Int {
+                val intermediate = x + z(200) * x * 34
+                z(636) * y * x
+                return intermediate + y * y * z(274)
+            }
+
+            fun main() {
+                val test = process(1) {
+                    val x = 34
+                    
+                    val y = when (x) {
+                        100 -> return
+                        101 -> return@process 40
+                        else -> 10
+                    }
+
+                    it * x * y
+                }
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @pragma('vm:always-consider-inlining')
+            int process(
+              int x,
+              int Function(int) z, {
+              int y = 2,
+            }) {
+              final int intermediate = x + z.call(200) * x * 34;
+              z.call(636) * y * x;
+              return intermediate + y * y * z.call(274);
+            }
+
+            void main() {
+              try {
+                final int test = process(1, (int it) {
+                  try {
+                    final int x = 34;
+                    final int y = () {
+                      final int tmp0_subject = x;
+                      return tmp0_subject == 100
+                          ? throw const ${'$'}Return<void>(null, 3343801)
+                          : tmp0_subject == 101
+                              ? throw const ${'$'}Return<int>(40, 6834)
+                              : 10;
+                    }.call();
+                    return it * x * y;
+                  } on ${'$'}Return<int> catch (tmp0_return) {
+                    if (tmp0_return.target == 6834) {
+                      return tmp0_return.value;
+                    } else {
+                      throw tmp0_return;
+                    }
+                  }
+                });
+              } on ${'$'}Return<void> catch (tmp0_return) {
+                if (tmp0_return.target == 3343801) {
+                  return;
+                } else {
+                  throw tmp0_return;
+                }
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `function with non-local return and return expression of same type`() = assertCompile {
+        kotlin(
+            """
+            inline fun process(z: (Int) -> Unit) {
+                z(300)
+            }
+
+            fun main() {
+                val test = process {
+                    val x = 34
+
+                    val y = when (x) {
+                        100 -> return
+                        101 -> return@process
+                        else -> 10
+                    }
+                }
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @pragma('vm:always-consider-inlining')
+            void process(void Function(int) z) {
+              z.call(300);
+            }
+
+            void main() {
+              try {
+                final void test = process((int it) {
+                  try {
+                    final int x = 34;
+                    final int y = () {
+                      final int tmp0_subject = x;
+                      return tmp0_subject == 100
+                          ? throw const ${'$'}Return<void>(null, 3343801)
+                          : tmp0_subject == 101
+                              ? throw const ${'$'}Return<void>(null, 3003)
+                              : 10;
+                    }.call();
+                  } on ${'$'}Return<void> catch (tmp0_return) {
+                    if (tmp0_return.target == 3003) {
+                      return;
+                    } else {
+                      throw tmp0_return;
+                    }
+                  }
+                });
+              } on ${'$'}Return<void> catch (tmp0_return) {
+                if (tmp0_return.target == 3343801) {
+                  return;
+                } else {
+                  throw tmp0_return;
+                }
+              }
+            }
+            """
+        )
+    }
 }

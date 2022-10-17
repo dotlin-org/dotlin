@@ -320,7 +320,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                     DartConditionalExpression(
                         condition = irBranch.condition.accept(context),
                         thenExpression = irBranch.result.accept(context),
-                    elseExpression = expression
+                        elseExpression = expression
                 )
             }
         )

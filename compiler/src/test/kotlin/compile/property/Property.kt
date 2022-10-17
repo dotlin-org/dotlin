@@ -920,4 +920,63 @@ class Property {
             """
         )
     }
+
+    @Test
+    fun `class with inline property getter`() = assertCompile {
+        kotlin(
+            """
+            class Test {
+                val property
+                    inline get() = 34
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {
+              @nonVirtual
+              @pragma('vm:always-consider-inlining')
+              int get property {
+                return 34;
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `class with inline property getter and setter`() = assertCompile {
+        kotlin(
+            """
+            class Test {
+                var property
+                    inline get() = 34
+                    inline set(value) {}
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            @sealed
+            class Test {
+              @nonVirtual
+              @pragma('vm:always-consider-inlining')
+              int get property {
+                return 34;
+              }
+
+              @nonVirtual
+              @pragma('vm:always-consider-inlining')
+              void set property(int value) {}
+            }
+            """
+        )
+    }
 }

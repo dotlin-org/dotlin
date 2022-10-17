@@ -36,33 +36,35 @@ import org.jetbrains.kotlin.name.Name
 import kotlin.reflect.KClass
 
 /**
- * Deep-copies the given class and remaps all references to it (if [remapReferences] is true).
+ * Deep-copies this declaration and remaps all references to it (if [remapReferences] is true).
  */
 inline fun <reified T : IrDeclaration> T.deepCopy(
     remapReferences: Boolean = true,
+    initialParent: IrDeclarationParent? = null
 ): T = when (this) {
-    is IrClass -> deepCopyWith(remapReferences) {}
-    is IrConstructor -> deepCopyWith(remapReferences) {}
-    is IrFunction -> deepCopyWith(remapReferences) {}
-    is IrProperty -> deepCopyWith(remapReferences) {}
-    is IrField -> deepCopyWith(remapReferences) {}
-    is IrValueParameter -> deepCopyWith(remapReferences) {}
+    is IrClass -> deepCopyWith(remapReferences, initialParent) {}
+    is IrConstructor -> deepCopyWith(remapReferences, initialParent) {}
+    is IrFunction -> deepCopyWith(remapReferences, initialParent) {}
+    is IrProperty -> deepCopyWith(remapReferences, initialParent) {}
+    is IrField -> deepCopyWith(remapReferences, initialParent) {}
+    is IrValueParameter -> deepCopyWith(remapReferences, initialParent) {}
     else -> throw UnsupportedOperationException("Cannot deep-copy ${T::class.simpleName}")
 }
 
 /**
- * Deep-copies the given class and remaps all references to it (if [remapReferences] is true).
+ * Deep-copies this declaration and remaps all references to it (if [remapReferences] is true).
  */
 inline fun <reified T : IrDeclarationWithName> T.deepCopyWith(
     remapReferences: Boolean = true,
+    initialParent: IrDeclarationParent? = null,
     name: Name,
 ): T = when (this) {
-    is IrClass -> deepCopyWith(remapReferences) { this.name = name }
-    is IrConstructor -> deepCopyWith(remapReferences) { this.name = name }
-    is IrFunction -> deepCopyWith(remapReferences) { this.name = name }
-    is IrProperty -> deepCopyWith(remapReferences) { this.name = name }
-    is IrField -> deepCopyWith(remapReferences) { this.name = name }
-    is IrValueParameter -> deepCopyWith(remapReferences) { this.name = name }
+    is IrClass -> deepCopyWith(remapReferences, initialParent) { this.name = name }
+    is IrConstructor -> deepCopyWith(remapReferences, initialParent) { this.name = name }
+    is IrFunction -> deepCopyWith(remapReferences, initialParent) { this.name = name }
+    is IrProperty -> deepCopyWith(remapReferences, initialParent) { this.name = name }
+    is IrField -> deepCopyWith(remapReferences, initialParent) { this.name = name }
+    is IrValueParameter -> deepCopyWith(remapReferences, initialParent) { this.name = name }
     else -> throw UnsupportedOperationException("Cannot deep-copy ${T::class.simpleName}")
 }
 
@@ -71,6 +73,7 @@ inline fun <reified T : IrDeclarationWithName> T.deepCopyWith(
  */
 inline fun <reified T : IrPossiblyExternalDeclaration> T.deepCopyWith(
     remapReferences: Boolean = true,
+    initialParent: IrDeclarationParent? = null,
     isExternal: Boolean,
 ): T = when (this) {
     is IrClass -> deepCopyWith(remapReferences) { this.isExternal = isExternal }
@@ -86,6 +89,7 @@ inline fun <reified T : IrPossiblyExternalDeclaration> T.deepCopyWith(
  */
 inline fun <reified T : IrClass> T.deepCopyWith(
     remapReferences: Boolean = true,
+    initialParent: IrDeclarationParent? = null,
     block: IrClassBuilder.() -> Unit
 ): T = deepCopyWith(
     block,
@@ -94,6 +98,7 @@ inline fun <reified T : IrClass> T.deepCopyWith(
         updateFrom(it)
         name = it.name
     },
+    initialParent,
     remapReferences
 )
 
@@ -102,6 +107,7 @@ inline fun <reified T : IrClass> T.deepCopyWith(
  */
 inline fun <reified T : IrFunction> T.deepCopyWith(
     remapReferences: Boolean = true,
+    initialParent: IrDeclarationParent? = null,
     block: IrFunctionBuilder.() -> Unit
 ): T = deepCopyWith(
     block,
@@ -111,6 +117,7 @@ inline fun <reified T : IrFunction> T.deepCopyWith(
         name = it.name
         returnType = it.returnType
     },
+    initialParent,
     remapReferences
 ).also {
     if (this is IrSimpleFunction && it is IrSimpleFunction) {
@@ -131,6 +138,7 @@ inline fun <reified T : IrFunction> T.deepCopyWith(
  */
 inline fun <reified T : IrProperty> T.deepCopyWith(
     remapReferences: Boolean = true,
+    initialParent: IrDeclarationParent? = null,
     block: IrPropertyBuilder.() -> Unit
 ): T = deepCopyWith(
     block,
@@ -139,6 +147,7 @@ inline fun <reified T : IrProperty> T.deepCopyWith(
         updateFrom(it)
         name = it.name
     },
+    initialParent,
     remapReferences
 )
 
@@ -147,6 +156,7 @@ inline fun <reified T : IrProperty> T.deepCopyWith(
  */
 inline fun <reified T : IrField> T.deepCopyWith(
     remapReferences: Boolean = true,
+    initialParent: IrDeclarationParent? = null,
     block: IrFieldBuilder.() -> Unit
 ): T = deepCopyWith(
     block,
@@ -155,6 +165,7 @@ inline fun <reified T : IrField> T.deepCopyWith(
         updateFrom(it)
         name = it.name
     },
+    initialParent,
     remapReferences
 ).apply {
     correspondingPropertySymbol = this@deepCopyWith.correspondingPropertySymbol
@@ -165,6 +176,7 @@ inline fun <reified T : IrField> T.deepCopyWith(
  */
 inline fun <reified T : IrValueParameter> T.deepCopyWith(
     remapReferences: Boolean = true,
+    initialParent: IrDeclarationParent? = null,
     block: IrValueParameterBuilder.() -> Unit
 ): T = deepCopyWith(
     block,
@@ -173,6 +185,7 @@ inline fun <reified T : IrValueParameter> T.deepCopyWith(
         updateFrom(it)
         name = it.name
     },
+    initialParent,
     remapReferences
 )
 
@@ -183,11 +196,12 @@ inline fun <reified D : IrDeclaration, B : IrDeclarationBuilder> D.deepCopyWith(
     block: B.() -> Unit,
     createBuilder: () -> B,
     updateFrom: B.(D) -> Unit,
+    initialParent: IrDeclarationParent?,
     remapReferences: Boolean,
 ): D {
     lateinit var deepCopier: DeepCopier
 
-    return deepCopyWithSymbols(parent) { symbolRemapper, typeRemapper ->
+    return deepCopyWithSymbols(initialParent ?: parent) { symbolRemapper, typeRemapper ->
         val builder = createBuilder().also {
             updateFrom(it, this)
         }

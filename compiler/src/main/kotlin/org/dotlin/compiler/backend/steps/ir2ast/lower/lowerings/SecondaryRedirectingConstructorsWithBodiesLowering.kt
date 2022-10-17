@@ -85,7 +85,6 @@ class SecondaryRedirectingConstructorsWithBodiesLowering(override val context: D
             val thisSymbol = declaration.parentAsClass.thisReceiver!!.symbol
 
             body.transformExpressions(initialParent = declaration) { exp, context ->
-                exp.transformChildren(context)
                 when {
                     exp is IrGetValue && exp.symbol == thisSymbol -> buildStatement(context.container.symbol) {
                         irGet(instanceVar)

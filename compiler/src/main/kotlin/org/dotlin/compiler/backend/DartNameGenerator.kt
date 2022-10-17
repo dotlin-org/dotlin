@@ -86,6 +86,7 @@ class DartNameGenerator {
             val annotatedName = dartAnnotatedName?.toDartIdentifier()
 
             var name = annotatedName ?: when {
+                this is IrSimpleFunction && isOperator && name.identifier == "invoke" -> "call".toDartIdentifier()
                 !name.isSpecial -> name.identifier.toDartIdentifier()
                 this is IrConstructor -> {
                     val constructors = parentClassOrNull?.declarations?.filterIsInstance<IrConstructor>() ?: emptyList()

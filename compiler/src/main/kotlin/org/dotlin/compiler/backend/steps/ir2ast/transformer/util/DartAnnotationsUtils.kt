@@ -75,7 +75,12 @@ val IrDeclaration.dartAnnotations: List<DartAnnotation>
             else -> null
         }
 
-        return listOfNotNull(visibility, modality, override)
+        val pragmaInline = when {
+            this is IrFunction && isInline -> DartAnnotation.pragma("vm:always-consider-inlining")
+            else -> null
+        }
+
+        return listOfNotNull(visibility, modality, override, pragmaInline)
     }
 
 private val IrDeclaration.modality: Modality?
