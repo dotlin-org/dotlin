@@ -323,7 +323,7 @@ fun main() {
 }
 ```
 
-The `createTest()` call is inlined, meaning the called constructor
+The `bilboBaggings()` call is inlined, meaning the called constructor
 is still `const`:
 
 ```dart
