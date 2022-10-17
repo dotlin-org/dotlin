@@ -138,78 +138,6 @@ _invocation_ you must use `@const`.
 
 Note that as in Dart, `@const` is not necessary when it's implied, e.g. by assigning to a `const val`.
 
-#### `const inline`
-
-In Dotlin, you can create `const inline` functions, which can be used similarly to `const` constructors.
-
-These functions must have a single return with a valid `const` expression, and otherwise only contain `const` variables.
-
-An example:
-
-```kotlin
-class Hobbit const constructor(name: String, age: Int, isCurrentRingbearer: Boolean)
-
-const inline fun bilboBaggings(): Hobbit {
-  const val fullName = "Bilbo Baggings"
-
-  return Hobbit(fullName, age = 111, isCurrentRingbearer = false)
-}
-
-fun main() {
-  const val bilbo = bilboBaggings()
-}
-```
-
-The `createTest()` call is inlined, meaning the called constructor
-is still `const`:
-
-```dart
-@pragma('vm:always-consider-inlining')
-Hobbit bilboBaggings() {
-  const String fullName = 'Bilbo Baggings';
-  return Hobbit(fullName, 111, false);
-}
-
-void main() {
-  const Hobbit bilbo = Hobbit('Bilbo Baggings', 111, false);
-}
-```
-
-You can also use arguments in `const inline` functions:
-
-```kotlin
-class Hobbit const constructor(name: String, age: Int, isCurrentRingbearer: Boolean)
-
-const inline fun baggings(firstName: String, age: Int): Hobbit {
-  const val fullName = "${'$'}firstName Baggings"
-  const val hasRing = firstName == "Frodo"
-
-  return Hobbit(fullName, age, isCurrentRingbearer = hasRing)
-}
-
-fun main() {
-  const val frodo = baggings("Frodo", age = 33)
-}
-```
-
-Note that if you use arguments in `const` variables, they will be made
-non-const. This is because `const inline` functions can still be called
-as non-const. However, if called as `const`, arguments are also `const`
-inlined:
-
-```dart
-@pragma('vm:always-consider-inlining')
-Hobbit baggings(String firstName, int age) {
-  final String fullName = '${firstName} Baggings';
-  final bool hasRing = firstName == 'Frodo';
-  return Hobbit(fullName, age, hasRing);
-}
-
-void main() {
-  const Hobbit frodo = Hobbit('Frodo Baggings', 33, 'Frodo' == 'Frodo');
-}
-```
-
 ### Lateinit
 
 In Kotlin, `lateinit` is not applicable to properties with types that are primitive or nullable/have a nullable upper bound. In Dotlin, this is possible.
@@ -372,6 +300,78 @@ As you can see, a named function is generated based on the lambda, and passed to
 
 This is only possible if the lambda does not capture local or class closure values. You _can_
 use top-level/global values, however.
+
+#### `const inline`
+
+In Dotlin, you can create `const inline` functions, which can be used similarly to `const` constructors.
+
+These functions must have a single return with a valid `const` expression, and otherwise only contain `const` variables.
+
+An example:
+
+```kotlin
+class Hobbit const constructor(name: String, age: Int, isCurrentRingbearer: Boolean)
+
+const inline fun bilboBaggings(): Hobbit {
+  const val fullName = "Bilbo Baggings"
+
+  return Hobbit(fullName, age = 111, isCurrentRingbearer = false)
+}
+
+fun main() {
+  const val bilbo = bilboBaggings()
+}
+```
+
+The `createTest()` call is inlined, meaning the called constructor
+is still `const`:
+
+```dart
+@pragma('vm:always-consider-inlining')
+Hobbit bilboBaggings() {
+  const String fullName = 'Bilbo Baggings';
+  return Hobbit(fullName, 111, false);
+}
+
+void main() {
+  const Hobbit bilbo = Hobbit('Bilbo Baggings', 111, false);
+}
+```
+
+You can also use arguments in `const inline` functions:
+
+```kotlin
+class Hobbit const constructor(name: String, age: Int, isCurrentRingbearer: Boolean)
+
+const inline fun baggings(firstName: String, age: Int): Hobbit {
+  const val fullName = "${'$'}firstName Baggings"
+  const val hasRing = firstName == "Frodo"
+
+  return Hobbit(fullName, age, isCurrentRingbearer = hasRing)
+}
+
+fun main() {
+  const val frodo = baggings("Frodo", age = 33)
+}
+```
+
+Note that if you use arguments in `const` variables, they will be made
+non-const. This is because `const inline` functions can still be called
+as non-const. However, if called as `const`, arguments are also `const`
+inlined:
+
+```dart
+@pragma('vm:always-consider-inlining')
+Hobbit baggings(String firstName, int age) {
+  final String fullName = '${firstName} Baggings';
+  final bool hasRing = firstName == 'Frodo';
+  return Hobbit(fullName, age, hasRing);
+}
+
+void main() {
+  const Hobbit frodo = Hobbit('Frodo Baggings', 33, 'Frodo' == 'Frodo');
+}
+```
 
 ### Type literals
 
