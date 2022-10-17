@@ -20,23 +20,20 @@
 package org.dotlin.compiler.backend.util
 
 import org.dotlin.compiler.backend.hasDartConstAnnotation
-import org.dotlin.compiler.backend.isDartStatic
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
-import org.jetbrains.kotlin.backend.common.ir.isTopLevel
 import org.jetbrains.kotlin.backend.jvm.ir.psiElement
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
-import org.jetbrains.kotlin.ir.expressions.IrDeclarationReference
-import org.jetbrains.kotlin.ir.expressions.IrGetObjectValue
-import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
+import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtModifierListOwner
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 fun IrDeclaration.isDartConst(): Boolean = when (this) {
     // Constructors can be annotated with `@const` by the `DartConstDeclarationsLowering`. This happens
     // for libraries' outputted IR, because source information is not available for dependencies.
-    is IrConstructor -> hasConstModifier() || parentAsClass.isDartConst() || hasDartConstAnnotation()
+    is IrConstructor -> hasConstModifierOrAnnotation() || parentAsClass.isDartConst()
     is IrField -> when {
         // Enum fields are always const.
         origin == IrDeclarationOrigin.FIELD_FOR_ENUM_ENTRY -> true
@@ -50,6 +47,7 @@ fun IrDeclaration.isDartConst(): Boolean = when (this) {
         isBackingField -> correspondingProperty?.isDartConst() == true
         else -> false
     }
+    is IrFunction -> hasConstModifierOrAnnotation()
     is IrProperty -> isConst
     // Only add cases here if a certain class should _always_ be const constructed.
     is IrClass -> when {
@@ -65,28 +63,32 @@ fun IrDeclaration.isDartConst(): Boolean = when (this) {
         // Annotations, enums and _$DefaultValue classes are always const.
         else -> isEnumClass || isAnnotationClass || origin == IrDartDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE
     }
-    is IrVariable -> isConst || hasConstModifier()
+    is IrVariable -> isConst || hasConstModifierOrAnnotation()
     else -> false
 }
 
-fun IrDeclaration.hasConstModifier(): Boolean {
+fun IrDeclaration.hasConstModifierOrAnnotation(): Boolean {
+    if (hasDartConstAnnotation()) return true
+
     val source = psiElement as? KtModifierListOwner ?: return false
     return source.modifierList?.hasModifier(KtTokens.CONST_KEYWORD) == true
 }
 
-fun IrDeclarationReference.isAccessibleInDartConstLambda(function: IrFunction): Boolean {
-    // For instance members, we check the instance (receiver) itself.
-    if (this is IrMemberAccessExpression<*>) {
-        receiver?.let {
-            return it is IrDeclarationReference && it.isAccessibleInDartConstLambda(function)
-        }
+@OptIn(ExperimentalContracts::class)
+fun IrDeclarationParent.isDartConstInlineFunction(): Boolean {
+    contract {
+        returns(true) implies (this@isDartConstInlineFunction is IrSimpleFunction)
     }
 
-    val declaration = symbol.owner as? IrDeclaration ?: return false
+    return this is IrDeclaration && (this as IrDeclaration).isDartConstInlineFunction()
+}
 
-    return declaration.run {
-        val parent = this.parent
-        parent == function || isTopLevel || isDartStatic ||
-                (parent is IrClass && parent.isObject && !parent.isAnonymousObject)
+@OptIn(ExperimentalContracts::class)
+fun IrDeclaration.isDartConstInlineFunction(): Boolean {
+    contract {
+        returns(true) implies (this@isDartConstInlineFunction is IrSimpleFunction)
     }
+
+    return this is IrSimpleFunction && isInline &&
+            !isPropertyAccessor && isDartConst()
 }

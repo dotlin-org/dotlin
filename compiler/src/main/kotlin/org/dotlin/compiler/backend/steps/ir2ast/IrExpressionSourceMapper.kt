@@ -5,16 +5,11 @@ import org.dotlin.compiler.backend.steps.ir2ast.attributes.IrAttributes
 import org.jetbrains.kotlin.backend.jvm.ir.getKtFile
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrFile
-import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
-import org.jetbrains.kotlin.ir.expressions.IrGetValue
+import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
-import org.jetbrains.kotlin.psi.KtCallExpression
-import org.jetbrains.kotlin.psi.KtExpression
-import org.jetbrains.kotlin.psi.KtNameReferenceExpression
-import org.jetbrains.kotlin.psi.KtVisitorVoid
+import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 
@@ -53,17 +48,6 @@ object IrExpressionSourceMapper {
                 }
             })
 
-            val mapped = mapOf(
-                *ktExpressions
-                    .mapNotNull {
-                        when (val key = irExpressions.firstOrNull { ir -> ir.isEquivalentTo(it) }) {
-                            null -> null
-                            else -> key to it
-                        }
-                    }
-                    .toTypedArray()
-            )
-
             ktExpressions
                 .asSequence()
                 .mapNotNull {
@@ -91,6 +75,9 @@ private fun IrExpression.matchesType(ktExpression: KtExpression) = ktExpression.
     when (this) {
         is IrFunctionAccessExpression -> it is KtCallExpression
         is IrGetValue -> it is KtNameReferenceExpression
+        is IrReturn -> it is KtReturnExpression
+        is IrWhen -> it is KtWhenExpression || it is KtIfExpression
+        is IrTry -> it is KtTryExpression
         // TODO: Support more types
         else -> false
     }

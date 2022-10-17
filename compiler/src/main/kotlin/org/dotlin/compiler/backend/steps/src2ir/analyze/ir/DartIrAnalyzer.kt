@@ -64,11 +64,11 @@ open class DartIrAnalyzer(
         WrongSetOperatorReturnChecker,
         ImplicitInterfaceOverrideChecker,
         ConstValInitializerChecker,
-        ConstConstructorParameterDefaultValueChecker,
+        ConstFunctionParameterDefaultValueChecker,
         LongTypeReferenceChecker,
-        ConstLambdaChecker,
         DartIndexChecker,
-        DartDifferentDefaultValueChecker
+        DartDifferentDefaultValueChecker,
+        ConstInlineChecker,
     ),
 ) {
     private val messageCollector = config[CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY] ?: MessageCollector.NONE

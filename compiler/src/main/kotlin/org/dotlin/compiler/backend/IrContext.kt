@@ -1,11 +1,8 @@
 package org.dotlin.compiler.backend
 
 import org.dotlin.compiler.backend.steps.ir2ast.attributes.IrAttributes
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementVisitor
-import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
+import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrIfNullExpression
-import org.dotlin.compiler.backend.steps.ir2ast.ir.receiver
-import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartBool
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartNumberPrimitive
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartString
@@ -13,6 +10,7 @@ import org.dotlin.compiler.backend.util.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartPrefixedIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
+import org.jetbrains.kotlin.backend.common.ir.isTopLevel
 import org.jetbrains.kotlin.backend.jvm.ir.psiElement
 import org.jetbrains.kotlin.ir.IrBuiltIns
 import org.jetbrains.kotlin.ir.IrElement
@@ -26,6 +24,7 @@ import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.types.impl.IrDynamicTypeImpl
 import org.jetbrains.kotlin.ir.types.toKotlinType
 import org.jetbrains.kotlin.ir.util.*
+import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
 import org.jetbrains.kotlin.psi.KtClass
@@ -216,32 +215,50 @@ abstract class IrContext : IrAttributes {
 
     fun IrExpression.hasAnnotation(fqName: FqName) = hasAnnotation(fqName, bindingContext)
 
-    fun IrExpression.isDartConst(initializedIn: IrDeclaration?): Boolean =
-        isDartConst(allowImplicit = initializedIn?.isDartConst() == true)
+    fun IrExpression.isDartConst(
+        initializedIn: IrDeclaration?,
+        constInlineContainer: IrSimpleFunction? = null
+    ): Boolean = isDartConst(implicit = initializedIn?.isDartConst() == true, constInlineContainer)
 
-    fun IrExpression.isDartConst(allowImplicit: Boolean = false): Boolean {
+    fun IrExpression.isDartConst(
+        implicit: Boolean = false,
+        constInlineContainer: IrSimpleFunction? = null
+    ): Boolean {
+        fun IrFunctionAccessExpression.areArgumentsDartConst() = valueArguments.all {
+            it == null || it.isDartConst(
+                implicit,
+                constInlineContainer
+            )
+        }
+
         fun IrCall.isOperatorCallOnConstPrimitives(): Boolean {
-            if (valueArgumentsCount > 0 && valueArguments.all { it?.isDartConst(allowImplicit) != true }) return false
-            if (receiver != null && !receiver!!.isDartConst(allowImplicit)) return false
+            if (!areArgumentsDartConst()) {
+                return false
+            }
+
+            val receiver = receiver
+            if (receiver != null && !receiver.isDartConst(implicit, constInlineContainer)) return false
 
             val types = listOfNotNull(receiver?.type) + valueArguments.mapNotNull { it?.type }
 
             return when {
                 types.all { it.isDartNumberPrimitive(orNullable = true) } -> when (origin) {
-                    PLUS, UPLUS, MINUS, UMINUS, MUL, DIV -> true
+                    EQEQ, PLUS, UPLUS, MINUS, UMINUS, MUL, DIV -> true
                     else -> false
                 }
                 types.all { it.isDartString(orNullable = true) } -> when (origin) {
-                    PLUS -> true
+                    EQEQ, PLUS -> true
                     else -> false
                 }
                 types.all { it.isDartBool(orNullable = true) } -> when (origin) {
-                    OROR, ANDAND -> true
+                    EQEQ, OROR, ANDAND -> true
                     else -> false
                 }
                 else -> false
             }
         }
+
+        val needConst by lazy { (implicit || hasAnnotation(dotlin.const)) }
 
         return when (this) {
             // Enums are always constructed as const.
@@ -254,7 +271,7 @@ abstract class IrContext : IrAttributes {
                     object : IrCustomElementVisitor<Unit, Nothing?> {
                         override fun visitElement(element: IrElement, data: Nothing?) {
                             if (element is IrExpression) {
-                                isConst = isConst && element.isDartConst(allowImplicit)
+                                isConst = isConst && element.isDartConst(implicit, constInlineContainer)
                             }
 
                             element.acceptChildren(this, null)
@@ -266,28 +283,92 @@ abstract class IrContext : IrAttributes {
 
                 isConst
             }
-            is IrConstructorCall -> {
-                val constructor = symbol.owner
-                val parentClass = constructor.parentAsClass
+            is IrFunctionAccessExpression -> {
+                val invoked = symbol.owner
 
                 when {
-                    // If @const is optional, having the called constructor be const is enough.
-                    allowImplicit && constructor.isDartConst() -> true
-                    // Some classes are always to be const constructed.
-                    parentClass.isDartConst() -> true
-                    // If the argument(s) in the $Return are all const, make it const.
-                    parentClass.defaultType.isDotlinReturn() -> {
-                        valueArguments.all { it?.isDartConst(allowImplicit) == true }
+                    needConst && invoked.isDartConst() && areArgumentsDartConst() -> true
+                    this is IrConstructorCall -> {
+                        val parentClass = invoked.parentAsClass
+                        when {
+                            // Some classes are always to be const constructed.
+                            parentClass.isDartConst() -> true
+                            // If the argument(s) in the $Return are all const, make it const.
+                            parentClass.defaultType.isDotlinReturn() -> areArgumentsDartConst()
+                            else -> false
+                        }
                     }
-                    else -> hasAnnotation(dotlin.const)
+                    this is IrCall -> {
+                        invoked as IrSimpleFunction
+                        when (origin) {
+                            GET_PROPERTY, GET_LOCAL_PROPERTY ->
+                                invoked.correspondingProperty?.isDartConst() == true
+                            else -> isOperatorCallOnConstPrimitives()
+                        }
+                    }
+                    else -> false
                 }
             }
-            is IrTypeOperatorCall -> argument.isDartConst(allowImplicit)
-            is IrCall -> when (origin) {
-                GET_PROPERTY, GET_LOCAL_PROPERTY -> symbol.owner.correspondingProperty?.isDartConst() == true
-                else -> isOperatorCallOnConstPrimitives()
+            is IrTypeOperatorCall -> argument.isDartConst(implicit, constInlineContainer)
+            is IrStringConcatenation -> arguments.all { it.isDartConst(implicit, constInlineContainer) }
+            is IrGetValue -> {
+                val owner = symbol.owner
+
+                when {
+                    owner.isDartConst() -> true
+                    // In `const inline` functions, parameter references are considered const. They will be made
+                    // non-const in the final Dart output, but will be const-inlined when the parent function is
+                    // called.
+                    owner is IrValueParameter && owner.parent == constInlineContainer -> true
+                    else -> false
+                }
+            }
+            is IrFunctionExpression -> needConst && run {
+                var containsNonGlobalReference = false
+
+                function.body?.acceptChildrenVoid(
+                    object : IrCustomElementVisitorVoid {
+                        override fun visitElement(element: IrElement) = element.acceptChildrenVoid(this)
+
+                        override fun visitDeclarationReference(expression: IrDeclarationReference) {
+                            if (!expression.isAccessibleInDartConstLambda(function)) {
+                                containsNonGlobalReference = true
+                            }
+
+                            if (!containsNonGlobalReference) {
+                                super.visitDeclarationReference(expression)
+                            }
+                        }
+                    }
+                )
+
+                !containsNonGlobalReference
             }
             else -> false
+        }
+    }
+
+
+    fun IrDeclarationReference.isAccessibleInDartConstLambda(
+        function: IrFunction
+    ): Boolean {
+        if (isDartConst()) {
+            return true
+        }
+
+        // For instance members, we check the instance (receiver) itself.
+        if (this is IrMemberAccessExpression<*>) {
+            receiver?.let {
+                return it is IrDeclarationReference && it.isAccessibleInDartConstLambda(function)
+            }
+        }
+
+        val declaration = symbol.owner as? IrDeclaration ?: return false
+
+        return declaration.run {
+            val parent = this.parent
+            parent == function || isTopLevel || isDartStatic ||
+                    (parent is IrClass && parent.isObject && !parent.isAnonymousObject)
         }
     }
 

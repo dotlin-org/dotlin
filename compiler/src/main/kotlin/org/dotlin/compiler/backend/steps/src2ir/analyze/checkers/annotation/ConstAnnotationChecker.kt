@@ -5,6 +5,7 @@ import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
 import org.dotlin.compiler.backend.util.getFqName
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.KotlinTarget
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.lexer.KtTokens
@@ -28,20 +29,28 @@ object ConstAnnotationChecker : AdditionalAnnotationChecker {
         if (entries.none { it.getFqName(trace.bindingContext) == dotlin.const }) return
         val expression = annotated?.children?.last { it is KtExpression } as? KtExpression ?: return
 
-        when (val calledConstructor = expression.getCalledConstructorDescriptor(trace.bindingContext)) {
-            null -> trace.report(ErrorsDart.ONLY_CONSTRUCTOR_CALLS_CAN_BE_CONST.on(expression))
-            else -> if (!calledConstructor.isDartConst()) {
-                trace.report(ErrorsDart.CONST_WITH_NON_CONST.on(expression))
+        when (val calledFunction = expression.getCalledDescriptor(trace.bindingContext)) {
+            null -> trace.report(ErrorsDart.ONLY_FUNCTION_AND_CONSTRUCTOR_CALLS_CAN_BE_CONST.on(expression))
+            else -> if (!calledFunction.isDartConst()) {
+                trace.report(
+                    ErrorsDart.CONST_WITH_NON_CONST.on(
+                        expression,
+                        when (calledFunction) {
+                            is ConstructorDescriptor -> "constructor"
+                            else -> "function"
+                        }
+                    )
+                )
             }
         }
     }
 }
 
-private fun KtExpression.getCalledConstructorDescriptor(bindingContext: BindingContext): ConstructorDescriptor? {
-    return getResolvedCall(bindingContext)?.resultingDescriptor as? ConstructorDescriptor
+private fun KtExpression.getCalledDescriptor(bindingContext: BindingContext): FunctionDescriptor? {
+    return getResolvedCall(bindingContext)?.resultingDescriptor as? FunctionDescriptor
 }
 
-private fun ConstructorDescriptor.isDartConst(): Boolean {
+private fun FunctionDescriptor.isDartConst(): Boolean {
     val psi = findPsi() as? KtModifierListOwner ?: return false
     return psi.hasModifier(KtTokens.CONST_KEYWORD)
 }

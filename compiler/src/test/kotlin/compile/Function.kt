@@ -1888,11 +1888,11 @@ class Function : BaseTest {
                       return tmp0_subject == 100
                           ? throw const ${'$'}Return<void>(null, 3343801)
                           : tmp0_subject == 101
-                              ? throw const ${'$'}Return<void>(null, 3003)
+                              ? throw const ${'$'}Return<void>(null, 2995)
                               : 10;
                     }.call();
                   } on ${'$'}Return<void> catch (tmp0_return) {
-                    if (tmp0_return.target == 3003) {
+                    if (tmp0_return.target == 2995) {
                       return;
                     } else {
                       throw tmp0_return;

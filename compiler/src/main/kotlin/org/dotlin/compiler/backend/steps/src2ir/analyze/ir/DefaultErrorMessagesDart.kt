@@ -65,8 +65,23 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
         )
 
         put(
-            ErrorsDart.ONLY_CONSTRUCTOR_CALLS_CAN_BE_CONST,
-            "only constructor call expressions can be const"
+            ErrorsDart.ONLY_FUNCTION_AND_CONSTRUCTOR_CALLS_CAN_BE_CONST,
+            "only function and constructor calls can be const",
+        )
+
+        put(
+            ErrorsDart.CONST_INLINE_FUNCTION_WITH_MULTIPLE_RETURNS,
+            "const inline functions cannot have multiple returns"
+        )
+
+        put(
+            ErrorsDart.CONST_INLINE_FUNCTION_RETURNS_NON_CONST,
+            "const inline functions must return a constant value"
+        )
+
+        put(
+            ErrorsDart.CONST_INLINE_FUNCTION_HAS_INVALID_STATEMENT,
+            "const inline functions must only contain const variables and a single return statement"
         )
 
         put(
@@ -93,11 +108,6 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
         put(
             ErrorsDart.UNNECESSARY_REIFIED,
             "using reified is not necessary, there's no type erasure"
-        )
-
-        put(
-            ErrorsDart.CONST_LAMBDA_ACCESSING_NON_GLOBAL_VALUE,
-            "const lambdas cannot access values from local or class closure"
         )
 
         put(
@@ -135,11 +145,12 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
 
         put(
             ErrorsDart.CONST_WITH_NON_CONST,
-            "the constructor being called isn't a const constructor"
+            "the {0} being called is not a const constructor",
+            Renderers.TO_STRING
         )
 
         put(
-            ErrorsDart.NON_CONSTANT_DEFAULT_VALUE_IN_CONST_CONSTRUCTOR,
+            ErrorsDart.NON_CONSTANT_DEFAULT_VALUE_IN_CONST_FUNCTION,
             "the default value of an optional parameter in a const constructor must be constant"
         )
 

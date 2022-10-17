@@ -21,7 +21,6 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.dotlin.compiler.backend.util.isAccessibleInDartConstLambda
 import org.jetbrains.kotlin.backend.common.ir.addChild
 import org.jetbrains.kotlin.backend.common.lower.irThrow
 import org.jetbrains.kotlin.ir.builders.IrSingleStatementBuilder

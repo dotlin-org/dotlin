@@ -17,7 +17,7 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package compile.dialect
+package compile.dialect.const
 
 import BaseTest
 import assertCompile
@@ -459,6 +459,52 @@ class Const : BaseTest {
 
             void main() {
               const Duration d = Duration(seconds: 2);
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `const val with lambda literal initializer`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                const val d = { 1 + 1 }
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              const int Function() d = _${'$'}7aa;
+            }
+
+            int _${'$'}7aa() {
+              return 1 + 1;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `const val with equality check`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                const val nope = true == false
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              const bool nope = true == false;
             }
             """
         )

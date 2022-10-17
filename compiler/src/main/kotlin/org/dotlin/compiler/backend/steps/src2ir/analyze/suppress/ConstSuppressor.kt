@@ -33,7 +33,7 @@ object ConstSuppressor : SubSuppressor {
         val target = b as? String ?: return false
 
         return when (target) {
-            "constructor", "local variable" -> true
+            "constructor", "local variable", "top level function" -> true
             else -> false
         }
     }

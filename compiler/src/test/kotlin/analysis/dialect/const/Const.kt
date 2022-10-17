@@ -17,7 +17,7 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package analysis.dialect
+package analysis.dialect.const
 
 import BaseTest
 import assertCompilesWithError
@@ -55,7 +55,7 @@ class Const : BaseTest {
 
     @Test
     fun `error if @const used on non-constructor call expression`() =
-        assertCompilesWithError(ErrorsDart.ONLY_CONSTRUCTOR_CALLS_CAN_BE_CONST) {
+        assertCompilesWithError(ErrorsDart.ONLY_FUNCTION_AND_CONSTRUCTOR_CALLS_CAN_BE_CONST) {
             kotlin(
                 """
                 fun test() {
@@ -95,7 +95,7 @@ class Const : BaseTest {
 
     @Test
     fun `error if const constructor parameter with default value is not const`() =
-        assertCompilesWithError(ErrorsDart.NON_CONSTANT_DEFAULT_VALUE_IN_CONST_CONSTRUCTOR) {
+        assertCompilesWithError(ErrorsDart.NON_CONSTANT_DEFAULT_VALUE_IN_CONST_FUNCTION) {
             kotlin(
                 """
                 class Test
@@ -107,7 +107,7 @@ class Const : BaseTest {
 
     @Test
     fun `error if const lambda literal accessing non-global closure variable`() =
-        assertCompilesWithError(ErrorsDart.CONST_LAMBDA_ACCESSING_NON_GLOBAL_VALUE) {
+        assertCompilesWithError(ErrorsDart.CONST_INITIALIZED_WITH_NON_CONSTANT_VALUE) {
             kotlin(
                 """
                 class Zen const constructor(private val maintainMotorcycle: () -> Int)
@@ -121,10 +121,9 @@ class Const : BaseTest {
             )
         }
 
-
     @Test
     fun `error if const lambda literal accessing non-global closure anonymous object`() =
-        assertCompilesWithError(ErrorsDart.CONST_LAMBDA_ACCESSING_NON_GLOBAL_VALUE) {
+        assertCompilesWithError(ErrorsDart.CONST_INITIALIZED_WITH_NON_CONSTANT_VALUE) {
             kotlin(
                 """
                 class Zen const constructor(private val maintainMotorcycle: () -> String)
@@ -138,6 +137,21 @@ class Const : BaseTest {
                         someObject
                         "Quality"
                     }
+                }
+                """
+            )
+        }
+
+    @Test
+    fun `error if const constructor called with non-const values`() =
+        assertCompilesWithError(ErrorsDart.CONST_INITIALIZED_WITH_NON_CONSTANT_VALUE) {
+            kotlin(
+                """
+                class Test const constructor(val message: String)
+
+                fun main() {
+                    val nonConst = "asd"
+                    const val z = Test(nonConst)
                 }
                 """
             )

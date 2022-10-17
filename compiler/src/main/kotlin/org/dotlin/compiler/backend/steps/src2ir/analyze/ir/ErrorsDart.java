@@ -55,7 +55,16 @@ public interface ErrorsDart {
     DiagnosticFactory0<KtDeclaration> CONST_INITIALIZED_WITH_NON_CONSTANT_VALUE =
             DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
 
-    DiagnosticFactory0<KtExpression> ONLY_CONSTRUCTOR_CALLS_CAN_BE_CONST =
+    DiagnosticFactory0<KtExpression> ONLY_FUNCTION_AND_CONSTRUCTOR_CALLS_CAN_BE_CONST =
+            DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
+
+    DiagnosticFactory0<KtElement> CONST_INLINE_FUNCTION_WITH_MULTIPLE_RETURNS =
+            DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
+
+    DiagnosticFactory0<KtElement> CONST_INLINE_FUNCTION_RETURNS_NON_CONST =
+            DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
+
+    DiagnosticFactory0<KtElement> CONST_INLINE_FUNCTION_HAS_INVALID_STATEMENT =
             DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
 
     DiagnosticFactory0<KtExpression> LONG_REFERENCE =
@@ -72,9 +81,6 @@ public interface ErrorsDart {
 
     DiagnosticFactory0<PsiElement> UNNECESSARY_REIFIED =
             DiagnosticFactory0.create(Severity.WARNING, DEFAULT);
-
-    DiagnosticFactory0<KtExpression> CONST_LAMBDA_ACCESSING_NON_GLOBAL_VALUE =
-            DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
 
     DiagnosticFactory0<KtExpression> KOTLIN_ITERATOR_METHOD_USAGE =
             DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
@@ -95,10 +101,11 @@ public interface ErrorsDart {
             DiagnosticFactory0.create(Severity.ERROR, DECLARATION_SIGNATURE_OR_DEFAULT);
 
     // Dart emulated errors.
-    DiagnosticFactory0<KtExpression> CONST_WITH_NON_CONST =
-            DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
+    DiagnosticFactory1<KtExpression, String> CONST_WITH_NON_CONST =
+            DiagnosticFactory1.create(Severity.ERROR, DEFAULT);
 
-    DiagnosticFactory0<KtExpression> NON_CONSTANT_DEFAULT_VALUE_IN_CONST_CONSTRUCTOR =
+    // Original name: NON_CONSTANT_DEFAULT_VALUE_IN_CONST_CONSTRUCTOR
+    DiagnosticFactory0<KtExpression> NON_CONSTANT_DEFAULT_VALUE_IN_CONST_FUNCTION =
             DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
 
     @SuppressWarnings("UnusedDeclaration")

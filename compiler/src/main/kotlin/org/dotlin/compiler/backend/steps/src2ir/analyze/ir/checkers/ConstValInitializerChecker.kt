@@ -23,6 +23,7 @@ import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
 import org.dotlin.compiler.backend.util.isDartConst
+import org.dotlin.compiler.backend.util.isDartConstInlineFunction
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrField
@@ -45,7 +46,21 @@ object ConstValInitializerChecker : IrDeclarationChecker {
             else -> null
         } ?: return
 
-        if (!initializer.isDartConst(allowImplicit = true)) {
+        val isDartConst = initializer.isDartConst(
+            implicit = true,
+            constInlineContainer = when (declaration) {
+                is IrVariable -> {
+                    val parent = declaration.parent
+                    when {
+                        parent.isDartConstInlineFunction() -> parent
+                        else -> null
+                    }
+                }
+                else -> null
+            }
+        )
+
+        if (!isDartConst) {
             trace.report(ErrorsDart.CONST_INITIALIZED_WITH_NON_CONSTANT_VALUE.on(source))
         }
     }

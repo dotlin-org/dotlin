@@ -24,16 +24,16 @@ import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
 import org.dotlin.compiler.backend.util.isDartConst
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
-import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
+import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.psi.KtDeclaration
 
-object ConstConstructorParameterDefaultValueChecker : IrDeclarationChecker {
-    override val reports = listOf(ErrorsDart.NON_CONSTANT_DEFAULT_VALUE_IN_CONST_CONSTRUCTOR)
+object ConstFunctionParameterDefaultValueChecker : IrDeclarationChecker {
+    override val reports = listOf(ErrorsDart.NON_CONSTANT_DEFAULT_VALUE_IN_CONST_FUNCTION)
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun IrAnalyzerContext.check(source: KtDeclaration, declaration: IrDeclaration) {
-        if (declaration !is IrConstructor || !declaration.isDartConst()) return
+        if (declaration !is IrFunction || !declaration.isDartConst()) return
         if (!declaration.isDartConst()) return
 
         val defaultValues = declaration.valueParameters.mapNotNull { it.defaultValue?.expression }
@@ -41,7 +41,7 @@ object ConstConstructorParameterDefaultValueChecker : IrDeclarationChecker {
         for (defaultValue in defaultValues) {
             if (!defaultValue.isDartConst()) {
                 trace.report(
-                    ErrorsDart.NON_CONSTANT_DEFAULT_VALUE_IN_CONST_CONSTRUCTOR.on(
+                    ErrorsDart.NON_CONSTANT_DEFAULT_VALUE_IN_CONST_FUNCTION.on(
                         defaultValue.ktExpression ?: source
                     )
                 )

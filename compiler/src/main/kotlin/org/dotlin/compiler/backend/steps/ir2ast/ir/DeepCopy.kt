@@ -48,6 +48,7 @@ inline fun <reified T : IrDeclaration> T.deepCopy(
     is IrProperty -> deepCopyWith(remapReferences, initialParent) {}
     is IrField -> deepCopyWith(remapReferences, initialParent) {}
     is IrValueParameter -> deepCopyWith(remapReferences, initialParent) {}
+    is IrVariable -> deepCopyWith(remapReferences, initialParent) {}
     else -> throw UnsupportedOperationException("Cannot deep-copy ${T::class.simpleName}")
 }
 
@@ -65,6 +66,7 @@ inline fun <reified T : IrDeclarationWithName> T.deepCopyWith(
     is IrProperty -> deepCopyWith(remapReferences, initialParent) { this.name = name }
     is IrField -> deepCopyWith(remapReferences, initialParent) { this.name = name }
     is IrValueParameter -> deepCopyWith(remapReferences, initialParent) { this.name = name }
+    is IrVariable -> deepCopyWith(remapReferences, initialParent) { this.name = name }
     else -> throw UnsupportedOperationException("Cannot deep-copy ${T::class.simpleName}")
 }
 
@@ -76,11 +78,11 @@ inline fun <reified T : IrPossiblyExternalDeclaration> T.deepCopyWith(
     initialParent: IrDeclarationParent? = null,
     isExternal: Boolean,
 ): T = when (this) {
-    is IrClass -> deepCopyWith(remapReferences) { this.isExternal = isExternal }
-    is IrConstructor -> deepCopyWith(remapReferences) { this.isExternal = isExternal }
-    is IrFunction -> deepCopyWith(remapReferences) { this.isExternal = isExternal }
-    is IrProperty -> deepCopyWith(remapReferences) { this.isExternal = isExternal }
-    is IrField -> deepCopyWith(remapReferences) { this.isExternal = isExternal }
+    is IrClass -> deepCopyWith(remapReferences, initialParent) { this.isExternal = isExternal }
+    is IrConstructor -> deepCopyWith(remapReferences, initialParent) { this.isExternal = isExternal }
+    is IrFunction -> deepCopyWith(remapReferences, initialParent) { this.isExternal = isExternal }
+    is IrProperty -> deepCopyWith(remapReferences, initialParent) { this.isExternal = isExternal }
+    is IrField -> deepCopyWith(remapReferences, initialParent) { this.isExternal = isExternal }
     else -> throw UnsupportedOperationException("Cannot deep-copy ${T::class.simpleName}")
 }
 
@@ -152,7 +154,7 @@ inline fun <reified T : IrProperty> T.deepCopyWith(
 )
 
 /**
- * Deep-copies the given field and remaps all references to it (if [remapReferences] is true).
+ * Deep-copies the given value parameter and remaps all references to it (if [remapReferences] is true).
  */
 inline fun <reified T : IrField> T.deepCopyWith(
     remapReferences: Boolean = true,
@@ -170,6 +172,24 @@ inline fun <reified T : IrField> T.deepCopyWith(
 ).apply {
     correspondingPropertySymbol = this@deepCopyWith.correspondingPropertySymbol
 }
+
+/**
+ * Deep-copies the given variable and remaps all references to it (if [remapReferences] is true).
+ */
+inline fun <reified T : IrVariable> T.deepCopyWith(
+    remapReferences: Boolean = true,
+    initialParent: IrDeclarationParent? = null,
+    block: IrVariableBuilder.() -> Unit
+): T = deepCopyWith(
+    block,
+    createBuilder = { IrVariableBuilder() },
+    updateFrom = {
+        updateFrom(it)
+        name = it.name
+    },
+    initialParent,
+    remapReferences
+)
 
 /**
  * Deep-copies the given field and remaps all references to it (if [remapReferences] is true).
@@ -725,5 +745,22 @@ class DeepCopier(
                 override var varargElementType = builder.varargElementType
             }
         )
+    }
+}
+
+class IrVariableBuilder : IrDeclarationBuilder() {
+    lateinit var type: IrType
+
+    var isVar: Boolean = false
+    var isLateinit: Boolean = false
+    var isConst: Boolean = false
+
+    fun updateFrom(from: IrVariable) {
+        super.updateFrom(from)
+
+        type = from.type
+        isVar = from.isVar
+        isLateinit = from.isLateinit
+        isConst = from.isConst
     }
 }

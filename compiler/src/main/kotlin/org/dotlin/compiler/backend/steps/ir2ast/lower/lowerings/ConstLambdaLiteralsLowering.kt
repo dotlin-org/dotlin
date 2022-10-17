@@ -21,15 +21,11 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.deepCopyWith
-import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
-import org.dotlin.compiler.backend.steps.ir2ast.lower.IrExpressionLowering
-import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformation
-import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
+import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.backend.common.ir.addChild
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionReferenceImpl
 import org.jetbrains.kotlin.ir.util.fileOrNull
@@ -46,41 +42,34 @@ class ConstLambdaLiteralsLowering(override val context: DartLoweringContext) : I
         expression: IrExpression,
         context: IrExpressionContext
     ): Transformation<IrExpression>? = context.run {
-        if (expression !is IrFunctionAccessExpression ||
+        if (expression !is IrFunctionExpression ||
             !expression.isDartConst(initializedIn = initializerContainer?.declaration)
         ) {
             return noChange()
         }
 
         val file = container.fileOrNull ?: return noChange()
-        for (i in 0 until expression.valueArgumentsCount) {
-            val arg = expression.getValueArgument(i)
-            if (arg !is IrFunctionExpression) continue
-
-            val namedFunction = arg.function.deepCopyWith {
-                visibility = DescriptorVisibilities.PRIVATE
-                name = Name.identifier(
-                    // Generate name based on the position in the file.
-                    "$" + listOf(arg.startOffset, arg.endOffset)
-                        .hashCode()
-                        .toUInt()
-                        .toString(radix = 16)
-                )
-            }
-
-            expression.putValueArgument(
-                i, IrFunctionReferenceImpl(
-                    UNDEFINED_OFFSET, UNDEFINED_OFFSET,
-                    type = arg.type,
-                    namedFunction.symbol,
-                    typeArgumentsCount = 0,
-                    valueArgumentsCount = 0,
-                )
+        val namedFunction = expression.function.deepCopyWith {
+            visibility = DescriptorVisibilities.PRIVATE
+            name = Name.identifier(
+                // Generate name based on the position in the file.
+                "$" + listOf(expression.startOffset, expression.endOffset)
+                    .hashCode()
+                    .toUInt()
+                    .toString(radix = 16)
             )
-
-            file.addChild(namedFunction)
         }
 
-        return noChange()
+        file.addChild(namedFunction)
+
+        return replaceWith(
+            IrFunctionReferenceImpl(
+                UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+                type = expression.type,
+                namedFunction.symbol,
+                typeArgumentsCount = 0,
+                valueArgumentsCount = 0,
+            )
+        )
     }
 }
