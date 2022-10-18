@@ -344,7 +344,7 @@ You can also use arguments in `const inline` functions:
 class Hobbit const constructor(name: String, age: Int, isCurrentRingbearer: Boolean)
 
 const inline fun baggings(firstName: String, age: Int): Hobbit {
-  const val fullName = "${'$'}firstName Baggings"
+  const val fullName = "$firstName Baggings"
   const val hasRing = firstName == "Frodo"
 
   return Hobbit(fullName, age, isCurrentRingbearer = hasRing)
