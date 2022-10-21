@@ -20,46 +20,20 @@
 package org.dotlin.compiler.cli.command
 
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.parameters.arguments.argument
-import com.github.ajalt.clikt.parameters.arguments.help
-import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.path
 import org.dotlin.compiler.KotlinToDartCompiler
+import org.dotlin.compiler.backend.DartProject
 import java.nio.file.Path
-import kotlin.io.path.extension
+import kotlin.io.path.Path
 
 class Compile : CliktCommand(name = "dotlin") {
-    private val sourceRoot: Path? by argument("SOURCE_ROOT")
-        .help("Kotlin source root directories")
-        .path(
-            mustExist = true,
-            mustBeReadable = true,
-            canBeFile = false,
-        )
-        .optional()
-
-    private val output: Path? by argument()
-        .help(
-            """
-            Path of the directory to compile to.
-            
-            If the extension of the file is .dart, Dart source will be generated. If the
-            extension of the file is .klib, a Klib will be generated.
-            """.trimIndent()
-        )
-        .path(
-            mustExist = false,
-            canBeFile = false
-        )
-        .optional()
-
     private val format: Boolean by option()
         .help("Whether to format the output Dart code using dart format")
         .flag("--no-format", default = false)
 
     private val dependencies: Set<Path> by option("-d", "--dependency")
-        .help("A .klib dependency necessary for compiling. Can be used multiple times.")
+        .help("A path to a dependency Dart project")
         .path(
             mustExist = true,
             mustBeReadable = true,
@@ -69,19 +43,16 @@ class Compile : CliktCommand(name = "dotlin") {
         .unique()
 
     override fun run() {
-        if (sourceRoot == null && output == null) {
-            println(KotlinToDartCompiler.compile(readLine()!!, format = format))
-            return
-        }
-
-        // TODO: Handle null output (write to stdout)
+        // TODO: Support compiling non-project Dart files and STDIN
 
         KotlinToDartCompiler.compile(
-            sourceRoot!!,
-            dependencies,
+            DartProject(
+                name = "TODO", // TODO
+                path = Path(""), // TODO: Find nearest pubspec,
+                isLibrary = false, // TODO
+                dependencies = emptySet() // TODO
+            ),
             format,
-            isKlib = output!!.extension == "klib",
-            output!!,
         )
     }
 }

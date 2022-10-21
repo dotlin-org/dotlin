@@ -20,8 +20,8 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
 import org.dotlin.compiler.backend.*
+import org.dotlin.compiler.backend.attributes.IrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.DartIrBuiltIns
-import org.dotlin.compiler.backend.steps.ir2ast.attributes.IrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartNumberPrimitive
 import org.dotlin.compiler.backend.util.sentenceCase
@@ -54,7 +54,6 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.BindingContext
-import java.nio.file.Path
 
 class DartLoweringContext(
     override val configuration: CompilerConfiguration,
@@ -62,9 +61,8 @@ class DartLoweringContext(
     override val bindingContext: BindingContext,
     val irModuleFragment: IrModuleFragment,
     override val dartNameGenerator: DartNameGenerator,
+    override val dartProject: DartProject,
     private val irAttributes: IrAttributes,
-    override val sourceRoot: Path,
-    override val dartPackage: DartPackage
 ) : IrContext(), CommonBackendContext, IrAttributes by irAttributes {
     override val builtIns = irModuleFragment.descriptor.builtIns
     override var inVerbosePhase = false

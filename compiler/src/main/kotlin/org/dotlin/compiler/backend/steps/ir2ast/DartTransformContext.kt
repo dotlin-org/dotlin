@@ -20,7 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast
 
 import org.dotlin.compiler.backend.IrContext
-import org.dotlin.compiler.backend.steps.ir2ast.attributes.IrAttributes
+import org.dotlin.compiler.backend.attributes.IrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.accept
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartAnnotations
@@ -44,8 +44,7 @@ class DartTransformContext(
     override val symbolTable = loweringContext.symbolTable
     override val irBuiltIns = loweringContext.irBuiltIns
     override val dartNameGenerator = loweringContext.dartNameGenerator
-    override val sourceRoot = loweringContext.sourceRoot
-    override val dartPackage = loweringContext.dartPackage
+    override val dartProject = loweringContext.dartProject
 
     private fun <N : DartAstNode> IrFunction.transformBy(
         context: DartTransformContext,

@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast
 
+import org.dotlin.compiler.backend.DartNameGenerator
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lower
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.IrToDartCompilationUnitTransformer
 import org.dotlin.compiler.backend.steps.src2ir.IrResult
@@ -41,18 +42,16 @@ import kotlin.io.path.Path
 fun irToDartAst(
     config: CompilerConfiguration,
     ir: IrResult,
-    isPublicPackage: Boolean
 ): IrToDartAstResult {
-    val loweringContext = ir.lower(config, context = ir.loweringContext)
+    val loweringContext = ir.lower(config, ir.loweringContext)
 
     // Some analysis must be done after lowering.
     DartIrAnalyzer(
         ir.module, ir.bindingTrace,
         ir.symbolTable, ir.dartNameGenerator,
-        ir.sourceRoot,
-        loweringContext.dartPackage,
+        ir.dartProject,
         config,
-        loweringContext,
+        ir.irAttributes,
         checkers = listOf(DartNameChecker),
     ).analyzeAndReport().also {
         it.throwIfHasErrors()
@@ -70,10 +69,12 @@ fun irToDartAst(
         }
     }
 
-    if (isPublicPackage) {
+    val dartProject = ir.dartProject
+
+    // TODO: Only do this if we're not mixing public Dart/Kotlin code.
+    if (dartProject.isLibrary) {
         // Add exports file.
-        // TODO: Use package name
-        units[Path("package_name.g.dart")] = DartCompilationUnit(
+        units[Path("lib/${dartProject.name}.${DartNameGenerator.FILE_EXTENSION}")] = DartCompilationUnit(
             directives = units.mapNotNull { (path, unit) ->
                 when {
                     // If all declarations in the unit are private or internal, we don't need to export it.

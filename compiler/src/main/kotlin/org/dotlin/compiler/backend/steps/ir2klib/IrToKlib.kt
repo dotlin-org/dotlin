@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2klib
 
+import org.dotlin.compiler.backend.DartProject
 import org.dotlin.compiler.backend.steps.src2ir.IrResult
 import org.jetbrains.kotlin.backend.common.serialization.KlibIrVersion
 import org.jetbrains.kotlin.backend.common.serialization.metadata.KlibMetadataMonolithicSerializer
@@ -40,8 +41,13 @@ import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
 
-fun writeToKlib(env: KotlinCoreEnvironment, config: CompilerConfiguration, irResult: IrResult, outputFile: Path) {
-    irResult.module.withFilePathsRelativeTo(irResult.sourceRoot) { module ->
+fun writeToKlib(
+    env: KotlinCoreEnvironment,
+    config: CompilerConfiguration,
+    irResult: IrResult,
+    dartProject: DartProject
+) {
+    irResult.module.withFilePathsRelativeTo(dartProject.path) { module ->
         val serializedIr = DartIrModuleSerializer(
             messageLogger = config.get(IrMessageLogger.IR_MESSAGE_LOGGER) ?: IrMessageLogger.None,
             builtIns = module.irBuiltins,
@@ -71,7 +77,7 @@ fun writeToKlib(env: KotlinCoreEnvironment, config: CompilerConfiguration, irRes
             metadata = serializedMetadata,
             ir = serializedIr,
             versions = versions,
-            output = outputFile.absolutePathString(),
+            output = dartProject.klibPath.absolutePathString(),
             moduleName = module.name.asStringStripSpecialMarkers(),
             nopack = true,
             perFile = false, // TODO

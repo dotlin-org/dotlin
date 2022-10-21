@@ -17,12 +17,11 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.backend.steps.ir2ast.attributes
+package org.dotlin.compiler.backend.attributes
 
 import org.dotlin.compiler.backend.util.getFqName
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrAttributeContainer
-import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -38,9 +37,9 @@ import kotlin.reflect.KProperty
 
 private typealias IrAttributeMap = MutableMap<IrElement, MutableMap<String, Any?>>
 
-interface IrAttributes {
+interface IrAttributes  {
     class Default : IrAttributes {
-        private val attributes = mutableMapOf<IrElement, MutableMap<String, Any?>>()
+        private val attributes: IrAttributeMap = mutableMapOf()
         private fun <T> attribute() = IrAttribute<T>(attributes)
         private fun <T> attribute(default: T) = IrAttributeWithDefault(attributes, default)
         private fun <T> attribute(create: () -> T) = IrAttributeWithCreatedDefault(attributes, create)
@@ -144,8 +143,3 @@ data class DartImport(
     val hide: String? = null,
     val show: String? = null
 )
-
-/**
- * Assumes that [attributeOwnerId] is the same type as `this`.
- */
-inline fun <reified T : IrAttributeContainer> T.attributeOwner(): T = attributeOwnerId as T

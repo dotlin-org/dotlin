@@ -21,7 +21,9 @@ package org.dotlin.compiler
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.util.Disposer
+import org.dotlin.compiler.backend.DartNameGenerator
 import org.dotlin.compiler.backend.DartPackage
+import org.dotlin.compiler.backend.DartProject
 import org.dotlin.compiler.backend.steps.ast2dart.dartAstToDartSource
 import org.dotlin.compiler.backend.steps.ir2ast.irToDartAst
 import org.dotlin.compiler.backend.steps.ir2klib.writeToKlib
@@ -51,11 +53,9 @@ object KotlinToDartCompiler {
     @OptIn(ExperimentalPathApi::class)
     fun compile(
         kotlin: String,
-        dependencies: Set<Path> = emptySet(),
         format: Boolean = false,
-        klib: Boolean = false,
-        output: Path = createTempDirectory(),
-        isPublicPackage: Boolean = false,
+        isLibrary: Boolean = false,
+        dependencies: Set<DartPackage>,
     ): CompilationResult {
         val tmpDir = createTempDirectory().also {
             it.resolve("main.kt")
@@ -65,70 +65,67 @@ object KotlinToDartCompiler {
         }
 
         return compile(
-            sourceRoot = tmpDir,
-            dependencies,
+            DartProject(
+                name = "main",
+                path = tmpDir,
+                isLibrary,
+                dependencies,
+            ),
             format,
-            klib,
-            output,
-            isPublicPackage
+            showPathsInDiagnostics = false
         )
     }
 
-    fun compile(
-        sourceRoot: Path,
-        dependencies: Set<Path>,
-        format: Boolean = false,
-        isKlib: Boolean = false,
-        output: Path = createTempDirectory(),
-        isPublicPackage: Boolean = false,
-    ): CompilationResult {
-        require(output.isDirectory())
+    fun compile(path: Path) = compile(
+        DartProject(
+            name = "TODO", // TODO: Load from pubspec
+            path,
+            isLibrary = false, // TODO: Load from pubspec
+            dependencies = emptySet() // TODO: Load from pubspec
+        )
+    )
 
-        val (env, config, rootDisposable) = prepareCompile(sourceRoot, showFiles = true)
+    fun compile(
+        project: DartProject,
+        format: Boolean = false,
+        showPathsInDiagnostics: Boolean = true,
+    ): CompilationResult {
+        require(project.path.isDirectory())
+
+        val (env, config, rootDisposable) = prepareCompile(project, showPathsInDiagnostics)
 
         try {
             val ir = sourceToIr(
                 env,
                 config,
-                dependencies,
-                sourceRoot.toRealPath().absolute(),
-                DartPackage(
-                    isPublic = isPublicPackage,
-                    isLibrary = isKlib
-                )
+                project
             )
 
-            // By lazy is important here, the klib must be written before compiling to Dart source,
-            // since it will change the IR in place.
-            val result by lazy { generateDartCode(ir, config, isPublicPackage) }
+            if (project.isLibrary) {
+                writeToKlib(env, config, ir, project)
+            }
 
-            when {
-                isKlib -> {
-                    writeToKlib(env, config, ir, output)
+            val result = generateDartCode(ir, config)
 
-                    val dartSourcePath = output.resolve("lib")
+            // Delete all old files first.
+            // TODO: Only delete changed files, but still delete related deleted .kt files.
+            project.path.toFile().walk()
+                .filter { !it.isDirectory && it.path.endsWith(".${DartNameGenerator.FILE_EXTENSION}") }
+                .forEach { it.delete() }
 
-                    for ((path, source) in result.sources) {
-                        dartSourcePath.resolve(path).apply {
-                            parent?.createDirectories()
-                            writeText(source)
-                        }
-                    }
-                }
-                else -> for ((path, source) in result.sources) {
-                    output.resolve(path).toFile().apply {
-                        parentFile.mkdirs()
-                        writeText(source)
-                    }
+            for ((path, source) in result.sources) {
+                project.path.resolve(path).apply {
+                    parent?.createDirectories()
+                    writeText(source)
                 }
             }
 
             if (format) {
-                dartFormat(output.absolutePathString())
+                dartFormat(project.path.absolutePathString())
             }
 
             return CompilationResult(
-                output,
+                project,
                 diagnostics = result.diagnostics
             )
         } finally {
@@ -136,12 +133,12 @@ object KotlinToDartCompiler {
         }
     }
 
-    private fun prepareCompile(sourceRoot: Path, showFiles: Boolean)
+    private fun prepareCompile(project: DartProject, showPaths: Boolean)
             : Triple<KotlinCoreEnvironment, CompilerConfiguration, Disposable> {
         val compilerConfig = CompilerConfiguration().apply {
             val messageCollector = PrintingMessageCollector(
                 System.out,
-                if (showFiles) MessageRenderer.PLAIN_RELATIVE_PATHS else MessageRenderer.WITHOUT_PATHS,
+                if (showPaths) MessageRenderer.PLAIN_RELATIVE_PATHS else MessageRenderer.WITHOUT_PATHS,
                 true,
             )
 
@@ -151,10 +148,10 @@ object KotlinToDartCompiler {
                 KlibMetadataVersion(*versionArray)
             }
 
-            put(CommonConfigurationKeys.MODULE_NAME, "main")  // TODO: Use package name
+            put(CommonConfigurationKeys.MODULE_NAME, project.name)
             put(CLIConfigurationKeys.PERF_MANAGER, object : CommonCompilerPerformanceManager("Dotlin") {})
 
-            addKotlinSourceRoots(listOf(sourceRoot.toString()))
+            addKotlinSourceRoots(listOf(project.path.toString()))
         }
 
         val rootDisposable = Disposer.newDisposable()
@@ -177,9 +174,8 @@ object KotlinToDartCompiler {
     private fun generateDartCode(
         ir: IrResult,
         config: CompilerConfiguration,
-        isPublicPackage: Boolean
     ): DartCodeGenerationResult {
-        val (dartAst, diagnostics) = irToDartAst(config, ir, isPublicPackage)
+        val (dartAst, diagnostics) = irToDartAst(config, ir)
         return DartCodeGenerationResult(dartAstToDartSource(dartAst), diagnostics)
     }
 
@@ -203,7 +199,7 @@ object KotlinToDartCompiler {
 }
 
 data class CompilationResult(
-    val output: Path,
+    val project: DartProject,
     val diagnostics: Collection<Diagnostic>
 )
 

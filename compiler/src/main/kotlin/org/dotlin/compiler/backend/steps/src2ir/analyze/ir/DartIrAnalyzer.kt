@@ -21,9 +21,9 @@ package org.dotlin.compiler.backend.steps.src2ir.analyze.ir
 
 import com.intellij.psi.PsiElement
 import org.dotlin.compiler.backend.DartNameGenerator
-import org.dotlin.compiler.backend.DartPackage
+import org.dotlin.compiler.backend.DartProject
 import org.dotlin.compiler.backend.IrContext
-import org.dotlin.compiler.backend.steps.ir2ast.attributes.IrAttributes
+import org.dotlin.compiler.backend.attributes.IrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.transformExpressions
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.*
@@ -47,15 +47,13 @@ import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.resolve.BindingTraceContext
-import java.nio.file.Path
 
 open class DartIrAnalyzer(
     private val module: IrModuleFragment,
     trace: BindingTraceContext,
     symbolTable: SymbolTable,
     dartNameGenerator: DartNameGenerator,
-    sourceRoot: Path,
-    dartPackage: DartPackage,
+    dartProject: DartProject,
     config: CompilerConfiguration,
     irAttributes: IrAttributes,
     private val checkers: List<IrChecker<*, *, *>> = listOf(
@@ -75,7 +73,7 @@ open class DartIrAnalyzer(
 
     private val context: IrAnalyzerContext = IrAnalyzerContext(
         trace, symbolTable, module.irBuiltins,
-        dartNameGenerator, sourceRoot, dartPackage,
+        dartNameGenerator, dartProject,
         irAttributes
     )
 
@@ -146,8 +144,7 @@ class IrAnalyzerContext(
     override val symbolTable: SymbolTable,
     override val irBuiltIns: IrBuiltIns,
     override val dartNameGenerator: DartNameGenerator,
-    override val sourceRoot: Path,
-    override val dartPackage: DartPackage,
+    override val dartProject: DartProject,
     irAttributes: IrAttributes
 ) : IrContext(), IrAttributes by irAttributes {
     override val bindingContext = trace.bindingContext

@@ -563,7 +563,7 @@ class Dotlin : BaseTest {
               Hobbit().isProudfoot();
             }
 
-            extension ${'$'}HobbitExtensions${'$'}21ad63ef on Hobbit {
+            extension ${'$'}HobbitExtensions${'$'}b07f86 on Hobbit {
               bool isProudfoot() {
                 return true;
               }
@@ -606,13 +606,13 @@ class Dotlin : BaseTest {
               Proudfoot().isProudfoot();
             }
 
-            extension ${'$'}HobbitExtensions${'$'}21ad63ef on Hobbit {
+            extension ${'$'}HobbitExtensions${'$'}b07f86 on Hobbit {
               bool isProudfoot() {
                 return false;
               }
             }
 
-            extension ${'$'}ProudfootExtensions${'$'}21ad63ef on Proudfoot {
+            extension ${'$'}ProudfootExtensions${'$'}b07f86 on Proudfoot {
               bool isProudfoot() {
                 return true;
               }
@@ -655,7 +655,7 @@ class Dotlin : BaseTest {
               Proudfoot().isProudfoot();
             }
 
-            extension ${'$'}ProudfootExtensions${'$'}21ad63ef on Proudfoot {
+            extension ${'$'}ProudfootExtensions${'$'}b07f86 on Proudfoot {
               bool isProudfoot() {
                 return true;
               }
@@ -874,7 +874,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import '0.g.dart';
+            import '0.dt.g.dart';
             import 'dart:core' hide Something;
             import 'package:meta/meta.dart';
 

@@ -31,7 +31,7 @@ class Dotlin : BaseTest {
     @Test
     fun `warning if declaring extension without @DartExtensionName in public package`() =
         assertCompilesWithWarning(ErrorsDart.EXTENSION_WITHOUT_EXPLICIT_DART_EXTENSION_NAME_IN_PUBLIC_PACKAGE) {
-            isPublicPackage = true
+            isLibrary = true
 
             kotlin(
                 """

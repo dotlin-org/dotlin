@@ -22,9 +22,9 @@ package org.dotlin.compiler.backend.steps.src2ir
 import org.dotlin.compiler.backend.DartDescriptorBasedMangler
 import org.dotlin.compiler.backend.DartIrLinker
 import org.dotlin.compiler.backend.DartNameGenerator
-import org.dotlin.compiler.backend.DartPackage
+import org.dotlin.compiler.backend.DartProject
+import org.dotlin.compiler.backend.attributes.IrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.IrExpressionSourceMapper
-import org.dotlin.compiler.backend.steps.ir2ast.attributes.IrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lower
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.output.DartConstDeclarationsLowering
@@ -54,20 +54,16 @@ import org.jetbrains.kotlin.psi2ir.Psi2IrTranslator
 import org.jetbrains.kotlin.resolve.BindingTraceContext
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.util.DummyLogger
-import java.nio.file.Path
-import kotlin.io.path.absolutePathString
 
 fun sourceToIr(
     env: KotlinCoreEnvironment,
     config: CompilerConfiguration,
-    dependencies: Set<Path>,
-    sourceRoot: Path,
-    dartPackage: DartPackage
+    dartProject: DartProject
 ): IrResult {
     val sourceFiles = env.getSourceFiles()
 
     val resolvedLibraries = resolveLibraries(
-        dependencies.map { it.absolutePathString() },
+        dartProject.dependencies.map { it.klibPath },
         DummyLogger,
     )
 
@@ -77,13 +73,12 @@ fun sourceToIr(
         sourceFiles,
         irFactory = IrFactoryImpl,
         resolvedLibraries,
-        sourceRoot,
-        dartPackage
+        dartProject,
     )
 
-    // If the Dart package is a library, we must annotate const declarations
+    // If the Dart package is a library, we must specify const declarations
     // that are not normally const in Kotlin. Otherwise this information is lost in the output IR.
-    if (dartPackage.isLibrary) {
+    if (dartProject.isLibrary) {
         ir = ir.copy(loweringContext = ir.lower(config, context = null, listOf(::DartConstDeclarationsLowering)))
     }
 
@@ -96,8 +91,7 @@ private fun loadIr(
     files: List<KtFile>,
     irFactory: IrFactory,
     resolvedLibs: KotlinLibraryResolveResult,
-    sourceRoot: Path,
-    dartPackage: DartPackage
+    dartProject: DartProject
 ): IrResult {
     val isCompilingBuiltIns = resolvedLibs.getFullList().none { it.isBuiltIns }
 
@@ -206,8 +200,7 @@ private fun loadIr(
         trace,
         symbolTable,
         dartNameGenerator,
-        sourceRoot,
-        dartPackage,
+        dartProject,
         config,
         extraIrAttributes
     ).analyzeAndReport()
@@ -222,8 +215,7 @@ private fun loadIr(
         symbolTable,
         extraIrAttributes,
         dartNameGenerator,
-        sourceRoot,
-        dartPackage,
+        dartProject,
         loweringContext = null
     )
 }
@@ -235,8 +227,7 @@ data class IrResult(
     val symbolTable: SymbolTable,
     val irAttributes: IrAttributes,
     val dartNameGenerator: DartNameGenerator,
-    val sourceRoot: Path,
-    val dartPackage: DartPackage,
+    val dartProject: DartProject,
     /**
      * A lowering context might be available if the IR output was already (partially) lowered.
      */

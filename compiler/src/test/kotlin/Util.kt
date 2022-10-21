@@ -17,19 +17,12 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import org.dotlin.compiler.KotlinToDartCompiler
-import org.dotlin.compiler.backend.DotlinCompilerError
-import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.assertDoesNotThrow
-import org.junit.jupiter.api.assertThrows
+import org.dotlin.compiler.backend.DartPackage
 import java.nio.file.Files
 import java.nio.file.Path
-import kotlin.io.path.*
-import kotlin.test.assertContains
-import kotlin.test.assertEquals
+import kotlin.io.path.Path
 
-val stdlibSrc = Path("../libraries/stdlib/src")
-val stdlibKlib = Path("build/stdlib.klib")
+val stdlib = DartPackage(name = "dotlin", Path("../libraries/stdlib"))
 
 /**
  * Used to reference the `_$DefaultValue` Dart type in multiline

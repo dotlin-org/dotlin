@@ -1,6 +1,6 @@
 package org.dotlin.compiler.backend
 
-import org.dotlin.compiler.backend.steps.ir2ast.attributes.IrAttributes
+import org.dotlin.compiler.backend.attributes.IrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrIfNullExpression
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartBool
@@ -39,12 +39,7 @@ abstract class IrContext : IrAttributes {
     abstract val irBuiltIns: IrBuiltIns
     abstract val dartNameGenerator: DartNameGenerator
 
-    /**
-     * The source root. This is a real, absolute path, meaning symlinks are resolved.
-     */
-    abstract val sourceRoot: Path
-
-    abstract val dartPackage: DartPackage
+    abstract val dartProject: DartProject
 
     lateinit var currentFile: IrFile
         private set

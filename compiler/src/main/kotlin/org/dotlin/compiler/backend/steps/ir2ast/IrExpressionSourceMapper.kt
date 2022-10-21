@@ -1,7 +1,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast
 
 import com.intellij.psi.PsiElement
-import org.dotlin.compiler.backend.steps.ir2ast.attributes.IrAttributes
+import org.dotlin.compiler.backend.attributes.IrAttributes
 import org.jetbrains.kotlin.backend.jvm.ir.getKtFile
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrFile

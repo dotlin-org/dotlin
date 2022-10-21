@@ -110,13 +110,12 @@ fun IrResult.lower(
 ): DartLoweringContext {
     val actualContext = context ?: DartLoweringContext(
         configuration,
-        irModuleFragment = module,
-        symbolTable = symbolTable,
+        symbolTable,
         bindingContext = bindingTrace.bindingContext,
-        dartNameGenerator = dartNameGenerator,
-        sourceRoot = sourceRoot,
-        dartPackage = dartPackage,
-        irAttributes = irAttributes
+        irModuleFragment = module,
+        dartNameGenerator,
+        dartProject,
+        irAttributes,
     )
 
     lowerings.forEach { lowering ->

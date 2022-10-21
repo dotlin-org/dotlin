@@ -43,7 +43,7 @@ class Extension : BaseTest {
             @sealed
             class Test {}
 
-            extension ${'$'}TestExtensions${'$'}21ad63ef on Test {
+            extension ${'$'}TestExtensions${'$'}b07f86 on Test {
               void doIt() {}
             }
             """
@@ -67,7 +67,7 @@ class Extension : BaseTest {
             @sealed
             class Test {}
 
-            extension ${'$'}TestExtensions${'$'}21ad63ef on Test {
+            extension ${'$'}TestExtensions${'$'}b07f86 on Test {
               int get number {
                 return 3;
               }
@@ -95,7 +95,7 @@ class Extension : BaseTest {
             @sealed
             class Test {}
 
-            extension ${'$'}TestExtensions${'$'}21ad63ef on Test {
+            extension ${'$'}TestExtensions${'$'}b07f86 on Test {
               int get number {
                 return 3;
               }
@@ -123,7 +123,7 @@ class Extension : BaseTest {
             @sealed
             class Test<T> {}
 
-            extension ${'$'}TestExtensions${'$'}21ad63ef<T> on Test<T> {
+            extension ${'$'}TestExtensions${'$'}b07f86<T> on Test<T> {
               void doIt() {}
             }
             """
@@ -149,7 +149,7 @@ class Extension : BaseTest {
             @sealed
             class Test<T> {}
 
-            extension ${'$'}TestExtensions${'$'}21ad63ef<T> on Test<T> {
+            extension ${'$'}TestExtensions${'$'}b07f86<T> on Test<T> {
               void doIt() {}
               void doItAgain() {}
             }
@@ -176,11 +176,11 @@ class Extension : BaseTest {
             @sealed
             class Test<T> {}
 
-            extension ${'$'}TestExtensions${'$'}21ad63ef<T> on Test<T> {
+            extension ${'$'}TestExtensions${'$'}b07f86<T> on Test<T> {
               void doIt() {}
             }
 
-            extension ${'$'}TestIntExtensions${'$'}21ad63ef on Test<int> {
+            extension ${'$'}TestIntExtensions${'$'}b07f86 on Test<int> {
               void doItAgain() {}
             }
             """
@@ -204,7 +204,7 @@ class Extension : BaseTest {
             @sealed
             class Test<T> {}
 
-            extension ${'$'}TestExtensions${'$'}21ad63ef<A> on Test<A> {
+            extension ${'$'}TestExtensions${'$'}b07f86<A> on Test<A> {
               void doIt<B>() {}
             }
             """
@@ -223,7 +223,7 @@ class Extension : BaseTest {
             """
             import 'package:meta/meta.dart';
 
-            extension ${'$'}KotlinStringExtensions${'$'}21ad63ef on String {
+            extension ${'$'}KotlinStringExtensions${'$'}b07f86 on String {
               void titlecase() {}
             }
             """
@@ -242,7 +242,7 @@ class Extension : BaseTest {
             """
             import 'package:meta/meta.dart';
 
-            extension ${'$'}TMustBeAnyExtensions${'$'}21ad63ef<T> on T {
+            extension ${'$'}TMustBeAnyExtensions${'$'}b07f86<T> on T {
               void doIt() {}
             }
             """
@@ -266,7 +266,7 @@ class Extension : BaseTest {
             @sealed
             class Test<T> {}
 
-            extension ${'$'}TMustBeTestWithTExtensions${'$'}21ad63ef<T extends Test<T>> on T {
+            extension ${'$'}TMustBeTestWithTExtensions${'$'}b07f86<T extends Test<T>> on T {
               void doIt() {}
             }
             """
@@ -290,8 +290,7 @@ class Extension : BaseTest {
             @sealed
             class Test<T> {}
 
-            extension ${'$'}TMustBeTestWithStringExtensions${'$'}21ad63ef<T extends Test<String>>
-                on T {
+            extension ${'$'}TMustBeTestWithStringExtensions${'$'}b07f86<T extends Test<String>> on T {
               void doIt() {}
             }
             """
@@ -355,7 +354,7 @@ class Extension : BaseTest {
               SomeItem().buildAndIdentify();
             }
 
-            extension ${'$'}TMustBeBuildableAndIdentifiableExtensions${'$'}21ad63ef<T extends Object>
+            extension ${'$'}TMustBeBuildableAndIdentifiableExtensions${'$'}b07f86<T extends Object>
                 on T {
               void buildAndIdentify() {
                 (this as Identifiable).identify();
@@ -379,7 +378,7 @@ class Extension : BaseTest {
             """
             import 'package:meta/meta.dart';
 
-            extension ${'$'}KotlinIntExtensions${'$'}21ad63ef on int {
+            extension ${'$'}KotlinIntExtensions${'$'}b07f86 on int {
               int shift() {
                 return 0;
               }
@@ -405,7 +404,7 @@ class Extension : BaseTest {
             import 'package:meta/meta.dart';
 
             void main() {
-              ${'$'}KotlinIntExtensions${'$'}b6c37449(0).absoluteValue;
+              ${'$'}KotlinIntExtensions${'$'}6745d637(0).absoluteValue;
             }
             """
         )

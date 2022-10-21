@@ -17,8 +17,13 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import org.dotlin.compiler.*
+import org.dotlin.compiler.CompilationResult
+import org.dotlin.compiler.KotlinToDartCompiler
+import org.dotlin.compiler.backend.DartPackage
+import org.dotlin.compiler.backend.DartProject
 import org.dotlin.compiler.backend.DotlinCompilerError
+import org.dotlin.compiler.factories
+import org.dotlin.compiler.warnings
 import org.intellij.lang.annotations.Language
 import org.jetbrains.kotlin.diagnostics.DiagnosticFactory
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -31,19 +36,20 @@ import kotlin.test.assertContains
 import kotlin.test.assertEquals
 
 abstract class CompilerAssertion {
-    abstract val sourceRoot: Path
-    protected open val dependencies: Set<Path> = setOf(stdlibKlib)
+    abstract val path: Path
+    protected open val dependencies: Set<DartPackage> = setOf(stdlib)
     protected open val format: Boolean = true
-    protected open val isKlib: Boolean = false
-    protected open val isPublicPackage: Boolean = false
+    protected open val isLibrary: Boolean = false
 
     protected fun compile(): CompilationResult {
         return KotlinToDartCompiler.compile(
-            sourceRoot,
-            dependencies,
-            format,
-            isKlib,
-            isPublicPackage = isPublicPackage
+            DartProject(
+                name = "test",
+                path,
+                isLibrary,
+                dependencies,
+            ),
+            format = true
         )
     }
 
@@ -53,13 +59,13 @@ abstract class CompilerAssertion {
 abstract class AssertCompileFiles : CompilerAssertion() {
     private val kotlinSources = mutableListOf<String>()
 
-    public override var isPublicPackage: Boolean = false
+    public override var isLibrary: Boolean = false
 
     fun kotlin(@Language("kotlin") kotlin: String) {
         kotlinSources += kotlin.trimIndent()
     }
 
-    override val sourceRoot: Path
+    override val path: Path
         get() = createTempDirectory().apply {
             kotlinSources.forEachIndexed { index, source ->
                 resolve("$index.kt").createFile().writeText(source)
@@ -76,8 +82,8 @@ class AssertCompilesTo : AssertCompileFiles() {
 
     override fun assert() {
         val compiledDartSources =
-            Files.walk(assertDoesNotThrow { compile() }.output)
-                .filter { it.isRegularFile() }
+            Files.walk(assertDoesNotThrow { compile() }.project.path)
+                .filter { it.extension == "dart" && it.isRegularFile() }
                 .toList()
                 .sortedBy { it.nameWithoutExtension }
                 .map { it.readText().removeSuffix("\n") }
@@ -121,15 +127,12 @@ class AssertCanCompile : AssertCompileFiles() {
 }
 
 abstract class AssertCompileLibrary<O> : CompilerAssertion() {
-    public override var dependencies = setOf(stdlibKlib)
-    override val isKlib = true
+    public override var dependencies = setOf(stdlib)
+    override val isLibrary = true
 }
 
 class AssertCanCompileLibraryFromPath : AssertCompileLibrary<Unit>() {
-    lateinit var path: Path
-
-    override val sourceRoot: Path
-        get() = path
+    override lateinit var path: Path
 
     override fun assert() {
         assertDoesNotThrow { compile() }

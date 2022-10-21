@@ -31,10 +31,9 @@ import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.isSetter
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
-import org.jetbrains.kotlin.konan.file.File
 import java.nio.file.Path
 import kotlin.io.path.Path
-import kotlin.io.path.absolute
+import kotlin.io.path.relativeTo
 
 class DartNameGenerator {
     private val builtInIdentifiers = listOf(
@@ -328,25 +327,19 @@ class DartNameGenerator {
                 index != 0 && char.isUpperCase() && !acc.last().isUpperCase() -> "_$char"
                 else -> char.toString()
             }
-        }.lowercase().replace(Regex("\\.kt$"), ".g.dart")
+        }.lowercase().replace(Regex("\\.kt$"), ".$FILE_EXTENSION")
     }
 
     fun IrContext.dartPathOf(file: IrFile): Path {
         val fileName = dartNameOf(file)
         val filePath = Path(file.path)
 
-        val relativePath: Path? = when {
-            file.isInCurrentModule -> Path(
-                (filePath.toRealPath().absolute() - sourceRoot)
-                    .joinToString(File.separator)
-            ).parent
-            else -> filePath.parent // File paths are always serialized as relative to their source root.
-        }
+        val relativeParentPath = when {
+            file.isInCurrentModule -> filePath.relativeTo(dartProject.path).parent
+            else -> filePath.parent // File paths are always serialized as relative to their project root.
+        } ?: Path("")
 
-        // All Dart files are always put in /src in Dotlin.
-        // TODO: Don't assume all Dart files are in src/ (e.g. non-Dotlin Dart packages).
-        val root = Path("src")
-        return relativePath?.let { root.resolve(it) }?.resolve(fileName) ?: root.resolve(fileName)
+        return relativeParentPath.resolve(fileName)
     }
 
     fun IrContext.relativeDartPathOf(file: IrFile): Path {
@@ -354,5 +347,12 @@ class DartNameGenerator {
         val currentDartPath = dartPathOf(currentFile)
 
         return currentDartPath.parent?.relativize(theirDartPath) ?: theirDartPath
+    }
+
+    companion object {
+        /**
+         * Dotlin-generated Dart file extension, without dot.
+         */
+        const val FILE_EXTENSION = "dt.g.dart"
     }
 }

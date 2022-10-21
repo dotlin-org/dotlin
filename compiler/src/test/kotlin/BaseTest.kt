@@ -18,6 +18,7 @@
  */
 
 import org.dotlin.compiler.KotlinToDartCompiler
+import org.dotlin.compiler.backend.DartProject
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayNameGeneration
 
@@ -28,11 +29,13 @@ interface BaseTest {
         @JvmStatic
         fun compileStdlib() {
             KotlinToDartCompiler.compile(
-                sourceRoot = stdlibSrc,
-                output = stdlibKlib,
-                dependencies = emptySet(),
-                isKlib = true,
-                isPublicPackage = true
+                DartProject(
+                    stdlib.name,
+                    stdlib.path,
+                    isLibrary = true,
+                    dependencies = emptySet(),
+                ),
+                format = true
             )
         }
     }
