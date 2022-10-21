@@ -301,7 +301,7 @@ As you can see, a named function is generated based on the lambda, and passed to
 This is only possible if the lambda does not capture local or class closure values. You _can_
 use top-level/global values, however.
 
-#### `const inline`
+### `const inline`
 
 In Dotlin, you can create `const inline` functions, which can be used similarly to `const` constructors.
 
