@@ -145,7 +145,7 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
 
         put(
             ErrorsDart.CONST_WITH_NON_CONST,
-            "the {0} being called is not a const constructor",
+            "the {0} being called is not a const {0}",
             Renderers.TO_STRING
         )
 

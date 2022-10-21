@@ -25,7 +25,6 @@ import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
 import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
 import org.dotlin.compiler.backend.util.isDartConst
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.util.defaultType
@@ -33,11 +32,11 @@ import org.jetbrains.kotlin.ir.util.primaryConstructor
 
 /**
  * Because source information is not available for code in dependencies, we have to add the `@const` annotation
- * to declarations that are not normally `const` in Kotlin, such as constructors.
+ * to declarations that are not normally `const` in Kotlin, such as constructors and functions.
  */
 class DartConstDeclarationsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
     override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
-        if (declaration !is IrConstructor || !declaration.isDartConst()) return noChange()
+        if (!declaration.isDartConst()) return noChange()
 
         val constAnnotationClass = dartBuiltIns.dotlin.const.owner
 

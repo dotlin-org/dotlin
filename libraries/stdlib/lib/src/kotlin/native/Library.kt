@@ -61,7 +61,7 @@ inline fun <reified @PureReifiable T> emptyArray(): Array<T> = dart("<T>[]")
  * Returns an array containing enum T entries.
  */
 @SinceKotlin("1.1")
-inline fun <reified T : Enum<T>> enumValues(): Array<T>
+external const inline fun <reified T : Enum<T>> enumValues(): Array<T>
 
 /**
  * Returns an enum entry with specified name.

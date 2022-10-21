@@ -21,7 +21,6 @@ package compile
 
 import BaseTest
 import assertCompile
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
@@ -292,7 +291,7 @@ class Enum : BaseTest {
             }
 
             fun main() {
-                enumValues<Test>()
+                const val values = enumValues<Test>()
             }
             """
         )
@@ -321,7 +320,7 @@ class Enum : BaseTest {
             }
 
             void main() {
-              Test.values();
+              const core.List<Test> values = Test.values();
             }
             """
         )

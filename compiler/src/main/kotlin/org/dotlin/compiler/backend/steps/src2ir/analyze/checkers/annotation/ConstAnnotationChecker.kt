@@ -51,6 +51,8 @@ private fun KtExpression.getCalledDescriptor(bindingContext: BindingContext): Fu
 }
 
 private fun FunctionDescriptor.isDartConst(): Boolean {
+    if (annotations.hasAnnotation(dotlin.const)) return true
+
     val psi = findPsi() as? KtModifierListOwner ?: return false
     return psi.hasModifier(KtTokens.CONST_KEYWORD)
 }

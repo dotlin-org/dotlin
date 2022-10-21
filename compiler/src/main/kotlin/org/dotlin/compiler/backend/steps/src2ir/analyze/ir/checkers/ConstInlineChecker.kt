@@ -22,10 +22,7 @@ package org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
-import org.dotlin.compiler.backend.util.isDartConst
-import org.dotlin.compiler.backend.util.isDartConstInlineFunction
-import org.dotlin.compiler.backend.util.ktDeclaration
-import org.dotlin.compiler.backend.util.returnExpressions
+import org.dotlin.compiler.backend.util.*
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrVariable
@@ -44,12 +41,14 @@ object ConstInlineChecker : IrDeclarationChecker {
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun IrAnalyzerContext.check(source: KtDeclaration, declaration: IrDeclaration) {
-        if (!declaration.isDartConstInlineFunction()) {
+        if (declaration.isActuallyExternal || !declaration.isDartConstInlineFunction()) {
             return
         }
 
         val returns = declaration.returnExpressions()
         val singleReturn = returns.singleOrNull()
+
+        // TODO: Add error for functions with no implementation
 
         if (singleReturn == null) {
             var reportedAtLeastOnce = false
