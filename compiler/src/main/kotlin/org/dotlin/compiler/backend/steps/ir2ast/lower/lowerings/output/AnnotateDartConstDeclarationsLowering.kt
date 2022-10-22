@@ -34,7 +34,7 @@ import org.jetbrains.kotlin.ir.util.primaryConstructor
  * Because source information is not available for code in dependencies, we have to add the `@const` annotation
  * to declarations that are not normally `const` in Kotlin, such as constructors and functions.
  */
-class DartConstDeclarationsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
+class AnnotateDartConstDeclarationsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
     override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (!declaration.isDartConst()) return noChange()
 

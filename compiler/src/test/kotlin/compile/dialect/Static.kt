@@ -58,7 +58,7 @@ class Static : BaseTest {
         kotlin(
             """
             external interface DateTime {
-                external companion object {ic
+                external companion object {
                     val now: DateTime
                 }
             }
@@ -108,6 +108,29 @@ class Static : BaseTest {
             class DateTime${'$'}Companion {
               const DateTime${'$'}Companion._();
               static const DateTime${'$'}Companion ${'$'}instance = const DateTime${'$'}Companion._();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `explicit external companion object static property access of dependency`() = assertCompile {
+        kotlin(
+            """
+            import dart.typeddata.Int16Array
+
+            fun main() {
+                val x = Int16Array.bytesPerElement
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              final int x = Int16List.bytesPerElement;
             }
             """
         )

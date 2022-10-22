@@ -27,7 +27,8 @@ import org.dotlin.compiler.backend.attributes.IrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.IrExpressionSourceMapper
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lower
-import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.output.DartConstDeclarationsLowering
+import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.output.AnnotateDartConstDeclarationsLowering
+import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.output.AnnotateExternalCompanionObjectsLowering
 import org.dotlin.compiler.backend.steps.src2ir.analyze.DartKotlinAnalyzerReporter
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.DartIrAnalyzer
 import org.jetbrains.kotlin.backend.common.serialization.DeserializationStrategy
@@ -79,7 +80,16 @@ fun sourceToIr(
     // If the Dart package is a library, we must specify const declarations
     // that are not normally const in Kotlin. Otherwise this information is lost in the output IR.
     if (dartProject.isLibrary) {
-        ir = ir.copy(loweringContext = ir.lower(config, context = null, listOf(::DartConstDeclarationsLowering)))
+        ir = ir.copy(
+            loweringContext = ir.lower(
+                config,
+                context = null,
+                listOf(
+                    ::AnnotateDartConstDeclarationsLowering,
+                    ::AnnotateExternalCompanionObjectsLowering,
+                )
+            )
+        )
     }
 
     return ir

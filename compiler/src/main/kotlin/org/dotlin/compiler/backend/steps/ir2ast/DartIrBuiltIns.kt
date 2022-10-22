@@ -44,7 +44,10 @@ class DartIrBuiltIns(context: DartLoweringContext) {
     class Dotlin(builtIns: DartIrBuiltIns) {
         val const = builtIns.classSymbolAt(dotlin.const)
         val dart = builtIns.functionSymbolAt(dotlin.dart)
+
+        // Lowering helpers
         val returnClass = builtIns.classSymbolAt(dotlin.`$Return`)
+        val dotlinExternal = builtIns.classSymbolAt(dotlin.DotlinExternal)
 
         // Reflect
         val kProperty0Impl = builtIns.classSymbolAt(dotlin.reflect.KProperty0Impl)

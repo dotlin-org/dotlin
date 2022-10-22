@@ -31,6 +31,7 @@ object dotlin : PackageFqNameWrapper {
 
     // Lowering helpers.
     val `$Return` = self.child("\$Return")
+    val DotlinExternal = self.child("DotlinExternal")
 
     object reflect : PackageFqNameWrapper {
         override val self = dotlin.self.child("reflect")
