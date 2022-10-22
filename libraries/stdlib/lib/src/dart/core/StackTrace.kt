@@ -38,14 +38,12 @@ external interface StackTrace {
          * This stack trace is used as the default in situations where
          * a stack trace is required, but the user has not supplied one.
          */
-        @DartStatic
         @DartName("empty")
         external val EMPTY: StackTrace = definedExternally
 
         /**
          * Returns a representation of the current stack trace.
          */
-        @DartStatic
         @DartName("current")
         external val CURRENT: StackTrace = definedExternally
     }

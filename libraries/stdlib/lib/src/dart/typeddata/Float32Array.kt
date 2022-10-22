@@ -47,7 +47,6 @@ external interface Float32Array : Array<Double>(Interface), TypedData {
 
     companion object {
         // TODO: const
-        @DartStatic
         external val bytesPerElement: Int = definedExternally
     }
 }

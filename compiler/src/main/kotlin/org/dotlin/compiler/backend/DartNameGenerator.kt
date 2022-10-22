@@ -186,7 +186,7 @@ class DartNameGenerator {
             }
 
             // Instance methods from objects get prefixed with '$'.
-            if (isFromObjectAndStaticallyAvailable) {
+            if (hasObjectParentAndStaticCounterpart) {
                 name = name?.asGenerated()
             }
 

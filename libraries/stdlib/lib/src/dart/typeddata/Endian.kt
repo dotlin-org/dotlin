@@ -23,17 +23,14 @@ package dart.typeddata
 external interface Endian {
     companion object {
         // TODO: const
-        @DartStatic
         @DartName("big")
         external val BIG: Endian = definedExternally
 
         // TODO: const
-        @DartStatic
         @DartName("little")
         external val LITTLE: Endian = definedExternally
 
         // TODO: const
-        @DartStatic
         @DartName("host")
         external val HOST: Endian = definedExternally
     }

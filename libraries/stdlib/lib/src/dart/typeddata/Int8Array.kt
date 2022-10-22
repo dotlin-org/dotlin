@@ -45,7 +45,6 @@ external interface Int8Array : Array<Int>(Interface), TypedData {
 
     companion object {
         // TODO: const
-        @DartStatic
         external val bytesPerElement: Int = definedExternally
     }
 }

@@ -25,7 +25,7 @@ import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.getAnnotation
 import org.dotlin.compiler.backend.util.hasAnnotation
-import org.dotlin.compiler.backend.util.isActuallyExternal
+import org.dotlin.compiler.backend.util.isDotlinExternal
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrFunction
@@ -57,7 +57,7 @@ object DartDifferentDefaultValueChecker : IrDeclarationChecker {
             )
         }
 
-        if ((declaration.parent as? IrFunction)?.isActuallyExternal != true) {
+        if ((declaration.parent as? IrFunction)?.isDotlinExternal != true) {
             trace.report(
                 ErrorsDart.DART_DIFFERENT_DEFAULT_VALUE_ON_NON_EXTERNAL.on(annotationSource)
             )

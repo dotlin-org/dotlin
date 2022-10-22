@@ -140,7 +140,7 @@ abstract class IrContext : IrAttributes {
 
     private fun IrDeclarationWithName.getDartLibraryImport(): DartUnresolvedImport? {
         return when {
-            isActuallyExternal -> unresolvedImportFromAnnotationFor(this) ?: when {
+            isDotlinExternal -> unresolvedImportFromAnnotationFor(this) ?: when {
                 // We don't want to look at the parent's class @DartLibrary annotation for companion objects,
                 // because we never need to import an external companion object
                 // (it's an error to use it as an instance instead of as static container).

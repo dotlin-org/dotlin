@@ -20,10 +20,7 @@
 package org.dotlin.compiler.backend
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
-import org.dotlin.compiler.backend.util.getSingleAnnotationStringArgumentOf
-import org.dotlin.compiler.backend.util.getSingleOverriddenAnnotationStringArgumentOf
-import org.dotlin.compiler.backend.util.hasAnnotation
-import org.dotlin.compiler.backend.util.hasOverriddenAnnotation
+import org.dotlin.compiler.backend.util.*
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.util.fileOrNull
 import org.jetbrains.kotlin.ir.util.isGetter
@@ -54,9 +51,8 @@ val IrValueParameter.isDartPositional: Boolean
     get() = (parent as? IrFunction)?.hasDartPositionalAnnotation() == true
 
 val IrDeclaration.isDartStatic: Boolean
-    get() = hasDartStaticAnnotation() ||
-            parentClassOrNull?.hasDartStaticAnnotation() == true ||
-            (this is IrSimpleFunction && correspondingProperty?.hasDartStaticAnnotation() == true)
+    get() = parentClassOrNull?.isCompanion == true &&
+            (isDotlinExternal || (this is IrSimpleFunction && correspondingProperty?.isDotlinExternal == true))
 
 val IrDeclaration.dartExtensionName: String?
     get() = getSingleAnnotationStringArgumentOf(dotlin.DartExtensionName)

@@ -27,7 +27,7 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.util.isObject
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 
-val IrDeclaration.isFromObjectAndStaticallyAvailable
+val IrDeclaration.hasObjectParentAndStaticCounterpart
     get() = (this is IrProperty || (this is IrField && !isStatic) || (this is IrSimpleFunction && !isStatic)) &&
             this !is IrConstructor &&
             !isFakeOverride() &&

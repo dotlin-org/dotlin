@@ -593,11 +593,11 @@ private fun IrExpression?.acceptAsReceiverOf(of: IrExpression, context: DartTran
                 when (it) {
                     null, is IrGetObjectValue -> when (owner) {
                         is IrDeclaration -> {
-                            val parentObj = owner.parentClassOrNull
-                            if (parentObj != null && (owner.isDartStatic || parentObj.isEnumClass)) {
+                            val parentClass = owner.parentClassOrNull
+                            if (parentClass != null && (owner.isDartStatic || parentClass.isEnumClass)) {
                                 return@accept when {
-                                    parentObj.isCompanion -> parentObj.parentClassOrNull!!.dartName
-                                    else -> parentObj.dartName
+                                    parentClass.isCompanion -> parentClass.parentClassOrNull!!.dartName
+                                    else -> parentClass.dartName
                                 }
                             }
                         }

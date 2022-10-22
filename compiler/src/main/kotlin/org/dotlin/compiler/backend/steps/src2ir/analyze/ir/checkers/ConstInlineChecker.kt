@@ -41,7 +41,7 @@ object ConstInlineChecker : IrDeclarationChecker {
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun IrAnalyzerContext.check(source: KtDeclaration, declaration: IrDeclaration) {
-        if (declaration.isActuallyExternal || !declaration.isDartConstInlineFunction()) {
+        if (declaration.isDotlinExternal || !declaration.isDartConstInlineFunction()) {
             return
         }
 

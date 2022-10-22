@@ -123,42 +123,6 @@ annotation class DartDifferentDefaultValue
 annotation class DartLibrary(val library: String, val aliased: Boolean = false)
 
 /**
- * Specifies that whenever a companion object member is referenced, it will do so statically in Dart.
- *
- * This is meant for external companion object or their members for external classes, to call Dart static code.
- *
- * Remember that by default companion objects and their members are _not_ external, even if inside `external` classes.
- *  If the companion object is not
- * `external` itself and this annotation is used on a member of that object, the member must be explicitely marked
- * `external`.
- *
- * For example, if in Dart there's a static method `Foo.bar()`, the Kotlin external declaration would look like so:
- *
- * ```kotlin
- * external class Foo {
- *     companion object {
- *         @DartStatic
- *         external fun bar() { .. }
- *     }
- * }
- * ```
- *
- * A call to `Foo.bar()` in Kotlin would then translate to `Foo.bar()` in Dart (as opposed to `Foo.$instance.$bar()`).
- *
- * It's also possbile to to annotate the companion object itself with `@DartStatic`. Then it behaves the same as if
- * every member of the companion object is annotated with `@DartStatic`.
- *
- * Not to be confused with how `@JvmStatic` works, which generates a static member. In Dotlin static members are always
- * generated.
- */
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
-@Retention(AnnotationRetention.SOURCE)
-annotation class DartStatic
-
-// TODO: Error for external companion object (or member) without a @DartStatic annotation, atleast
-// until Dart singleton pattern is supported.
-
-/**
  * Specifies the Dart extension container name for this declaration.
  *
  * In Dart, extensions live in an extension container. By default in Dotlin, names for these are generated using the

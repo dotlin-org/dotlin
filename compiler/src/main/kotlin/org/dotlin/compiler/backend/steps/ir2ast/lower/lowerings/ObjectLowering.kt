@@ -21,7 +21,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.dotlin.compiler.backend.util.isFromObjectAndStaticallyAvailable
+import org.dotlin.compiler.backend.util.hasObjectParentAndStaticCounterpart
 import org.dotlin.compiler.backend.util.isSimple
 import org.jetbrains.kotlin.backend.common.ir.addChild
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
@@ -141,7 +141,7 @@ class ObjectLowering(override val context: DartLoweringContext) : IrDeclarationL
 
         // Add static methods/properties.
         obj.declarations
-            .filter { it.isFromObjectAndStaticallyAvailable }
+            .filter { it.hasObjectParentAndStaticCounterpart }
             .map { original ->
                 when (original) {
                     is IrSimpleFunction -> original.deepCopy(remapReferences = false).apply {
