@@ -31,6 +31,8 @@ private typealias Lowering = KFunction1<DartLoweringContext, IrLowering>
 
 private val lowerings: List<Lowering> = listOf(
     ::UnrepresentableDecimalConstsLowering,
+    DartConstructorsLowering::Declarations,
+    DartConstructorsLowering::Calls,
     Comparable::PreOperatorsLowering,
     ::DartExtensionsLowering,
     ::ExternalDeclarationsLowering,

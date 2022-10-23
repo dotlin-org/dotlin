@@ -17,9 +17,9 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers
+package org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.const
 
-import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart.*
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
 import org.dotlin.compiler.backend.util.*
@@ -34,9 +34,9 @@ import org.jetbrains.kotlin.psi.KtElement
 
 object ConstInlineChecker : IrDeclarationChecker {
     override val reports = listOf(
-        ErrorsDart.CONST_INLINE_FUNCTION_WITH_MULTIPLE_RETURNS,
-        ErrorsDart.CONST_INLINE_FUNCTION_RETURNS_NON_CONST,
-        ErrorsDart.CONST_INLINE_FUNCTION_HAS_INVALID_STATEMENT
+        CONST_INLINE_FUNCTION_WITH_MULTIPLE_RETURNS,
+        CONST_INLINE_FUNCTION_RETURNS_NON_CONST,
+        CONST_INLINE_FUNCTION_HAS_INVALID_STATEMENT
     )
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)
@@ -53,7 +53,7 @@ object ConstInlineChecker : IrDeclarationChecker {
         if (singleReturn == null) {
             var reportedAtLeastOnce = false
             fun report(element: KtElement) {
-                trace.report(ErrorsDart.CONST_INLINE_FUNCTION_WITH_MULTIPLE_RETURNS.on(element))
+                trace.report(CONST_INLINE_FUNCTION_WITH_MULTIPLE_RETURNS.on(element))
                 reportedAtLeastOnce = true
             }
 
@@ -72,7 +72,7 @@ object ConstInlineChecker : IrDeclarationChecker {
 
         if (singleReturn?.value?.isDartConst(implicit = true, constInlineContainer = declaration) == false) {
             trace.report(
-                ErrorsDart.CONST_INLINE_FUNCTION_RETURNS_NON_CONST.on(singleReturn.value.ktExpression ?: source)
+                CONST_INLINE_FUNCTION_RETURNS_NON_CONST.on(singleReturn.value.ktExpression ?: source)
             )
         }
 
@@ -85,7 +85,7 @@ object ConstInlineChecker : IrDeclarationChecker {
                 }
 
                 trace.report(
-                    ErrorsDart.CONST_INLINE_FUNCTION_HAS_INVALID_STATEMENT.on(reportOn)
+                    CONST_INLINE_FUNCTION_HAS_INVALID_STATEMENT.on(reportOn)
                 )
             }
         }

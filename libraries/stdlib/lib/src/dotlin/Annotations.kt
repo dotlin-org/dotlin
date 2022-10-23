@@ -141,3 +141,12 @@ annotation class DartLibrary(val library: String, val aliased: Boolean = false)
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.FUNCTION, AnnotationTarget.FILE)
 @Retention(AnnotationRetention.SOURCE)
 annotation class DartExtensionName(val name: String)
+
+/**
+ * Specifies that the function is a constructor in Dart.
+ *
+ * Can only be used on external companion object methods.
+ */
+@Target(AnnotationTarget.FUNCTION,)
+@Retention(AnnotationRetention.SOURCE)
+annotation class DartConstructor

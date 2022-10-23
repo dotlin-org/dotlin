@@ -27,6 +27,7 @@ import org.dotlin.compiler.backend.attributes.IrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.transformExpressions
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.*
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.const.*
 import org.dotlin.compiler.backend.steps.src2ir.reportAll
 import org.dotlin.compiler.backend.util.ktDeclaration
 import org.dotlin.compiler.hasErrors
@@ -66,7 +67,10 @@ open class DartIrAnalyzer(
         LongTypeReferenceChecker,
         DartIndexChecker,
         DartDifferentDefaultValueChecker,
+        ConstAnnotationChecker,
         ConstInlineChecker,
+        DartConstructorChecker,
+        ConstFunctionWithoutInlineChecker,
     ),
 ) {
     private val messageCollector = config[CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY] ?: MessageCollector.NONE

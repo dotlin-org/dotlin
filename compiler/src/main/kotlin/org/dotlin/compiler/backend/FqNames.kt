@@ -23,6 +23,7 @@ object dotlin : PackageFqNameWrapper {
     val DartExtensionName = self.child("DartExtensionName")
     val DartIndex = self.child("DartIndex")
     val DartDifferentDefaultValue = self.child("DartDifferentDefaultValue")
+    val DartConstructor = self.child("DartConstructor")
 
     // Internal annotations.
     val DartGetter = self.child("DartGetter")

@@ -20,6 +20,7 @@
 package org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers
 
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart.WRONG_SET_OPERATOR_RETURN_TYPE
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
 import org.jetbrains.kotlin.ir.IrElement
@@ -39,7 +40,7 @@ abstract class WrongSetOperatorChecker : IrDeclarationChecker {
 }
 
 object WrongSetOperatorReturnTypeChecker : WrongSetOperatorChecker() {
-    override val reports = listOf(ErrorsDart.WRONG_SET_OPERATOR_RETURN_TYPE)
+    override val reports = listOf(WRONG_SET_OPERATOR_RETURN_TYPE)
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun IrAnalyzerContext.check(source: KtDeclaration, declaration: IrDeclaration) {
@@ -49,7 +50,7 @@ object WrongSetOperatorReturnTypeChecker : WrongSetOperatorChecker() {
 
         val parameterType = declaration.valueParameters[1].type
         if (parameterType != declaration.returnType) {
-            trace.report(ErrorsDart.WRONG_SET_OPERATOR_RETURN_TYPE.on(source, parameterType.toKotlinType()))
+            trace.report(WRONG_SET_OPERATOR_RETURN_TYPE.on(source, parameterType.toKotlinType()))
         }
     }
 }

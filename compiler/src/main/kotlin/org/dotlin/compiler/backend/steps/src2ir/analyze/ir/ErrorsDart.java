@@ -22,6 +22,7 @@ package org.dotlin.compiler.backend.steps.src2ir.analyze.ir;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor;
 import org.jetbrains.kotlin.diagnostics.*;
+import org.jetbrains.kotlin.lexer.KtModifierKeywordToken;
 import org.jetbrains.kotlin.psi.KtAnnotationEntry;
 import org.jetbrains.kotlin.psi.KtDeclaration;
 import org.jetbrains.kotlin.psi.KtElement;
@@ -67,6 +68,9 @@ public interface ErrorsDart {
     DiagnosticFactory0<KtElement> CONST_INLINE_FUNCTION_HAS_INVALID_STATEMENT =
             DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
 
+    DiagnosticFactory0<PsiElement> INAPPLICABLE_CONST_FUNCTION_MODIFIER =
+            DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
+
     DiagnosticFactory0<KtExpression> LONG_REFERENCE =
             DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
 
@@ -99,6 +103,12 @@ public interface ErrorsDart {
 
     DiagnosticFactory0<KtAnnotationEntry> DART_DIFFERENT_DEFAULT_VALUE_ON_NON_EXTERNAL =
             DiagnosticFactory0.create(Severity.ERROR, DECLARATION_SIGNATURE_OR_DEFAULT);
+
+    DiagnosticFactory0<KtAnnotationEntry> DART_CONSTRUCTOR_WRONG_TARGET =
+            DiagnosticFactory0.create(Severity.ERROR, DECLARATION_SIGNATURE_OR_DEFAULT);
+
+    DiagnosticFactory1<KtElement, KotlinType> DART_CONSTRUCTOR_WRONG_RETURN_TYPE =
+            DiagnosticFactory1.create(Severity.ERROR, DECLARATION_SIGNATURE_OR_DEFAULT);
 
     // Dart emulated errors.
     DiagnosticFactory1<KtExpression, String> CONST_WITH_NON_CONST =

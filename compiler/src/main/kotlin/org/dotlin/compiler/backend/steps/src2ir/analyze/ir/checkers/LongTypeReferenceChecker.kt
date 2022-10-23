@@ -23,6 +23,8 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.isBackingField
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isNullableLong
 import org.dotlin.compiler.backend.steps.ir2ast.ir.type
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart.IMPLICIT_LONG_REFERENCE
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart.LONG_REFERENCE
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
@@ -35,7 +37,7 @@ import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtTypeReference
 
 object LongTypeReferenceChecker : IrDeclarationChecker {
-    override val reports = listOf(ErrorsDart.LONG_REFERENCE, ErrorsDart.IMPLICIT_LONG_REFERENCE)
+    override val reports = listOf(LONG_REFERENCE, IMPLICIT_LONG_REFERENCE)
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun IrAnalyzerContext.check(source: KtDeclaration, declaration: IrDeclaration) {

@@ -339,6 +339,13 @@ abstract class IrContext : IrAttributes {
 
                 !containsNonGlobalReference
             }
+            is IrVararg -> elements.all {
+                when (it) {
+                    is IrExpression -> it.isDartConst(implicit, constInlineContainer)
+                    is IrSpreadElement -> it.expression.isDartConst(implicit, constInlineContainer)
+                    else -> false
+                }
+            }
             else -> false
         }
     }

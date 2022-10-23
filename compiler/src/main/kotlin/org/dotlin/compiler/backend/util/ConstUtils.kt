@@ -31,9 +31,6 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 fun IrDeclaration.isDartConst(): Boolean = when (this) {
-    // Constructors can be annotated with `@const` by the `DartConstDeclarationsLowering`. This happens
-    // for libraries' outputted IR, because source information is not available for dependencies.
-    is IrConstructor -> hasConstModifierOrAnnotation() || parentAsClass.isDartConst()
     is IrField -> when {
         // Enum fields are always const.
         origin == IrDeclarationOrigin.FIELD_FOR_ENUM_ENTRY -> true
@@ -47,7 +44,10 @@ fun IrDeclaration.isDartConst(): Boolean = when (this) {
         isBackingField -> correspondingProperty?.isDartConst() == true
         else -> false
     }
-    is IrFunction -> hasConstModifierOrAnnotation()
+    is IrFunction -> hasConstModifierOrAnnotation() || when (this) {
+        is IrConstructor -> parentAsClass.isDartConst()
+        else -> false
+    }
     is IrProperty -> isConst
     // Only add cases here if a certain class should _always_ be const constructed.
     is IrClass -> when {
@@ -68,6 +68,8 @@ fun IrDeclaration.isDartConst(): Boolean = when (this) {
 }
 
 fun IrDeclaration.hasConstModifierOrAnnotation(): Boolean {
+    // Functions/constructors can be annotated with `@const` by the `DartConstDeclarationsLowering`. This happens
+    // for libraries' outputted IR, because source information is not available for dependencies.
     if (hasDartConstAnnotation()) return true
 
     val source = psiElement as? KtModifierListOwner ?: return false

@@ -21,6 +21,8 @@ package org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers
 
 import org.dotlin.compiler.backend.dotlin
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart.DART_INDEX_CONFLICT
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart.DART_INDEX_OUT_OF_BOUNDS
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.getAnnotation
@@ -33,7 +35,7 @@ import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtParameter
 
 object DartIndexChecker : IrDeclarationChecker {
-    override val reports = listOf(ErrorsDart.DART_INDEX_OUT_OF_BOUNDS, ErrorsDart.DART_INDEX_CONFLICT)
+    override val reports = listOf(DART_INDEX_OUT_OF_BOUNDS, DART_INDEX_CONFLICT)
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun IrAnalyzerContext.check(source: KtDeclaration, declaration: IrDeclaration) {

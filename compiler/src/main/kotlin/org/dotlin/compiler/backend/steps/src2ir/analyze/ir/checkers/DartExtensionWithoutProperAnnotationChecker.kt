@@ -22,6 +22,7 @@ package org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers
 import org.dotlin.compiler.backend.hasDartExtensionNameAnnotation
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isExtension
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart.EXTENSION_WITHOUT_EXPLICIT_DART_EXTENSION_NAME_IN_PUBLIC_PACKAGE
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
@@ -30,7 +31,7 @@ import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.psi.KtDeclaration
 
 object DartExtensionWithoutProperAnnotationChecker : IrDeclarationChecker {
-    override val reports = listOf(ErrorsDart.EXTENSION_WITHOUT_EXPLICIT_DART_EXTENSION_NAME_IN_PUBLIC_PACKAGE)
+    override val reports = listOf(EXTENSION_WITHOUT_EXPLICIT_DART_EXTENSION_NAME_IN_PUBLIC_PACKAGE)
 
     override fun IrAnalyzerContext.check(source: KtDeclaration, declaration: IrDeclaration) {
         // TODO: Report if mixing Dart and Kotlin code

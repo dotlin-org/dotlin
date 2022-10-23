@@ -21,6 +21,8 @@ package org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers
 
 import org.dotlin.compiler.backend.dotlin
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart.DART_DIFFERENT_DEFAULT_VALUE_ON_NON_EXTERNAL
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart.DART_DIFFERENT_DEFAULT_VALUE_ON_PARAMETER_WITHOUT_DEFAULT_VALUE
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.getAnnotation
@@ -34,8 +36,8 @@ import org.jetbrains.kotlin.psi.KtDeclaration
 
 object DartDifferentDefaultValueChecker : IrDeclarationChecker {
     override val reports = listOf(
-        ErrorsDart.DART_DIFFERENT_DEFAULT_VALUE_ON_PARAMETER_WITHOUT_DEFAULT_VALUE,
-        ErrorsDart.DART_DIFFERENT_DEFAULT_VALUE_ON_NON_EXTERNAL
+        DART_DIFFERENT_DEFAULT_VALUE_ON_PARAMETER_WITHOUT_DEFAULT_VALUE,
+        DART_DIFFERENT_DEFAULT_VALUE_ON_NON_EXTERNAL
     )
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)

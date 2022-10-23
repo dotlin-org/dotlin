@@ -29,6 +29,7 @@ import org.jetbrains.kotlin.ir.expressions.IrGetField
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.IrTypeOperatorCall
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.psiUtil.getAnnotationEntries
 import org.jetbrains.kotlin.resolve.BindingContext
@@ -85,7 +86,12 @@ interface IrAttributes  {
     fun IrExpression.hasAnnotation(fqName: FqName, bindingContext: BindingContext): Boolean {
         val ktExpression = ktExpression ?: return false
 
-        return ktExpression.getAnnotationEntries().any { it.getFqName(bindingContext) == fqName }
+        val annotated = when (val parent = ktExpression.parent) {
+            is KtDotQualifiedExpression -> parent
+            else -> ktExpression
+        }
+
+        return annotated.getAnnotationEntries().any { it.getFqName(bindingContext) == fqName }
     }
 
     var IrExpression.isParenthesized: Boolean

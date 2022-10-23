@@ -78,6 +78,10 @@ private fun IrExpression.matchesType(ktExpression: KtExpression) = ktExpression.
         is IrReturn -> it is KtReturnExpression
         is IrWhen -> it is KtWhenExpression || it is KtIfExpression
         is IrTry -> it is KtTryExpression
+        is IrConst<*> -> it is KtConstantExpression
+        is IrBlock -> it is KtBlockExpression
+        is IrBreakContinue -> it is KtBreakExpression || it is KtContinueExpression
+        is IrThrow -> it is KtThrowExpression
         // TODO: Support more types
         else -> false
     }

@@ -24,11 +24,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
 import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
 import org.dotlin.compiler.backend.util.isDartConst
-import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
-import org.jetbrains.kotlin.ir.util.defaultType
-import org.jetbrains.kotlin.ir.util.primaryConstructor
 
 /**
  * Because source information is not available for code in dependencies, we have to add the `@const` annotation
@@ -38,16 +34,7 @@ class AnnotateDartConstDeclarationsLowering(override val context: DartLoweringCo
     override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (!declaration.isDartConst()) return noChange()
 
-        val constAnnotationClass = dartBuiltIns.dotlin.const.owner
-
-        declaration.annotations += IrConstructorCallImpl(
-            UNDEFINED_OFFSET, UNDEFINED_OFFSET,
-            type = constAnnotationClass.defaultType,
-            symbol = constAnnotationClass.primaryConstructor!!.symbol,
-            typeArgumentsCount = 0,
-            constructorTypeArgumentsCount = 0,
-            valueArgumentsCount = 0,
-        )
+        declaration.addConstAnnotation()
 
         return noChange()
     }

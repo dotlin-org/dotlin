@@ -34,7 +34,7 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTraceContext
 import org.jetbrains.kotlin.util.slicedMap.BasicWritableSlice
-import org.jetbrains.kotlin.util.slicedMap.RewritePolicy
+import org.jetbrains.kotlin.util.slicedMap.RewritePolicy.DO_NOTHING
 
 /**
  * Throws if there are any non-suppressed errors in the `bindingContext`.
@@ -47,7 +47,7 @@ fun Iterable<Diagnostic>.throwIfHasErrors() {
     }
 }
 
-private val suppressedDiagnosticsSlice = BasicWritableSlice<Int, Diagnostic>(RewritePolicy.DO_NOTHING)
+private val suppressedDiagnosticsSlice = BasicWritableSlice<Int, Diagnostic>(DO_NOTHING)
 
 fun BindingTraceContext.markSuppressed(diagnostic: Diagnostic) {
     record(suppressedDiagnosticsSlice, diagnostic.hashCode(), diagnostic)

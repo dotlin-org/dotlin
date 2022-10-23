@@ -1,12 +1,16 @@
 package org.dotlin.compiler.backend.steps.src2ir.analyze.suppress
 
+import org.dotlin.compiler.backend.dotlin
+import org.jetbrains.kotlin.cfg.getDeclarationDescriptorIncludingConstructors
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticWithParameters2
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.lexer.KtModifierKeywordToken
 import org.jetbrains.kotlin.lexer.KtTokens
+import org.jetbrains.kotlin.psi.KtFunction
+import org.jetbrains.kotlin.resolve.BindingTraceContext
 
-object ConstSuppressor : SubSuppressor {
+class ConstSuppressor(private val trace: BindingTraceContext) : SubSuppressor {
     override fun Diagnostic.isSuppressed(): Boolean {
         return isWrongModifierTargetError() ||
                 isTypeCannotBeUsedForConstValError() ||
@@ -32,7 +36,12 @@ object ConstSuppressor : SubSuppressor {
 
         val target = b as? String ?: return false
 
+        val descriptor by lazy {
+            (psiElement.parent.parent as KtFunction).getDeclarationDescriptorIncludingConstructors(trace.bindingContext)
+        }
+
         return when (target) {
+            "member function" -> descriptor?.annotations?.hasAnnotation(dotlin.DartConstructor) == true
             "constructor", "local variable", "top level function" -> true
             else -> false
         }

@@ -17,9 +17,9 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers
+package org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.const
 
-import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart.NON_CONSTANT_DEFAULT_VALUE_IN_CONST_FUNCTION
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
 import org.dotlin.compiler.backend.util.isDartConst
@@ -29,19 +29,18 @@ import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.psi.KtDeclaration
 
 object ConstFunctionParameterDefaultValueChecker : IrDeclarationChecker {
-    override val reports = listOf(ErrorsDart.NON_CONSTANT_DEFAULT_VALUE_IN_CONST_FUNCTION)
+    override val reports = listOf(NON_CONSTANT_DEFAULT_VALUE_IN_CONST_FUNCTION)
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun IrAnalyzerContext.check(source: KtDeclaration, declaration: IrDeclaration) {
         if (declaration !is IrFunction || !declaration.isDartConst()) return
-        if (!declaration.isDartConst()) return
 
         val defaultValues = declaration.valueParameters.mapNotNull { it.defaultValue?.expression }
 
         for (defaultValue in defaultValues) {
             if (!defaultValue.isDartConst()) {
                 trace.report(
-                    ErrorsDart.NON_CONSTANT_DEFAULT_VALUE_IN_CONST_FUNCTION.on(
+                    NON_CONSTANT_DEFAULT_VALUE_IN_CONST_FUNCTION.on(
                         defaultValue.ktExpression ?: source
                     )
                 )

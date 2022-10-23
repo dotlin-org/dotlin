@@ -19,7 +19,6 @@
 
 package org.dotlin.compiler.backend.steps.src2ir.analyze
 
-import org.dotlin.compiler.backend.steps.src2ir.analyze.checkers.annotation.ConstAnnotationChecker
 import org.dotlin.compiler.backend.steps.src2ir.analyze.checkers.call.KotlinIteratorMethodCallChecker
 import org.dotlin.compiler.backend.steps.src2ir.analyze.checkers.call.SpecialInheritanceConstructorCallChecker
 import org.dotlin.compiler.backend.steps.src2ir.analyze.checkers.declaration.DartNameAnnotationOverrideChecker
@@ -39,7 +38,6 @@ object DartPlatformConfigurator : PlatformConfiguratorBase(
         DartNameAnnotationOverrideChecker
     ),
     additionalCallCheckers = listOf(SpecialInheritanceConstructorCallChecker, KotlinIteratorMethodCallChecker),
-    additionalAnnotationCheckers = listOf(ConstAnnotationChecker),
     additionalTypeCheckers = listOf(FloatTypeChecker, CharTypeChecker)
 ) {
     override fun configureModuleComponents(container: StorageComponentContainer) {}

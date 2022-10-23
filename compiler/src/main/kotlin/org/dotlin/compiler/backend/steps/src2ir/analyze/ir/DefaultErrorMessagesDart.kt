@@ -85,6 +85,11 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
         )
 
         put(
+            ErrorsDart.INAPPLICABLE_CONST_FUNCTION_MODIFIER,
+            "'const' modifier is not applicable without 'inline' modifier"
+        )
+
+        put(
             ErrorsDart.LONG_REFERENCE,
             "cannot use Long, use Int instead"
         )
@@ -139,6 +144,17 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
         put(
             ErrorsDart.DART_DIFFERENT_DEFAULT_VALUE_ON_NON_EXTERNAL,
             "parameter must be in external function",
+        )
+
+        put(
+            ErrorsDart.DART_CONSTRUCTOR_WRONG_TARGET,
+            "@DartConstructor can only be used on external companion object methods",
+        )
+
+        put(
+            ErrorsDart.DART_CONSTRUCTOR_WRONG_RETURN_TYPE,
+            "@DartConstructor annotated method must have return type ''{0}''",
+            Renderers.RENDER_TYPE
         )
 
         // Dart emulated errors.

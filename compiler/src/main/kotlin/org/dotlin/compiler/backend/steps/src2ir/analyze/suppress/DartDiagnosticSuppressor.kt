@@ -9,9 +9,10 @@ class DartDiagnosticSuppressor(
     private val trace: BindingTraceContext,
 ) : DiagnosticSuppressor {
     private val subSuppressors = listOf(
-        NumberPrimitiveSuppressor, ThrowSuppressor,
+        NumberPrimitiveSuppressor,
+        ThrowSuppressor,
         SpecialInheritanceSuppressor(trace),
-        ConstSuppressor,
+        ConstSuppressor(trace),
         TypeErasureSuppressor,
         LateInitSuppressor,
         KotlinIteratorSuppressor,
