@@ -66,15 +66,17 @@ package kotlin
 external open class Array<T> {
     constructor(useAs: InterfaceOrMixin)
 
-    /**
-     * Creates a new array with the specified [size], where each element is calculated by calling the specified
-     * [init] function.
-     *
-     * The function [init] is called for each array element sequentially starting from the first one.
-     * It should return the value for an array element given its index.
-     */
-    @DartName("generate")
-    constructor(size: Int, init: (Int) -> T)
+    companion object {
+        /**
+         * Creates a new array with the specified [size], where each element is calculated by calling the specified
+         * [init] function.
+         *
+         * The function [init] is called for each array element sequentially starting from the first one.
+         * It should return the value for an array element given its index.
+         */
+        @DartConstructor
+        external fun <T> generate(size: Int, init: (Int) -> T): Array<T>
+    }
 
     /**
      * Returns the array element at the specified [index]. This method can be called using the

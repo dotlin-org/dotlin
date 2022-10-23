@@ -29,7 +29,7 @@ package dart.typeddata
  * value with the same value.
  */
 @DartName("Float32List")
-external interface Float32Array : Array<Double>(Interface), TypedData {
+external abstract class Float32Array : Array<Double>(Interface), TypedData {
     /**
      * Returns a new array containing the elements between [start] and [end].
      *
@@ -48,5 +48,9 @@ external interface Float32Array : Array<Double>(Interface), TypedData {
     companion object {
         // TODO: const
         external val bytesPerElement: Int = definedExternally
+
+        @DartName("fromList")
+        @DartConstructor
+        external fun fromArray(element: Array<Double>): Float32Array
     }
 }

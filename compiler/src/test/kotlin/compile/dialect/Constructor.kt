@@ -195,5 +195,79 @@ class Constructor : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `@DartConstructor call from dependency`() = assertCompile {
+        kotlin(
+            """
+            import dart.typeddata.Float32Array
+
+            fun main() {
+                Float32Array.fromArray(arrayOf(0.1, 0.2, 0.3))
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'dart:typed_data';
+            import 'dart:core' as core;
+            import 'dart:core' hide List;
+            import 'package:meta/meta.dart';
+
+            void main() {
+              Float32List.fromList(arrayOf<double>(<double>[0.1, 0.2, 0.3]));
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `@DartConstructor call from dependency with type arguments`() = assertCompile {
+        kotlin(
+            """
+            import dart.typeddata.Float32Array
+
+            fun main() {
+                val array = Array.generate<Int>(10) { it }
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'dart:core' as core;
+            import 'dart:core' hide List;
+            import 'package:meta/meta.dart';
+
+            void main() {
+              final core.List<int> array = core.List<int>.generate(10, (int it) {
+                return it;
+              });
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `const @DartConstructor call from dependency`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                val logging = @const Boolean.fromEnvironment("logging")
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            void main() {
+              final bool logging = const bool.fromEnvironment('logging');
+            }
+            """
+        )
+    }
 }
 

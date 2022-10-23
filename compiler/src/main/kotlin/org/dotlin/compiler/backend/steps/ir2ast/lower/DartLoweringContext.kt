@@ -388,18 +388,5 @@ class DartLoweringContext(
         }
     }
 
-    fun IrMutableAnnotationContainer.addConstAnnotation() {
-        val constAnnotationClass = dartBuiltIns.dotlin.const.owner
-
-        annotations = annotations + IrConstructorCallImpl(
-            UNDEFINED_OFFSET, UNDEFINED_OFFSET,
-            type = constAnnotationClass.defaultType,
-            symbol = constAnnotationClass.primaryConstructor!!.symbol,
-            typeArgumentsCount = 0,
-            constructorTypeArgumentsCount = 0,
-            valueArgumentsCount = 0,
-        )
-    }
-
     private fun DartIdentifier.escapedValue() = value.replace(".", "").sentenceCase()
 }

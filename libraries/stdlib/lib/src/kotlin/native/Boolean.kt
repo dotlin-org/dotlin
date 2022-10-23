@@ -56,6 +56,45 @@ external class Boolean private constructor() : Comparable<Boolean> {
     override fun compareTo(other: Boolean): Int
 
     @DartName("Boolean\$Companion")
-    @SinceKotlin("1.3")
-    companion object {}
+    companion object {
+        /**
+         * Returns the boolean value of the environment declaration [name].
+         *
+         * The boolean value of the declaration is `true` if the declared value is
+         * the string `"true"`, and `false` if the value is `"false"`.
+         *
+         * In all other cases, including when there is no declaration for `name`,
+         * the result is the [defaultValue].
+         *
+         * The result is the same as would be returned by:
+         * ```kotlin
+         * when (@const String.fromEnvironment(name)) {
+         *     "true" -> true
+         *     "false" -> false
+         *     else -> defaultValue
+         * }
+         * ```
+         * Example:
+         * ```kotlin
+         * const val loggingFlag = @const Boolean.fromEnvironment("logging");
+         * ```
+         * If you want to use a different truth-string than `"true"`, you can use the
+         * [String.fromEnvironment] constructor directly:
+         * ```dart
+         * const val isLoggingOn = (@const String.fromEnvironment("logging") == "on");
+         * ```
+         *
+         * The string value, or lack of a value, associated with a [name]
+         * must be consistent across all calls to [String.fromEnvironment],
+         * [int.fromEnvironment], `bool.fromEnvironment` and [bool.hasEnvironment]
+         * in a single program.
+         *
+         * This constructor is only guaranteed to work when invoked as `const`.
+         * It may work as a non-constant invocation on some platforms which
+         * have access to compiler options at run-time, but most ahead-of-time
+         * compiled platforms will not have this information.
+         */
+        @DartConstructor
+        external const fun fromEnvironment(name: String, defaultValue: Boolean = false): Boolean
+    }
 }

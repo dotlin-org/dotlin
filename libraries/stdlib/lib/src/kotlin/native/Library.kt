@@ -45,7 +45,7 @@ operator fun String?.plus(other: Any?): String = toString() + other.toString()
 /**
  * Returns an array of objects of the given type with the given [size], initialized with null values.
  */
-inline fun <reified @PureReifiable T> arrayOfNulls(size: Int): Array<T?> = Array<T?>(size) { null }
+inline fun <reified @PureReifiable T> arrayOfNulls(size: Int): Array<T?> = Array.generate<T?>(size) { null }
 
 /**
  * Returns an array containing the specified elements.

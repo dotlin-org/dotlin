@@ -28,10 +28,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.ObjectLowering
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.createDartAssignment
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartInt
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartNumberPrimitive
-import org.dotlin.compiler.backend.util.component6
-import org.dotlin.compiler.backend.util.component7
-import org.dotlin.compiler.backend.util.runWith
-import org.dotlin.compiler.backend.util.toPair
+import org.dotlin.compiler.backend.util.*
 import org.dotlin.compiler.dart.ast.collection.DartCollectionElementList
 import org.dotlin.compiler.dart.ast.expression.*
 import org.dotlin.compiler.dart.ast.expression.DartAssignmentOperator.*
@@ -240,8 +237,8 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                     else -> {
                         val arguments = irCallLike.accept(IrToDartArgumentListTransformer, context)
 
-                        when (irCallLike) {
-                            is IrConstructorCall, is IrEnumConstructorCall -> {
+                        when {
+                            irCallLike.isDartConstructorCall() -> {
                                 val type = irCallLike.type.accept(context, isConstructorType = true) as DartNamedType
                                 val name = irCallLike.symbol.owner.simpleDartNameOrNull
 
