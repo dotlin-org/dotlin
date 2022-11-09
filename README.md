@@ -392,7 +392,7 @@ final myType = String;
 Existing Dart collections have been dissected into different interfaces
 based on their mutability, just like in Kotlin.
 
-However, `List` has been split it in more interfaces, to represent all `List`
+However, `List` has been split into more interfaces, to represent all `List`
 kinds that exist in Dart runtime using types.
 
 #### `Iterable`
