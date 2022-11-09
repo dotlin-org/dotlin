@@ -44,7 +44,7 @@ class Loop : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               int i = 0;
@@ -72,7 +72,7 @@ class Loop : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               int i = 0;
@@ -100,7 +100,7 @@ class Loop : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               int i = 0;
@@ -131,7 +131,7 @@ class Loop : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               for (int i = 0; i < 10; i += 1) process(i);
@@ -159,7 +159,7 @@ class Loop : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
             
             void main() {
               for (int i = 0; i <= 10; i += 1) {
@@ -190,7 +190,7 @@ class Loop : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               for (int i = 10; i >= 0; i -= 1) {
@@ -220,7 +220,7 @@ class Loop : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               for (int i = 0; i < 14; i += 2) process(i);
@@ -249,7 +249,7 @@ class Loop : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               for (int i = 0; i < 14; i += 3) process(i);
@@ -277,7 +277,7 @@ class Loop : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final List<int> elements =

@@ -44,7 +44,7 @@ class Lambda : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void compute(void Function() action) {}
             void main() {
@@ -78,7 +78,7 @@ class Lambda : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void compute(void Function() action) {}
             void main() {
@@ -111,7 +111,7 @@ class Lambda : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void compute(void Function(int) action) {}
             void main() {
@@ -143,7 +143,7 @@ class Lambda : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void compute(int Function(int) action) {}
             void main() {

@@ -38,7 +38,7 @@ class TypeAlias : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             typedef MyDynamic<T> = dynamic;
             """

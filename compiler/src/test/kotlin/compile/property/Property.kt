@@ -19,7 +19,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -46,7 +46,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -77,7 +77,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -113,7 +113,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -162,7 +162,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -203,7 +203,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -229,7 +229,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             int returnsInt() {
               return 343;
@@ -262,7 +262,7 @@ class Property {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 int returnsInt() {
                   return 343;
@@ -302,7 +302,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -325,7 +325,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -356,7 +356,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             int returnsInt() {
               return 343;
@@ -394,7 +394,7 @@ class Property {
 
             dart(
                 """
-                    import 'package:meta/meta.dart';
+                    import "package:meta/meta.dart";
 
                     int returnsInt() {
                       return 343;
@@ -443,7 +443,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -476,7 +476,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -518,7 +518,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -554,7 +554,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -581,7 +581,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -615,7 +615,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -656,7 +656,7 @@ class Property {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -688,7 +688,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             int returnsInt() {
               return 343;
@@ -719,7 +719,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -749,7 +749,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Vector {
@@ -775,7 +775,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Vector {
@@ -799,7 +799,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Vector {
@@ -821,7 +821,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Vector {
@@ -846,7 +846,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             bool get x {
               return false;
@@ -869,7 +869,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             late bool test;
             void main() {
@@ -877,7 +877,7 @@ class Property {
             }
 
             const KMutableProperty0Impl<bool> test${'$'}kProperty0 =
-                KMutableProperty0Impl<bool>('test', _${'$'}381, _${'$'}381With${'$'}value);
+                KMutableProperty0Impl<bool>("test", _${'$'}381, _${'$'}381With${'$'}value);
             bool _${'$'}381() => test;
             bool _${'$'}381With${'$'}value(bool ${'$'}value) => test = ${'$'}value;
             """
@@ -901,7 +901,7 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -910,7 +910,7 @@ class Property {
               @nonVirtual
               late final KMutableProperty0Impl<bool> enabled${'$'}kProperty0 =
                   KMutableProperty0Impl<bool>(
-                      'enabled', () => enabled, (bool ${'$'}value) => enabled = ${'$'}value);
+                      "enabled", () => enabled, (bool ${'$'}value) => enabled = ${'$'}value);
             }
 
             void main() {
@@ -934,12 +934,12 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
               @nonVirtual
-              @pragma('vm:always-consider-inlining')
+              @pragma("vm:always-consider-inlining")
               int get property {
                 return 34;
               }
@@ -962,18 +962,18 @@ class Property {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
               @nonVirtual
-              @pragma('vm:always-consider-inlining')
+              @pragma("vm:always-consider-inlining")
               int get property {
                 return 34;
               }
 
               @nonVirtual
-              @pragma('vm:always-consider-inlining')
+              @pragma("vm:always-consider-inlining")
               void set property(int value) {}
             }
             """

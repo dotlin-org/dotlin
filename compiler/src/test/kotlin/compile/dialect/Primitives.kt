@@ -38,7 +38,7 @@ class Primitives : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final int x = 9223372036854775807;

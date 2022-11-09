@@ -36,7 +36,7 @@ class LateInit : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             late String? x;
             """
@@ -53,7 +53,7 @@ class LateInit : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             late int x;
             """
@@ -72,7 +72,7 @@ class LateInit : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
             
             @sealed
             class Test<T> {

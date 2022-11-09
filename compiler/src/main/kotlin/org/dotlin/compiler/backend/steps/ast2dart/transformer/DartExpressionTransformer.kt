@@ -240,7 +240,7 @@ object DartExpressionTransformer : DartAstNodeTransformer() {
         block: (DartSingleStringLiteralDefaults) -> String
     ) = DartSingleStringLiteralDefaults(
         rawToken = if (isRaw) "r" else "",
-        quoteToken = if (isSingleQuoted) "'" else "\""
+        quoteToken = "\""
     ).let { block(it) }
 
     private data class DartSingleStringLiteralDefaults(val rawToken: String, val quoteToken: String)

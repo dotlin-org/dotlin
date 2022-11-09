@@ -40,7 +40,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -68,7 +68,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -94,7 +94,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
             
             @sealed
             class Test {
@@ -103,7 +103,7 @@ class Const : BaseTest {
               final String message;
             }
             
-            const Test t = Test('Test');
+            const Test t = Test("Test");
             """
         )
     }
@@ -122,7 +122,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
             
             @sealed
             class Test {
@@ -132,7 +132,7 @@ class Const : BaseTest {
             }
             
             void test() {
-              const Test t = Test('Test');
+              const Test t = Test("Test");
             }
             """
         )
@@ -154,7 +154,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Testable {
@@ -185,7 +185,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
             
             const int x = 9223372036854775780;
             """
@@ -209,8 +209,8 @@ class Const : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide Enum;
-            import 'package:meta/meta.dart';
+            import "dart:core" hide Enum;
+            import "package:meta/meta.dart";
 
             @sealed
             class Temperature extends Enum<Temperature> {
@@ -218,10 +218,10 @@ class Const : BaseTest {
                 String name,
                 int ordinal,
               ) : super(name, ordinal);
-              static const Temperature COLD = const Temperature._('COLD', 0);
-              static const Temperature CHILLY = const Temperature._('CHILLY', 1);
-              static const Temperature WARM = const Temperature._('WARM', 2);
-              static const Temperature HOT = const Temperature._('HOT', 3);
+              static const Temperature COLD = const Temperature._("COLD", 0);
+              static const Temperature CHILLY = const Temperature._("CHILLY", 1);
+              static const Temperature WARM = const Temperature._("WARM", 2);
+              static const Temperature HOT = const Temperature._("HOT", 3);
               static List<Temperature> values() {
                 return <Temperature>[
                   Temperature.COLD,
@@ -254,7 +254,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -278,7 +278,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             const int x = -92233720368;
             const int y = x - 1;
@@ -300,7 +300,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Zen {
@@ -314,7 +314,7 @@ class Const : BaseTest {
             }
 
             String _${'$'}11ce() {
-              return 'Quality';
+              return "Quality";
             }
             """
         )
@@ -336,7 +336,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Zen {
@@ -345,7 +345,7 @@ class Const : BaseTest {
               final String Function() _maintainMotorcycle;
             }
 
-            final String quality = 'Quality';
+            final String quality = "Quality";
             void main() {
               const Zen zen = Zen(_${'$'}14ec);
             }
@@ -375,7 +375,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Zen {
@@ -388,7 +388,7 @@ class Const : BaseTest {
             class Good {
               Good._() : super();
               @nonVirtual
-              final String ${'$'}QUALITY = 'Quality';
+              final String ${'$'}QUALITY = "Quality";
               static final Good ${'$'}instance = Good._();
               static final String QUALITY = Good.${'$'}instance.${'$'}QUALITY;
             }
@@ -421,7 +421,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Zen {
@@ -435,7 +435,7 @@ class Const : BaseTest {
             }
 
             String _${'$'}11f0() {
-              final String x = 'Quality';
+              final String x = "Quality";
               return x + x;
             }
             """
@@ -454,7 +454,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               const Duration d = Duration(seconds: 2);
@@ -475,7 +475,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               const int Function() d = _${'$'}7aa;
@@ -500,7 +500,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               const bool nope = true == false;

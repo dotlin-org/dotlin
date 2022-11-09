@@ -45,7 +45,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 void main() {
                   if (0 == 1) {
@@ -74,7 +74,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 void main() {
                   if (1 + 1 == 3) {
@@ -102,7 +102,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 void main() {
                   if (1 + 1 == 3) {
@@ -131,7 +131,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 void main(int x) {
                   if (1 + 1 == 3) {
@@ -163,7 +163,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 int test(int y) {
                   return y * 3;
@@ -207,7 +207,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 void main() {
                   try {
@@ -218,7 +218,7 @@ class Statement : BaseTest {
                 }
 
                 int thisThrows() {
-                  throw Exception('You done did it now');
+                  throw Exception("You done did it now");
                 }
                 """
             )
@@ -246,7 +246,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 void main() {
                   try {
@@ -259,7 +259,7 @@ class Statement : BaseTest {
                 }
 
                 int thisThrows() {
-                  throw Exception('You done did it now');
+                  throw Exception("You done did it now");
                 }
                 """
             )
@@ -280,7 +280,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 void main() {
                   return;
@@ -303,11 +303,11 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 String doIt(int? x) {
                   if (x == null) {
-                    return 'null';
+                    return "null";
                   }
                   return x.toString();
                 }
@@ -331,7 +331,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 void main() {
                   int x = 0;
@@ -354,7 +354,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 void main() {
                   int x = 0;
@@ -377,7 +377,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 void main() {
                   int x = 0;
@@ -400,7 +400,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 void main() {
                   int x = 0;
@@ -423,7 +423,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 void main() {
                   int x = 0;
@@ -446,7 +446,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 void main() {
                   double x = 0.0;
@@ -472,7 +472,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -503,7 +503,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -534,7 +534,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -565,7 +565,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -596,7 +596,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -627,7 +627,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -656,7 +656,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 void main() {
                   late int test;

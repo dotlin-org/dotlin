@@ -36,7 +36,7 @@ class Annotation : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test implements Annotation {

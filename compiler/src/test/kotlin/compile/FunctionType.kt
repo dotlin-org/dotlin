@@ -35,7 +35,7 @@ class FunctionType : BaseTest {
         )
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             final int Function() function = () {
               return 0;
@@ -53,7 +53,7 @@ class FunctionType : BaseTest {
         )
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             final void Function() function = () {
               return;
@@ -71,7 +71,7 @@ class FunctionType : BaseTest {
         )
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             final void Function(
               int,
@@ -95,7 +95,7 @@ class FunctionType : BaseTest {
         )
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void test<T>(void Function(T) block) {}
             """
@@ -111,7 +111,7 @@ class FunctionType : BaseTest {
         )
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             final void Function(
               int first,
@@ -137,7 +137,7 @@ class FunctionType : BaseTest {
         )
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test implements Function0<void> {
@@ -159,7 +159,7 @@ class FunctionType : BaseTest {
         )
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test implements Function1<int, void> {
@@ -181,7 +181,7 @@ class FunctionType : BaseTest {
         )
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
             
             @sealed
             class Test implements Function2<int, double, String> {
@@ -190,7 +190,7 @@ class FunctionType : BaseTest {
                 int value,
                 double value2,
               ) {
-                return 'cool';
+                return "cool";
               }
             }
             """
@@ -210,7 +210,7 @@ class FunctionType : BaseTest {
         )
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test implements Function2<int, double, String> {
@@ -219,7 +219,7 @@ class FunctionType : BaseTest {
                 int value,
                 double value2,
               ) {
-                return 'cool';
+                return "cool";
               }
             }
 
@@ -248,7 +248,7 @@ class FunctionType : BaseTest {
         )
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test implements Function2<int, double, String> {
@@ -257,7 +257,7 @@ class FunctionType : BaseTest {
                 int value,
                 double value2,
               ) {
-                return 'cool';
+                return "cool";
               }
             }
 
@@ -293,7 +293,7 @@ class FunctionType : BaseTest {
         )
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test implements Function2<int, double, String> {
@@ -302,7 +302,7 @@ class FunctionType : BaseTest {
                 int value,
                 double value2,
               ) {
-                return 'cool';
+                return "cool";
               }
             }
 

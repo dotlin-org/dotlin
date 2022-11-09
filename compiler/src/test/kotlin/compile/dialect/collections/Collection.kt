@@ -43,7 +43,7 @@ class Collection : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final AnyCollection<int> myCollection = calculate();
@@ -66,7 +66,7 @@ class Collection : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             final AnyCollection<int> myCollection = calculate();
             """
@@ -92,7 +92,7 @@ class Collection : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final List<int> myList = calculate();
@@ -123,7 +123,7 @@ class Collection : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final dynamic obj = calculate();
@@ -154,7 +154,7 @@ class Collection : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -185,7 +185,7 @@ class Collection : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final dynamic obj = calculate();
@@ -216,7 +216,7 @@ class Collection : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -334,7 +334,7 @@ class Collection : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final AnyCollection<int> myList = MyList<int>();
@@ -365,7 +365,7 @@ class Collection : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final dynamic obj = calculate();

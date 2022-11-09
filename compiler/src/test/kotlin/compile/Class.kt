@@ -31,7 +31,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {}
@@ -45,7 +45,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class _Test {}
@@ -59,7 +59,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @internal
             @sealed
@@ -81,7 +81,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 class A {}
                 
@@ -102,7 +102,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 class A {
                   A(int x) : super();
@@ -127,7 +127,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 class A {
                   A(int x) : super();
@@ -153,7 +153,7 @@ class Class : BaseTest {
 
                 dart(
                     """
-                    import 'package:meta/meta.dart';
+                    import "package:meta/meta.dart";
 
                     class A {
                       A(int x) : super();
@@ -183,7 +183,7 @@ class Class : BaseTest {
 
                 dart(
                     """
-                    import 'package:meta/meta.dart';
+                    import "package:meta/meta.dart";
 
                     int returnsInt() {
                       return 343;
@@ -223,7 +223,7 @@ class Class : BaseTest {
 
                 dart(
                     """
-                    import 'package:meta/meta.dart';
+                    import "package:meta/meta.dart";
 
                     @sealed
                     class Vector {}
@@ -266,7 +266,7 @@ class Class : BaseTest {
 
                 dart(
                     """
-                    import 'package:meta/meta.dart';
+                    import "package:meta/meta.dart";
 
                     @sealed
                     class Vector {}
@@ -314,7 +314,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 class A {
                   final int property = 0;
@@ -343,7 +343,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 class A {
                   final int property = 0;
@@ -371,7 +371,7 @@ class Class : BaseTest {
 
                 dart(
                     """
-                    import 'package:meta/meta.dart';
+                    import "package:meta/meta.dart";
 
                     class A {
                       A({this.property = 0}) : super();
@@ -403,7 +403,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 abstract class Marker {}
     
@@ -426,7 +426,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 abstract class Marker {}
                 
@@ -452,7 +452,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 abstract class Marker {
                   void doSomething();
@@ -479,7 +479,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 abstract class Test {
                   void method(
@@ -522,7 +522,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 abstract class Test {
                   void method(
@@ -578,7 +578,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 abstract class Test {
                   int method(
@@ -626,7 +626,7 @@ class Class : BaseTest {
 
                 dart(
                     """
-                    import 'package:meta/meta.dart';
+                    import "package:meta/meta.dart";
 
                     abstract class Test {
                       int method(
@@ -684,7 +684,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 abstract class Test {
                   abstract final int property;
@@ -716,7 +716,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 abstract class Test {
                   int get property {
@@ -757,7 +757,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 void sideEffect(int x) {}
     
@@ -811,7 +811,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 abstract class Base {
                   String sayHello();
@@ -820,14 +820,14 @@ class Class : BaseTest {
                 abstract class A implements Base {
                   @override
                   String sayHello() {
-                    return 'I am A';
+                    return "I am A";
                   }
                 }
 
                 abstract class B implements Base {
                   @override
                   String sayHello() {
-                    return 'I am B';
+                    return "I am B";
                   }
                 }
 
@@ -839,7 +839,7 @@ class Class : BaseTest {
                   }
 
                   String _B${'$'}sayHello() {
-                    return 'I am B';
+                    return "I am B";
                   }
                 }
                 """
@@ -873,7 +873,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 abstract class Base {
                   abstract final String greeting;
@@ -882,14 +882,14 @@ class Class : BaseTest {
                 abstract class A implements Base {
                   @override
                   String get greeting {
-                    return 'I am A';
+                    return "I am A";
                   }
                 }
 
                 abstract class B implements Base {
                   @override
                   String get greeting {
-                    return 'I am B';
+                    return "I am B";
                   }
                 }
 
@@ -901,7 +901,7 @@ class Class : BaseTest {
                   }
 
                   String get _B${'$'}greeting {
-                    return 'I am B';
+                    return "I am B";
                   }
                 }
                 """
@@ -942,7 +942,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 void sideEffect(String x) {}
 
@@ -953,24 +953,24 @@ class Class : BaseTest {
                 abstract class A implements Base {
                   @override
                   String get greeting {
-                    return 'I am A';
+                    return "I am A";
                   }
 
                   @override
                   void set greeting(String value) {
-                    return sideEffect('I am A');
+                    return sideEffect("I am A");
                   }
                 }
 
                 abstract class B implements Base {
                   @override
                   String get greeting {
-                    return 'I am B';
+                    return "I am B";
                   }
 
                   @override
                   void set greeting(String value) {
-                    return sideEffect('I am B');
+                    return sideEffect("I am B");
                   }
                 }
 
@@ -987,11 +987,11 @@ class Class : BaseTest {
                   }
 
                   String get _A${'$'}greeting {
-                    return 'I am A';
+                    return "I am A";
                   }
 
                   void set _B${'$'}greeting(String value) {
-                    return sideEffect('I am B');
+                    return sideEffect("I am B");
                   }
                 }
                 """
@@ -1011,7 +1011,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -1060,7 +1060,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 abstract class Vector {
                   Vector(int? u) : super();
@@ -1148,7 +1148,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -1181,7 +1181,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -1214,7 +1214,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -1247,7 +1247,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -1280,7 +1280,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -1307,7 +1307,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -1337,7 +1337,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -1367,7 +1367,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -1395,7 +1395,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -1430,7 +1430,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -1457,7 +1457,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -1482,7 +1482,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -1512,7 +1512,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -1543,7 +1543,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 abstract class Marker {}
 
@@ -1574,7 +1574,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -1614,7 +1614,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -1658,7 +1658,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 abstract class A {
                   int compareTo(A other);
@@ -1693,7 +1693,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -1720,7 +1720,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -1747,7 +1747,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -1774,7 +1774,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -1801,7 +1801,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test {
@@ -1825,7 +1825,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -1849,7 +1849,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -1879,7 +1879,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -1906,7 +1906,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -1934,7 +1934,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -1963,7 +1963,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -2000,7 +2000,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             class Test {
               Test(
@@ -2039,7 +2039,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -2070,7 +2070,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Tree {}
@@ -2095,7 +2095,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Tree {}
@@ -2127,7 +2127,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Tree {}
@@ -2151,7 +2151,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test<T> {}
@@ -2171,7 +2171,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             class Base<T> {}
 
@@ -2195,7 +2195,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test<T> {
@@ -2219,7 +2219,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 @sealed
                 class Test<T> {
@@ -2236,7 +2236,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test<T0, T1> {}
@@ -2250,7 +2250,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test<T extends int> {}
@@ -2295,7 +2295,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             abstract class Buildable {
               void build();
@@ -2372,7 +2372,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             abstract class Marker {}
 
@@ -2457,7 +2457,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 abstract class Marker {
                   void mark();
@@ -2539,7 +2539,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             abstract class Buildable {
               void build();
@@ -2617,7 +2617,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 abstract class Buildable {
                   void build();
@@ -2694,7 +2694,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             abstract class Marker {}
 
@@ -2771,7 +2771,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             abstract class Buildable {
               void build();
@@ -2849,7 +2849,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 abstract class Marker {}
 
@@ -2926,7 +2926,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 abstract class Buildable {
                   void build();
@@ -3003,7 +3003,7 @@ class Class : BaseTest {
 
             dart(
                 """
-                import 'package:meta/meta.dart';
+                import "package:meta/meta.dart";
 
                 abstract class Marker {}
 
@@ -3048,7 +3048,7 @@ class Class : BaseTest {
         kotlin("class covariant")
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class ${'$'}covariant {}
@@ -3061,7 +3061,7 @@ class Class : BaseTest {
         kotlin("class final")
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class ${'$'}final {}
@@ -3074,7 +3074,7 @@ class Class : BaseTest {
         kotlin("class `class`")
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class ${'$'}class {}
@@ -3098,7 +3098,7 @@ class Class : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             abstract class Base {
               void exec({int arg = 30});

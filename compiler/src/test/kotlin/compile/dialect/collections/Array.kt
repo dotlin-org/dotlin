@@ -38,7 +38,7 @@ class Array : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final List<int> array = List<int>.of(<int>[0, 1, 2], growable: false);
@@ -59,7 +59,7 @@ class Array : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final List<int?> array = arrayOfNulls<int>(10);
@@ -80,7 +80,7 @@ class Array : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final List<String> array = List<String>.empty(growable: false);
@@ -101,7 +101,7 @@ class Array : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final List<int> array = List<int>.empty(growable: false);
@@ -126,7 +126,7 @@ class Array : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               test(List<int>.empty(growable: false));
@@ -151,7 +151,7 @@ class Array : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void process(List<String> numbers) {
               test(numbers);
@@ -176,7 +176,7 @@ class Array : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void process(List<String> words) {
               test(words);
@@ -201,7 +201,7 @@ class Array : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final List<int> myArray = calculate();
@@ -316,7 +316,7 @@ class Array : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final List<int> myList = MyList<int>();

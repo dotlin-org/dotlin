@@ -39,8 +39,8 @@ class List : BaseTest {
 
         dart(
             """
-            import 'dart:collection';
-            import 'package:meta/meta.dart';
+            import "dart:collection";
+            import "package:meta/meta.dart";
 
             void main() {
               final List<int> list = UnmodifiableListView<int>(<int>[0, 1, 2]);
@@ -61,7 +61,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final List<int> list = const <int>[0, 1, 2];
@@ -82,7 +82,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               const List<int> list = <int>[0, 1, 2];
@@ -103,8 +103,8 @@ class List : BaseTest {
 
         dart(
             """
-            import 'dart:collection';
-            import 'package:meta/meta.dart';
+            import "dart:collection";
+            import "package:meta/meta.dart";
 
             void main() {
               final List<String> list = UnmodifiableListView<String>(<String>[]);
@@ -125,7 +125,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final List<String> list = const <String>[];
@@ -146,7 +146,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               const List<String> list = <String>[];
@@ -167,7 +167,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final List<int> list = <int>[0, 1, 2];
@@ -188,7 +188,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final List<int?> list = mutableListOfNulls<int>(40);
@@ -210,7 +210,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final List<int> list = kotlin.List<int>(30, (int it) {
@@ -234,7 +234,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final List<int> list = MutableList<int>(30, (int it) {
@@ -261,8 +261,8 @@ class List : BaseTest {
 
         dart(
             """
-            import 'dart:collection';
-            import 'package:meta/meta.dart';
+            import "dart:collection";
+            import "package:meta/meta.dart";
 
             void main() {
               test(UnmodifiableListView<int>(<int>[]));
@@ -287,7 +287,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               test(<int>[]);
@@ -402,7 +402,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final List<int> myList = MaybeMutableList<int>();
@@ -427,7 +427,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final List<int> myList = calculate();
@@ -542,7 +542,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final List<int> myList = MaybeMutableList<int>();
@@ -568,7 +568,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -599,7 +599,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -628,7 +628,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -659,7 +659,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -688,7 +688,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -719,7 +719,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -748,7 +748,7 @@ class List : BaseTest {
 
             dart(
                 """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -779,7 +779,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -811,7 +811,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -845,7 +845,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -874,7 +874,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -905,7 +905,7 @@ class List : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -981,21 +981,21 @@ class List : BaseTest {
 
         dart(
             """
-            import 'dart:math';
-            import 'package:meta/meta.dart';
+            import "dart:math";
+            import "package:meta/meta.dart";
             
             @sealed
             class EmptyImmutableList<E> implements List<E>, ImmutableListMarker {
               @nonVirtual
-              int _${'$'}lengthBackingField = 0;
+              int _${"$"}lengthBackingField = 0;
               @override
               int get length {
-                return this._${'$'}lengthBackingField;
+                return this._${"$"}lengthBackingField;
               }
             
               @override
-              void set length(int ${'$'}value) {
-                throw UnsupportedError('Cannot change the size of an immutable list');
+              void set length(int ${"$"}value) {
+                throw UnsupportedError("Cannot change the size of an immutable list");
               }
             
               @override
@@ -1005,7 +1005,7 @@ class List : BaseTest {
             
               @override
               E get(int index) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -1072,7 +1072,7 @@ class List : BaseTest {
             
               @override
               Map<int, E> asMap() {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               bool equals(Object? other) {
@@ -1083,7 +1083,7 @@ class List : BaseTest {
               bool operator ==(Object? other) => this.equals(other);
               @override
               Iterator<E> get iterator {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -1125,7 +1125,7 @@ class List : BaseTest {
                 E,
               )
                       combine) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -1137,7 +1137,7 @@ class List : BaseTest {
                 )
                     combine,
               ) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -1146,8 +1146,8 @@ class List : BaseTest {
               }
             
               @override
-              String join([String separator = ', ']) {
-                return '';
+              String join([String separator = ", "]) {
+                return "";
               }
             
               @override
@@ -1191,32 +1191,32 @@ class List : BaseTest {
               }
             
               @nonVirtual
-              E _${'$'}firstBackingField = throw UnsupportedError('Empty');
+              E _${"$"}firstBackingField = throw UnsupportedError("Empty");
               @override
               E get first {
-                return this._${'$'}firstBackingField;
+                return this._${"$"}firstBackingField;
               }
             
               @override
-              void set first(E ${'$'}value) {
-                throw UnsupportedError('Cannot modify an immutable list');
+              void set first(E ${"$"}value) {
+                throw UnsupportedError("Cannot modify an immutable list");
               }
             
               @nonVirtual
-              E _${'$'}lastBackingField = throw UnsupportedError('Empty');
+              E _${"$"}lastBackingField = throw UnsupportedError("Empty");
               @override
               E get last {
-                return this._${'$'}lastBackingField;
+                return this._${"$"}lastBackingField;
               }
             
               @override
-              void set last(E ${'$'}value) {
-                throw UnsupportedError('Cannot modify an immutable list');
+              void set last(E ${"$"}value) {
+                throw UnsupportedError("Cannot modify an immutable list");
               }
             
               @override
               E get single {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -1224,7 +1224,7 @@ class List : BaseTest {
                 bool Function(E) test, {
                 E Function()? orElse = null,
               }) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -1232,7 +1232,7 @@ class List : BaseTest {
                 bool Function(E) test, {
                 E Function()? orElse = null,
               }) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -1240,17 +1240,17 @@ class List : BaseTest {
                 bool Function(E) test, {
                 E Function()? orElse = null,
               }) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
               E elementAt(int index) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
               Set<E> toSet() {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -1258,7 +1258,7 @@ class List : BaseTest {
                 int index,
                 E element,
               ) {
-                throw UnsupportedError('Cannot add to an immutable list');
+                throw UnsupportedError("Cannot add to an immutable list");
               }
             
               @override
@@ -1266,17 +1266,17 @@ class List : BaseTest {
                 int index,
                 Iterable<E> iterable,
               ) {
-                throw UnsupportedError('Cannot add to an immutable list');
+                throw UnsupportedError("Cannot add to an immutable list");
               }
             
               @override
               E removeAt(int index) {
-                throw UnsupportedError('Cannot remove from an immutable list');
+                throw UnsupportedError("Cannot remove from an immutable list");
               }
             
               @override
               E removeLast() {
-                throw UnsupportedError('Cannot remove from an immutable list');
+                throw UnsupportedError("Cannot remove from an immutable list");
               }
             
               @override
@@ -1284,7 +1284,7 @@ class List : BaseTest {
                 int start,
                 int end,
               ) {
-                throw UnsupportedError('Cannot remove from an immutable list');
+                throw UnsupportedError("Cannot remove from an immutable list");
               }
             
               @override
@@ -1293,7 +1293,7 @@ class List : BaseTest {
                 int end,
                 Iterable<E> replacements,
               ) {
-                throw UnsupportedError('Cannot remove from an immutable list');
+                throw UnsupportedError("Cannot remove from an immutable list");
               }
             
               @override
@@ -1301,7 +1301,7 @@ class List : BaseTest {
                 int index,
                 E value,
               ) {
-                throw UnsupportedError('Cannot modify an immutable list');
+                throw UnsupportedError("Cannot modify an immutable list");
               }
             
               @override
@@ -1315,7 +1315,7 @@ class List : BaseTest {
                 int index,
                 Iterable<E> iterable,
               ) {
-                throw UnsupportedError('Cannot modify an immutable list');
+                throw UnsupportedError("Cannot modify an immutable list");
               }
             
               @override
@@ -1325,7 +1325,7 @@ class List : BaseTest {
                 Iterable<E> iterable, [
                 int skipCount = 0,
               ]) {
-                throw UnsupportedError('Cannot modify an immutable list');
+                throw UnsupportedError("Cannot modify an immutable list");
               }
             
               @override
@@ -1334,7 +1334,7 @@ class List : BaseTest {
                 int end, [
                 E? fillValue = null,
               ]) {
-                throw UnsupportedError('Cannot modify an immutable list');
+                throw UnsupportedError("Cannot modify an immutable list");
               }
             
               @override
@@ -1344,42 +1344,42 @@ class List : BaseTest {
                     E,
                   )?
                       compare = null]) {
-                throw UnsupportedError('Cannot modify an immutable list');
+                throw UnsupportedError("Cannot modify an immutable list");
               }
             
               @override
               void shuffle([Random? random = null]) {
-                throw UnsupportedError('Cannot modify an immutable list');
+                throw UnsupportedError("Cannot modify an immutable list");
               }
             
               @override
               void add(E value) {
-                throw UnsupportedError('Cannot add to an immutable list');
+                throw UnsupportedError("Cannot add to an immutable list");
               }
             
               @override
               void addAll(Iterable<E> iterable) {
-                throw UnsupportedError('Cannot add to an immutable list');
+                throw UnsupportedError("Cannot add to an immutable list");
               }
             
               @override
               void clear() {
-                throw UnsupportedError('Cannot clear an immutable list');
+                throw UnsupportedError("Cannot clear an immutable list");
               }
             
               @override
               bool remove(Object? value) {
-                throw UnsupportedError('Cannot remove from an immutable list');
+                throw UnsupportedError("Cannot remove from an immutable list");
               }
             
               @override
               void removeWhere(bool Function(E) test) {
-                throw UnsupportedError('Cannot remove from an immutable list');
+                throw UnsupportedError("Cannot remove from an immutable list");
               }
             
               @override
               void retainWhere(bool Function(E) test) {
-                throw UnsupportedError('Cannot remove from an immutable list');
+                throw UnsupportedError("Cannot remove from an immutable list");
               }
             }
             """
@@ -1466,21 +1466,21 @@ class List : BaseTest {
 
         dart(
             """
-            import 'dart:math';
-            import 'package:meta/meta.dart';
+            import "dart:math";
+            import "package:meta/meta.dart";
             
             @sealed
             class EmptyWriteableList<E> implements List<E>, WriteableListMarker {
               @nonVirtual
-              int _${'$'}lengthBackingField = 0;
+              int _${"$"}lengthBackingField = 0;
               @override
               int get length {
-                return this._${'$'}lengthBackingField;
+                return this._${"$"}lengthBackingField;
               }
             
               @override
-              void set length(int ${'$'}value) {
-                throw UnsupportedError('Cannot change the size of a writeable list');
+              void set length(int ${"$"}value) {
+                throw UnsupportedError("Cannot change the size of a writeable list");
               }
             
               @override
@@ -1490,7 +1490,7 @@ class List : BaseTest {
             
               @override
               E get(int index) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -1557,7 +1557,7 @@ class List : BaseTest {
             
               @override
               Map<int, E> asMap() {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               bool equals(Object? other) {
@@ -1568,7 +1568,7 @@ class List : BaseTest {
               bool operator ==(Object? other) => this.equals(other);
               @override
               Iterator<E> get iterator {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -1610,7 +1610,7 @@ class List : BaseTest {
                 E,
               )
                       combine) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -1622,7 +1622,7 @@ class List : BaseTest {
                 )
                     combine,
               ) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -1631,8 +1631,8 @@ class List : BaseTest {
               }
             
               @override
-              String join([String separator = ', ']) {
-                return '';
+              String join([String separator = ", "]) {
+                return "";
               }
             
               @override
@@ -1676,12 +1676,12 @@ class List : BaseTest {
               }
             
               @override
-              E first = throw UnsupportedError('Empty');
+              E first = throw UnsupportedError("Empty");
               @override
-              E last = throw UnsupportedError('Empty');
+              E last = throw UnsupportedError("Empty");
               @override
               E get single {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -1689,7 +1689,7 @@ class List : BaseTest {
                 bool Function(E) test, {
                 E Function()? orElse = null,
               }) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -1697,7 +1697,7 @@ class List : BaseTest {
                 bool Function(E) test, {
                 E Function()? orElse = null,
               }) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -1705,17 +1705,17 @@ class List : BaseTest {
                 bool Function(E) test, {
                 E Function()? orElse = null,
               }) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
               E elementAt(int index) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
               Set<E> toSet() {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -1723,7 +1723,7 @@ class List : BaseTest {
                 int index,
                 E value,
               ) {
-                throw UnsupportedError('');
+                throw UnsupportedError("");
               }
             
               @override
@@ -1764,7 +1764,7 @@ class List : BaseTest {
                 int index,
                 E element,
               ) {
-                throw UnsupportedError('Cannot add to a writeable list');
+                throw UnsupportedError("Cannot add to a writeable list");
               }
             
               @override
@@ -1772,17 +1772,17 @@ class List : BaseTest {
                 int index,
                 Iterable<E> iterable,
               ) {
-                throw UnsupportedError('Cannot add to a writeable list');
+                throw UnsupportedError("Cannot add to a writeable list");
               }
             
               @override
               E removeAt(int index) {
-                throw UnsupportedError('Cannot remove from a writeable list');
+                throw UnsupportedError("Cannot remove from a writeable list");
               }
             
               @override
               E removeLast() {
-                throw UnsupportedError('Cannot remove from a writeable list');
+                throw UnsupportedError("Cannot remove from a writeable list");
               }
             
               @override
@@ -1790,7 +1790,7 @@ class List : BaseTest {
                 int start,
                 int end,
               ) {
-                throw UnsupportedError('Cannot remove from a writeable list');
+                throw UnsupportedError("Cannot remove from a writeable list");
               }
             
               @override
@@ -1799,37 +1799,37 @@ class List : BaseTest {
                 int end,
                 Iterable<E> replacements,
               ) {
-                throw UnsupportedError('Cannot remove from a writeable list');
+                throw UnsupportedError("Cannot remove from a writeable list");
               }
             
               @override
               void add(E value) {
-                throw UnsupportedError('Cannot add to a writeable list');
+                throw UnsupportedError("Cannot add to a writeable list");
               }
             
               @override
               void addAll(Iterable<E> iterable) {
-                throw UnsupportedError('Cannot add to a writeable list');
+                throw UnsupportedError("Cannot add to a writeable list");
               }
             
               @override
               void clear() {
-                throw UnsupportedError('Cannot clear a writeable list');
+                throw UnsupportedError("Cannot clear a writeable list");
               }
             
               @override
               bool remove(Object? value) {
-                throw UnsupportedError('Cannot remove from a writeable list');
+                throw UnsupportedError("Cannot remove from a writeable list");
               }
             
               @override
               void removeWhere(bool Function(E) test) {
-                throw UnsupportedError('Cannot remove from a writeable list');
+                throw UnsupportedError("Cannot remove from a writeable list");
               }
             
               @override
               void retainWhere(bool Function(E) test) {
-                throw UnsupportedError('Cannot remove from a writeable list');
+                throw UnsupportedError("Cannot remove from a writeable list");
               }
             }
             """
@@ -1916,21 +1916,21 @@ class List : BaseTest {
 
         dart(
             """
-            import 'dart:math';
-            import 'package:meta/meta.dart';
+            import "dart:math";
+            import "package:meta/meta.dart";
             
             @sealed
             class EmptyArray<E> implements List<E>, FixedSizeListMarker {
               @nonVirtual
-              int _${'$'}lengthBackingField = 0;
+              int _${"$"}lengthBackingField = 0;
               @override
               int get length {
-                return this._${'$'}lengthBackingField;
+                return this._${"$"}lengthBackingField;
               }
             
               @override
-              void set length(int ${'$'}value) {
-                throw UnsupportedError('Cannot change the size of a fixed-size list');
+              void set length(int ${"$"}value) {
+                throw UnsupportedError("Cannot change the size of a fixed-size list");
               }
             
               @override
@@ -1940,7 +1940,7 @@ class List : BaseTest {
             
               @override
               E get(int index) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -2007,7 +2007,7 @@ class List : BaseTest {
             
               @override
               Map<int, E> asMap() {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               bool equals(Object? other) {
@@ -2018,7 +2018,7 @@ class List : BaseTest {
               bool operator ==(Object? other) => this.equals(other);
               @override
               Iterator<E> get iterator {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -2060,7 +2060,7 @@ class List : BaseTest {
                 E,
               )
                       combine) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -2072,7 +2072,7 @@ class List : BaseTest {
                 )
                     combine,
               ) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -2081,8 +2081,8 @@ class List : BaseTest {
               }
             
               @override
-              String join([String separator = ', ']) {
-                return '';
+              String join([String separator = ", "]) {
+                return "";
               }
             
               @override
@@ -2126,12 +2126,12 @@ class List : BaseTest {
               }
             
               @override
-              E first = throw UnsupportedError('Empty');
+              E first = throw UnsupportedError("Empty");
               @override
-              E last = throw UnsupportedError('Empty');
+              E last = throw UnsupportedError("Empty");
               @override
               E get single {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -2139,7 +2139,7 @@ class List : BaseTest {
                 bool Function(E) test, {
                 E Function()? orElse = null,
               }) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -2147,7 +2147,7 @@ class List : BaseTest {
                 bool Function(E) test, {
                 E Function()? orElse = null,
               }) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -2155,17 +2155,17 @@ class List : BaseTest {
                 bool Function(E) test, {
                 E Function()? orElse = null,
               }) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
               E elementAt(int index) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
               Set<E> toSet() {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -2173,7 +2173,7 @@ class List : BaseTest {
                 int index,
                 E value,
               ) {
-                throw UnsupportedError('');
+                throw UnsupportedError("");
               }
             
               @override
@@ -2214,7 +2214,7 @@ class List : BaseTest {
                 int index,
                 E element,
               ) {
-                throw UnsupportedError('Cannot add to a fixed-size list');
+                throw UnsupportedError("Cannot add to a fixed-size list");
               }
             
               @override
@@ -2222,17 +2222,17 @@ class List : BaseTest {
                 int index,
                 Iterable<E> iterable,
               ) {
-                throw UnsupportedError('Cannot add to a fixed-size list');
+                throw UnsupportedError("Cannot add to a fixed-size list");
               }
             
               @override
               E removeAt(int index) {
-                throw UnsupportedError('Cannot remove from a fixed-size list');
+                throw UnsupportedError("Cannot remove from a fixed-size list");
               }
             
               @override
               E removeLast() {
-                throw UnsupportedError('Cannot remove from a fixed-size list');
+                throw UnsupportedError("Cannot remove from a fixed-size list");
               }
             
               @override
@@ -2240,7 +2240,7 @@ class List : BaseTest {
                 int start,
                 int end,
               ) {
-                throw UnsupportedError('Cannot remove from a fixed-size list');
+                throw UnsupportedError("Cannot remove from a fixed-size list");
               }
             
               @override
@@ -2249,37 +2249,37 @@ class List : BaseTest {
                 int end,
                 Iterable<E> replacements,
               ) {
-                throw UnsupportedError('Cannot remove from a fixed-size list');
+                throw UnsupportedError("Cannot remove from a fixed-size list");
               }
             
               @override
               void add(E value) {
-                throw UnsupportedError('Cannot add to a fixed-size list');
+                throw UnsupportedError("Cannot add to a fixed-size list");
               }
             
               @override
               void addAll(Iterable<E> iterable) {
-                throw UnsupportedError('Cannot add to a fixed-size list');
+                throw UnsupportedError("Cannot add to a fixed-size list");
               }
             
               @override
               void clear() {
-                throw UnsupportedError('Cannot clear a fixed-size list');
+                throw UnsupportedError("Cannot clear a fixed-size list");
               }
             
               @override
               bool remove(Object? value) {
-                throw UnsupportedError('Cannot remove from a fixed-size list');
+                throw UnsupportedError("Cannot remove from a fixed-size list");
               }
             
               @override
               void removeWhere(bool Function(E) test) {
-                throw UnsupportedError('Cannot remove from a fixed-size list');
+                throw UnsupportedError("Cannot remove from a fixed-size list");
               }
             
               @override
               void retainWhere(bool Function(E) test) {
-                throw UnsupportedError('Cannot remove from a fixed-size list');
+                throw UnsupportedError("Cannot remove from a fixed-size list");
               }
             }
             """
@@ -2387,8 +2387,8 @@ class List : BaseTest {
 
         dart(
             """
-            import 'dart:math';
-            import 'package:meta/meta.dart';
+            import "dart:math";
+            import "package:meta/meta.dart";
             
             @sealed
             class EmptyMutableList<E> implements List<E>, MutableListMarker {
@@ -2401,7 +2401,7 @@ class List : BaseTest {
             
               @override
               E get(int index) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -2468,7 +2468,7 @@ class List : BaseTest {
             
               @override
               Map<int, E> asMap() {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               bool equals(Object? other) {
@@ -2479,7 +2479,7 @@ class List : BaseTest {
               bool operator ==(Object? other) => this.equals(other);
               @override
               MutableIterator<E> get iterator {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -2521,7 +2521,7 @@ class List : BaseTest {
                 E,
               )
                       combine) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -2533,7 +2533,7 @@ class List : BaseTest {
                 )
                     combine,
               ) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -2542,8 +2542,8 @@ class List : BaseTest {
               }
             
               @override
-              String join([String separator = ', ']) {
-                return '';
+              String join([String separator = ", "]) {
+                return "";
               }
             
               @override
@@ -2587,12 +2587,12 @@ class List : BaseTest {
               }
             
               @override
-              E first = throw UnsupportedError('Empty');
+              E first = throw UnsupportedError("Empty");
               @override
-              E last = throw UnsupportedError('Empty');
+              E last = throw UnsupportedError("Empty");
               @override
               E get single {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -2600,7 +2600,7 @@ class List : BaseTest {
                 bool Function(E) test, {
                 E Function()? orElse = null,
               }) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -2608,7 +2608,7 @@ class List : BaseTest {
                 bool Function(E) test, {
                 E Function()? orElse = null,
               }) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -2616,17 +2616,17 @@ class List : BaseTest {
                 bool Function(E) test, {
                 E Function()? orElse = null,
               }) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
               E elementAt(int index) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
               Set<E> toSet() {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -2634,7 +2634,7 @@ class List : BaseTest {
                 int index,
                 E value,
               ) {
-                throw UnsupportedError('');
+                throw UnsupportedError("");
               }
             
               @override
@@ -2697,12 +2697,12 @@ class List : BaseTest {
               ) {}
               @override
               E removeAt(int index) {
-                throw 'no';
+                throw "no";
               }
             
               @override
               E removeLast() {
-                throw 'no';
+                throw "no";
               }
             
               @override
@@ -2803,21 +2803,21 @@ class List : BaseTest {
 
         dart(
             """
-            import 'dart:math';
-            import 'package:meta/meta.dart';
+            import "dart:math";
+            import "package:meta/meta.dart";
             
             @sealed
             class EmptyArray<E> implements List<E>, FixedSizeListMarker {
               @nonVirtual
-              int _${'$'}lengthBackingField = 0;
+              int _${"$"}lengthBackingField = 0;
               @override
               int get length {
-                return this._${'$'}lengthBackingField;
+                return this._${"$"}lengthBackingField;
               }
             
               @override
-              void set length(int ${'$'}value) {
-                throw UnsupportedError('Cannot change the size of a fixed-size list');
+              void set length(int ${"$"}value) {
+                throw UnsupportedError("Cannot change the size of a fixed-size list");
               }
             
               @override
@@ -2827,7 +2827,7 @@ class List : BaseTest {
             
               @override
               E get(int index) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -2894,7 +2894,7 @@ class List : BaseTest {
             
               @override
               Map<int, E> asMap() {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               bool equals(Object? other) {
@@ -2905,7 +2905,7 @@ class List : BaseTest {
               bool operator ==(Object? other) => this.equals(other);
               @override
               Iterator<E> get iterator {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -2947,7 +2947,7 @@ class List : BaseTest {
                 E,
               )
                       combine) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -2959,7 +2959,7 @@ class List : BaseTest {
                 )
                     combine,
               ) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -2968,8 +2968,8 @@ class List : BaseTest {
               }
             
               @override
-              String join([String separator = ', ']) {
-                return '';
+              String join([String separator = ", "]) {
+                return "";
               }
             
               @override
@@ -3013,12 +3013,12 @@ class List : BaseTest {
               }
             
               @override
-              E first = throw UnsupportedError('Empty');
+              E first = throw UnsupportedError("Empty");
               @override
-              E last = throw UnsupportedError('Empty');
+              E last = throw UnsupportedError("Empty");
               @override
               E get single {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -3026,7 +3026,7 @@ class List : BaseTest {
                 bool Function(E) test, {
                 E Function()? orElse = null,
               }) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -3034,7 +3034,7 @@ class List : BaseTest {
                 bool Function(E) test, {
                 E Function()? orElse = null,
               }) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -3042,17 +3042,17 @@ class List : BaseTest {
                 bool Function(E) test, {
                 E Function()? orElse = null,
               }) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
               E elementAt(int index) {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
               Set<E> toSet() {
-                throw UnsupportedError('Empty');
+                throw UnsupportedError("Empty");
               }
             
               @override
@@ -3060,7 +3060,7 @@ class List : BaseTest {
                 int index,
                 E value,
               ) {
-                throw UnsupportedError('');
+                throw UnsupportedError("");
               }
             
               @override
@@ -3103,7 +3103,7 @@ class List : BaseTest {
                 int index,
                 E element,
               ) {
-                throw UnsupportedError('Cannot add to a fixed-size list');
+                throw UnsupportedError("Cannot add to a fixed-size list");
               }
             
               @override
@@ -3111,17 +3111,17 @@ class List : BaseTest {
                 int index,
                 Iterable<E> iterable,
               ) {
-                throw UnsupportedError('Cannot add to a fixed-size list');
+                throw UnsupportedError("Cannot add to a fixed-size list");
               }
             
               @override
               E removeAt(int index) {
-                throw UnsupportedError('Cannot remove from a fixed-size list');
+                throw UnsupportedError("Cannot remove from a fixed-size list");
               }
             
               @override
               E removeLast() {
-                throw UnsupportedError('Cannot remove from a fixed-size list');
+                throw UnsupportedError("Cannot remove from a fixed-size list");
               }
             
               @override
@@ -3129,7 +3129,7 @@ class List : BaseTest {
                 int start,
                 int end,
               ) {
-                throw UnsupportedError('Cannot remove from a fixed-size list');
+                throw UnsupportedError("Cannot remove from a fixed-size list");
               }
             
               @override
@@ -3138,32 +3138,32 @@ class List : BaseTest {
                 int end,
                 Iterable<E> replacements,
               ) {
-                throw UnsupportedError('Cannot remove from a fixed-size list');
+                throw UnsupportedError("Cannot remove from a fixed-size list");
               }
             
               @override
               void addAll(Iterable<E> iterable) {
-                throw UnsupportedError('Cannot add to a fixed-size list');
+                throw UnsupportedError("Cannot add to a fixed-size list");
               }
             
               @override
               void clear() {
-                throw UnsupportedError('Cannot clear a fixed-size list');
+                throw UnsupportedError("Cannot clear a fixed-size list");
               }
             
               @override
               bool remove(Object? value) {
-                throw UnsupportedError('Cannot remove from a fixed-size list');
+                throw UnsupportedError("Cannot remove from a fixed-size list");
               }
             
               @override
               void removeWhere(bool Function(E) test) {
-                throw UnsupportedError('Cannot remove from a fixed-size list');
+                throw UnsupportedError("Cannot remove from a fixed-size list");
               }
             
               @override
               void retainWhere(bool Function(E) test) {
-                throw UnsupportedError('Cannot remove from a fixed-size list');
+                throw UnsupportedError("Cannot remove from a fixed-size list");
               }
             }
             """

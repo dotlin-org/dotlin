@@ -40,9 +40,9 @@ class Import : BaseTest {
 
         dart(
             """
-            import 'dart:core' as Int64 show int;
-            import 'dart:core' hide int;
-            import 'package:meta/meta.dart';
+            import "dart:core" as Int64 show int;
+            import "dart:core" hide int;
+            import "package:meta/meta.dart";
 
             void main() {
               final Int64.int x = 3;
@@ -65,8 +65,8 @@ class Import : BaseTest {
 
         dart(
             """
-            import 'dart:typed_data';
-            import 'package:meta/meta.dart';
+            import "dart:typed_data";
+            import "package:meta/meta.dart";
 
             void main() {
               final ByteData buffer = ByteData(8);

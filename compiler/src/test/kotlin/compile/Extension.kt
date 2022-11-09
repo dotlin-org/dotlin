@@ -38,7 +38,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {}
@@ -62,7 +62,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {}
@@ -90,7 +90,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {}
@@ -118,7 +118,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test<T> {}
@@ -144,7 +144,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test<T> {}
@@ -171,7 +171,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test<T> {}
@@ -199,7 +199,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test<T> {}
@@ -221,7 +221,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             extension ${'$'}KotlinStringExtensions${'$'}b07f86 on String {
               void titlecase() {}
@@ -240,7 +240,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             extension ${'$'}TMustBeAnyExtensions${'$'}b07f86<T> on T {
               void doIt() {}
@@ -261,7 +261,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test<T> {}
@@ -285,7 +285,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test<T> {}
@@ -330,7 +330,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             abstract class Buildable {
               void build();
@@ -376,7 +376,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             extension ${'$'}KotlinIntExtensions${'$'}b07f86 on int {
               int shift() {
@@ -401,7 +401,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               ${'$'}KotlinIntExtensions${'$'}6745d637(0).absoluteValue;

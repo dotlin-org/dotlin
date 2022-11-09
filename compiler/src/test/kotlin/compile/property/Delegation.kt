@@ -34,11 +34,11 @@ class Delegation : BaseTest {
             
             class Delegate {
                 operator fun getValue(thisRef: Any?, property: KProperty<*>): String {
-                    return "${'$'}thisRef has ${'$'}{property.name}"
+                    return "${"$"}thisRef has ${"$"}{property.name}"
                 }
             
                 operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {
-                    "${'$'}{property.name} = ${'$'}value in ${'$'}thisRef"
+                    "${"$"}{property.name} = ${"$"}value in ${"$"}thisRef"
                 }
             }
 
@@ -48,7 +48,7 @@ class Delegation : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Delegate {
@@ -57,7 +57,7 @@ class Delegation : BaseTest {
                 Object? thisRef,
                 KProperty<dynamic> property,
               ) {
-                return '${'$'}{thisRef} has ${'$'}{property.name}';
+                return "${"$"}{thisRef} has ${"$"}{property.name}";
               }
 
               @nonVirtual
@@ -66,17 +66,17 @@ class Delegation : BaseTest {
                 KProperty<dynamic> property,
                 String value,
               ) {
-                '${'$'}{property.name} = ${'$'}{value} in ${'$'}{thisRef}';
+                "${"$"}{property.name} = ${"$"}{value} in ${"$"}{thisRef}";
               }
             }
 
             String get x {
-              return _x${'$'}delegate.getValue(null, x${'$'}kProperty0);
+              return _x${"$"}delegate.getValue(null, x${"$"}kProperty0);
             }
             
-            final Delegate _x${'$'}delegate = Delegate();
-            const KProperty0Impl<String> x${'$'}kProperty0 = KProperty0Impl<String>('x', _${'$'}381);
-            String _${'$'}381() => x;
+            final Delegate _x${"$"}delegate = Delegate();
+            const KProperty0Impl<String> x${"$"}kProperty0 = KProperty0Impl<String>("x", _${"$"}381);
+            String _${"$"}381() => x;
             """
         )
     }
@@ -89,11 +89,11 @@ class Delegation : BaseTest {
             
             class Delegate {
                 operator fun getValue(thisRef: Any?, property: KProperty<*>): String {
-                    return "${'$'}thisRef has ${'$'}{property.name}"
+                    return "${"$"}thisRef has ${"$"}{property.name}"
                 }
             
                 operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {
-                    "${'$'}{property.name} = ${'$'}value in ${'$'}thisRef"
+                    "${"$"}{property.name} = ${"$"}value in ${"$"}thisRef"
                 }
             }
 
@@ -103,7 +103,7 @@ class Delegation : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Delegate {
@@ -112,7 +112,7 @@ class Delegation : BaseTest {
                 Object? thisRef,
                 KProperty<dynamic> property,
               ) {
-                return '${'$'}{thisRef} has ${'$'}{property.name}';
+                return "${"$"}{thisRef} has ${"$"}{property.name}";
               }
 
               @nonVirtual
@@ -121,23 +121,23 @@ class Delegation : BaseTest {
                 KProperty<dynamic> property,
                 String value,
               ) {
-                '${'$'}{property.name} = ${'$'}{value} in ${'$'}{thisRef}';
+                "${"$"}{property.name} = ${"$"}{value} in ${"$"}{thisRef}";
               }
             }
 
             String get x {
-              return _x${'$'}delegate.getValue(null, x${'$'}kProperty0);
+              return _x${"$"}delegate.getValue(null, x${"$"}kProperty0);
             }
 
-            void set x(String ${'$'}value) {
-              return _x${'$'}delegate.setValue(null, x${'$'}kProperty0, ${'$'}value);
+            void set x(String ${"$"}value) {
+              return _x${"$"}delegate.setValue(null, x${"$"}kProperty0, ${"$"}value);
             }
 
-            final Delegate _x${'$'}delegate = Delegate();
-            const KMutableProperty0Impl<String> x${'$'}kProperty0 =
-                KMutableProperty0Impl<String>('x', _${'$'}381, _${'$'}381With${'$'}value);
-            String _${'$'}381() => x;
-            String _${'$'}381With${'$'}value(String ${'$'}value) => x = ${'$'}value;
+            final Delegate _x${"$"}delegate = Delegate();
+            const KMutableProperty0Impl<String> x${"$"}kProperty0 =
+                KMutableProperty0Impl<String>("x", _${"$"}381, _${"$"}381With${"$"}value);
+            String _${"$"}381() => x;
+            String _${"$"}381With${"$"}value(String ${"$"}value) => x = ${"$"}value;
             """
         )
     }
@@ -150,11 +150,11 @@ class Delegation : BaseTest {
             
             class Delegate {
                 operator fun getValue(thisRef: Any?, property: KProperty<*>): String {
-                    return "${'$'}thisRef has ${'$'}{property.name}"
+                    return "${"$"}thisRef has ${"$"}{property.name}"
                 }
             
                 operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {
-                    "${'$'}{property.name} = ${'$'}value in ${'$'}thisRef"
+                    "${"$"}{property.name} = ${"$"}value in ${"$"}thisRef"
                 }
             }
 
@@ -166,7 +166,7 @@ class Delegation : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Delegate {
@@ -175,7 +175,7 @@ class Delegation : BaseTest {
                 Object? thisRef,
                 KProperty<dynamic> property,
               ) {
-                return '${'$'}{thisRef} has ${'$'}{property.name}';
+                return "${"$"}{thisRef} has ${"$"}{property.name}";
               }
 
               @nonVirtual
@@ -184,7 +184,7 @@ class Delegation : BaseTest {
                 KProperty<dynamic> property,
                 String value,
               ) {
-                '${'$'}{property.name} = ${'$'}{value} in ${'$'}{thisRef}';
+                "${"$"}{property.name} = ${"$"}{value} in ${"$"}{thisRef}";
               }
             }
 
@@ -192,13 +192,13 @@ class Delegation : BaseTest {
             class Test {
               @nonVirtual
               String get x {
-                return this._x${'$'}delegate.getValue(this, this.x${'$'}kProperty1);
+                return this._x${"$"}delegate.getValue(this, this.x${"$"}kProperty1);
               }
 
-              final Delegate _x${'$'}delegate = Delegate();
+              final Delegate _x${"$"}delegate = Delegate();
               @nonVirtual
-              late final KProperty1Impl<Test, String> x${'$'}kProperty1 =
-                  KProperty1Impl<Test, String>('x', (Test ${'$'}receiver1) => ${'$'}receiver1.x);
+              late final KProperty1Impl<Test, String> x${"$"}kProperty1 =
+                  KProperty1Impl<Test, String>("x", (Test ${"$"}receiver1) => ${"$"}receiver1.x);
             }
             """
         )
@@ -212,11 +212,11 @@ class Delegation : BaseTest {
             
             class Delegate {
                 operator fun getValue(thisRef: Any?, property: KProperty<*>): String {
-                    return "${'$'}thisRef has ${'$'}{property.name}"
+                    return "${"$"}thisRef has ${"$"}{property.name}"
                 }
             
                 operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {
-                    "${'$'}{property.name} = ${'$'}value in ${'$'}thisRef"
+                    "${"$"}{property.name} = ${"$"}value in ${"$"}thisRef"
                 }
             }
 
@@ -228,7 +228,7 @@ class Delegation : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Delegate {
@@ -237,7 +237,7 @@ class Delegation : BaseTest {
                 Object? thisRef,
                 KProperty<dynamic> property,
               ) {
-                return '${'$'}{thisRef} has ${'$'}{property.name}';
+                return "${"$"}{thisRef} has ${"$"}{property.name}";
               }
 
               @nonVirtual
@@ -246,7 +246,7 @@ class Delegation : BaseTest {
                 KProperty<dynamic> property,
                 String value,
               ) {
-                '${'$'}{property.name} = ${'$'}{value} in ${'$'}{thisRef}';
+                "${"$"}{property.name} = ${"$"}{value} in ${"$"}{thisRef}";
               }
             }
 
@@ -254,25 +254,25 @@ class Delegation : BaseTest {
             class Test {
               @nonVirtual
               String get x {
-                return this._x${'$'}delegate.getValue(this, this.x${'$'}kProperty1);
+                return this._x${"$"}delegate.getValue(this, this.x${"$"}kProperty1);
               }
 
               @nonVirtual
-              void set x(String ${'$'}value) {
-                return this._x${'$'}delegate.setValue(this, this.x${'$'}kProperty1, ${'$'}value);
+              void set x(String ${"$"}value) {
+                return this._x${"$"}delegate.setValue(this, this.x${"$"}kProperty1, ${"$"}value);
               }
 
-              final Delegate _x${'$'}delegate = Delegate();
+              final Delegate _x${"$"}delegate = Delegate();
               @nonVirtual
-              late final KMutableProperty1Impl<Test, String> x${'$'}kProperty1 =
+              late final KMutableProperty1Impl<Test, String> x${"$"}kProperty1 =
                   KMutableProperty1Impl<Test, String>(
-                      'x',
-                      (Test ${'$'}receiver1) => ${'$'}receiver1.x,
+                      "x",
+                      (Test ${"$"}receiver1) => ${"$"}receiver1.x,
                       (
-                        Test ${'$'}receiver1,
-                        String ${'$'}value,
+                        Test ${"$"}receiver1,
+                        String ${"$"}value,
                       ) =>
-                          ${'$'}receiver1.x = ${'$'}value);
+                          ${"$"}receiver1.x = ${"$"}value);
             }
             """
         )
@@ -286,11 +286,11 @@ class Delegation : BaseTest {
             
             class Delegate {
                 operator fun getValue(thisRef: Any?, property: KProperty<*>): String {
-                    return "${'$'}thisRef has ${'$'}{property.name}"
+                    return "${"$"}thisRef has ${"$"}{property.name}"
                 }
             
                 operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {
-                    "${'$'}{property.name} = ${'$'}value in ${'$'}thisRef"
+                    "${"$"}{property.name} = ${"$"}value in ${"$"}thisRef"
                 }
             }
 
@@ -304,7 +304,7 @@ class Delegation : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Delegate {
@@ -313,7 +313,7 @@ class Delegation : BaseTest {
                 Object? thisRef,
                 KProperty<dynamic> property,
               ) {
-                return '${'$'}{thisRef} has ${'$'}{property.name}';
+                return "${"$"}{thisRef} has ${"$"}{property.name}";
               }
 
               @nonVirtual
@@ -322,19 +322,19 @@ class Delegation : BaseTest {
                 KProperty<dynamic> property,
                 String value,
               ) {
-                '${'$'}{property.name} = ${'$'}{value} in ${'$'}{thisRef}';
+                "${"$"}{property.name} = ${"$"}{value} in ${"$"}{thisRef}";
               }
             }
 
             void main() {
-              late final KProperty0Impl<String> x${'$'}kProperty0 = KProperty0Impl<String>('x',
-                  () => throw UnsupportedError('Cannot call getter for this declaration'));
-              final Delegate x${'$'}delegate = Delegate();
-              String get${'$'}x() {
-                return x${'$'}delegate.getValue(null, x${'$'}kProperty0);
+              late final KProperty0Impl<String> x${"$"}kProperty0 = KProperty0Impl<String>("x",
+                  () => throw UnsupportedError("Cannot call getter for this declaration"));
+              final Delegate x${"$"}delegate = Delegate();
+              String get${"$"}x() {
+                return x${"$"}delegate.getValue(null, x${"$"}kProperty0);
               }
 
-              final String y = get${'$'}x();
+              final String y = get${"$"}x();
             }
             """
         )
@@ -348,11 +348,11 @@ class Delegation : BaseTest {
             
             class Delegate {
                 operator fun getValue(thisRef: Any?, property: KProperty<*>): String {
-                    return "${'$'}thisRef has ${'$'}{property.name}"
+                    return "${"$"}thisRef has ${"$"}{property.name}"
                 }
             
                 operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {
-                    "${'$'}{property.name} = ${'$'}value in ${'$'}thisRef"
+                    "${"$"}{property.name} = ${"$"}value in ${"$"}thisRef"
                 }
             }
 
@@ -366,7 +366,7 @@ class Delegation : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Delegate {
@@ -375,7 +375,7 @@ class Delegation : BaseTest {
                 Object? thisRef,
                 KProperty<dynamic> property,
               ) {
-                return '${'$'}{thisRef} has ${'$'}{property.name}';
+                return "${"$"}{thisRef} has ${"$"}{property.name}";
               }
 
               @nonVirtual
@@ -384,28 +384,28 @@ class Delegation : BaseTest {
                 KProperty<dynamic> property,
                 String value,
               ) {
-                '${'$'}{property.name} = ${'$'}{value} in ${'$'}{thisRef}';
+                "${"$"}{property.name} = ${"$"}{value} in ${"$"}{thisRef}";
               }
             }
 
             void main() {
-              late final KMutableProperty0Impl<String> x${'$'}kProperty0 = KMutableProperty0Impl<
+              late final KMutableProperty0Impl<String> x${"$"}kProperty0 = KMutableProperty0Impl<
                       String>(
-                  'x',
-                  () => throw UnsupportedError('Cannot call getter for this declaration'),
-                  (String ${'$'}value) =>
-                      throw UnsupportedError('Cannot call setter for this declaration'));
-              final Delegate x${'$'}delegate = Delegate();
-              String get${'$'}x() {
-                return x${'$'}delegate.getValue(null, x${'$'}kProperty0);
+                  "x",
+                  () => throw UnsupportedError("Cannot call getter for this declaration"),
+                  (String ${"$"}value) =>
+                      throw UnsupportedError("Cannot call setter for this declaration"));
+              final Delegate x${"$"}delegate = Delegate();
+              String get${"$"}x() {
+                return x${"$"}delegate.getValue(null, x${"$"}kProperty0);
               }
 
-              void set${'$'}x(String value) {
-                return x${'$'}delegate.setValue(null, x${'$'}kProperty0, value);
+              void set${"$"}x(String value) {
+                return x${"$"}delegate.setValue(null, x${"$"}kProperty0, value);
               }
 
-              final String y = get${'$'}x();
-              set${'$'}x(y);
+              final String y = get${"$"}x();
+              set${"$"}x(y);
             }
             """
         )
@@ -421,7 +421,7 @@ class Delegation : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             late final int myLazy = 100;
             """
@@ -441,7 +441,7 @@ class Delegation : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             late final int myLazy = () {
               final int x = 340;
@@ -465,7 +465,7 @@ class Delegation : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               late final int myLazy = 100;
@@ -492,7 +492,7 @@ class Delegation : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               late final int myLazy = () {

@@ -41,7 +41,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Dar {}
@@ -67,7 +67,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Human {
@@ -77,7 +77,7 @@ class Dotlin : BaseTest {
             }
 
             void main() {
-              Human.withName('Faramir');
+              Human.withName("Faramir");
             }
             """
         )
@@ -100,14 +100,14 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Human {
               Human(this.name) : super();
               @nonVirtual
               final String name;
-              Human.nameless() : this('');
+              Human.nameless() : this("");
             }
 
             void main() {
@@ -134,7 +134,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Cool {
@@ -167,7 +167,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Cool {
@@ -201,7 +201,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Kot {
@@ -239,7 +239,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Dot {
@@ -280,7 +280,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             class Processor {
               void dartProcess() {}
@@ -320,7 +320,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             class Processor {
               final int dartAmount = 4;
@@ -351,7 +351,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void process(bool Function(int) test) {
               test.call(0);
@@ -376,7 +376,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void process({bool Function(int)? test = null}) {
               test = test == null
@@ -419,7 +419,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             class Processor {
               void process({bool Function(int)? test = null}) {
@@ -472,7 +472,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Hobbit {
@@ -512,7 +512,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             class Hobbit {
               bool get isProudfoot {
@@ -554,7 +554,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Hobbit {}
@@ -595,7 +595,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             class Hobbit {}
 
@@ -649,7 +649,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               Proudfoot().isProudfoot();
@@ -677,8 +677,8 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'dart:typed_data';
-            import 'package:meta/meta.dart';
+            import "dart:typed_data";
+            import "package:meta/meta.dart";
 
             void test(Something s) {}
             """
@@ -700,9 +700,9 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'dart:core' as core;
-            import 'dart:core' hide List;
-            import 'package:meta/meta.dart';
+            import "dart:core" as core;
+            import "dart:core" hide List;
+            import "package:meta/meta.dart";
 
             void main() {
               core.List();
@@ -734,9 +734,9 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'dart:core' as core;
-            import 'dart:core' hide List;
-            import 'package:meta/meta.dart';
+            import "dart:core" as core;
+            import "dart:core" hide List;
+            import "package:meta/meta.dart";
 
             void main() {
               core.List();
@@ -758,9 +758,9 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'dart:core' as core;
-            import 'dart:core' hide List;
-            import 'package:meta/meta.dart';
+            import "dart:core" as core;
+            import "dart:core" hide List;
+            import "package:meta/meta.dart";
 
             void test(core.List list) {}
             """
@@ -784,8 +784,8 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide Enum;
-            import 'package:meta/meta.dart';
+            import "dart:core" hide Enum;
+            import "package:meta/meta.dart";
 
             @sealed
             class Enum {}
@@ -817,8 +817,8 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide Enum, List;
-            import 'package:meta/meta.dart';
+            import "dart:core" hide Enum, List;
+            import "package:meta/meta.dart";
 
             @sealed
             class Enum {}
@@ -861,8 +861,8 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide Something, SomethingElse;
-            import 'package:meta/meta.dart';
+            import "dart:core" hide Something, SomethingElse;
+            import "package:meta/meta.dart";
 
             @sealed
             class Something {}
@@ -874,9 +874,9 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import '0.dt.g.dart';
-            import 'dart:core' hide Something;
-            import 'package:meta/meta.dart';
+            import "0.dt.g.dart";
+            import "dart:core" hide Something;
+            import "package:meta/meta.dart";
 
             void main() {
               Something();
@@ -897,7 +897,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final dynamic x = [];
@@ -925,7 +925,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               final x = [0, 1, 2];
@@ -949,7 +949,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void test(
               int z, [
@@ -970,7 +970,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -1004,7 +1004,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             class A {
               void doTest(
@@ -1041,7 +1041,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             extension NegativeIntExtensions on int {
               int toNegative() {
@@ -1069,7 +1069,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             extension NegativeIntExtensions on int {
               int toNegative() {
@@ -1103,7 +1103,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             extension IntExtensions on int {
               int toNegative() {
@@ -1132,7 +1132,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             int test(
               int secondParam,
@@ -1169,7 +1169,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             class Test {
               int test(
@@ -1214,7 +1214,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             int test(
               int secondParam, {
@@ -1254,7 +1254,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             class Test {
               int test(
@@ -1301,7 +1301,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             void main() {
               test(param: 5);
@@ -1335,7 +1335,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class SubTest extends Test {

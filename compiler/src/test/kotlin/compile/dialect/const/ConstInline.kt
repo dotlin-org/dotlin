@@ -38,14 +38,14 @@ class ConstInline : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
               const Test() : super();
             }
 
-            @pragma('vm:always-consider-inlining')
+            @pragma("vm:always-consider-inlining")
             Test test() {
               return Test();
             }
@@ -69,14 +69,14 @@ class ConstInline : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
               const Test() : super();
             }
 
-            @pragma('vm:always-consider-inlining')
+            @pragma("vm:always-consider-inlining")
             Test createTest() {
               return Test();
             }
@@ -104,14 +104,14 @@ class ConstInline : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
               const Test() : super();
             }
 
-            @pragma('vm:always-consider-inlining')
+            @pragma("vm:always-consider-inlining")
             Test createTest() {
               return Test();
             }
@@ -144,22 +144,22 @@ class ConstInline : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
               const Test(String message) : super();
             }
 
-            @pragma('vm:always-consider-inlining')
+            @pragma("vm:always-consider-inlining")
             Test createTest() {
-              const String firstPart = 'first, ';
-              const String secondPart = 'second';
+              const String firstPart = "first, ";
+              const String secondPart = "second";
               return Test(firstPart + secondPart);
             }
 
             void main() {
-              const Test y = Test('first, ' + 'second');
+              const Test y = Test("first, " + "second");
             }
             """
         )
@@ -186,22 +186,22 @@ class ConstInline : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
               const Test(String message) : super();
             }
 
-            @pragma('vm:always-consider-inlining')
+            @pragma("vm:always-consider-inlining")
             Test createTest(String thirdPart) {
-              const String firstPart = 'first, ';
-              const String secondPart = 'second, ';
+              const String firstPart = "first, ";
+              const String secondPart = "second, ";
               return Test(firstPart + secondPart + thirdPart);
             }
 
             void main() {
-              const Test y = Test('first, ' + 'second, ' + 'third');
+              const Test y = Test("first, " + "second, " + "third");
             }
             """
         )
@@ -228,22 +228,22 @@ class ConstInline : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
               const Test(String message) : super();
             }
 
-            @pragma('vm:always-consider-inlining')
+            @pragma("vm:always-consider-inlining")
             Test createTest(String thirdPart) {
-              const String firstPart = 'first, ';
-              const String secondPart = 'second, ';
+              const String firstPart = "first, ";
+              const String secondPart = "second, ";
               return Test(firstPart + secondPart + thirdPart);
             }
 
             void main() {
-              final Test y = createTest('third');
+              final Test y = createTest("third");
             }
             """
         )
@@ -257,7 +257,7 @@ class ConstInline : BaseTest {
 
             const inline fun createTest(thirdPart: String): Test {
                 const val firstPart = "first, "
-                const val secondAndThirdPart = "second, ${'$'}thirdPart"
+                const val secondAndThirdPart = "second, ${"$"}thirdPart"
 
                 return Test(firstPart + secondAndThirdPart)
             }
@@ -270,22 +270,22 @@ class ConstInline : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Test {
               const Test(String message) : super();
             }
 
-            @pragma('vm:always-consider-inlining')
+            @pragma("vm:always-consider-inlining")
             Test createTest(String thirdPart) {
-              const String firstPart = 'first, ';
-              final String secondAndThirdPart = 'second, ${'$'}{thirdPart}';
+              const String firstPart = "first, ";
+              final String secondAndThirdPart = "second, ${"$"}{thirdPart}";
               return Test(firstPart + secondAndThirdPart);
             }
 
             void main() {
-              const Test y = Test('first, ' + 'second, third');
+              const Test y = Test("first, " + "second, third");
             }
             """
         )
@@ -311,7 +311,7 @@ class ConstInline : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class Zen {
@@ -320,7 +320,7 @@ class ConstInline : BaseTest {
               final String Function() _maintainMotorcycle;
             }
 
-            @pragma('vm:always-consider-inlining')
+            @pragma("vm:always-consider-inlining")
             Zen createZenWith(String Function() maintain) {
               return Zen(maintain);
             }
@@ -329,17 +329,17 @@ class ConstInline : BaseTest {
             class Good {
               Good._() : super();
               @nonVirtual
-              final String ${'$'}QUALITY = 'Quality';
-              static final Good ${'$'}instance = Good._();
-              static final String QUALITY = Good.${'$'}instance.${'$'}QUALITY;
+              final String ${"$"}QUALITY = "Quality";
+              static final Good ${"$"}instance = Good._();
+              static final String QUALITY = Good.${"$"}instance.${"$"}QUALITY;
             }
 
             void main() {
-              const Zen zen = Zen(_${'$'}21b1);
+              const Zen zen = Zen(_${"$"}21b1);
             }
 
-            String _${'$'}21b1() {
-              return Good.${'$'}instance.${'$'}QUALITY;
+            String _${"$"}21b1() {
+              return Good.${"$"}instance.${"$"}QUALITY;
             }
             """
         )

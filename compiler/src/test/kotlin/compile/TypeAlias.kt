@@ -37,7 +37,7 @@ class TypeAlias : BaseTest {
         )
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             @sealed
             class X {}
@@ -58,7 +58,7 @@ class TypeAlias : BaseTest {
         )
         dart(
         """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
             
             @sealed
             class X<T> {}
@@ -77,7 +77,7 @@ class TypeAlias : BaseTest {
         )
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
             
             typedef Processor = void Function(int);
             """
@@ -93,7 +93,7 @@ class TypeAlias : BaseTest {
         )
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
             
             typedef Processor = void Function(int number);
             """
@@ -109,7 +109,7 @@ class TypeAlias : BaseTest {
         )
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
             
             typedef Predicate<T> = bool Function(T);
             """
@@ -128,7 +128,7 @@ class TypeAlias : BaseTest {
 
         dart(
             """
-            import 'package:meta/meta.dart';
+            import "package:meta/meta.dart";
 
             typedef Predicate<T> = bool Function(T);
             void test(Predicate<int> predicate) {}
