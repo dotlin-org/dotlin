@@ -411,7 +411,7 @@ lot of methods. However, they've been renamed to match Kotlin conventions, some 
 | `every`     | `all`              |
 | `skip`      | `drop`             |
 
-#### `Collection`
+#### `Collection` <sup>`is Iterable`</sup>
 
 Represents any type of collection of elements. It provides a common interface for
 `List` and `Set, which in Dart don't have a common interface.
@@ -419,7 +419,7 @@ Represents any type of collection of elements. It provides a common interface fo
 > **Note**  
 > Runtime type checks work: `List`s and `Set`s are considered `Collection`s at runtime.
 
-##### `MutableCollection`
+##### `MutableCollection` <sup>`is Collection`</sup>
 
 Represents any kind of mutable collection of elements. "Mutable" specifically means
 _growable_ in Dart terms, meaning elements can be added and removed.
@@ -436,7 +436,7 @@ _only if_ they are actually mutable. Examples (Dart):
 > ```
 > <sup>These type checks don't work as Dart code as-is, but are compiled specially when writing a similar expression in Dotlin.</sup>
 
-#### `List`
+#### `List` <sup>`is Collection`</sup>
 
 <sup>Dart: `List`</sup>
 
@@ -509,7 +509,7 @@ _only if_ they are actually writeable. Examples (Dart):
 > List.unmodifiable([1, 2, 3]) is FixedSizeList<int> == false
 > ```
 
-##### `MutableList` <sup>`is WriteableList`</sup>
+##### `MutableList` <sup>`is WriteableList, MutableCollection`</sup>
 
 <sup>Dart: `List` (`growable: true`)</sup>
 
@@ -529,7 +529,7 @@ _only if_ they are actually mutable (writeable & growable). Examples (Dart):
 > List.unmodifiable([1, 2, 3]) is MutableList<int> == false
 > ```
 
-#### `Set`
+#### `Set` <sup>`is Collection`</sup>
 
 <sup>Dart: `Set`</sup>
 
@@ -556,7 +556,7 @@ _only if_ they are actually immutable. Examples (Dart):
 > {1, 2, 3} is ImmutableSet<int> == false
 > ```
 
-##### `MutableSet` <sup>`is Set`</sup>
+##### `MutableSet` <sup>`is Set, MutableCollection`</sup>
 
 <sup>Dart: `Set` (`{..}`)</sup>
 
