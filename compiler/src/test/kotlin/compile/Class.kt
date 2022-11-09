@@ -3081,4 +3081,35 @@ class Class : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `class with method with default value that's overridden`() = assertCompile {
+        kotlin(
+            """
+            interface Base {
+                fun exec(arg: Int = 30)
+            }
+
+            class Impl : Base {
+                override fun exec(arg: Int) {}
+            }
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            abstract class Base {
+              void exec({int arg = 30});
+            }
+
+            @sealed
+            class Impl implements Base {
+              @override
+              void exec({int arg = 30}) {}
+            }
+            """
+        )
+    }
 }

@@ -23,4 +23,4 @@ import org.dotlin.compiler.backend.dotlin
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classFqName
 
-fun IrType.isDotlinReturn(): Boolean = classFqName == dotlin.`$Return`
+fun IrType.isDotlinReturn(): Boolean = classFqName == dotlin.intrinsics.`$Return`

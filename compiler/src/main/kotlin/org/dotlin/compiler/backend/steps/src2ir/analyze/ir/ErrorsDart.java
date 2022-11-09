@@ -20,9 +20,7 @@
 package org.dotlin.compiler.backend.steps.src2ir.analyze.ir;
 
 import com.intellij.psi.PsiElement;
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor;
 import org.jetbrains.kotlin.diagnostics.*;
-import org.jetbrains.kotlin.lexer.KtModifierKeywordToken;
 import org.jetbrains.kotlin.psi.KtAnnotationEntry;
 import org.jetbrains.kotlin.psi.KtDeclaration;
 import org.jetbrains.kotlin.psi.KtElement;

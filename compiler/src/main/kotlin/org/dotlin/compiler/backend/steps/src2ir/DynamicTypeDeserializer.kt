@@ -22,6 +22,7 @@ package org.dotlin.compiler.backend.steps.src2ir
 import org.jetbrains.kotlin.metadata.ProtoBuf
 import org.jetbrains.kotlin.serialization.deserialization.FlexibleTypeDeserializer
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.KotlinTypeFactory
 import org.jetbrains.kotlin.types.SimpleType
 import org.jetbrains.kotlin.types.checker.StrictEqualityTypeChecker
 import org.jetbrains.kotlin.types.createDynamicType
@@ -43,7 +44,7 @@ object DynamicTypeDeserializer : FlexibleTypeDeserializer {
                 lowerBound strictlyEquals nothingType && upperBound strictlyEquals nullableAnyType -> {
                     createDynamicType(this)
                 }
-                else -> error("Invalid type range for dynamic: $lowerBound..$upperBound")
+                else -> KotlinTypeFactory.flexibleType(lowerBound, upperBound)
             }
         }
     }

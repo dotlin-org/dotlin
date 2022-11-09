@@ -28,7 +28,7 @@ open class IntProgression
             start: Int,
             endInclusive: Int,
             step: Int
-    ) : Iterable<Int> {
+    ) : Iterable<Int>() {
     init {
         if (step == 0) throw ArgumentError("Step must be non-zero.")
         if (step == Int.MIN_VALUE) throw ArgumentError("Step must be greater than Int.MIN_VALUE to avoid overflow on negation.")
@@ -37,12 +37,12 @@ open class IntProgression
     /**
      * The first element in the progression.
      */
-    val first: Int = start
+    override val first: Int = start
 
     /**
      * The last element in the progression.
      */
-    val last: Int = getProgressionLastElement(start, endInclusive, step)
+    override val last: Int = getProgressionLastElement(start, endInclusive, step)
 
     /**
      * The step of the progression.

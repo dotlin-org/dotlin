@@ -277,12 +277,11 @@ class Loop : BaseTest {
 
         dart(
             """
-            import 'dart:core' as core;
-            import 'dart:core' hide List;
             import 'package:meta/meta.dart';
 
             void main() {
-              final core.List<int> elements = arrayOf<int>(<int>[1, 2, 3, 4, 5]);
+              final List<int> elements =
+                  List<int>.of(<int>[1, 2, 3, 4, 5], growable: false);
               for (int i in elements) process(i);
             }
 

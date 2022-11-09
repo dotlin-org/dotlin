@@ -20,11 +20,8 @@
 package compile
 
 import BaseTest
-import DefaultValue
 import assertCompile
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 @DisplayName("Compile: Type Alias")
@@ -115,6 +112,26 @@ class TypeAlias : BaseTest {
             import 'package:meta/meta.dart';
             
             typedef Predicate<T> = bool Function(T);
+            """
+        )
+    }
+
+    @Test
+    fun `type alias is not expanded`() = assertCompile {
+        kotlin(
+            """
+            typealias Predicate<T> = (T) -> Boolean
+
+            fun test(predicate: Predicate<Int>) {}
+            """
+        )
+
+        dart(
+            """
+            import 'package:meta/meta.dart';
+
+            typedef Predicate<T> = bool Function(T);
+            void test(Predicate<int> predicate) {}
             """
         )
     }

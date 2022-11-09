@@ -55,7 +55,7 @@ class Import : BaseTest {
     fun `using class from Dart's typed_data`() = assertCompile {
         kotlin(
             """
-            import dart.typeddata.ByteData
+            import dart.typed_data.ByteData
 
             fun main() {
                 val buffer = ByteData(8)

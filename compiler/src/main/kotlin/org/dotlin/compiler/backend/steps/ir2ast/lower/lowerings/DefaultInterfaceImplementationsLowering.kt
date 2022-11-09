@@ -30,7 +30,6 @@ import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
 import org.dotlin.compiler.backend.util.replace
 import org.jetbrains.kotlin.backend.common.ir.moveBodyTo
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.util.isInterface
 import org.jetbrains.kotlin.ir.util.parentAsClass
 

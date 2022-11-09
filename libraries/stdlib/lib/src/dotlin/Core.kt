@@ -28,7 +28,7 @@ external val definedExternally: Nothing
 /**
  * Returns a [Type] instance of the given type [T].
  *
- * Functions exactly like a type literal in Dart. For example,
+ * Behaves exactly like a type literal in Dart. For example,
  * the call of
  * ```kotlin
  * typeOf<String>()

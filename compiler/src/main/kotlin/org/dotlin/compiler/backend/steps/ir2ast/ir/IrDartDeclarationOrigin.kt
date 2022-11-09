@@ -61,6 +61,8 @@ sealed class IrDartDeclarationOrigin(private val name: String) : IrDeclarationOr
     /**
      * Default implementations from interfaces are copied over to the class that implements in the interface, since
      * in Dart no super implementations are available when `implements` is used.
+     *
+     * ALso used in [CollectionImplementersLowering].
      */
     object COPIED_OVERRIDE : IrDartDeclarationOrigin("COPIED_OVERRIDE")
 

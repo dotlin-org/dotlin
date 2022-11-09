@@ -22,10 +22,10 @@ import kotlin.internal.getProgressionLastElement
 /**
  * A progression of values of type `Char`.
  */
-internal external interface CharProgression : Iterable<Char>
+internal external interface CharProgression : Iterable<Char>(Interface)
 
 /**
  * A progression of values of type `Long`.
  */
-internal external interface LongProgression : Iterable<Long>
+internal external interface LongProgression : Iterable<Long>(Interface)
 

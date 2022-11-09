@@ -24,10 +24,7 @@ import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrAttributeContainer
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrProperty
-import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrGetField
-import org.jetbrains.kotlin.ir.expressions.IrGetValue
-import org.jetbrains.kotlin.ir.expressions.IrTypeOperatorCall
+import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtExpression
@@ -57,6 +54,8 @@ interface IrAttributes  {
         override var IrExpression.isParenthesized by attribute(default = false)
 
         override var IrTypeOperatorCall.isFunctionTypeCheck by attribute(default = false)
+
+        override var IrVararg.literalKind by attribute(default = CollectionLiteralKind.LIST)
     }
 
     /**
@@ -95,8 +94,13 @@ interface IrAttributes  {
     }
 
     var IrExpression.isParenthesized: Boolean
+    fun IrExpression.parenthesize(): IrExpression = apply {
+        isParenthesized = true
+    }
 
     var IrTypeOperatorCall.isFunctionTypeCheck: Boolean
+
+    var IrVararg.literalKind: CollectionLiteralKind
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -149,3 +153,9 @@ data class DartImport(
     val hide: String? = null,
     val show: String? = null
 )
+
+enum class CollectionLiteralKind {
+    LIST,
+    SET,
+    MAP
+}

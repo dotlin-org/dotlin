@@ -62,6 +62,11 @@ fun IrValueParameter.resolveOverride(): IrValueParameter? {
     return irFunction.resolveOverride()?.valueParameters?.get(index)
 }
 
+fun IrValueParameter.resolveRootOverride(): IrValueParameter? {
+    val irFunction = parent as? IrSimpleFunction ?: return null
+    return irFunction.resolveRootOverride()?.valueParameters?.get(index)
+}
+
 val IrOverridableDeclaration<*>.isOverride: Boolean
     get() = resolveOverride() != null
 
@@ -416,16 +421,26 @@ fun IrBuilderWithScope.irCall(
     callee: IrSimpleFunction,
     receiver: IrExpression? = null,
     vararg valueArguments: IrExpression,
+    typeArguments: Collection<IrType?> = emptyList(),
     origin: IrStatementOrigin? = null,
+    isExtension: Boolean = false
 ): IrCall =
     irCall(callee, origin).apply {
-        this@apply.dispatchReceiver = receiver
+        when {
+            isExtension -> this@apply.extensionReceiver = receiver
+            else -> this@apply.dispatchReceiver = receiver
+        }
 
         if (valueArguments.size > callee.valueParameters.size) {
             throw IllegalArgumentException("Too many value arguments passed for this function")
         }
 
+        if (typeArguments.size > callee.typeParameters.size) {
+            throw IllegalArgumentException("Too many type arguments passed for this function")
+        }
+
         valueArguments.forEachIndexed { index, arg -> putValueArgument(index, arg) }
+        typeArguments.forEachIndexed { index, arg -> putTypeArgument(index, arg) }
     }
 
 fun IrBuilderWithScope.irCallSet(property: IrProperty, value: IrExpression): IrCall =

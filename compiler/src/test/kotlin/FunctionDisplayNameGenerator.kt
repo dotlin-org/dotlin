@@ -20,7 +20,7 @@
 import org.junit.jupiter.api.DisplayNameGenerator
 import java.lang.reflect.Method
 
-class FunctionDisplayNameGenerator() : DisplayNameGenerator {
+class FunctionDisplayNameGenerator : DisplayNameGenerator {
     override fun generateDisplayNameForClass(testClass: Class<*>?) = testClass?.simpleName ?: "null"
 
     override fun generateDisplayNameForNestedClass(nestedClass: Class<*>?) = nestedClass?.simpleName ?: "null"

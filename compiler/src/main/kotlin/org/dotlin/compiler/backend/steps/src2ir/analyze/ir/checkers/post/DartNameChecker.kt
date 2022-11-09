@@ -22,7 +22,6 @@ package org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.post
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
-import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.on
 import org.jetbrains.kotlin.backend.common.lower.parents
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.util.isPropertyAccessor
@@ -40,8 +39,7 @@ object DartNameChecker : IrDeclarationChecker {
         val dartName = declaration.dartNameOrNull ?: return
 
         val clashes = scope.declarations
-            .filterIsInstanceAnd<IrDeclarationWithName> { it != declaration }
-            .filter { it.dartNameOrNull == dartName }
+            .filterIsInstanceAnd<IrDeclarationWithName> { it != declaration && it.dartNameOrNull == dartName }
 
         for (clash in clashes) {
             // Value parameter clashes are ignored.

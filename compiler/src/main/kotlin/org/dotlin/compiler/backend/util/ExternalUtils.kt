@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.psi.KtDeclaration
  * if it's annotated with `@DotlinExternal`.
  */
 val IrDeclaration.isExplicitlyExternal: Boolean
-    get() = hasAnnotation(dotlin.DotlinExternal) ||
+    get() = hasAnnotation(dotlin.intrinsics.DotlinExternal) ||
             (psiElement as? KtDeclaration)?.hasModifier(KtTokens.EXTERNAL_KEYWORD) == true
 
 /**

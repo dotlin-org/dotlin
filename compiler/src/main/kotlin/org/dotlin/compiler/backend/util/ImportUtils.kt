@@ -20,12 +20,8 @@
 package org.dotlin.compiler.backend.util
 
 import org.jetbrains.kotlin.backend.jvm.ir.getKtFile
-import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationWithName
 import org.jetbrains.kotlin.ir.declarations.IrFile
-import org.jetbrains.kotlin.ir.util.fileOrNull
-import org.jetbrains.kotlin.ir.util.fqNameForIrSerialization
 import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
 
 fun IrDeclarationWithName.importAliasIn(file: IrFile): String? {

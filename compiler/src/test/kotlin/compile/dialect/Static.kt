@@ -21,6 +21,7 @@ package compile.dialect
 
 import BaseTest
 import assertCompile
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
@@ -80,6 +81,8 @@ class Static : BaseTest {
         )
     }
 
+    // TODO: Will change when loading from Dart code directly
+    @Disabled
     @Test
     fun `explicit external method in non-external companion object static call`() = assertCompile {
         kotlin(
@@ -113,11 +116,12 @@ class Static : BaseTest {
         )
     }
 
+    @Disabled
     @Test
     fun `explicit external companion object static property access of dependency`() = assertCompile {
         kotlin(
             """
-            import dart.typeddata.Int16Array
+            import dart.typed_data.Int16Array
 
             fun main() {
                 val x = Int16Array.bytesPerElement

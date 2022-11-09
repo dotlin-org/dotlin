@@ -20,8 +20,6 @@
 package org.dotlin.compiler.dart.ast.`typealias`
 
 import org.dotlin.compiler.dart.ast.compilationunit.DartNamedCompilationUnitMember
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartClassMember
-import org.dotlin.compiler.dart.ast.type.DartNamedType
 import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
 import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameterList
 

@@ -29,8 +29,10 @@ import org.jetbrains.kotlin.backend.common.lower.parents
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.file
+import org.jetbrains.kotlin.ir.util.isGetter
 import org.jetbrains.kotlin.ir.util.isSetter
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
+import org.jetbrains.kotlin.util.collectionUtils.filterIsInstanceAnd
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.relativeTo
@@ -111,7 +113,11 @@ class DartNameGenerator {
             }
 
             // Handle function overloads.
-            if (name != null && annotatedName == null && this is IrSimpleFunction && isOverload && !isRootOverload) {
+            if (name != null && annotatedName == null &&
+                this is IrSimpleFunction &&
+                !isGetter && !isSetter &&
+                isOverload && !isRootOverload
+            ) {
                 val baseOverload = baseOverload
                 val uniqueParameters = when {
                     rootOverload != baseOverload -> uniqueValueParametersComparedTo(rootOverload)
@@ -222,8 +228,7 @@ class DartNameGenerator {
             if (name != null && (this is IrProperty || this is IrField)) {
                 val clashingMethods =
                     (parent as? IrDeclarationContainer)?.declarations
-                        ?.filterIsInstance<IrFunction>()
-                        ?.filter { !it.isPropertyAccessor && it.dartNameOrNull == name }
+                        ?.filterIsInstanceAnd<IrFunction> { !it.isPropertyAccessor && it.dartNameOrNull == name }
                         .orEmpty()
 
                 if (clashingMethods.isNotEmpty()) {

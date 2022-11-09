@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Wilko Manger
+ * Copyright 2021-2022 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package kotlin
+package dotlin.intrinsics
 
-internal external class ByteArray
-internal external class CharArray
-internal external class ShortArray
-internal external class IntArray
-internal external class LongArray
-internal external class FloatArray
-internal external class DoubleArray
-internal external class BooleanArray
+annotation class SpecialInheritance
+
+/**
+ * This annotation is used on super types in the output IR, because it's information normally not
+ * present in the IR.
+ */
+internal annotation class SpecialInheritedType(
+    val kind: String /* "SuperTypeKind.Interface.Implicit" | "SuperTypeKind.Mixin" */
+)

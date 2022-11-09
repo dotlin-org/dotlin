@@ -25,13 +25,13 @@ import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
 import org.jetbrains.kotlin.backend.common.ir.isMethodOfAny
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
-import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.diagnostics.Errors.ABSTRACT_MEMBER_NOT_IMPLEMENTED
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrOverridableDeclaration
+import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.isInterface
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
@@ -61,12 +61,12 @@ object ImplicitInterfaceOverrideChecker : IrDeclarationChecker {
             val isFakeOverrideOfImplicitInterface =
                 when (val rootOverrideParentType = rootOverride?.parentClassOrNull?.defaultType) {
                     null -> false
-                    else -> rootOverrideParentType in implicitInterfaces
+                    else -> implicitInterfaces.any { it.classFqName == rootOverrideParentType.classFqName }
                 }
 
             if (isFakeOverrideOfImplicitInterface) {
                 trace.report(
-                    Errors.ABSTRACT_MEMBER_NOT_IMPLEMENTED.on(
+                    ABSTRACT_MEMBER_NOT_IMPLEMENTED.on(
                         source,
                         source,
                         rootOverride!!.descriptor as CallableMemberDescriptor

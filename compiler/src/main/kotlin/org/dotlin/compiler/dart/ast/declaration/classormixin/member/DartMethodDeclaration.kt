@@ -20,7 +20,6 @@
 package org.dotlin.compiler.dart.ast.declaration.classormixin.member
 
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
-import org.dotlin.compiler.dart.ast.accept
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.declaration.function.DartNamedFunctionDeclaration
 import org.dotlin.compiler.dart.ast.expression.DartFunctionExpression

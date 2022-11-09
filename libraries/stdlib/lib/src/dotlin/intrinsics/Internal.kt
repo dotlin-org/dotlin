@@ -14,27 +14,10 @@
  * limitations under the License.
  */
 
-package dart.typeddata
+package dotlin.intrinsics
 
-/**
- * A typed view of a sequence of bytes.
- */
-external interface TypedData {
-    /**
-     * Returns the number of bytes in the representation of each element in this
-     * array.
-     */
-    val elementSizeInBytes: Int
+// TODO: Kotlin-only internal (@DartPublic)
 
-    /**
-     * Returns the offset in bytes into the underlying byte buffer of this view.
-     */
-    val offsetInBytes: Int
+internal class `$Return`<T> const constructor(val value: T, val target: Int)
 
-    /**
-     * Returns the length of this view, in bytes.
-     */
-    val lengthInBytes: Int
-
-    // TODO: buffer
-}
+internal annotation class DotlinExternal

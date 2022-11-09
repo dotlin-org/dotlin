@@ -30,13 +30,13 @@ class SpecialInheritance : BaseTest {
     fun `implement multiple implicit interfaces`() = assertCompile {
         kotlin(
             """
-            external open class Pigeon {
+            open external class Pigeon {
                 constructor(useAs: Interface)
             
                 open fun fly(): Unit = definedExternally
             }
 
-            external open class Carrier {
+            open external class Carrier {
                 constructor(useAs: Interface)
             
                 constructor(message: String)
@@ -70,13 +70,13 @@ class SpecialInheritance : BaseTest {
     fun `implement multiple implicit interfaces that can be mixed in`() = assertCompile {
         kotlin(
             """
-            external open class Pigeon {
+            open external class Pigeon {
                 constructor(useAs: InterfaceOrMixin)
             
                 open fun fly(): Unit = definedExternally
             }
 
-            external open class Carrier {
+            open external class Carrier {
                 constructor(useAs: InterfaceOrMixin)
             
                 constructor(message: String)
@@ -110,13 +110,13 @@ class SpecialInheritance : BaseTest {
     fun `implement multiple mixins`() = assertCompile {
         kotlin(
             """
-            external open class Pigeon {
+            open external class Pigeon {
                 constructor(useAs: InterfaceOrMixin)
             
                 open fun fly(): Unit = definedExternally
             }
 
-            external open class Carrier {
+            open external class Carrier {
                 constructor(useAs: InterfaceOrMixin)
             
                 open fun send(): Unit = definedExternally
@@ -140,14 +140,14 @@ class SpecialInheritance : BaseTest {
     fun `implement implicit interface and regular external class`() = assertCompile {
         kotlin(
             """
-            external open class Pigeon {
+            open external class Pigeon {
                 constructor()
                 constructor(implement: Interface)
             
                 open fun fly(): Unit = definedExternally
             }
 
-            external open class Carrier {
+            open external class Carrier {
                 constructor()
                 constructor(implement: Interface)
             
@@ -182,14 +182,14 @@ class SpecialInheritance : BaseTest {
     fun `implement mixin and regular external class`() = assertCompile {
         kotlin(
             """
-            external open class Pigeon {
+            open external class Pigeon {
                 constructor()
                 constructor(implement: InterfaceOrMixin)
             
                 open fun fly(): Unit = definedExternally
             }
 
-            external open class Carrier {
+            open external class Carrier {
                 constructor(implement: InterfaceOrMixin)
             
                 open fun send(): Unit = definedExternally
@@ -221,14 +221,14 @@ class SpecialInheritance : BaseTest {
     fun `implement implicit interface and mixin`() = assertCompile {
         kotlin(
             """
-            external open class Pigeon {
+            open external class Pigeon {
                 constructor()
                 constructor(implement: InterfaceOrMixin)
             
                 open fun fly(): Unit = definedExternally
             }
 
-            external open class Carrier {
+            open external class Carrier {
                 constructor(implement: InterfaceOrMixin)
             
                 open fun send(): Unit = definedExternally
@@ -260,18 +260,18 @@ class SpecialInheritance : BaseTest {
     fun `implement regular external class, implicit interface and mixin`() = assertCompile {
         kotlin(
             """
-            external open class Bird {
+            open external class Bird {
                 constructor(isCool: Boolean)
             }
 
-            external open class Pigeon {
+            open external class Pigeon {
                 constructor()
                 constructor(implement: InterfaceOrMixin)
             
                 open fun fly(): Unit = definedExternally
             }
 
-            external open class Carrier {
+            open external class Carrier {
                 constructor(implement: InterfaceOrMixin)
             
                 open fun send(): Unit = definedExternally

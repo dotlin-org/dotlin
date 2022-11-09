@@ -33,13 +33,13 @@ class SpecialInheritance : BaseTest {
     fun `implement multiple implicit interfaces`() = assertCanCompile {
         kotlin(
             """
-            external open class Pigeon {
+            open external class Pigeon {
                 constructor(implement: Interface)
             
                 open fun fly(): Unit = definedExternally
             }
 
-            external open class Carrier {
+            open external class Carrier {
                 constructor(implement: Interface)
             
                 constructor(message: String)
@@ -59,13 +59,13 @@ class SpecialInheritance : BaseTest {
     fun `implement multiple implicit interfaces that can be mixed in`() = assertCanCompile {
         kotlin(
             """
-            external open class Pigeon {
+            open external class Pigeon {
                 constructor(implement: Interface)
             
                 open fun fly(): Unit = definedExternally
             }
 
-            external open class Carrier {
+            open external class Carrier {
                 constructor(implement: Interface)
             
                 constructor(message: String)
@@ -87,13 +87,13 @@ class SpecialInheritance : BaseTest {
         assertCompilesWithError(Errors.MANY_CLASSES_IN_SUPERTYPE_LIST) {
             kotlin(
                 """
-                external open class Pigeon {
+                open external class Pigeon {
                     constructor(implement: Interface)
                 
                     open fun fly(): Unit = definedExternally
                 }
     
-                external open class Carrier {
+                open external class Carrier {
                     constructor(implement: Interface)
                 
                     constructor(message: String)
@@ -116,13 +116,13 @@ class SpecialInheritance : BaseTest {
                 """
                 object Interface
 
-                external open class Pigeon {
+                open external class Pigeon {
                     constructor(implement: Interface)
                 
                     open fun fly(): Unit = definedExternally
                 }
     
-                external open class Carrier {
+                open external class Carrier {
                     constructor(implement: Interface)
                 
                     constructor(message: String)
@@ -143,7 +143,7 @@ class SpecialInheritance : BaseTest {
         assertCompilesWithError(Errors.ABSTRACT_MEMBER_NOT_IMPLEMENTED) {
             kotlin(
                 """
-                external open class Pigeon {
+                open external class Pigeon {
                     constructor(implement: InterfaceOrMixin)
                 
                     open fun fly(): Unit = definedExternally
@@ -159,7 +159,7 @@ class SpecialInheritance : BaseTest {
         assertCompilesWithError(Errors.ABSTRACT_MEMBER_NOT_IMPLEMENTED) {
             kotlin(
                 """
-                external open class Pigeon {
+                open external class Pigeon {
                     constructor(implement: InterfaceOrMixin)
                 
                     open fun fly(): Unit = definedExternally
@@ -177,7 +177,7 @@ class SpecialInheritance : BaseTest {
         assertCanCompile {
             kotlin(
                 """
-                external open class Pigeon {
+                open external class Pigeon {
                     constructor(implement: InterfaceOrMixin)
                 
                     open fun fly(): Unit = definedExternally
@@ -193,7 +193,7 @@ class SpecialInheritance : BaseTest {
         assertCompilesWithError(ErrorsDart.SPECIAL_INHERITANCE_CONSTRUCTOR_MISUSE) {
             kotlin(
                 """
-                external open class Pigeon {
+                open external class Pigeon {
                     constructor(implement: InterfaceOrMixin)
 
                     open fun fly(): Unit = definedExternally

@@ -20,12 +20,9 @@
 package analysis.dialect
 
 import BaseTest
-import assertCanCompile
 import assertCompilesWithError
-import assertCompilesWithErrors
 import assertCompilesWithWarning
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 

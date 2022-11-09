@@ -32,6 +32,7 @@ import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.util.primaryConstructor
 
+// TODO: Most likely not needed anymore
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UnnecessaryVariable")
 class ConflictingExtensionCallsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
     override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {

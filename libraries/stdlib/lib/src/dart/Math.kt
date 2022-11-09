@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-@file:DartLibrary("dart:math")
-
 package dart.math
+
+// STUB: Will be generated later
+
+external class Random
 
 /**
  * Converts [radians] to a [Double] and returns the sine of the value.

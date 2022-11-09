@@ -39,8 +39,7 @@ class Enum : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide Enum, List;
-            import 'dart:core' as core;
+            import 'dart:core' hide Enum;
             import 'package:meta/meta.dart';
 
             @sealed
@@ -51,7 +50,7 @@ class Enum : BaseTest {
               ) : super(name, ordinal);
               static const Test ALPHA = const Test._('ALPHA', 0);
               static const Test BETA = const Test._('BETA', 1);
-              static core.List<Test> values() {
+              static List<Test> values() {
                 return <Test>[Test.ALPHA, Test.BETA];
               }
 
@@ -76,8 +75,7 @@ class Enum : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide Enum, List;
-            import 'dart:core' as core;
+            import 'dart:core' hide Enum;
             import 'package:meta/meta.dart';
 
             @sealed
@@ -91,7 +89,7 @@ class Enum : BaseTest {
               final String lowercase;
               static const Test ALPHA = const Test._('ALPHA', 0, 'α');
               static const Test BETA = const Test._('BETA', 1, 'β');
-              static core.List<Test> values() {
+              static List<Test> values() {
                 return <Test>[Test.ALPHA, Test.BETA];
               }
 
@@ -116,8 +114,7 @@ class Enum : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide Enum, List;
-            import 'dart:core' as core;
+            import 'dart:core' hide Enum;
             import 'package:meta/meta.dart';
 
             @sealed
@@ -134,7 +131,7 @@ class Enum : BaseTest {
               final String uppercase;
               static const Test ALPHA = const Test._('ALPHA', 0, 'α', 'Α');
               static const Test BETA = const Test._('BETA', 1, 'β', 'Β');
-              static core.List<Test> values() {
+              static List<Test> values() {
                 return <Test>[Test.ALPHA, Test.BETA];
               }
 
@@ -163,8 +160,7 @@ class Enum : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide Enum, List;
-            import 'dart:core' as core;
+            import 'dart:core' hide Enum;
             import 'package:meta/meta.dart';
 
             @sealed
@@ -175,7 +171,7 @@ class Enum : BaseTest {
               ) : super(name, ordinal);
               static const Test ALPHA = const Test._('ALPHA', 0);
               static const Test BETA = const Test._('BETA', 1);
-              static core.List<Test> values() {
+              static List<Test> values() {
                 return <Test>[Test.ALPHA, Test.BETA];
               }
 
@@ -208,8 +204,7 @@ class Enum : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide Enum, List;
-            import 'dart:core' as core;
+            import 'dart:core' hide Enum;
             import 'package:meta/meta.dart';
 
             @sealed
@@ -220,7 +215,7 @@ class Enum : BaseTest {
               ) : super(name, ordinal);
               static const Test ALPHA = const Test._('ALPHA', 0);
               static const Test BETA = const Test._('BETA', 1);
-              static core.List<Test> values() {
+              static List<Test> values() {
                 return <Test>[Test.ALPHA, Test.BETA];
               }
 
@@ -253,8 +248,7 @@ class Enum : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide Enum, List;
-            import 'dart:core' as core;
+            import 'dart:core' hide Enum;
             import 'package:meta/meta.dart';
 
             @sealed
@@ -265,7 +259,7 @@ class Enum : BaseTest {
               ) : super(name, ordinal);
               static const Test ALPHA = const Test._('ALPHA', 0);
               static const Test BETA = const Test._('BETA', 1);
-              static core.List<Test> values() {
+              static List<Test> values() {
                 return <Test>[Test.ALPHA, Test.BETA];
               }
 
@@ -298,8 +292,7 @@ class Enum : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide Enum, List;
-            import 'dart:core' as core;
+            import 'dart:core' hide Enum;
             import 'package:meta/meta.dart';
 
             @sealed
@@ -310,7 +303,7 @@ class Enum : BaseTest {
               ) : super(name, ordinal);
               static const Test ALPHA = const Test._('ALPHA', 0);
               static const Test BETA = const Test._('BETA', 1);
-              static core.List<Test> values() {
+              static List<Test> values() {
                 return <Test>[Test.ALPHA, Test.BETA];
               }
 
@@ -320,7 +313,7 @@ class Enum : BaseTest {
             }
 
             void main() {
-              const core.List<Test> values = Test.values();
+              const List<Test> values = Test.values();
             }
             """
         )
@@ -343,8 +336,7 @@ class Enum : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide Enum, List;
-            import 'dart:core' as core;
+            import 'dart:core' hide Enum;
             import 'package:meta/meta.dart';
 
             @sealed
@@ -355,7 +347,7 @@ class Enum : BaseTest {
               ) : super(name, ordinal);
               static const Test ALPHA = const Test._('ALPHA', 0);
               static const Test BETA = const Test._('BETA', 1);
-              static core.List<Test> values() {
+              static List<Test> values() {
                 return <Test>[Test.ALPHA, Test.BETA];
               }
 

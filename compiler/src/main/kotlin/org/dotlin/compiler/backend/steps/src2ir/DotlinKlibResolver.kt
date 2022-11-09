@@ -29,7 +29,7 @@ import org.jetbrains.kotlin.library.resolver.impl.libraryResolver
 import org.jetbrains.kotlin.util.Logger
 import java.nio.file.Path
 
-class DartLibraryResolver(
+class DotlinKlibResolver(
     repositories: List<String>,
     directLibs: List<String>,
     distributionKlib: String?,
@@ -49,15 +49,15 @@ class DartLibraryResolver(
         createKotlinLibraryComponents(file, isDefault)
 }
 
-fun resolveLibraries(
-    klibPaths: List<Path>,
+fun resolveKlibs(
+    paths: List<Path>,
     logger: Logger,
 ): KotlinLibraryResolveResult {
-    val unresolvedLibraries = klibPaths.map { UnresolvedLibrary(it.toString(), null) }
+    val unresolvedLibraries = paths.map { UnresolvedLibrary(it.toString(), null) }
 
-    val resolver = DartLibraryResolver(
+    val resolver = DotlinKlibResolver(
         repositories = emptyList(),
-        directLibs = klibPaths.map { it.toString() },
+        directLibs = paths.map { it.toString() },
         distributionKlib = null,
         localKotlinDir = null,
         skipCurrentDir = false,

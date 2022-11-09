@@ -209,10 +209,9 @@ class Const : BaseTest {
 
         dart(
             """
-            import 'dart:core' hide Enum, List;
-            import 'dart:core' as core;
+            import 'dart:core' hide Enum;
             import 'package:meta/meta.dart';
-            
+
             @sealed
             class Temperature extends Enum<Temperature> {
               const Temperature._(
@@ -223,7 +222,7 @@ class Const : BaseTest {
               static const Temperature CHILLY = const Temperature._('CHILLY', 1);
               static const Temperature WARM = const Temperature._('WARM', 2);
               static const Temperature HOT = const Temperature._('HOT', 3);
-              static core.List<Temperature> values() {
+              static List<Temperature> values() {
                 return <Temperature>[
                   Temperature.COLD,
                   Temperature.CHILLY,

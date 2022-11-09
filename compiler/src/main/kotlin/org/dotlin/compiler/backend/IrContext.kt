@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.ir.types.toKotlinType
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.resolve.BindingContext
@@ -49,6 +50,9 @@ abstract class IrContext : IrAttributes {
     }
 
     val dynamicType: IrDynamicType = IrDynamicTypeImpl(null, emptyList(), Variance.INVARIANT)
+
+    val IrDeclaration.dartNameOrNull: DartIdentifier?
+        get() = (this as? IrDeclarationWithName)?.dartNameOrNull
 
     val IrDeclarationWithName.dartName: DartIdentifier
         get() = dartNameGenerator.runWith(this) { dartNameOf(it, currentFile) }
@@ -118,14 +122,7 @@ abstract class IrContext : IrAttributes {
             else -> null
         }
 
-    // Import utils
-    private val builtInImports = mapOf(
-        "dart.core" to "dart:core",
-        "dart.typeddata" to "dart:typed_data",
-        "dart.math" to "dart:math"
-    )
-
-    private fun IrAnnotationContainer.unresolvedImportFromAnnotationFor(declaration: IrDeclarationWithName) =
+    private fun IrAnnotationContainer.getUnresolvedImportFromAnnotation() =
         getTwoAnnotationArgumentsOf<String, Boolean>(dotlin.DartLibrary)
             ?.let { (library, aliased) ->
                 DartUnresolvedImport(
@@ -139,51 +136,64 @@ abstract class IrContext : IrAttributes {
             }
 
     private fun IrDeclarationWithName.getDartLibraryImport(): DartUnresolvedImport? {
-        return when {
-            isDotlinExternal -> unresolvedImportFromAnnotationFor(this) ?: when {
-                // We don't want to look at the parent's class @DartLibrary annotation for companion objects,
-                // because we never need to import an external companion object
-                // (it's an error to use it as an instance instead of as static container).
-                (this as? IrClass)?.isCompanion != true -> parentClassOrNull?.let {
-                    // Aliases and hidings for class member imports are ignored.
-                    it.unresolvedImportFromAnnotationFor(it)?.copy(alias = null, hidden = false)
+        if (isDotlinExternal) {
+            val fromDeclarationAnnotation = getUnresolvedImportFromAnnotation()
+            // Try the containing class (in case it's a nested/inner class), see if it has the annotation.
+                ?: when {
+                    // We don't want to look at the parent's class @DartLibrary annotation for companion objects,
+                    // because we never need to import an external companion object
+                    // (it's an error to use it as an instance instead of as static container).
+                    (this as? IrClass)?.isCompanion != true -> parentClassOrNull?.let {
+                        // Aliases and hidings for class member imports are ignored.
+                        it.getUnresolvedImportFromAnnotation()?.copy(alias = null, hidden = false)
+                    }
+                    else -> null
                 }
-                else -> null
-            } ?: when (this) {
-                // Try to see if the file has a @DartLibrary annotation.
-                !is IrFile -> fileOrNull?.unresolvedImportFromAnnotationFor(this)
-                    ?: getPackageFragment()?.fqName?.let { fqName ->
-                        // If the declaration belongs to a built-in package (e.g. `dart.math`), we know what to import.
-                        builtInImports[fqName.asString()]?.let {
+
+            if (fromDeclarationAnnotation != null) return fromDeclarationAnnotation
+
+            return fileOrNull?.getUnresolvedImportFromAnnotation()
+            // Convert package fqName to a valid Dart import string if there's no annotation.
+                ?: getPackageFragment()?.fqName?.let { fqName ->
+                    when {
+                        // TODO: (TEMP when branch): Support package imports
+                        !fqName.startsWith(Name.identifier("dart")) -> null
+                        fqName.isRoot -> null
+                        else -> {
+                            val parts = fqName.pathSegments().map { it.identifier }
+
                             DartUnresolvedImport(
-                                library = it,
+                                library = when (parts[0]) {
+                                    "dart" -> "dart:${parts[1]}"
+                                    else -> "" // TODO: Package imports
+                                },
                                 alias = null,
                                 hidden = false,
                             )
                         }
                     }
-                else -> null
-            }
-            else -> fileOrNull?.let { file ->
-                when {
-                    file != currentFile -> when {
-                        file.isInCurrentModule -> file.relativeDartPath.toString().let { importPath ->
-                            when {
-                                importPath.isNotBlank() -> DartUnresolvedImport(
-                                    library = importPath,
-                                    alias = null,
-                                    hidden = false
-                                )
-                                else -> null
-                            }
-                        }
-                        // TODO: Package imports
+                }
+        }
+
+        val file = fileOrNull ?: return null
+        if (file != currentFile) {
+            return when {
+                file.isInCurrentModule -> file.relativeDartPath.toString().let { importPath ->
+                    when {
+                        importPath.isNotBlank() -> DartUnresolvedImport(
+                            library = importPath,
+                            alias = null,
+                            hidden = false
+                        )
                         else -> null
                     }
-                    else -> null
                 }
+                // TODO: Package/Dart stdlib imports
+                else -> null
             }
         }
+
+        return null
     }
 
     val IrDeclaration.dartUnresolvedImport: DartUnresolvedImport?
@@ -217,12 +227,14 @@ abstract class IrContext : IrAttributes {
 
     fun IrExpression.isDartConst(
         implicit: Boolean = false,
-        constInlineContainer: IrSimpleFunction? = null
+        constInlineContainer: IrSimpleFunction? = null,
+        isArgument: Boolean = false,
     ): Boolean {
         fun IrFunctionAccessExpression.areArgumentsDartConst() = valueArguments.all {
             it == null || it.isDartConst(
                 implicit,
-                constInlineContainer
+                constInlineContainer,
+                isArgument = true
             )
         }
 
@@ -339,7 +351,7 @@ abstract class IrContext : IrAttributes {
 
                 !containsNonGlobalReference
             }
-            is IrVararg -> elements.all {
+            is IrVararg -> (isArgument || needConst) && elements.all {
                 when (it) {
                     is IrExpression -> it.isDartConst(implicit, constInlineContainer)
                     is IrSpreadElement -> it.expression.isDartConst(implicit, constInlineContainer)
@@ -389,6 +401,28 @@ abstract class IrContext : IrAttributes {
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     private fun IrClass.superSpecialClasses(only: SuperTypeKind.Special): Set<IrType> {
+        if (!isInCurrentModule) {
+            return superTypes
+                .filter {
+                    val specialInheritedAnnotation = it.annotations.firstOrNull { annotation ->
+                        annotation.isAnnotationWithEqualFqName(dotlin.intrinsics.SpecialInheritedType)
+                    }
+
+                    when (specialInheritedAnnotation) {
+                        null -> false
+                        else -> {
+                            val arg = specialInheritedAnnotation.getValueArgument(0)
+
+                            when {
+                                arg is IrConst<*> && arg.value == only.toString() -> true
+                                else -> false
+                            }
+                        }
+                    }
+                }
+                .toSet()
+        }
+
         val ktClass = psiElement as? KtClass ?: return emptySet()
         val superTypeEntries = ktClass.getSuperTypeList()?.entries?.toList() ?: return emptySet()
         val ktTypes = superTypeEntries.mapNotNull {
@@ -443,6 +477,7 @@ sealed interface SuperTypeKind {
      */
     sealed interface Special
 
+    // TODO: Use data object ?
     object Class : SuperTypeKind {
         override fun toString() = "SuperTypeKind.Class"
     }

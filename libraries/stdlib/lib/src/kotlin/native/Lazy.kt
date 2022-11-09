@@ -19,7 +19,7 @@ package kotlin
 import kotlin.reflect.KProperty
 
 /**
- * To create lazily initialized variable or property, use [lazy].
+ * To create a lazily initialized variable or property, use [lazy].
  */
 external interface Lazy<out T> {
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T
@@ -31,4 +31,5 @@ external interface Lazy<out T> {
  * In Dart, the variable or property will be compiled as `late`. The [Lazy]
  * delegate is not used.
  */
+// TODO: Error if using as anything but a property delegate
 external fun <T> lazy(initializer: () -> T): Lazy<T>

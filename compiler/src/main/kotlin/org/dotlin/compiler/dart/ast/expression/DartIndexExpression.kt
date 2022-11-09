@@ -20,7 +20,6 @@
 package org.dotlin.compiler.dart.ast.expression
 
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
-import org.dotlin.compiler.dart.ast.DartLabel
 
 data class DartIndexExpression(
     val target: DartExpression,

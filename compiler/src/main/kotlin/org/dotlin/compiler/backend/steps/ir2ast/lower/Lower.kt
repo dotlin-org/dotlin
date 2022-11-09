@@ -48,6 +48,7 @@ private val lowerings: List<Lowering> = listOf(
     ::PropertiesReferencingThisLowering,
     ::PropertiesReferencingParametersLowering,
     ::PrivateParameterPropertyWithDefaultValuesLowering,
+    ::CollectionImplementersLowering,
     ::OverriddenParametersLowering,
     ::DefaultInterfaceImplementationsLowering,
     ::OperatorsLowering,
@@ -88,6 +89,10 @@ private val lowerings: List<Lowering> = listOf(
     ::IrCompositesToIrBlocksLowering,
     ::ContravariantLowering,
     ::DartDifferentDefaultValueArgumentsLowering,
+    ::CollectionTypeChecksLowering,
+    ::CollectionFactoryCallsLowering,
+    RuntimeCollectionTypeLowering::Declarations,
+    RuntimeCollectionTypeLowering::Casts,
     ::DartCodeLowering,
     ::DartImportsLowering
 )

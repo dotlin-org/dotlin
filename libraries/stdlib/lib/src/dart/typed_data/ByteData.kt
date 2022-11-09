@@ -18,7 +18,7 @@
     "ABSTRACT_MEMBER_NOT_IMPLEMENTED" // TODO: Fix in analyzer
 )
 
-package dart.typeddata
+package dart.typed_data
 
 /**
  * A fixed-length, random-access sequence of bytes that also provides random

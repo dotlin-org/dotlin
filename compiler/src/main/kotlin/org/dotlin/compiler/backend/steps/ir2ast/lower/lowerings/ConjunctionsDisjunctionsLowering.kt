@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.IrWhen
 
+// TODO: Lower to call to ANDAND/OROR instead of custom element
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UnnecessaryVariable")
 class ConjunctionsDisjunctionsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
     override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {

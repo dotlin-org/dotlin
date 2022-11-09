@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
+import org.dotlin.compiler.backend.dotlin
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.owner
 import org.dotlin.compiler.backend.util.runWith
@@ -41,12 +42,19 @@ fun IrType.accept(
     useFunctionInterface: Boolean = false,
 ): DartTypeAnnotation =
     context.runWith(this) {
-        if (!isConstructorType && it.isUnit()) {
+        if (it.isUnit() && (!isConstructorType)) {
             return@runWith DartTypeAnnotation.VOID
         }
 
         when (it) {
             is IrSimpleType -> when {
+                it.abbreviation != null -> it.abbreviation!!.let { abbrv ->
+                    DartNamedType(
+                        name = abbrv.typeAlias.owner.dartName,
+                        isNullable = abbrv.hasQuestionMark,
+                        typeArguments = abbrv.arguments.accept(context),
+                    )
+                }
                 !useFunctionInterface && it.isFunction() -> DartFunctionType(
                     returnType = it.arguments.last().accept(context),
                     parameters = DartFormalParameterList(
@@ -60,8 +68,10 @@ fun IrType.accept(
                                 type = arg.accept(context),
                             )
                         }
-                    )
+                    ),
+                    isNullable = it.hasQuestionMark
                 )
+                it.classFqName == dotlin.intrinsics.Dynamic -> DartTypeAnnotation.DYNAMIC
                 else -> DartNamedType(
                     name = it.owner.dartName,
                     isNullable = it.hasQuestionMark,

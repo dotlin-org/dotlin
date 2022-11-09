@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.src2ir.analyze
 
+import org.dotlin.compiler.backend.steps.src2ir.DotlinTypeTransformer
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.functions.functionInterfacePackageFragmentProvider
@@ -38,10 +39,11 @@ import org.jetbrains.kotlin.frontend.di.configureStandardResolveComponents
 import org.jetbrains.kotlin.incremental.components.ExpectActualTracker
 import org.jetbrains.kotlin.incremental.components.InlineConstTracker
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.platform.js.JsPlatforms
+import org.jetbrains.kotlin.platform.SimplePlatform
+import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.*
-import org.jetbrains.kotlin.resolve.lazy.KotlinCodeAnalyzer
+import org.jetbrains.kotlin.resolve.lazy.ResolveSession
 import org.jetbrains.kotlin.resolve.lazy.declarations.FileBasedDeclarationProviderFactory
 
 class DartKotlinAnalyzer(
@@ -61,7 +63,7 @@ class DartKotlinAnalyzer(
             ProjectContext(env.project, "Dart Kotlin Analyzer"),
             Name.special("<$moduleName>"),
             builtIns,
-            platform = JsPlatforms.defaultJsPlatform, // TODO: JS reference
+            platform = DartPlatform,
         )
 
         val thisModule = moduleContext.module
@@ -80,12 +82,13 @@ class DartKotlinAnalyzer(
         ) {
             configureModule(
                 moduleContext,
-                platform = JsPlatforms.defaultJsPlatform, // TODO: JS reference
+                platform = DartPlatform,
                 analyzerServices = DartPlatformAnalyzerServices,
                 trace = trace,
                 languageVersionSettings = config.languageVersionSettings,
             )
 
+            useInstance(DotlinTypeTransformer())
             configureStandardResolveComponents()
             useInstance(ExpectActualTracker.DoNothing)
             useInstance(
@@ -97,7 +100,8 @@ class DartKotlinAnalyzer(
             thisModule.initialize(
                 CompositePackageFragmentProvider(
                     providers = listOf(
-                        get<KotlinCodeAnalyzer>().packageFragmentProvider,
+                        get<ResolveSession>().packageFragmentProvider,
+                        // TODO: Only if isBuiltIns
                         functionInterfacePackageFragmentProvider(moduleContext.storageManager, thisModule)
                     ),
                     debugName = "CompositeProvider: $thisModule"
@@ -116,5 +120,11 @@ class DartKotlinAnalyzer(
             }
             else -> AnalysisResult.success(trace.bindingContext, thisModule)
         }
+    }
+}
+
+private object DartPlatform : TargetPlatform(setOf(Simple)) {
+    object Simple : SimplePlatform("Dart") {
+        override val oldFashionedDescription = "Dart"
     }
 }

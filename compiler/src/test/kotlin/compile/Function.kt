@@ -294,11 +294,9 @@ class Function : BaseTest {
 
         dart(
             """
-            import 'dart:core' as core;
-            import 'dart:core' hide List;
             import 'package:meta/meta.dart';
 
-            void test(core.List<String> args) {}
+            void test(List<String> args) {}
             """
         )
     }
@@ -317,11 +315,9 @@ class Function : BaseTest {
 
         dart(
             """
-            import 'dart:core' as core;
-            import 'dart:core' hide List;
             import 'package:meta/meta.dart';
 
-            void test(core.List<String> args) {}
+            void test(List<String> args) {}
             void main() {
               test(<String>['abc', 'def', 'ghi']);
             }
@@ -343,12 +339,10 @@ class Function : BaseTest {
 
         dart(
             """
-            import 'dart:core' as core;
-            import 'dart:core' hide List;
             import 'package:meta/meta.dart';
 
             void test(
-              core.List<String> args,
+              List<String> args,
               int x,
             ) {}
             void main() {

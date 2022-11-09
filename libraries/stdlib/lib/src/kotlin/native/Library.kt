@@ -15,16 +15,7 @@
  * limitations under the License.
  */
 
-@file:Suppress(
-    "NON_ABSTRACT_FUNCTION_WITH_NO_BODY",
-    "MUST_BE_INITIALIZED_OR_BE_ABSTRACT",
-    "UNUSED_PARAMETER",
-    "NON_MEMBER_FUNCTION_NO_BODY"
-)
-
 package kotlin
-
-import kotlin.internal.PureReifiable
 
 /**
  * Returns a string representation of the object. Can be called with a null receiver, in which case
@@ -43,21 +34,6 @@ fun Any?.toString(): String {
 operator fun String?.plus(other: Any?): String = toString() + other.toString()
 
 /**
- * Returns an array of objects of the given type with the given [size], initialized with null values.
- */
-inline fun <reified @PureReifiable T> arrayOfNulls(size: Int): Array<T?> = Array.generate<T?>(size) { null }
-
-/**
- * Returns an array containing the specified elements.
- */
-inline fun <reified @PureReifiable T> arrayOf(vararg elements: T): Array<T> = dart("<T>[...elements]")
-
-/**
- * Returns an empty array of the specified type [T].
- */
-inline fun <reified @PureReifiable T> emptyArray(): Array<T> = dart("<T>[]")
-
-/**
  * Returns an array containing enum T entries.
  */
 @SinceKotlin("1.1")
@@ -67,4 +43,4 @@ external const inline fun <reified T : Enum<T>> enumValues(): Array<T>
  * Returns an enum entry with specified name.
  */
 @SinceKotlin("1.1")
-inline fun <reified T : Enum<T>> enumValueOf(name: String): T
+external inline fun <reified T : Enum<T>> enumValueOf(name: String): T

@@ -14,6 +14,8 @@ object dotlin : PackageFqNameWrapper {
 
     val dart = self.child("dart")
 
+    val typeOf = self.child("typeOf")
+
     // Annotations
     val const = self.child("const")
     val DartName = self.child("DartName")
@@ -30,9 +32,48 @@ object dotlin : PackageFqNameWrapper {
     val DartExtension = self.child("DartExtension")
     val DartHideNameFromCore = self.child("DartHideNameFromCore")
 
-    // Lowering helpers.
-    val `$Return` = self.child("\$Return")
-    val DotlinExternal = self.child("DotlinExternal")
+    object intrinsics : PackageFqNameWrapper {
+        override val self = dotlin.self.child("intrinsics")
+
+        val Flex = self.child("Flex")
+        val AnyList = self.child("AnyList")
+        val AnySet = self.child("AnySet")
+        val AnyMap = self.child("AnyMap")
+
+        // Collections
+        val AnyCollection = self.child("AnyCollection")
+
+        val isCollection = self.child("isCollection")
+        val isMutableCollection = self.child("isMutableCollection")
+
+        val isImmutableList = self.child("isImmutableList")
+        val isWriteableList = self.child("isWriteableList")
+        val isFixedSizeList = self.child("isFixedSizeList")
+        val isMutableList = self.child("isMutableList")
+
+        val isImmutableSet = self.child("isImmutableSet")
+        val isMutableSet = self.child("isMutableSet")
+
+        val isImmutableMap = self.child("isImmutableMap")
+        val isMutableMap = self.child("isMutableMap")
+
+        val ImmutableListMarker = self.child("ImmutableListMarker")
+        val WriteableListMarker = self.child("WriteableListMarker")
+        val MutableListMarker = self.child("MutableListMarker")
+        val FixedSizeListMarker = self.child("FixedSizeListMarker")
+
+        val ImmutableSetMarker = self.child("ImmutableSetMarker")
+        val MutableSetMarker = self.child("MutableSetMarker")
+
+        val ImmutableMapMarker = self.child("ImmutableMapMarker")
+        val MutableMapMarker = self.child("MutableMapMarker")
+
+        val `$Return` = self.child("\$Return")
+        val DotlinExternal = self.child("DotlinExternal")
+        val SpecialInheritedType = self.child("SpecialInheritedType")
+
+        val Dynamic = self.child("Dynamic")
+    }
 
     object reflect : PackageFqNameWrapper {
         override val self = dotlin.self.child("reflect")
@@ -52,10 +93,22 @@ object dart : PackageFqNameWrapper {
     object core : PackageFqNameWrapper {
         override val self = dart.self.child("core")
 
-        val identical = self.child("identical")
         val Iterator = self.child("Iterator")
         val Iterable = self.child("Iterable")
+        val List = self.child("List")
+        val Set = self.child("Set")
+        val Map = self.child("Map")
+        val MapEntry = self.child("MapEntry")
+
+        val identical = self.child("identical")
         val UnsupportedError = self.child("UnsupportedError")
+    }
+
+    object collection : PackageFqNameWrapper {
+        override val self = dart.self.child("collection")
+
+        val ImmutableListView = self.child("ImmutableListView")
+        val ImmutableSetView = self.child("ImmutableSetView")
     }
 }
 
@@ -64,10 +117,46 @@ object kotlin : PackageFqNameWrapper {
 
     val Lazy = self.child("Lazy")
 
+    val Array = self.child("Array")
+
+    val arrayOf = self.child("arrayOf")
+    val arrayOfNulls = self.child("arrayOfNulls")
+    val emptyArray = self.child("emptyArray")
+
     object collections : PackageFqNameWrapper {
         override val self = kotlin.self.child("collections")
 
         val Iterator = self.child("Iterator")
+
+        val Collection = self.child("Collection")
+        val MutableCollection = self.child("MutableCollection")
+
+        val List = self.child("List")
+        val ImmutableList = self.child("ImmutableList")
+        val WriteableList = self.child("WriteableList")
+        val MutableList = self.child("MutableList")
+
+        val Set = self.child("Set")
+        val ImmutableSet = self.child("ImmutableSet")
+        val MutableSet = self.child("MutableSet")
+
+        val Map = self.child("Map")
+        val ImmutableMap = self.child("ImmutableMap")
+        val MutableMap = self.child("MutableMap")
+
+        val listOf = self.child("listOf")
+        val emptyList = self.child("emptyList")
+
+        val mutableListOf = self.child("mutableListOf")
+        val mutableListOfNulls = self.child("mutableListOfNulls")
+
+        val mapOf = self.child("mapOf")
+        val mutableMapOf = self.child("mutableMapOf")
+        val emptyMap = self.child("emptyMap")
+
+        val setOf = self.child("setOf")
+        val mutableSetOf = self.child("mutableSetOf")
+        val emptySet = self.child("emptySet")
     }
 
     object ranges : PackageFqNameWrapper {

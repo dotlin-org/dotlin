@@ -29,11 +29,11 @@ import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lower
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.output.AnnotateDartConstDeclarationsLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.output.AnnotateExternalCompanionObjectsLowering
+import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.output.AnnotateSpecialInheritanceTypes
 import org.dotlin.compiler.backend.steps.src2ir.analyze.DartKotlinAnalyzerReporter
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.DartIrAnalyzer
 import org.jetbrains.kotlin.backend.common.serialization.DeserializationStrategy
 import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDescriptor
-import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
@@ -63,7 +63,7 @@ fun sourceToIr(
 ): IrResult {
     val sourceFiles = env.getSourceFiles()
 
-    val resolvedLibraries = resolveLibraries(
+    val resolvedKlibs = resolveKlibs(
         dartProject.dependencies.map { it.klibPath },
         DummyLogger,
     )
@@ -73,7 +73,7 @@ fun sourceToIr(
         config,
         sourceFiles,
         irFactory = IrFactoryImpl,
-        resolvedLibraries,
+        resolvedKlibs,
         dartProject,
     )
 
@@ -87,6 +87,7 @@ fun sourceToIr(
                 listOf(
                     ::AnnotateDartConstDeclarationsLowering,
                     ::AnnotateExternalCompanionObjectsLowering,
+                    ::AnnotateSpecialInheritanceTypes
                 )
             )
         )
@@ -100,12 +101,12 @@ private fun loadIr(
     config: CompilerConfiguration,
     files: List<KtFile>,
     irFactory: IrFactory,
-    resolvedLibs: KotlinLibraryResolveResult,
+    resolvedKlibs: KotlinLibraryResolveResult,
     dartProject: DartProject
 ): IrResult {
-    val isCompilingBuiltIns = resolvedLibs.getFullList().none { it.isBuiltIns }
+    val isCompilingBuiltIns = resolvedKlibs.getFullList().none { it.isBuiltIns }
 
-    val createBuiltIns = { DefaultBuiltIns(loadBuiltInsFromCurrentClassLoader = false) }
+    val createBuiltIns = ::DotlinBuiltIns
 
     lateinit var builtIns: KotlinBuiltIns
 
@@ -119,9 +120,9 @@ private fun loadIr(
             // TODO?: It might be possible that this is called for just the first module instead of the built-ins one,
             // if that's the case, resolve the built-ins module separately.
             createBuiltIns = { createBuiltIns().also { builtIns = it } },
-            DynamicTypeDeserializer
+            DynamicTypeDeserializer,
         ).DefaultResolvedDescriptorsFactory.createResolved(
-            resolvedLibs,
+            resolvedKlibs,
             storageManager = LockBasedStorageManager("ResolvedModules"),
             builtIns = when {
                 isCompilingBuiltIns -> builtIns
@@ -190,8 +191,6 @@ private fun loadIr(
             irLinker.deserializeIrModuleHeader(it, it.kotlinLibrary)
         }
 
-    // TODO: IrPlugins
-
     val module = psi2Ir.generateModuleFragment(
         context = psi2IrContext,
         ktFiles = files,
@@ -220,7 +219,7 @@ private fun loadIr(
 
     return IrResult(
         module,
-        resolvedLibs,
+        resolvedKlibs,
         trace,
         symbolTable,
         extraIrAttributes,

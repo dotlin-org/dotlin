@@ -219,10 +219,14 @@ object DartExpressionTransformer : DartAstNodeTransformer() {
     override fun DartGenerationContext.visitBooleanLiteral(literal: DartBooleanLiteral) =
         literal.value.toString()
 
-    override fun DartGenerationContext.visitListLiteral(literal: DartListLiteral) = literal.run {
+    override fun DartGenerationContext.visitCollectionLiteral(literal: DartCollectionLiteral) = literal.run {
         val const = if (literal.isConst) "const " else ""
         val typeArguments = acceptChild { typeArguments }
-        val elements = "[${acceptChild { elements }}]"
+        val (start, end) = when (literal) {
+            is DartListLiteral -> "[" to "]"
+            is DartSetLiteral, is DartMapLiteral -> "{" to "}"
+        }
+        val elements = "$start${acceptChild { elements }}$end"
 
         "$const$typeArguments$elements"
     }

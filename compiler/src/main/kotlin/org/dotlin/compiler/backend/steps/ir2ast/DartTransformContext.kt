@@ -42,6 +42,7 @@ class DartTransformContext(
 ) : IrContext(), IrAttributes by loweringContext {
     override val bindingContext = loweringContext.bindingContext
     override val symbolTable = loweringContext.symbolTable
+    val dartBuiltIns = loweringContext.dartBuiltIns
     override val irBuiltIns = loweringContext.irBuiltIns
     override val dartNameGenerator = loweringContext.dartNameGenerator
     override val dartProject = loweringContext.dartProject

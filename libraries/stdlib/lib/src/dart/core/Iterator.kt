@@ -37,7 +37,7 @@ package dart.core
  * or after a call to [moveNext] has returned false.
  */
 external abstract class Iterator<out E>() {
-    constructor(useAs: InterfaceOrMixin)
+    constructor(implement: InterfaceOrMixin)
 
     /**
      * Advances the iterator to the next element of the iteration.

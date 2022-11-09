@@ -20,8 +20,6 @@
 package org.dotlin.compiler.dart.ast.type
 
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
-import org.dotlin.compiler.dart.ast.accept
-import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.dotlin.compiler.dart.ast.parameter.DartFormalParameterList
 import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameterList
 

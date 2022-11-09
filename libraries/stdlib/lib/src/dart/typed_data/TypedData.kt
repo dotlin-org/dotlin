@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Wilko Manger
+ * Copyright 2021-2022 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,27 @@
  * limitations under the License.
  */
 
-package dart.typeddata
+package dart.typed_data
 
 /**
- * Describes endianness to be used when accessing or updating a
- * sequence of bytes.
+ * A typed view of a sequence of bytes.
  */
-external interface Endian {
-    companion object {
-        // TODO: const
-        @DartName("big")
-        external val BIG: Endian = definedExternally
+external interface TypedData {
+    /**
+     * Returns the number of bytes in the representation of each element in this
+     * array.
+     */
+    val elementSizeInBytes: Int
 
-        // TODO: const
-        @DartName("little")
-        external val LITTLE: Endian = definedExternally
+    /**
+     * Returns the offset in bytes into the underlying byte buffer of this view.
+     */
+    val offsetInBytes: Int
 
-        // TODO: const
-        @DartName("host")
-        external val HOST: Endian = definedExternally
-    }
+    /**
+     * Returns the length of this view, in bytes.
+     */
+    val lengthInBytes: Int
+
+    // TODO: buffer
 }

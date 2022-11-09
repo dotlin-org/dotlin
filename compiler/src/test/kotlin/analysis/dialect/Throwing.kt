@@ -21,10 +21,6 @@ package analysis.dialect
 
 import BaseTest
 import assertCanCompile
-import assertCompilesWithError
-import assertCompilesWithErrors
-import assertCompilesWithWarning
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 

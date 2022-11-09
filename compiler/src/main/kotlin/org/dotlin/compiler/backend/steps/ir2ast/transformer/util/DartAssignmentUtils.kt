@@ -4,7 +4,6 @@ import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.getValueArgumentOrDefault
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.accept
 import org.dotlin.compiler.dart.ast.expression.DartAssignmentExpression
-import org.dotlin.compiler.dart.ast.expression.DartAssignmentOperator
 import org.dotlin.compiler.dart.ast.expression.DartAssignmentOperator.*
 import org.dotlin.compiler.dart.ast.expression.DartExpression
 import org.jetbrains.kotlin.ir.expressions.IrExpression

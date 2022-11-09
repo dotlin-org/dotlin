@@ -22,7 +22,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 import org.dotlin.compiler.backend.steps.ir2ast.ir.asAssignable
 import org.dotlin.compiler.backend.steps.ir2ast.ir.hasDirectReferenceTo
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isInitializerForComplexParameter
-import org.dotlin.compiler.backend.steps.ir2ast.ir.resolveOverride
+import org.dotlin.compiler.backend.steps.ir2ast.ir.resolveRootOverride
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
@@ -38,13 +38,13 @@ class OverriddenParametersLowering(override val context: DartLoweringContext) : 
     override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrValueParameter) return noChange()
 
-        val irValueParameter = declaration
+        val parameter = declaration
 
-        val overriddenParameter = irValueParameter.resolveOverride() ?: return noChange()
-        val irFunction = irValueParameter.parent as? IrSimpleFunction ?: return noChange()
-        val overriddenFunction = irFunction.resolveOverride() ?: return noChange()
+        val irFunction = parameter.parent as? IrSimpleFunction ?: return noChange()
+        val overriddenParameter = parameter.resolveRootOverride() ?: return noChange()
+        val overriddenFunction = overriddenParameter.parent as? IrSimpleFunction ?: return noChange()
 
-        var newIrValueParameter = irValueParameter.apply {
+        var newIrValueParameter = parameter.apply {
             overriddenParameter.type.let {
                 if (!it.isTypeParameter()) {
                     type = it

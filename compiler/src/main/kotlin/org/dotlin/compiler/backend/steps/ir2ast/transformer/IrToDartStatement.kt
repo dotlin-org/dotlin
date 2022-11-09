@@ -347,8 +347,3 @@ fun Iterable<IrStatement>.accept(context: DartTransformContext) = map { it.accep
 fun IrExpression.acceptAsStatement(context: DartTransformContext) = accept(IrToDartStatementTransformer, context)
 fun IrVariable.acceptAsStatement(context: DartTransformContext) =
     accept(IrToDartStatementTransformer, context) as DartVariableDeclarationStatement
-
-
-
-
-

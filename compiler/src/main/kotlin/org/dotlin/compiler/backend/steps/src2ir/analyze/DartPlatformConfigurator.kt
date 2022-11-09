@@ -26,12 +26,15 @@ import org.dotlin.compiler.backend.steps.src2ir.analyze.checkers.declaration.Kot
 import org.dotlin.compiler.backend.steps.src2ir.analyze.checkers.declaration.TypeErasureChecker
 import org.dotlin.compiler.backend.steps.src2ir.analyze.checkers.type.CharTypeChecker
 import org.dotlin.compiler.backend.steps.src2ir.analyze.checkers.type.FloatTypeChecker
+import org.jetbrains.kotlin.builtins.PlatformToKotlinClassMapper
 import org.jetbrains.kotlin.container.StorageComponentContainer
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.resolve.PlatformConfiguratorBase
 import org.jetbrains.kotlin.types.DynamicTypesAllowed
 
 object DartPlatformConfigurator : PlatformConfiguratorBase(
     DynamicTypesAllowed(),
+    platformToKotlinClassMapper = PlatformClassMapper,
     additionalDeclarationCheckers = listOf(
         TypeErasureChecker,
         KotlinIteratorOperatorMethodChecker,
@@ -41,4 +44,14 @@ object DartPlatformConfigurator : PlatformConfiguratorBase(
     additionalTypeCheckers = listOf(FloatTypeChecker, CharTypeChecker)
 ) {
     override fun configureModuleComponents(container: StorageComponentContainer) {}
+
+    // TODO?: Use PlatformDependentDeclarationFilter for filtering dart:io, dart:html, etc.
+
+    // TODO: Raise warnings if using dart:core Lists, Sets etc. directly
+    object PlatformClassMapper : PlatformToKotlinClassMapper {
+        override fun mapPlatformClass(classDescriptor: ClassDescriptor): Collection<ClassDescriptor> {
+            return mutableListOf()
+        }
+
+    }
 }

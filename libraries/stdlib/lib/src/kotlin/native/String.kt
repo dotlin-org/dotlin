@@ -23,7 +23,7 @@ package kotlin
  */
 @DartLibrary("dart:core")
 external class String : Comparable<String> {
-    companion object {}
+    companion object
     
     /**
      * Returns a string obtained by concatenating this string with the string representation of the given [other] object.

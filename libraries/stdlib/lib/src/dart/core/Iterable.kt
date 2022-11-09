@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Wilko Manger
+ * Copyright 2022 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-package dotlin
+package dart.core
 
-// TODO: Kotlin-only internal (@DartPublic)
-
-internal class `$Return`<T> const constructor(val value: T, val target: Int)
-
-internal annotation class DotlinExternal
+// TODO: Don't compile
+/*external*/ typealias Iterable<E> = kotlin.collections.Iterable<E>

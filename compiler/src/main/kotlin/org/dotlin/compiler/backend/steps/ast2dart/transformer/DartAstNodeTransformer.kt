@@ -429,10 +429,11 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     open fun DartGenerationContext.visitDoubleLiteral(literal: DartDoubleLiteral) =
         super.visitDoubleLiteral(literal, this)
 
-    final override fun visitListLiteral(literal: DartListLiteral, context: DartGenerationContext): String =
-        with(context) { visitListLiteral(literal) }
+    final override fun visitCollectionLiteral(literal: DartCollectionLiteral, context: DartGenerationContext): String =
+        with(context) { visitCollectionLiteral(literal) }
 
-    open fun DartGenerationContext.visitListLiteral(literal: DartListLiteral) = super.visitListLiteral(literal, this)
+    open fun DartGenerationContext.visitCollectionLiteral(literal: DartCollectionLiteral) =
+        super.visitCollectionLiteral(literal, this)
 
     final override fun visitCollectionElementList(
         collectionElementList: DartCollectionElementList,

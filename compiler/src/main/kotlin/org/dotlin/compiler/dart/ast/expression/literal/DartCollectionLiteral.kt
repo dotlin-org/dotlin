@@ -23,16 +23,32 @@ import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 import org.dotlin.compiler.dart.ast.collection.DartCollectionElementList
 import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
 
-data class DartListLiteral(
-    val elements: DartCollectionElementList,
-    override val isConst: Boolean = false,
-    override val typeArguments: DartTypeArgumentList
-) : DartTypedLiteral {
+sealed interface DartCollectionLiteral : DartTypedLiteral {
+    val elements: DartCollectionElementList
+
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) =
-        visitor.visitListLiteral(this, data)
+        visitor.visitCollectionLiteral(this, data)
 
     override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
         elements.accept(visitor, data)
         typeArguments.accept(visitor, data)
     }
 }
+
+data class DartListLiteral(
+    override val elements: DartCollectionElementList,
+    override val isConst: Boolean = false,
+    override val typeArguments: DartTypeArgumentList
+) : DartCollectionLiteral
+
+data class DartSetLiteral(
+    override val elements: DartCollectionElementList,
+    override val isConst: Boolean = false,
+    override val typeArguments: DartTypeArgumentList
+) : DartCollectionLiteral
+
+data class DartMapLiteral(
+    override val elements: DartCollectionElementList,
+    override val isConst: Boolean = false,
+    override val typeArguments: DartTypeArgumentList
+) : DartCollectionLiteral

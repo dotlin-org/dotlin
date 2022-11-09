@@ -1,6 +1,7 @@
 package org.dotlin.compiler.backend.steps.src2ir.analyze.suppress
 
-import org.dotlin.compiler.backend.util.*
+import org.dotlin.compiler.backend.util.isImplicitInterfaceConstructorCall
+import org.dotlin.compiler.backend.util.isSpecialInheritanceConstructorCall
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.resolve.BindingTraceContext

@@ -17,7 +17,7 @@
 
 package kotlin
 
-import dart.typeddata.ByteData
+import dart.typed_data.ByteData
 
 /**
  * Returns a bit representation of the specified floating-point value as [Int]

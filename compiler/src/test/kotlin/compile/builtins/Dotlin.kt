@@ -378,7 +378,7 @@ class Dotlin : BaseTest {
             """
             import 'package:meta/meta.dart';
 
-            void process({bool Function(int) test = null}) {
+            void process({bool Function(int)? test = null}) {
               test = test == null
                   ? (int it) {
                       return false;
@@ -422,7 +422,7 @@ class Dotlin : BaseTest {
             import 'package:meta/meta.dart';
 
             class Processor {
-              void process({bool Function(int) test = null}) {
+              void process({bool Function(int)? test = null}) {
                 test = test == null
                     ? (int it) {
                         return false;
@@ -435,7 +435,7 @@ class Dotlin : BaseTest {
             @sealed
             class ProcessorImpl extends Processor {
               @override
-              void process({bool Function(int) test = null}) {
+              void process({bool Function(int)? test = null}) {
                 test = test == null
                     ? (int it) {
                         return false;

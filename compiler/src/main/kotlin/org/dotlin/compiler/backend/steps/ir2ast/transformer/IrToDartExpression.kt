@@ -19,6 +19,8 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
+import org.dotlin.compiler.backend.attributes.CollectionLiteralKind.*
+import org.dotlin.compiler.backend.dotlin
 import org.dotlin.compiler.backend.hasDartGetterAnnotation
 import org.dotlin.compiler.backend.isDartStatic
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
@@ -43,15 +45,8 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin.*
 import org.jetbrains.kotlin.ir.expressions.IrTypeOperator.*
-import org.jetbrains.kotlin.ir.types.isBoolean
-import org.jetbrains.kotlin.ir.types.isChar
-import org.jetbrains.kotlin.ir.types.isInt
-import org.jetbrains.kotlin.ir.types.isString
-import org.jetbrains.kotlin.ir.util.defaultType
-import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
-import org.jetbrains.kotlin.ir.util.isEnumClass
-import org.jetbrains.kotlin.ir.util.parentClassOrNull
-import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.ir.types.*
+import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.Name
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
@@ -62,7 +57,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
     override fun DartTransformContext.visitFunctionAccess(
         irCallLike: IrFunctionAccessExpression,
         context: DartTransformContext,
-    ) = context.run {
+    ): DartExpression {
         val irReceiver = irCallLike.extensionReceiver ?: irCallLike.dispatchReceiver
         val irSingleArgument by lazy { irCallLike.getValueArgument(0)!! }
         val optionalReceiver by lazy {
@@ -71,12 +66,12 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                 else -> irReceiver.acceptAsReceiverOf(irCallLike, context)
             }
         }
-        val receiver by lazy { optionalReceiver!! }
+        val receiver by lazy { optionalReceiver!!.maybeParenthesize(isReceiver = true) }
         val singleArgument by lazy { irSingleArgument.accept(context) }
 
-        val optionalInfixReceiver by lazy { optionalReceiver?.possiblyParenthesize(inBinaryInfix = true) }
+        val optionalInfixReceiver by lazy { optionalReceiver?.maybeParenthesize(inBinaryInfix = true) }
         val infixReceiver by lazy { optionalInfixReceiver!! }
-        val infixSingleArgument by lazy { singleArgument.possiblyParenthesize(inBinaryInfix = true) }
+        val infixSingleArgument by lazy { singleArgument.maybeParenthesize(inBinaryInfix = true) }
 
         fun methodInvocation(methodName: DartSimpleIdentifier): DartMethodInvocation {
             return DartMethodInvocation(
@@ -86,7 +81,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
             )
         }
 
-        when (val origin = irCallLike.origin) {
+        return when (val origin = irCallLike.origin) {
             PLUS -> {
                 val irLeftType = irReceiver!!.type
                 val irRightType = irSingleArgument.type
@@ -128,11 +123,11 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                     infixReceiver to infixSingleArgument
                 } else {
                     irCallLike.valueArguments
-                        .mapNotNull { it?.accept(context)?.possiblyParenthesize(inBinaryInfix = true) }
+                        .mapNotNull { it?.accept(context)?.maybeParenthesize(inBinaryInfix = true) }
                         .toPair()
                 }
 
-                return DartComparisonExpression(
+                DartComparisonExpression(
                     left = actualLeft,
                     operator = when (origin) {
                         GT -> DartComparisonExpression.Operators.GREATER
@@ -147,7 +142,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
             EQEQ, EXCLEQ -> {
                 val isNegated = origin == EXCLEQ
 
-                fun IrExpression.accept() = accept(context).possiblyParenthesize(inEquals = true)
+                fun IrExpression.accept() = accept(context).maybeParenthesize(inEquals = true)
 
                 val (left, right) = when {
                     isNegated -> irReceiver as IrCall
@@ -162,10 +157,10 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                 }
             }
             EXCLEXCL -> DartNotNullAssertionExpression(
-                singleArgument.possiblyParenthesize(isReceiver = true)
+                singleArgument.maybeParenthesize(isReceiver = true)
             )
             UMINUS -> DartUnaryMinusExpression(
-                receiver.possiblyParenthesize(isReceiver = true)
+                receiver.maybeParenthesize(isReceiver = true)
             )
             else -> {
                 val irFunction = irCallLike.symbol.owner
@@ -176,7 +171,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
 
                 when {
                     origin == EXCL && irReceiver!!.type.isBoolean() -> {
-                        DartNegatedExpression(receiver.possiblyParenthesize(isReceiver = true))
+                        DartNegatedExpression(receiver.maybeParenthesize(isReceiver = true))
                     }
                     origin == GET_PROPERTY || origin == GET_LOCAL_PROPERTY
                             || hasDartGetterAnnotation -> {
@@ -260,7 +255,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                                         typeArguments,
                                     )
                                     else -> DartMethodInvocation(
-                                        target = receiver.possiblyParenthesize(isReceiver = true),
+                                        target = receiver.maybeParenthesize(isReceiver = true),
                                         methodName = functionName as DartSimpleIdentifier,
                                         arguments,
                                         typeArguments
@@ -347,7 +342,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
         return when (receiver) {
             null -> name
             else -> DartPropertyAccessExpression(
-                target = receiver.possiblyParenthesize(isReceiver = true),
+                target = receiver.maybeParenthesize(isReceiver = true),
                 propertyName = name,
             )
         }
@@ -381,7 +376,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
         val name = relevantDartNameOf(irSetField.symbol.owner)
         val assignee = if (receiver != null)
             DartPropertyAccessExpression(
-                target = receiver.possiblyParenthesize(isReceiver = true),
+                target = receiver.maybeParenthesize(isReceiver = true),
                 propertyName = name,
             )
         else
@@ -403,10 +398,10 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
             useFunctionInterface = irTypeOperatorCall.isFunctionTypeCheck
         )
 
-        fun DartExpression.parenthesize() = possiblyParenthesize(isReceiver = true, inBinaryInfix = true)
+        fun DartExpression.parenthesize() = maybeParenthesize(isReceiver = true, inBinaryInfix = true)
 
         return when (val operator = irTypeOperatorCall.operator) {
-            CAST, IMPLICIT_CAST -> DartAsExpression(expression.parenthesize(), type)
+            CAST, IMPLICIT_CAST, IMPLICIT_DYNAMIC_CAST -> DartAsExpression(expression.parenthesize(), type)
             IMPLICIT_NOTNULL -> TODO()
             IMPLICIT_COERCION_TO_UNIT -> expression
             IMPLICIT_INTEGER_COERCION -> TODO()
@@ -417,7 +412,6 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                 isNegated = operator == NOT_INSTANCEOF
             )
             SAM_CONVERSION -> TODO()
-            IMPLICIT_DYNAMIC_CAST -> expression
             REINTERPRET_CAST -> TODO()
         }
     }
@@ -429,17 +423,23 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
     }
 
     override fun DartTransformContext.visitVararg(irVararg: IrVararg, context: DartTransformContext): DartExpression {
-        return DartListLiteral(
-            elements = DartCollectionElementList(
-                irVararg.elements.map {
-                    when (it) {
-                        is IrExpression -> it.accept(context)
-                        else -> throw UnsupportedOperationException("Spread elements are not supported yet.")
-                    }
+        val elements = DartCollectionElementList(
+            irVararg.elements.map {
+                when (it) {
+                    is IrExpression -> it.accept(context)
+                    else -> throw UnsupportedOperationException("Spread elements are not supported yet.")
                 }
-            ),
-            typeArguments = DartTypeArgumentList(irVararg.varargElementType.accept(context))
+            }
         )
+
+        val typeArguments = DartTypeArgumentList(irVararg.varargElementType.accept(context))
+        val isConst = irVararg.isDartConst()
+
+        return when (irVararg.literalKind) {
+            LIST -> DartListLiteral(elements, isConst, typeArguments)
+            SET -> DartSetLiteral(elements, isConst, typeArguments)
+            MAP -> DartMapLiteral(elements, isConst, typeArguments)
+        }
     }
 
     override fun DartTransformContext.visitFunctionExpression(
@@ -490,8 +490,8 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
         binaryInfix: IrBinaryInfixExpression,
         context: DartTransformContext
     ): DartExpression {
-        val left = binaryInfix.left.accept(context).possiblyParenthesize(inBinaryInfix = true)
-        val right = binaryInfix.right.accept(context).possiblyParenthesize(inBinaryInfix = true)
+        val left = binaryInfix.left.accept(context).maybeParenthesize(inBinaryInfix = true)
+        val right = binaryInfix.right.accept(context).maybeParenthesize(inBinaryInfix = true)
 
         return when (binaryInfix) {
             is IrConjunctionExpression -> DartConjunctionExpression(left, right)
@@ -505,7 +505,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
         context: DartTransformContext
     ): DartExpression = DartCode(irCode.code)
 
-    private fun DartExpression.possiblyParenthesize(
+    private fun DartExpression.maybeParenthesize(
         isReceiver: Boolean = false,
         inEquals: Boolean = false,
         inBinaryInfix: Boolean = inEquals,
@@ -631,5 +631,4 @@ private fun IrFunctionAccessExpression.isSetOperator() =
                 it.name == Name.identifier("set")
     } == true
 
-// TODO: Use FqName syntax
-private fun IrFunctionAccessExpression.isTypeOfCall() = symbol.owner.fqNameWhenAvailable == FqName("dotlin.typeOf")
+private fun IrFunctionAccessExpression.isTypeOfCall() = symbol.owner.fqNameWhenAvailable == dotlin.typeOf

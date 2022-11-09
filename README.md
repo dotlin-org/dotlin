@@ -201,14 +201,14 @@ Kotlin primitives that are not used in Dart and would only complicate code have 
 `Byte`, `Short`, `Long`, `Float`, and `Char` are not present. This is because Dotlin has the following
 mapping of built-ins:
 
-| Kotlin    | Dart     |
-| --------- | -------- |
-| `Int`     | `int`    |
-| `Double`  | `double` |
-| `String`  | `String` |
-| `Boolean` | `bool`   |
-| `Any`     | `Object` |
-| `Nothing` | `Never`  |
+| Dart     | Kotlin    |
+| -------- | --------- |
+| `int`    | `Int`     |
+| `double` | `Double`  |
+| `String` | `String`  |
+| `bool`   | `Boolean` |
+| `Object` | `Any`     |
+| `Never`  | `Nothing` |
 
 This also means that `Int` now refers to a 64-bit integer, instead of 32-bit as in Kotlin.
 
@@ -386,6 +386,192 @@ Compiles to:
 ```dart
 final myType = String;
 ```
+
+### Collections
+
+Existing Dart collections have been dissected into different interfaces
+based on their mutability, just like in Kotlin.
+
+However, `List` has been split it in more interfaces, to represent all `List`
+kinds that exist in Dart runtime using types.
+
+#### `Iterable`
+
+Dotlin's `Iterable` is mapped directly to Dart's `Iterable`. This means that unlike in Kotlin,
+`Iterable`s are _lazy_.
+
+The `Iterable` class is significantly larger because Dart's `Iterable` contains a
+lot of methods. However, they've been renamed to match Kotlin conventions, some examples:
+
+| Dart        | Kotlin             |
+| ----------- | ------------------ |
+| `where`     | `filter`           |
+| `whereType` | `filterIsInstance` |
+| `expand`    | `flatMap`          |
+| `every`     | `all`              |
+| `skip`      | `drop`             |
+
+#### `Collection`
+
+Represents any type of collection of elements. It provides a common interface for
+`List` and `Set, which in Dart don't have a common interface.
+
+> **Note**  
+> Runtime type checks work: `List`s and `Set`s are considered `Collection`s at runtime.
+
+##### `MutableCollection`
+
+Represents any kind of mutable collection of elements. "Mutable" specifically means
+_growable_ in Dart terms, meaning elements can be added and removed.
+
+> **Note**  
+> Runtime type checks work: Dart `List`s and `Set`s are considered `MutableCollection`s,
+_only if_ they are actually mutable. Examples (Dart):
+>
+> ```dart
+> [1, 2, 3] is MutableCollection<int> == true
+> ```
+> ```dart
+> List.unmodifiable([1, 2, 3]) is MutableCollection<int> == false
+> ```
+> <sup>These type checks don't work as Dart code as-is, but are compiled specially when writing a similar expression in Dotlin.</sup>
+
+#### `List`
+
+<sup>Dart: `List`</sup>
+
+A read-only interface that represents any kind of Dart's `List`s. Mutating methods can be
+accessed through subtypes.
+
+##### `ImmutableList` <sup>`is List`</sup>
+
+<sup>Dart: `List.unmodifiable`, `const [..]`</sup>
+
+An immutable list. Same interface as `List`, but guaranteed to be immutable.
+
+> **Note**  
+> Runtime type checks work: Dart `List`s are considered `ImmutableList`s,
+_only if_ they are actually immutable. Examples (Dart):
+>
+> ```dart
+> const [1, 2, 3] is ImmutableList<int> == true
+> ```
+> ```dart
+> List.unmodifiable([1, 2, 3]) is ImmutableList<int> == true
+> ```
+> ```dart
+> [1, 2, 3] is ImmutableList<int> == false
+> ```
+
+##### `WriteableList` <sup>`is List`</sup>
+
+<sup>Dart: `List` (`growable: true|false`)</sup>
+
+An interface that supports changing elements (`list[0] = "abc"`), but not adding or removing elements. This
+interface represents both `FixedSizeList`s and `MutableList`s, since they are both writeable.
+
+> **Note**  
+> Runtime type checks work: Dart `List`s are considered `WriteableList`s,
+_only if_ they are actually writeable. Examples (Dart):
+>
+> ```dart
+> [1, 2, 3] is WriteableList<int> == true
+> ```
+> ```dart
+> List.of([1, 2, 3], growable: false) is WriteableList<int> == true
+> ```
+> ```dart
+> List.unmodifiable([1, 2, 3]) is WriteableList<int> == false
+> ```
+
+##### `FixedSizeList` (`Array`) <sup>`is WriteableList`</sup>
+
+<sup>Dart: `List` (`growable: false`)</sup>
+
+An interface that represents writeable fixed-length Dart `List`s, also known as _arrays_. Elements can
+be changed (`array[0] = "abc"`), but not be added or removed. Any other operation that would change
+the size of the list is also not possible.
+
+The difference between this interface and `WriteableList` is that `WriteableList` represents
+any list whose elements can be changed, which also includes `MutableList`s.
+
+> **Note**  
+> Runtime type checks work: Dart `List`s are considered `FixedSizeList`s,
+_only if_ they are actually writeable. Examples (Dart):
+>
+> ```dart
+> List.of([1, 2, 3], growable: false) is FixedSizeList<int> == true
+> ```
+> ```dart
+> [1, 2, 3] is FixedSizeList<int> == false
+> ```
+> ```dart
+> List.unmodifiable([1, 2, 3]) is FixedSizeList<int> == false
+> ```
+
+##### `MutableList` <sup>`is WriteableList`</sup>
+
+<sup>Dart: `List` (`growable: true`)</sup>
+
+An interface that represents growable Dart `List`s. Elements can be changed, added and removed.
+
+> **Note**  
+> Runtime type checks work: Dart `List`s are considered `MutableList`s,
+_only if_ they are actually mutable (writeable & growable). Examples (Dart):
+>
+> ```dart
+> [1, 2, 3] is MutableList<int> == true
+> ```
+> ```dart
+> List.of([1, 2, 3], growable: false) is MutableList<int> == false
+> ```
+> ```dart
+> List.unmodifiable([1, 2, 3]) is MutableList<int> == false
+> ```
+
+#### `Set`
+
+<sup>Dart: `Set`</sup>
+
+A read-only interface that represents any kind of Dart's `Set`s. Mutating methods can be
+accessed through `MutableSet`.
+
+##### `ImmutablSet` <sup>`is Set`</sup>
+
+<sup>Dart: `Set.unmodifiable`, `const {..}`</sup>
+
+An immutable set. Same interface as `Set`, but guaranteed to be immutable.
+
+> **Note**  
+> Runtime type checks work: Dart `Set`s are considered `ImmutableSet`s,
+_only if_ they are actually immutable. Examples (Dart):
+>
+> ```dart
+> const {1, 2, 3} is ImmutableSet<int> == true
+> ```
+> ```dart
+> Set.unmodifiable({1, 2, 3}) is ImmutableSet<int> == true
+> ```
+> ```dart
+> {1, 2, 3} is ImmutableSet<int> == false
+> ```
+
+##### `MutableSet` <sup>`is Set`</sup>
+
+<sup>Dart: `Set` (`{..}`)</sup>
+
+An interface that represents growable Dart `Set`s. Elements can be changed, added and removed.
+
+> **Note**  
+> Runtime type checks work: Dart `Set`s are considered `MutableSet`s,
+_only if_ they are actually mutable. Examples (Dart):
+>
+> ```dart
+> {1, 2, 3} is MutableSet<int> == true
+> ```
+> ```dart
+> Set.unmodifiable({1, 2, 3}) is MutableSet<int> == false
+> ```
 
 ## Usage
 

@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.src2ir.analyze
 
+import org.dotlin.compiler.backend.dart
 import org.dotlin.compiler.backend.kotlin
 import org.jetbrains.kotlin.resolve.ImportPath
 import org.jetbrains.kotlin.resolve.PlatformDependentAnalyzerServices
@@ -38,5 +39,9 @@ object DartPlatformAnalyzerServices : PlatformDependentAnalyzerServices() {
     }
 
     override val platformConfigurator = DartPlatformConfigurator
-    override val excludedImports = listOf(kotlin.collections.Iterator)
+    override val excludedImports = listOf(
+        kotlin.collections.Iterator, dart.core.Iterable,
+        dart.core.List, dart.core.Set,
+        dart.core.Map, dart.core.MapEntry,
+    )
 }

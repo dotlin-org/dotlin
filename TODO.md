@@ -5,20 +5,10 @@
 - [ ] Built-ins
   - [x] Annotation
   - [x] Any
-  - [ ] Arrays
-    - [ ] Array
-    - [ ] ByteArray
-    - [ ] CharArray
-    - [ ] ShortArray
-    - [ ] IntArray
-    - [ ] LongArray
-    - [ ] FloatArray
-    - [ ] DoubleArray
-    - [ ] BooleanArray
+  - [x] Arrays
+    - [x] Array
   - [x] Boolean
-  - [ ] Char
-  - [ ] CharSequence
-  - [ ] Collections
+  - [x] Collections
   - [x] Comparable
   - [x] Enum
   - [x] Iterator
@@ -155,5 +145,5 @@
   - [ ] Class literals
 
 ### Misc
-- [ ] Remove most if not all JS IR references from compiler
+- [x] Remove most if not all JS IR references from compiler
 - [x] Disable type erasure hints and analysis errors

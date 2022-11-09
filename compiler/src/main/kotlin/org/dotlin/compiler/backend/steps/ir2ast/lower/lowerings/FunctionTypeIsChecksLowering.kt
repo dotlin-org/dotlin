@@ -49,7 +49,7 @@ class FunctionTypeIsChecksLowering(override val context: DartLoweringContext) : 
 
         if (!expression.typeOperand.isFunctionTypeOrSubtype()) return noChange()
 
-        val negated = expression.operator == IrTypeOperator.NOT_INSTANCEOF;
+        val negated = expression.operator == IrTypeOperator.NOT_INSTANCEOF
 
         val instanceOfFunctionInterface = buildStatement(context.container.symbol) {
             val arg = expression.argument
