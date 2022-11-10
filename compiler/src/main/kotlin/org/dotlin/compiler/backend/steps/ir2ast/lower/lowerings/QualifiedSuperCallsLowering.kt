@@ -34,6 +34,7 @@ import org.jetbrains.kotlin.ir.symbols.IrPropertySymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
+import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.Name
 
@@ -99,7 +100,7 @@ class QualifiedSuperCallsLowering(override val context: DartLoweringContext) : I
 
         // Remap calls to the new copied declaration.
         irFunction.body?.transformChildrenVoid(
-            object : IrCustomElementTransformerVoid() {
+            object : IrElementTransformerVoid() {
                 override fun visitCall(expression: IrCall): IrExpression {
                     expression.transformChildrenVoid()
 

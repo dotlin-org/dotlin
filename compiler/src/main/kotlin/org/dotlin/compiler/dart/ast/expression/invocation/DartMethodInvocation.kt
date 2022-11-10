@@ -31,13 +31,11 @@ data class DartMethodInvocation(
     val methodName: DartSimpleIdentifier,
     override val arguments: DartArgumentList = DartArgumentList(),
     override val typeArguments: DartTypeArgumentList = DartTypeArgumentList(),
-    override val isNullAware: Boolean = false,
+    override val isNullAware: Boolean,
 ) : DartInvocationExpression, DartPossiblyNullAwareExpression {
     override val function = DartPropertyAccessExpression(
         target = target,
         propertyName = methodName,
         isNullAware = isNullAware,
     )
-
-    override fun asNullAware(): DartMethodInvocation = copy(isNullAware = true)
 }

@@ -20,7 +20,6 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionContext
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrDisjunctionExpression
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.builders.irIs
 import org.jetbrains.kotlin.ir.builders.irNotIs
@@ -64,12 +63,13 @@ class FunctionTypeIsChecksLowering(override val context: DartLoweringContext) : 
         instanceOfFunctionInterface.isFunctionTypeCheck = true
 
         return replaceWith(
-            IrDisjunctionExpression(
-                expression,
-                instanceOfFunctionInterface,
-                type = irBuiltIns.booleanType
-            ).apply {
-                isParenthesized = true
+            buildStatement(context.container.symbol) {
+                irDisjunction(
+                    left = expression,
+                    right = instanceOfFunctionInterface,
+                ).apply {
+                    isParenthesized = true
+                }
             }
         )
     }

@@ -37,6 +37,8 @@ import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
+import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
+import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.util.collectionUtils.filterIsInstanceAnd
@@ -103,7 +105,7 @@ inline fun <reified T : IrElement> IrElement.firstOrNull(crossinline block: (T) 
 inline fun <reified T : IrElement> IrElement.firstOrNullChild(crossinline block: (T) -> Boolean): T? {
     var first: T? = null
 
-    val visitor = object : IrCustomElementVisitorVoid {
+    val visitor = object : IrElementVisitorVoid {
         override fun visitElement(element: IrElement) {
             if (element is T && first == null && block(element)) {
                 first = element
@@ -129,7 +131,7 @@ inline fun <reified T : IrElement> IrElement.filter(crossinline block: (T) -> Bo
 inline fun <reified T : IrElement> IrElement.filterChildren(crossinline block: (T) -> Boolean): List<T> {
     val matches = mutableListOf<T>()
 
-    val visitor = object : IrCustomElementVisitorVoid {
+    val visitor = object : IrElementVisitorVoid {
         override fun visitElement(element: IrElement) {
             if (element is T && block(element)) {
                 matches.add(element)
@@ -184,7 +186,7 @@ fun IrExpression.hasDirectReferenceTo(parameter: IrValueParameter): Boolean {
 fun IrExpression.hasIndirectReferenceTo(parameter: IrValueParameter): Boolean {
     var hasReference = false
 
-    val visitor = object : IrCustomElementVisitorVoid {
+    val visitor = object : IrElementVisitorVoid {
         override fun visitElement(element: IrElement) {
             if (!hasReference && element is IrDeclarationReference) {
                 hasReference = element.symbol == parameter.symbol
@@ -420,7 +422,7 @@ val IrType.owner: IrDeclarationWithName
 fun IrBuilderWithScope.irCall(
     callee: IrSimpleFunction,
     receiver: IrExpression? = null,
-    vararg valueArguments: IrExpression,
+    vararg valueArguments: IrExpression?,
     typeArguments: Collection<IrType?> = emptyList(),
     origin: IrStatementOrigin? = null,
     isExtension: Boolean = false
@@ -476,7 +478,7 @@ val IrFunctionAccessExpression.typeArguments: List<IrType?>
 
 fun IrElement.replaceExpressions(block: (IrExpression) -> IrExpression) {
     transformChildren(
-        object : IrCustomElementTransformerVoid() {
+        object : IrElementTransformerVoid() {
             override fun visitExpression(expression: IrExpression): IrExpression {
                 expression.transformChildrenVoid()
 

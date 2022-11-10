@@ -232,7 +232,7 @@ class Const : BaseTest {
               }
             
               static Temperature valueOf(String value) {
-                return values().firstWhere((v) => v.name == value);
+                return this.values().firstWhere((Temperature v) => v.name == value);
               }
             }
             

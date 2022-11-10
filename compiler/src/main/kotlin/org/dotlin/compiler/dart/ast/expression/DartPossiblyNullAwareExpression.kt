@@ -21,9 +21,4 @@ package org.dotlin.compiler.dart.ast.expression
 
 interface DartPossiblyNullAwareExpression : DartExpression {
     val isNullAware: Boolean
-
-    /**
-     * Returns a copy of this expression with [isNullAware] `true`.
-     */
-    fun asNullAware(): DartPossiblyNullAwareExpression
 }

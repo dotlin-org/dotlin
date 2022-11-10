@@ -20,21 +20,28 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrDartCodeExpression
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.dotlin.compiler.backend.util.replace
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.builders.declarations.buildField
+import org.jetbrains.kotlin.ir.builders.declarations.buildFun
 import org.jetbrains.kotlin.ir.builders.declarations.buildValueParameter
 import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.declarations.impl.IrValueParameterImpl
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockBodyImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionExpressionImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.interpreter.toIrConst
+import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
 import org.jetbrains.kotlin.ir.types.classOrNull
+import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
+import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.types.Variance
 
 // TODO: Use
 private object Documentation {
@@ -172,7 +179,9 @@ class EnumClassLowering(override val context: DartLoweringContext) : IrDeclarati
                 replace(old, new)
             }
 
-            methodWithName("values").apply {
+            val valuesMethod = methodWithName("values")
+
+            valuesMethod.apply {
                 body = IrBlockBodyImpl(
                     UNDEFINED_OFFSET, UNDEFINED_OFFSET,
                     statements = listOf(
@@ -194,16 +203,81 @@ class EnumClassLowering(override val context: DartLoweringContext) : IrDeclarati
             }
 
             methodWithName("valueOf").apply {
+                val valueOfMethod = this
+                val valueParam = valueParameters.first()
+
                 body = IrBlockBodyImpl(
                     UNDEFINED_OFFSET, UNDEFINED_OFFSET,
                     statements = listOf(
-                        IrDartCodeExpression(
-                            code =
-                            """
-                            return values().firstWhere((v) => v.name == value)
-                            """.trimIndent(),
-                            type = context.dynamicType
-                        )
+                        buildStatement(symbol) {
+                            irReturn(
+                                irCall(
+                                    irBuiltIns.iterableClass.owner.methodWithName("first"),
+                                    receiver = irCall(valuesMethod, receiver = irGet(enum.thisReceiver!!)),
+                                    valueArguments = arrayOf(
+                                        null,
+                                        IrFunctionExpressionImpl(
+                                            SYNTHETIC_OFFSET, SYNTHETIC_OFFSET,
+                                            type = IrSimpleTypeImpl(
+                                                irBuiltIns.functionN(1).symbol,
+                                                hasQuestionMark = false,
+                                                arguments = listOf(
+                                                    makeTypeProjection(
+                                                        irBuiltIns.booleanType,
+                                                        Variance.INVARIANT,
+                                                    ),
+                                                    makeTypeProjection(
+                                                        enum.defaultType,
+                                                        Variance.INVARIANT,
+                                                    ),
+                                                ),
+                                                annotations = emptyList(),
+                                                abbreviation = null
+                                            ),
+                                            origin = IrStatementOrigin.LAMBDA,
+                                            function = irFactory.buildFun {
+                                                name = Name.special("<anonymous>")
+                                                returnType = irBuiltIns.booleanType
+                                            }.apply {
+                                                val lambda = this
+                                                parent = valueOfMethod
+
+                                                val localValueParam = IrValueParameterImpl(
+                                                    SYNTHETIC_OFFSET, SYNTHETIC_OFFSET,
+                                                    origin = IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA,
+                                                    symbol = IrValueParameterSymbolImpl(),
+                                                    name = Name.identifier("v"),
+                                                    index = 0,
+                                                    type = enum.defaultType,
+                                                    varargElementType = null,
+                                                    isNoinline = false,
+                                                    isCrossinline = false,
+                                                    isAssignable = false,
+                                                    isHidden = false,
+                                                ).apply {
+                                                    parent = lambda
+                                                }
+
+                                                valueParameters = listOf(localValueParam)
+
+                                                val getter = enum.propertyWithName("name").getter!!
+
+                                                body = IrExpressionBodyImpl(
+                                                    irEquals(
+                                                        irGet(
+                                                            type = getter.returnType,
+                                                            receiver = irGet(localValueParam),
+                                                            getter.symbol,
+                                                        ),
+                                                        irGet(valueParam)
+                                                    )
+                                                )
+                                            }
+                                        )
+                                    )
+                                )
+                            )
+                        }
                     )
                 )
             }

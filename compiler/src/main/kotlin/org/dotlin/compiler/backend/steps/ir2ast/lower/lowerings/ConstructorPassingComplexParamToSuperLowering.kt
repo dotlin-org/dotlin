@@ -31,6 +31,7 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.util.statements
+import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.Name
 
@@ -104,7 +105,7 @@ class ConstructorPassingComplexParamToSuperLowering(override val context: DartLo
                             is IrDelegatingConstructorCall -> {
                                 superCall.also {
                                     transformChildrenVoid(
-                                        object : IrCustomElementTransformerVoid() {
+                                        object : IrElementTransformerVoid() {
                                             override fun visitExpression(expression: IrExpression): IrExpression {
                                                 expression.transformChildrenVoid()
 

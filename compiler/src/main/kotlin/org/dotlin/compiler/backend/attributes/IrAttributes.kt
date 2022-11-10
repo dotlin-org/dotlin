@@ -44,18 +44,13 @@ interface IrAttributes  {
 
         override var IrProperty.isInitializedInConstructorBody by attribute(default = false)
         override var IrProperty.isInitializedInFieldInitializerList by attribute(default = false)
-
         override var IrGetField.correspondingConstructorParameterReference by attribute<IrGetValue?>(default = null)
-
         override val IrFile.dartImports by attribute { mutableSetOf<DartImport>() }
-
         override var IrExpression.ktExpression by attribute<KtExpression?>(default = null)
-
         override var IrExpression.isParenthesized by attribute(default = false)
-
         override var IrTypeOperatorCall.isFunctionTypeCheck by attribute(default = false)
-
         override var IrVararg.literalKind by attribute(default = CollectionLiteralKind.LIST)
+        override var IrMemberAccessExpression<*>.isNullSafe by attribute(default = false)
     }
 
     /**
@@ -101,6 +96,11 @@ interface IrAttributes  {
     var IrTypeOperatorCall.isFunctionTypeCheck: Boolean
 
     var IrVararg.literalKind: CollectionLiteralKind
+
+    /**
+     * Whether this member is accessed null-safely (e.g. `x?.y`).
+     */
+    var IrMemberAccessExpression<*>.isNullSafe: Boolean
 }
 
 @Suppress("UNCHECKED_CAST")

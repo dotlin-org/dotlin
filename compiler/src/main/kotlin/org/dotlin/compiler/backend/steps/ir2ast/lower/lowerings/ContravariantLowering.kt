@@ -19,7 +19,6 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementTransformerVoid
 import org.dotlin.compiler.backend.steps.ir2ast.ir.parametersByArguments
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrFileLowering
@@ -31,6 +30,7 @@ import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.types.impl.originalKotlinType
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.isFunctionTypeOrSubtype
+import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.types.Variance
 
@@ -69,7 +69,7 @@ class ContravariantLowering(override val context: DartLoweringContext) : IrFileL
         }
 
         file.transformChildrenVoid(
-            object : IrCustomElementTransformerVoid() {
+            object : IrElementTransformerVoid() {
                 override fun visitDeclaration(declaration: IrDeclarationBase): IrStatement {
                     if (declaration is IrTypeParametersContainer) {
                         declaration.apply {

@@ -20,16 +20,15 @@
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementVisitor
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.*
 import org.dotlin.compiler.backend.steps.ir2ast.ir.todo
 import org.dotlin.compiler.dart.ast.DartAstNode
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-abstract class IrDartAstTransformer<N : DartAstNode?> : IrCustomElementVisitor<N, DartTransformContext> {
+abstract class IrDartAstTransformer<N : DartAstNode?> : IrElementVisitor<N, DartTransformContext> {
     final override fun visitElement(element: IrElement, context: DartTransformContext): N {
         todo(element)
     }
@@ -580,68 +579,4 @@ abstract class IrDartAstTransformer<N : DartAstNode?> : IrCustomElementVisitor<N
 
     open fun DartTransformContext.visitBody(body: IrBody, context: DartTransformContext): N =
         super.visitBody(body, context)
-
-    final override fun visitDartCodeExpression(expression: IrDartCodeExpression, context: DartTransformContext): N =
-        context.run { visitDartCodeExpression(expression, context) }
-
-    open fun DartTransformContext.visitDartCodeExpression(
-        expression: IrDartCodeExpression,
-        context: DartTransformContext
-    ): N = super.visitDartCodeExpression(expression, context)
-
-    final override fun visitNullAwareExpression(expression: IrNullAwareExpression, context: DartTransformContext): N =
-        context.run { visitNullAwareExpression(expression, context) }
-
-    open fun DartTransformContext.visitNullAwareExpression(
-        expression: IrNullAwareExpression,
-        context: DartTransformContext
-    ): N = super.visitNullAwareExpression(expression, context)
-
-    final override fun visitExpressionBodyWithOrigin(
-        body: IrExpressionBodyWithOrigin,
-        context: DartTransformContext
-    ): N = context.run { visitExpressionBodyWithOrigin(body, context) }
-
-    open fun DartTransformContext.visitExpressionBodyWithOrigin(
-        body: IrExpressionBodyWithOrigin,
-        context: DartTransformContext
-    ): N = super.visitExpressionBodyWithOrigin(body, context)
-
-    final override fun visitBinaryInfixExpression(
-        expression: IrBinaryInfixExpression,
-        context: DartTransformContext
-    ): N = context.run { visitBinaryInfixExpression(expression, context) }
-
-    open fun DartTransformContext.visitBinaryInfixExpression(
-        expression: IrBinaryInfixExpression,
-        context: DartTransformContext
-    ): N = super.visitBinaryInfixExpression(expression, context)
-
-    final override fun visitIfNullExpression(expression: IrIfNullExpression, context: DartTransformContext): N =
-        context.run { visitIfNullExpression(expression, context) }
-
-    open fun DartTransformContext.visitIfNullExpression(
-        expression: IrIfNullExpression,
-        context: DartTransformContext
-    ): N = super.visitIfNullExpression(expression, context)
-
-    final override fun visitConjunctionExpression(
-        expression: IrConjunctionExpression,
-        context: DartTransformContext
-    ): N = context.run { visitConjunctionExpression(expression, context) }
-
-    open fun DartTransformContext.visitConjunctionExpression(
-        expression: IrConjunctionExpression,
-        context: DartTransformContext
-    ): N = super.visitConjunctionExpression(expression, context)
-
-    final override fun visitDisjunctionExpression(
-        expression: IrDisjunctionExpression,
-        context: DartTransformContext
-    ): N = context.run { visitDisjunctionExpression(expression, context) }
-
-    open fun DartTransformContext.visitDisjunctionExpression(
-        expression: IrDisjunctionExpression,
-        context: DartTransformContext
-    ): N = super.visitDisjunctionExpression(expression, context)
 }

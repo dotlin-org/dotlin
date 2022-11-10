@@ -52,5 +52,7 @@ sealed class IrDartStatementOrigin(private val name: String) : IrStatementOrigin
      */
     object PROPERTY_REFERENCE : IrDartStatementOrigin("PROPERTY_REFERENCE")
 
+    object IF_NULL : IrDartStatementOrigin("IF_NULL")
+
     override fun toString() = name
 }

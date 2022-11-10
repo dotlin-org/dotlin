@@ -26,16 +26,24 @@ import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
+import org.jetbrains.kotlin.ir.builders.declarations.buildFun
+import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
+import org.jetbrains.kotlin.ir.declarations.impl.IrExternalPackageFragmentImpl
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.symbols.IrTypeAliasSymbol
+import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
+import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.makeNullable
+import org.jetbrains.kotlin.ir.util.SYNTHETIC_OFFSET
 import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 
 // TODO: Make lazy
-class DartIrBuiltIns(context: DartLoweringContext) {
+class DartIrBuiltIns(private val context: DartLoweringContext) {
     private val builtInsModule = context.irModuleFragment.descriptor.builtIns.builtInsModule
     private val symbolTable = context.symbolTable
 
@@ -50,7 +58,41 @@ class DartIrBuiltIns(context: DartLoweringContext) {
     val immutableListView = classSymbolAt(dart.collection.ImmutableListView)
     val immutableSetView = classSymbolAt(dart.collection.ImmutableSetView)
 
-    class Dotlin(builtIns: DartIrBuiltIns) {
+    class Dotlin(private val builtIns: DartIrBuiltIns) {
+        private val operatorsPackage = IrExternalPackageFragmentImpl.createEmptyExternalPackageFragment(
+            builtIns.builtInsModule,
+            dotlin.intrinsics.operators.self
+        )
+
+        // Fake functions for certain operators.
+        fun ifNull(type: IrType) = builtIns.context.irFactory.buildFun {
+            origin = IrDeclarationOrigin.IR_BUILTINS_STUB
+            name = Name.identifier("IF_NULL")
+            returnType = type
+        }.apply {
+            val ifNull = this
+
+            valueParameters = listOf(
+                builtIns.context.irFactory.createValueParameter(
+                    SYNTHETIC_OFFSET, SYNTHETIC_OFFSET,
+                    origin = IrDeclarationOrigin.IR_BUILTINS_STUB,
+                    symbol = IrValueParameterSymbolImpl(),
+                    name = Name.identifier("p$0"),
+                    index = 0,
+                    type = builtIns.context.irBuiltIns.anyType.makeNullable(),
+                    varargElementType = null,
+                    isCrossinline = false,
+                    isNoinline = false,
+                    isHidden = false,
+                    isAssignable = false
+                ).apply {
+                    parent = ifNull
+                }
+            )
+
+            parent = operatorsPackage
+        }
+
         val const = builtIns.classSymbolAt(dotlin.const)
         val dart = builtIns.functionSymbolAt(dotlin.dart)
 

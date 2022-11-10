@@ -73,6 +73,11 @@ object dotlin : PackageFqNameWrapper {
         val SpecialInheritedType = self.child("SpecialInheritedType")
 
         val Dynamic = self.child("Dynamic")
+
+        // This package only exists while compiling.
+        object operators : PackageFqNameWrapper {
+            override val self = dotlin.intrinsics.self.child("operators")
+        }
     }
 
     object reflect : PackageFqNameWrapper {

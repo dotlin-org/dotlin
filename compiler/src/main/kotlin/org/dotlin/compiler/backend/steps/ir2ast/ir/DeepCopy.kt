@@ -19,7 +19,6 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.ir
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.*
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
@@ -29,9 +28,7 @@ import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.*
-import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
-import org.jetbrains.kotlin.ir.visitors.acceptVoid
-import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
+import org.jetbrains.kotlin.ir.visitors.*
 import org.jetbrains.kotlin.name.Name
 import kotlin.reflect.KClass
 
@@ -339,7 +336,7 @@ fun IrElement.remapTypes(mapping: Map<IrType, IrType>) = remapTypes(
 
 class DeclarationReferenceRemapper(
     private val mapping: Map<out IrSymbol, IrSymbol>
-) : IrCustomElementTransformerVoid() {
+) : IrElementTransformerVoid() {
     private inline fun <reified S : IrSymbol> IrOverridableDeclaration<S>.remapOverrides() {
         overriddenSymbols = overriddenSymbols.map { mapping[it] as? S ?: it }
     }
@@ -388,7 +385,7 @@ class DeclarationReferenceRemapper(
             val old = this
             // Functions of function expression still need their parents set.
             it.acceptChildrenVoid(
-                object : IrCustomElementVisitorVoid {
+                object : IrElementVisitorVoid {
                     override fun visitElement(element: IrElement) = element.acceptChildrenVoid(this)
 
                     override fun visitFunctionExpression(expression: IrFunctionExpression) {
@@ -481,58 +478,7 @@ class DeepCopier(
     typeRemapper: TypeRemapper,
     symbolRenamer: SymbolRenamer,
     private val declarationRebuilder: DeclarationRebuilder,
-) : DeepCopyIrTreeWithSymbols(symbolRemapper, typeRemapper, symbolRenamer), IrCustomElementTransformerHelperVoid {
-    override fun visitExpression(expression: IrExpression) = visitCustomExpression(
-        expression,
-        data = null,
-        fallback = { super<DeepCopyIrTreeWithSymbols>.visitExpression(expression) }
-    ) as IrExpression
-
-    override fun visitBody(body: IrBody) =
-        visitCustomBody(
-            body,
-            data = null,
-            fallback = { super<DeepCopyIrTreeWithSymbols>.visitBody(body) }
-        ) as IrBody
-
-    override fun visitDartCodeExpression(expression: IrDartCodeExpression): IrDartCodeExpression =
-        IrDartCodeExpression(
-            expression.code,
-            expression.type.remapType()
-        ).copyAttributes(expression)
-
-    override fun visitNullAwareExpression(expression: IrNullAwareExpression): IrNullAwareExpression =
-        IrNullAwareExpression(expression.expression.transform())
-            .copyAttributes(expression)
-
-    override fun visitIfNullExpression(expression: IrIfNullExpression): IrIfNullExpression =
-        IrIfNullExpression(
-            expression.left.transform(),
-            expression.right.transform(),
-            expression.type.remapType(),
-        ).copyAttributes(expression)
-
-    override fun visitConjunctionExpression(expression: IrConjunctionExpression): IrConjunctionExpression =
-        IrConjunctionExpression(
-            left = expression.left.transform(),
-            right = expression.right.transform(),
-            type = expression.type.remapType()
-        ).copyAttributes(expression)
-
-    override fun visitDisjunctionExpression(expression: IrDisjunctionExpression): IrDisjunctionExpression =
-        IrDisjunctionExpression(
-            left = expression.left.transform(),
-            right = expression.right.transform(),
-            type = expression.type.remapType()
-        ).copyAttributes(expression)
-
-    override fun visitExpressionBodyWithOrigin(body: IrExpressionBodyWithOrigin): IrExpressionBodyWithOrigin {
-        return IrExpressionBodyWithOrigin(
-            expression = body.expression.transform(),
-            origin = body.origin
-        )
-    }
-
+) : DeepCopyIrTreeWithSymbols(symbolRemapper, typeRemapper, symbolRenamer) {
     override fun visitClass(declaration: IrClass) = declaration.let {
         val builder = declarationRebuilder.getClassBuilder(declaration.symbol)
             ?: return super<DeepCopyIrTreeWithSymbols>.visitClass(declaration)

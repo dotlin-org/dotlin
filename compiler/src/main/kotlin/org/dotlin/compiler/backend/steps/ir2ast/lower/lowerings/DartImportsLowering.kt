@@ -20,7 +20,6 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.attributes.DartImport
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementVisitorVoid
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrFileLowering
 import org.dotlin.compiler.backend.util.importAliasIn
@@ -41,6 +40,7 @@ import org.jetbrains.kotlin.ir.util.TypeRemapper
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.ir.util.remapTypes
+import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 
 /**
@@ -133,7 +133,7 @@ class DartImportsLowering(override val context: DartLoweringContext) : IrFileLow
         }
 
         file.acceptChildrenVoid(
-            object : IrCustomElementVisitorVoid {
+            object : IrElementVisitorVoid {
                 override fun visitDeclarationReference(expression: IrDeclarationReference) {
                     super.visitDeclarationReference(expression)
 

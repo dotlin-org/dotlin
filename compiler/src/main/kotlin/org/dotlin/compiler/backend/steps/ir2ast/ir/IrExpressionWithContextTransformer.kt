@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 
 sealed class IrInitializable {
     class Field(val field: IrField) : IrInitializable()
@@ -48,7 +49,7 @@ data class IrExpressionContext(
     val initializerContainer: IrInitializable? = null
 )
 
-open class IrExpressionWithContextTransformer : IrCustomElementTransformer<IrExpressionContext?>() {
+open class IrExpressionWithContextTransformer : IrElementTransformer<IrExpressionContext?> {
     final override fun visitDeclaration(
         declaration: IrDeclarationBase,
         context: IrExpressionContext?

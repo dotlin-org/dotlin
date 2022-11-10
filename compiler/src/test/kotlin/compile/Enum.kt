@@ -55,7 +55,7 @@ class Enum : BaseTest {
               }
 
               static Test valueOf(String value) {
-                return values().firstWhere((v) => v.name == value);
+                return this.values().firstWhere((Test v) => v.name == value);
               }
             }
             """
@@ -94,7 +94,7 @@ class Enum : BaseTest {
               }
 
               static Test valueOf(String value) {
-                return values().firstWhere((v) => v.name == value);
+                return this.values().firstWhere((Test v) => v.name == value);
               }
             }
             """
@@ -136,7 +136,7 @@ class Enum : BaseTest {
               }
 
               static Test valueOf(String value) {
-                return values().firstWhere((v) => v.name == value);
+                return this.values().firstWhere((Test v) => v.name == value);
               }
             }
             """
@@ -176,7 +176,7 @@ class Enum : BaseTest {
               }
 
               static Test valueOf(String value) {
-                return values().firstWhere((v) => v.name == value);
+                return this.values().firstWhere((Test v) => v.name == value);
               }
             }
 
@@ -220,7 +220,7 @@ class Enum : BaseTest {
               }
 
               static Test valueOf(String value) {
-                return values().firstWhere((v) => v.name == value);
+                return this.values().firstWhere((Test v) => v.name == value);
               }
             }
 
@@ -264,7 +264,7 @@ class Enum : BaseTest {
               }
 
               static Test valueOf(String value) {
-                return values().firstWhere((v) => v.name == value);
+                return this.values().firstWhere((Test v) => v.name == value);
               }
             }
 
@@ -308,7 +308,7 @@ class Enum : BaseTest {
               }
 
               static Test valueOf(String value) {
-                return values().firstWhere((v) => v.name == value);
+                return this.values().firstWhere((Test v) => v.name == value);
               }
             }
 
@@ -352,7 +352,7 @@ class Enum : BaseTest {
               }
 
               static Test valueOf(String value) {
-                return values().firstWhere((v) => v.name == value);
+                return this.values().firstWhere((Test v) => v.name == value);
               }
             }
 

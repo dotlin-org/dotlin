@@ -388,5 +388,24 @@ class DartLoweringContext(
         }
     }
 
+    fun IrSingleStatementBuilder.irConjunction(left: IrExpression, right: IrExpression) =
+        irLogicalOperator(left, right, isConjunction = true)
+
+    fun IrSingleStatementBuilder.irDisjunction(left: IrExpression, right: IrExpression) =
+        irLogicalOperator(left, right, isConjunction = false)
+
+    fun IrSingleStatementBuilder.irLogicalOperator(
+        left: IrExpression,
+        right: IrExpression,
+        isConjunction: Boolean
+    ): IrExpression {
+        val (symbol, origin) = when {
+            isConjunction -> irBuiltIns.andandSymbol to IrStatementOrigin.ANDAND
+            else -> irBuiltIns.ororSymbol to IrStatementOrigin.OROR
+        }
+
+        return irCall(symbol.owner, receiver = left, right, origin = origin)
+    }
+
     private fun DartIdentifier.escapedValue() = value.replace(".", "").sentenceCase()
 }

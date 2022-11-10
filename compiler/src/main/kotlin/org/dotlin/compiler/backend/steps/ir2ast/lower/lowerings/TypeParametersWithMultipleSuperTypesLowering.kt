@@ -20,7 +20,6 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrNullAwareExpression
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
@@ -39,6 +38,7 @@ import org.jetbrains.kotlin.ir.types.impl.originalKotlinType
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.ir.util.superTypes
+import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.types.Variance
 
@@ -81,7 +81,7 @@ class TypeParametersWithMultipleSuperTypesLowering(override val context: DartLow
 
         // Add explicit casts of relevant types.
         declaration.transformChildrenVoid(
-            object : IrCustomElementTransformerVoid() {
+            object : IrElementTransformerVoid() {
                 fun IrExpression?.possiblyCastReceiver(
                     of: IrDeclarationReference,
                     isInNullAware: Boolean,
@@ -167,20 +167,10 @@ class TypeParametersWithMultipleSuperTypesLowering(override val context: DartLow
                     }
 
                 override fun visitMemberAccess(expression: IrMemberAccessExpression<*>) =
-                    visitMemberAccess(expression, isInNullAware = false)
+                    visitMemberAccess(expression, isInNullAware = expression.isNullSafe)
 
                 override fun visitFieldAccess(expression: IrFieldAccessExpression) =
                     visitFieldAccess(expression, isInNullAware = false)
-
-                override fun visitNullAwareExpression(expression: IrNullAwareExpression): IrNullAwareExpression {
-                    fun IrExpression.wrap() = IrNullAwareExpression(this)
-
-                    return when (val baseExpression = expression.expression) {
-                        is IrMemberAccessExpression<*> -> visitMemberAccess(baseExpression, isInNullAware = true).wrap()
-                        is IrFieldAccessExpression -> visitFieldAccess(baseExpression, isInNullAware = true).wrap()
-                        else -> expression
-                    }
-                }
             }
         )
 

@@ -34,6 +34,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrSetFieldImpl
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.isGetter
 import org.jetbrains.kotlin.ir.util.isSetter
+import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.Name
 
@@ -67,7 +68,7 @@ class PropertySimplifyingLowering(override val context: DartLoweringContext) : I
             }
 
             irProperty.file.transformChildrenVoid(
-                object : IrCustomElementTransformerVoid() {
+                object : IrElementTransformerVoid() {
                     override fun visitCall(expression: IrCall): IrExpression {
                         expression.transformChildrenVoid(this)
 

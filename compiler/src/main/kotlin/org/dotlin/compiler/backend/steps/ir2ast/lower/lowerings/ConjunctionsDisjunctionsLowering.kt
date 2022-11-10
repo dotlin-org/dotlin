@@ -19,8 +19,8 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrConjunctionExpression
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrDisjunctionExpression
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionContext
+import org.dotlin.compiler.backend.steps.ir2ast.ir.irCall
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
@@ -29,7 +29,10 @@ import org.jetbrains.kotlin.ir.expressions.IrWhen
 // TODO: Lower to call to ANDAND/OROR instead of custom element
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UnnecessaryVariable")
 class ConjunctionsDisjunctionsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
+    override fun DartLoweringContext.transform(
+        expression: IrExpression,
+        context: IrExpressionContext
+    ): Transformation<IrExpression>? {
         if (expression !is IrWhen) return noChange()
 
         val irWhen = expression
@@ -44,12 +47,9 @@ class ConjunctionsDisjunctionsLowering(override val context: DartLoweringContext
             else -> irWhen.branches.last().result
         }
 
-        val type = irBuiltIns.booleanType
-
         return replaceWith(
-            when {
-                isConjunction -> IrConjunctionExpression(left, right, type)
-                else -> IrDisjunctionExpression(left, right, type)
+            buildStatement(context.container.symbol) {
+                irLogicalOperator(left, right, isConjunction)
             }
         )
     }

@@ -2,7 +2,6 @@ package org.dotlin.compiler.backend
 
 import org.dotlin.compiler.backend.attributes.IrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrIfNullExpression
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartBool
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartNumberPrimitive
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartString
@@ -24,6 +23,8 @@ import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.types.impl.IrDynamicTypeImpl
 import org.jetbrains.kotlin.ir.types.toKotlinType
 import org.jetbrains.kotlin.ir.util.*
+import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
+import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -271,11 +272,11 @@ abstract class IrContext : IrAttributes {
             // Enums are always constructed as const.
             is IrGetEnumValue, is IrEnumConstructorCall -> true
             is IrConst<*> -> true
-            is IrWhen, is IrIfNullExpression -> {
+            is IrWhen -> {
                 var isConst = true
 
                 acceptChildren(
-                    object : IrCustomElementVisitor<Unit, Nothing?> {
+                    object : IrElementVisitor<Unit, Nothing?> {
                         override fun visitElement(element: IrElement, data: Nothing?) {
                             if (element is IrExpression) {
                                 isConst = isConst && element.isDartConst(implicit, constInlineContainer)
@@ -334,7 +335,7 @@ abstract class IrContext : IrAttributes {
                 var containsNonGlobalReference = false
 
                 function.body?.acceptChildrenVoid(
-                    object : IrCustomElementVisitorVoid {
+                    object : IrElementVisitorVoid {
                         override fun visitElement(element: IrElement) = element.acceptChildrenVoid(this)
 
                         override fun visitDeclarationReference(expression: IrDeclarationReference) {

@@ -19,7 +19,6 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrCustomElementTransformerVoid
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.irCall
 import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
@@ -28,6 +27,7 @@ import org.dotlin.compiler.backend.util.isStatementIn
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.types.makeNotNull
+import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 
 /**
  * Since a temporary subject is used, smart cast does not work, so explicit casts are added.
@@ -53,7 +53,7 @@ class WhensWithSubjectCastToNonNullLowering(override val context: DartLoweringCo
 
             if (mustAssertNotNull) {
                 branch.result = branch.result.transform(
-                    object : IrCustomElementTransformerVoid() {
+                    object : IrElementTransformerVoid() {
                         override fun visitExpression(expression: IrExpression): IrExpression {
                             expression.transformChildrenVoid()
                             if (expression !is IrGetValue || expression.symbol != originalSubject.symbol) {

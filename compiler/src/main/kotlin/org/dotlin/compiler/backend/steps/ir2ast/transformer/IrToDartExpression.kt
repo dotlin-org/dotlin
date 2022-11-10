@@ -25,7 +25,7 @@ import org.dotlin.compiler.backend.hasDartGetterAnnotation
 import org.dotlin.compiler.backend.isDartStatic
 import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.*
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartStatementOrigin.IF_NULL
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.ObjectLowering
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.createDartAssignment
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartInt
@@ -59,6 +59,10 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
         irCallLike: IrFunctionAccessExpression,
         context: DartTransformContext,
     ): DartExpression {
+        when (irCallLike.symbol) {
+            dartBuiltIns.dotlin.dart -> return visitDartCodeCall(irCallLike)
+        }
+
         val irReceiver = irCallLike.extensionReceiver ?: irCallLike.dispatchReceiver
         val irSingleArgument by lazy { irCallLike.getValueArgument(0)!! }
         val optionalReceiver by lazy {
@@ -78,7 +82,8 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
             return DartMethodInvocation(
                 target = receiver,
                 methodName = methodName,
-                arguments = DartArgumentList(singleArgument)
+                arguments = DartArgumentList(singleArgument),
+                isNullAware = irCallLike.isNullSafe
             )
         }
 
@@ -163,6 +168,9 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
             UMINUS -> DartUnaryMinusExpression(
                 receiver.maybeParenthesize(isReceiver = true)
             )
+            ANDAND -> DartConjunctionExpression(infixReceiver, infixSingleArgument)
+            OROR -> DartDisjunctionExpression(infixReceiver, infixSingleArgument)
+            IF_NULL -> DartIfNullExpression(infixReceiver, infixSingleArgument)
             else -> {
                 val irFunction = irCallLike.symbol.owner
                 val hasDartGetterAnnotation = irFunction.hasDartGetterAnnotation()
@@ -184,7 +192,11 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
 
                         when (irReceiver) {
                             null -> irAccessed.dartName
-                            else -> DartPropertyAccessExpression(infixReceiver, irAccessed.dartNameAsSimple)
+                            else -> DartPropertyAccessExpression(
+                                infixReceiver,
+                                irAccessed.dartNameAsSimple,
+                                isNullAware = irCallLike.isNullSafe
+                            )
                         }
                     }
                     irCallLike.isDartIndexedGet() -> DartIndexExpression(receiver, singleArgument)
@@ -203,7 +215,8 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                                 null -> propertyName
                                 else -> DartPropertyAccessExpression(
                                     target = infixReceiver,
-                                    propertyName
+                                    propertyName,
+                                    isNullAware = irCallLike.isNullSafe
                                 )
                             },
                             right = singleArgument,
@@ -259,7 +272,8 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                                         target = receiver.maybeParenthesize(isReceiver = true),
                                         methodName = functionName as DartSimpleIdentifier,
                                         arguments,
-                                        typeArguments
+                                        typeArguments,
+                                        isNullAware = irCallLike.isNullSafe
                                     )
                                 }
                             }
@@ -348,6 +362,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
             else -> DartPropertyAccessExpression(
                 target = receiver.maybeParenthesize(isReceiver = true),
                 propertyName = name,
+                isNullAware = false
             )
         }
     }
@@ -357,7 +372,8 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
         data: DartTransformContext
     ) = DartPropertyAccessExpression(
         target = irGetObjectValue.symbol.owner.dartName,
-        propertyName = ObjectLowering.INSTANCE_FIELD_NAME.toDartIdentifier()
+        propertyName = ObjectLowering.INSTANCE_FIELD_NAME.toDartIdentifier(),
+        isNullAware = false
     )
 
     override fun DartTransformContext.visitSetValue(
@@ -382,6 +398,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
             DartPropertyAccessExpression(
                 target = receiver.maybeParenthesize(isReceiver = true),
                 propertyName = name,
+                isNullAware = false
             )
         else
             name
@@ -466,15 +483,11 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
             null -> irFunction.dartName
             else -> DartPropertyAccessExpression(
                 target = receiver.accept(context),
-                propertyName = irFunction.dartNameAsSimple
+                propertyName = irFunction.dartNameAsSimple,
+                isNullAware = expression.isNullSafe
             )
         }
     }
-
-    override fun DartTransformContext.visitNullAwareExpression(
-        irNullAware: IrNullAwareExpression,
-        context: DartTransformContext
-    ): DartExpression = (irNullAware.expression.accept(context) as DartPossiblyNullAwareExpression).asNullAware()
 
     override fun DartTransformContext.visitStringConcatenation(
         expression: IrStringConcatenation,
@@ -516,25 +529,6 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
             )
         }
     }
-
-    override fun DartTransformContext.visitBinaryInfixExpression(
-        binaryInfix: IrBinaryInfixExpression,
-        context: DartTransformContext
-    ): DartExpression {
-        val left = binaryInfix.left.accept(context).maybeParenthesize(inBinaryInfix = true)
-        val right = binaryInfix.right.accept(context).maybeParenthesize(inBinaryInfix = true)
-
-        return when (binaryInfix) {
-            is IrConjunctionExpression -> DartConjunctionExpression(left, right)
-            is IrDisjunctionExpression -> DartDisjunctionExpression(left, right)
-            is IrIfNullExpression -> DartIfNullExpression(left, right)
-        }
-    }
-
-    override fun DartTransformContext.visitDartCodeExpression(
-        irCode: IrDartCodeExpression,
-        context: DartTransformContext
-    ): DartExpression = DartCode(irCode.code)
 
     private fun DartExpression.maybeParenthesize(
         isReceiver: Boolean = false,
@@ -592,6 +586,12 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
             }
             else -> todo(expression)
         }
+
+    private fun visitDartCodeCall(irCallLike: IrFunctionAccessExpression): DartExpression {
+        val code = (irCallLike.valueArguments[0] as IrConst<*>).value as String
+
+        return DartCode(code.trimIndent())
+    }
 
     private fun DartTransformContext.relevantDartNameOf(irField: IrField): DartSimpleIdentifier = irField.let {
         when {

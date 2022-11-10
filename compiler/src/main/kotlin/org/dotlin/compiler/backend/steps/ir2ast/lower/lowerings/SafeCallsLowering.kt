@@ -19,14 +19,17 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.element.IrNullAwareExpression
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.*
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UnnecessaryVariable")
 class SafeCallsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
+    override fun DartLoweringContext.transform(
+        expression: IrExpression,
+        context: IrExpressionContext
+    ): Transformation<IrExpression>? {
         if (expression !is IrBlock || expression.origin != IrStatementOrigin.SAFE_CALL) return noChange()
 
         val irBlock = expression
@@ -40,8 +43,8 @@ class SafeCallsLowering(override val context: DartLoweringContext) : IrExpressio
 
         value.dispatchReceiver = receiver
 
-        return replaceWith(
-            IrNullAwareExpression(value)
-        )
+        value.isNullSafe = true
+
+        return replaceWith(value)
     }
 }

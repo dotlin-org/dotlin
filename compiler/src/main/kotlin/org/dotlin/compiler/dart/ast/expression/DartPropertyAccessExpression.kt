@@ -25,7 +25,7 @@ import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 data class DartPropertyAccessExpression(
     val target: DartExpression,
     val propertyName: DartSimpleIdentifier,
-    override val isNullAware: Boolean = false,
+    override val isNullAware: Boolean,
 ) : DartPossiblyNullAwareExpression {
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
         visitor.visitPropertyAccess(this, data)
@@ -34,6 +34,4 @@ data class DartPropertyAccessExpression(
         target.accept(visitor, data)
         propertyName.accept(visitor, data)
     }
-
-    override fun asNullAware(): DartPropertyAccessExpression = copy(isNullAware = true)
 }
