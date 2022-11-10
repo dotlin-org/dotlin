@@ -48,6 +48,7 @@ import org.jetbrains.kotlin.ir.expressions.IrTypeOperator.*
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
@@ -279,23 +280,26 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
             is IrConstKind.Long -> DartIntegerLiteral(irConst.value as Long)
             is IrConstKind.Float -> DartDoubleLiteral(irConst.value as Float)
             is IrConstKind.Double -> DartDoubleLiteral(irConst.value as Double)
-            is IrConstKind.Char -> {
-                val char = irConst.value as Char
-                val charValue = char.code
+            is IrConstKind.Char, is IrConstKind.String -> {
+                val source = irConst.ktExpression
+                val isTripleQuoted = (source as? KtStringTemplateExpression)?.isTripleQuoted() == true
 
-                // If the code point is outside of ASCII range, the Dart string literal will be a
-                // Unicode literal.
-                val string = when {
-                    charValue >= 128 || charValue == 0 -> "\\u{${charValue.toString(radix = 16)}}"
-                    else -> char.toString()
-                }
+                val irConstValue = irConst.value as String
 
-                DartSimpleStringLiteral(string)
+                DartSimpleStringLiteral(
+                    // If it's not a triple quoted string, it might contain characters such as '\n', which are parsed
+                    // in irConstValue. We want them as-is in the source ('\n'). Thus, we grab the string value from
+                    // the source in that case.
+                    value = when {
+                        isTripleQuoted -> irConstValue
+                        else -> source?.text?.drop(1)?.dropLast(1) ?: irConstValue
+                    },
+                    // Always raw if triple quoted, because there's
+                    // no string interpolation anyway.
+                    isRaw = isTripleQuoted,
+                    isTripleQuoted
+                )
             }
-            is IrConstKind.String -> DartSimpleStringLiteral(
-                value = irConst.value as String
-                // TODO: isMultiline, isRaw
-            )
             else -> todo(irConst)
         }
     }
@@ -476,14 +480,41 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
         expression: IrStringConcatenation,
         context: DartTransformContext
     ): DartExpression {
-        return DartStringInterpolation(
-            elements = expression.arguments.map {
-                when {
-                    it is IrConst<*> && it.kind == IrConstKind.String -> DartInterpolationString(it.value as String)
-                    else -> DartInterpolationExpression(it.accept(context))
-                }
+        val isTripledQuoted = (expression.ktExpression as? KtStringTemplateExpression)?.isTripleQuoted() == true
+
+        val expressions = expression.arguments.map {
+            when (val exp = it.accept(context)) {
+                //
+                is DartSimpleStringLiteral -> exp.copy(isTripleQuoted = true)
+                else -> exp
             }
-        )
+        }
+
+        return when {
+            // For triple quoted string literals, we make it a string concatenation. This is necessary, because
+            // Dart triple quoted strings cannot have interpolation (`"$x"`) in them. But, we still need to
+            // use triple quotes in Dart because special characters (`\n`) should stay literal as-is, and
+            // new lines should be preserved.
+            isTripledQuoted -> expressions
+                .map {
+                    when (it) {
+                        // We must make any string literals triple quoted and raw, because that enables similar
+                        // features as with Kotlin triple quoted strings: No escaped characters and the literal
+                        // can go over multiple lines.
+                        is DartSimpleStringLiteral -> it.copy(isTripleQuoted = true, isRaw = true)
+                        else -> it
+                    }
+                }
+                .reduceRight { value, acc -> DartPlusExpression(value, acc) }
+            else -> DartStringInterpolation(
+                elements = expressions.map {
+                    when (it) {
+                        is DartSimpleStringLiteral -> DartInterpolationString(it.value)
+                        else -> DartInterpolationExpression(it)
+                    }
+                },
+            )
+        }
     }
 
     override fun DartTransformContext.visitBinaryInfixExpression(

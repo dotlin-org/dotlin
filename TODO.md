@@ -67,9 +67,9 @@
     - [x] Float literals
     - [x] Double literals
     - [x] Character literals
-    - [ ] String literals
+    - [x] String literals
       - [x] Single string literal
-      - [ ] Multiline string literal
+      - [x] Multiline string literal
       - [x] String interpolations
   - [x] Try catch expressions
   - [x] Conditional expressions

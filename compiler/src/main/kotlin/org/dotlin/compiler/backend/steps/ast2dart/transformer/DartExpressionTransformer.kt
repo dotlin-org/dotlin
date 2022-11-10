@@ -184,8 +184,6 @@ object DartExpressionTransformer : DartAstNodeTransformer() {
             transformBy { (rawToken, quoteToken) ->
                 val value = literal.value
 
-                // TODO: Handle multiline
-
                 "$rawToken$quoteToken$value$quoteToken"
             }
         }
@@ -240,7 +238,7 @@ object DartExpressionTransformer : DartAstNodeTransformer() {
         block: (DartSingleStringLiteralDefaults) -> String
     ) = DartSingleStringLiteralDefaults(
         rawToken = if (isRaw) "r" else "",
-        quoteToken = "\""
+        quoteToken = if (isTripleQuoted) "\"\"\"" else "\""
     ).let { block(it) }
 
     private data class DartSingleStringLiteralDefaults(val rawToken: String, val quoteToken: String)

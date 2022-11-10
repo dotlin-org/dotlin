@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrField
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
 import org.jetbrains.kotlin.psi.KtDeclaration
+import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.calls.util.getResolvedCall
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
@@ -42,3 +43,5 @@ fun KtAnnotationEntry.getFqName(bindingContext: BindingContext) = getResolvedCal
     ?.resultingDescriptor
     ?.containingDeclaration
     ?.fqNameSafe
+
+fun KtStringTemplateExpression.isTripleQuoted() = text.startsWith("\"\"\"")

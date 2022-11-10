@@ -27,7 +27,7 @@ import org.dotlin.compiler.dart.ast.expression.DartExpression
 data class DartStringInterpolation(
     val elements: List<DartInterpolationElement>,
     override val isRaw: Boolean = false,
-    override val isMultiline: Boolean = false,
+    override val isTripleQuoted: Boolean = false,
 ) : DartSingleStringLiteral {
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
         visitor.visitStringInterpolation(this, data)

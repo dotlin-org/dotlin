@@ -24,7 +24,7 @@ import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 data class DartSimpleStringLiteral(
     val value: String,
     override val isRaw: Boolean = false,
-    override val isMultiline: Boolean = false,
+    override val isTripleQuoted: Boolean = false,
 ) : DartSingleStringLiteral {
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
         visitor.visitSimpleStringLiteral(this, data)

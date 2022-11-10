@@ -2053,4 +2053,151 @@ class Expression : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `string literal with escaped newlines`() = assertCompile {
+        kotlin(
+            """
+            fun main () {
+                val x = "Line0\nLine1"
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            void main() {
+              final String x = "Line0\nLine1";
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `multiline string literal`() = assertCompile {
+        kotlin(
+            """
+            fun main () {
+                val x = ${"\"\"\""}Line 0
+                Line 1
+                Line 2
+                ${"\"\"\""}
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            void main() {
+              final String x = r${"\"\"\""}Line 0
+                Line 1
+                Line 2
+                ${"\"\"\""};
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `multiline string literal with interpolation`() = assertCompile {
+        kotlin(
+            """
+            fun main () {
+                val a = "A"
+                val b = "BEE"
+
+                val x = ${"\"\"\""}Line 0
+                Line 1 or ${'$'}a
+                Line 2 and ${'$'}b
+                ${"\"\"\""}
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            void main() {
+              final String a = "A";
+              final String b = "BEE";
+              final String x = r${"\"\"\""}Line 0
+                Line 1 or ${"\"\"\""} +
+                  a +
+                  r${"\"\"\""}
+                Line 2 and ${"\"\"\""} +
+                  b +
+                  r${"\"\"\""}
+                ${"\"\"\""};
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `multiline string literal with newline characters`() = assertCompile {
+        kotlin(
+            """
+            fun main () {
+                val x = ${"\"\"\""}Line\n0
+                Line\n1
+                Line\n2
+                ${"\"\"\""}
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            void main() {
+              final String x = r${"\"\"\""}Line\n0
+                Line\n1
+                Line\n2
+                ${"\"\"\""};
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `multiline string literal with interpolation and newline characters`() = assertCompile {
+        kotlin(
+            """
+            fun main () {
+                val a = "A"
+                val b = "BEE"
+
+                val x = ${"\"\"\""}Line\n0
+                Line\n1 or ${'$'}a
+                Line\n2 and ${'$'}b
+                ${"\"\"\""}
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            void main() {
+              final String a = "A";
+              final String b = "BEE";
+              final String x = r${"\"\"\""}Line\n0
+                Line\n1 or ${"\"\"\""} +
+                  a +
+                  r${"\"\"\""}
+                Line\n2 and ${"\"\"\""} +
+                  b +
+                  r${"\"\"\""}
+                ${"\"\"\""};
+            }
+            """
+        )
+    }
 }
