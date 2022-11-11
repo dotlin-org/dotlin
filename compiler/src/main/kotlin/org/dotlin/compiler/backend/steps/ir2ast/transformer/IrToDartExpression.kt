@@ -284,7 +284,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
         }
     }
 
-    override fun <T> DartTransformContext.visitConst(irConst: IrConst<T>, data: DartTransformContext): DartExpression {
+    override fun DartTransformContext.visitConst(irConst: IrConst<*>, data: DartTransformContext): DartExpression {
         return when (irConst.kind) {
             is IrConstKind.Null -> DartNullLiteral
             is IrConstKind.Boolean -> DartBooleanLiteral(irConst.value as Boolean)

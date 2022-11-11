@@ -21,7 +21,6 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.jetbrains.kotlin.backend.common.ir.isMethodOfAny
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -41,6 +40,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.symbols.IrValueSymbol
 import org.jetbrains.kotlin.ir.types.classifierOrFail
+import org.jetbrains.kotlin.ir.util.isMethodOfAny
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.addIfNotNull
 
@@ -189,7 +189,7 @@ class OperatorsLowering(override val context: DartLoweringContext) : IrDeclarati
 
         return replaceWith(
             irFunction.deepCopyWith {
-                // This function should not marked as an operator anymore, since only the newly added operator method
+                // This function should not be marked as an operator anymore, since only the newly added operator method
                 // will be the actual Dart operator, if it's added.
                 isOperator = false
                 origin = IrDartDeclarationOrigin.WAS_OPERATOR

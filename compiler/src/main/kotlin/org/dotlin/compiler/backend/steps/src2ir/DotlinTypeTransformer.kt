@@ -2,7 +2,6 @@ package org.dotlin.compiler.backend.steps.src2ir
 
 import org.dotlin.compiler.backend.dotlin
 import org.dotlin.compiler.backend.kotlin
-import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
 import org.jetbrains.kotlin.renderer.DescriptorRendererOptions
@@ -60,7 +59,7 @@ class DotlinFlexibleType(private val original: FlexibleType) : FlexibleType(orig
         return "$mainPart<$argument>$questionMark"
     }
 
-    override fun replaceAnnotations(newAnnotations: Annotations) = original.replaceAnnotations(newAnnotations)
+    override fun replaceAttributes(newAttributes: TypeAttributes) = delegate.replaceAttributes(newAttributes)
 }
 
 private fun KotlinType.isAnyList(): Boolean = fqNameOrNull() == dotlin.intrinsics.AnyList

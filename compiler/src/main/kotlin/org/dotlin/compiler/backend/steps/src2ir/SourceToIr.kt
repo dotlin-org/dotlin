@@ -131,7 +131,8 @@ private fun loadIr(
             config.languageVersionSettings,
             additionalDependencyModules = listOf(),
             friendModuleFiles = emptySet(),
-            includedLibraryFiles = emptySet()
+            includedLibraryFiles = emptySet(),
+            isForMetadataCompilation = false
         ).resolvedDescriptors
         else -> emptyList()
     }

@@ -26,11 +26,11 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArgumentsOrDefaults
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.dotlin.compiler.backend.util.isDartConst
 import org.dotlin.compiler.backend.util.returnExpressions
-import org.jetbrains.kotlin.backend.common.deepCopyWithVariables
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.declarations.IrVariable
+import org.jetbrains.kotlin.ir.deepCopyWithVariables
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetValue

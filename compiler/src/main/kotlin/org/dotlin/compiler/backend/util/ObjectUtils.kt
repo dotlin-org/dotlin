@@ -22,8 +22,8 @@ package org.dotlin.compiler.backend.util
 import org.dotlin.compiler.backend.isDartStatic
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isFakeOverride
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isStatic
-import org.jetbrains.kotlin.backend.common.ir.isMethodOfAny
 import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.util.isMethodOfAny
 import org.jetbrains.kotlin.ir.util.isObject
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 

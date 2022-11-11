@@ -23,7 +23,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.dotlin.compiler.backend.util.hasObjectParentAndStaticCounterpart
 import org.dotlin.compiler.backend.util.isSimple
-import org.jetbrains.kotlin.backend.common.ir.addChild
+import org.jetbrains.kotlin.ir.util.addChild
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET

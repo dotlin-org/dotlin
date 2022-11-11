@@ -20,14 +20,17 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.*
+import org.dotlin.compiler.backend.steps.ir2ast.ir.irCall
+import org.dotlin.compiler.backend.steps.ir2ast.ir.propertyWithName
+import org.dotlin.compiler.backend.steps.ir2ast.ir.transformExpressions
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.dotlin.compiler.backend.util.isStatementIn
 import org.jetbrains.kotlin.backend.common.lower.irCatch
 import org.jetbrains.kotlin.backend.common.lower.irThrow
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.*
-import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.declarations.IrDeclaration
+import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrTryImpl
@@ -36,7 +39,10 @@ import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
 import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.types.impl.originalKotlinType
 import org.jetbrains.kotlin.ir.types.isUnit
-import org.jetbrains.kotlin.ir.util.*
+import org.jetbrains.kotlin.ir.util.SYNTHETIC_OFFSET
+import org.jetbrains.kotlin.ir.util.defaultType
+import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
+import org.jetbrains.kotlin.ir.util.primaryConstructor
 import org.jetbrains.kotlin.types.Variance
 
 /**
@@ -74,9 +80,9 @@ private fun DartLoweringContext.transformReturnExpressionsIn(function: IrFunctio
     val returnClass = dartBuiltIns.dotlin.returnClass.owner
     val returnClassType = returnClass.defaultType.let {
         IrSimpleTypeImpl(
-            kotlinType = it.originalKotlinType,
-            classifier = it.classifier,
-            hasQuestionMark = it.hasQuestionMark,
+            it.originalKotlinType,
+            it.classifier,
+            it.nullability,
             arguments = listOf(
                 makeTypeProjection(returnType, variance = Variance.INVARIANT)
             ),

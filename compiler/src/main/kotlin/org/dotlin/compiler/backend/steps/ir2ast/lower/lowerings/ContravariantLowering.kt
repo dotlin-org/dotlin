@@ -49,7 +49,7 @@ class ContravariantLowering(override val context: DartLoweringContext) : IrFileL
             return IrSimpleTypeImpl(
                 originalKotlinType,
                 classifier,
-                hasQuestionMark,
+                nullability,
                 arguments = arguments
                     .map {
                         when (it) {

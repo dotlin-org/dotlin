@@ -81,6 +81,7 @@ class RuntimeCollectionTypeLowering private constructor() {
                     expression.typeOperand = expression.typeOperand.toAnyCollection(context.dartBuiltIns)
                     expression.type = expression.typeOperand
                 }
+                else -> {}
             }
 
             return noChange()

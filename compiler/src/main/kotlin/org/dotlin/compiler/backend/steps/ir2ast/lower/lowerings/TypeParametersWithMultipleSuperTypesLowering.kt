@@ -19,7 +19,10 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.*
+import org.dotlin.compiler.backend.steps.ir2ast.ir.allSuperTypes
+import org.dotlin.compiler.backend.steps.ir2ast.ir.firstNonFakeOverrideOrSelf
+import org.dotlin.compiler.backend.steps.ir2ast.ir.polymorphicallyIs
+import org.dotlin.compiler.backend.steps.ir2ast.ir.typeParameterOrNull
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
@@ -189,7 +192,7 @@ class TypeParametersWithMultipleSuperTypesLowering(override val context: DartLow
         return IrSimpleTypeImpl(
             originalKotlinType,
             classifier,
-            hasQuestionMark,
+            nullability,
             arguments = originalSuperType.arguments,
             annotations,
             abbreviation
@@ -202,7 +205,7 @@ class TypeParametersWithMultipleSuperTypesLowering(override val context: DartLow
         return IrSimpleTypeImpl(
             originalKotlinType,
             classifier,
-            hasQuestionMark,
+            nullability,
             arguments = arguments.map {
                 val typeParam = it.typeOrNull?.typeParameterOrNull ?: return@map it
 

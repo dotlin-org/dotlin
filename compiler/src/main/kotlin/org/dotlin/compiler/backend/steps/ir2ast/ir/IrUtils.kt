@@ -22,7 +22,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.ir
 import org.dotlin.compiler.backend.hasDartExtensionAnnotation
 import org.dotlin.compiler.backend.util.falseIfNull
 import org.jetbrains.kotlin.backend.common.ir.*
-import org.jetbrains.kotlin.backend.common.ir.isStatic
+import org.jetbrains.kotlin.ir.util.isStatic
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.IrElement

@@ -42,7 +42,7 @@ class DotlinBuiltIns : KotlinBuiltIns(LockBasedStorageManager("DotlinBuiltIns"))
     override fun getArrayType(projectionType: Variance, argument: KotlinType, annotations: Annotations): SimpleType {
         return KotlinTypeFactory.simpleType(
             baseType = array.defaultType,
-            annotations = annotations,
+            annotations = TypeAttributes.create(listOf(AnnotationsTypeAttribute(annotations))),
             arguments = listOf(TypeProjectionImpl(projectionType, argument)),
         )
     }

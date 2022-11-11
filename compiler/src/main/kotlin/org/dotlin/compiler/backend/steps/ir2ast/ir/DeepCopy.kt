@@ -24,7 +24,10 @@ import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.builders.declarations.*
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.expressions.IrDeclarationReference
+import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrFunctionExpression
+import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.*
@@ -493,18 +496,17 @@ class DeepCopier(
                 override val descriptor = it.descriptor
                 override val endOffset = builder.endOffset
                 override val factory = it.factory
-                override var inlineClassRepresentation = it.inlineClassRepresentation
                 override val isCompanion = builder.isCompanion
                 override val isData = builder.isCompanion
                 override val isExpect = builder.isExpect
                 override val isExternal = builder.isExternal
                 override val isFun = builder.isFun
-                override val isInline = builder.isInline
                 override val isInner = builder.isInner
+                override val isValue = it.isValue
                 override val kind = builder.kind
                 override var metadata = it.metadata
                 override var modality = builder.modality
-                override val name = builder.name
+                override var name = builder.name
                 override var origin = builder.origin
                 override var parent = it.parent
                 override var sealedSubclasses = it.sealedSubclasses
@@ -514,6 +516,7 @@ class DeepCopier(
                 override val symbol = it.symbol
                 override var thisReceiver = it.thisReceiver
                 override var typeParameters = it.typeParameters
+                override var valueClassRepresentation = it.valueClassRepresentation
                 override var visibility = builder.visibility
             },
         )
@@ -548,7 +551,7 @@ class DeepCopier(
                 override val isTailrec = builder.isTailrec
                 override var metadata = it.metadata
                 override val modality = builder.modality
-                override val name = builder.name
+                override var name = builder.name
                 override var origin = builder.origin
                 override var overriddenSymbols = it.overriddenSymbols
                 override var parent = it.parent
@@ -584,7 +587,7 @@ class DeepCopier(
                 override val isInline = builder.isInline
                 override val isPrimary = builder.isPrimary
                 override var metadata = it.metadata
-                override val name = builder.name
+                override var name = builder.name
                 override var origin = builder.origin
                 override var parent = it.parent
                 override var returnType = builder.returnType
@@ -623,7 +626,7 @@ class DeepCopier(
                 override val isVar = builder.isVar
                 override var metadata = it.metadata
                 override val modality = builder.modality
-                override val name = builder.name
+                override var name = builder.name
                 override var origin = builder.origin
                 override var overriddenSymbols = it.overriddenSymbols
                 override var parent = it.parent
@@ -653,7 +656,7 @@ class DeepCopier(
                 override val isFinal = builder.isFinal
                 override val isStatic = builder.isStatic
                 override var metadata = builder.metadata
-                override val name = builder.name
+                override var name = builder.name
                 override var origin = builder.origin
                 override var parent = it.parent
                 override val startOffset = builder.startOffset
@@ -682,7 +685,7 @@ class DeepCopier(
                 override val isCrossinline = it.isCrossinline
                 override val isHidden = builder.isHidden
                 override val isNoinline = builder.isNoinline
-                override val name = builder.name
+                override var name = builder.name
                 override var origin = builder.origin
                 override var parent = it.parent
                 override val startOffset = it.startOffset

@@ -26,6 +26,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.builders.declarations.buildFun
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.impl.IrExternalPackageFragmentImpl
@@ -43,6 +44,7 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 
 // TODO: Make lazy
+@OptIn(ObsoleteDescriptorBasedAPI::class)
 class DartIrBuiltIns(private val context: DartLoweringContext) {
     private val builtInsModule = context.irModuleFragment.descriptor.builtIns.builtInsModule
     private val symbolTable = context.symbolTable

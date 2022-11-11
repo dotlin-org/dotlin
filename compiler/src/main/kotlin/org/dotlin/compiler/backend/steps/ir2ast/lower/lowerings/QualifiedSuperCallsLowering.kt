@@ -24,7 +24,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
 import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
-import org.jetbrains.kotlin.backend.common.ir.addChild
+import org.jetbrains.kotlin.ir.util.addChild
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.declarations.*

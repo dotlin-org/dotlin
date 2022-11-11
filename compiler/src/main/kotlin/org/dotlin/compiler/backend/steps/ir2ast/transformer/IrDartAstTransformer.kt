@@ -111,10 +111,10 @@ abstract class IrDartAstTransformer<N : DartAstNode?> : IrElementVisitor<N, Dart
     open fun DartTransformContext.visitComposite(expression: IrComposite, context: DartTransformContext): N =
         super.visitComposite(expression, context)
 
-    final override fun <T> visitConst(expression: IrConst<T>, context: DartTransformContext): N =
+    final override fun visitConst(expression: IrConst<*>, context: DartTransformContext): N =
         context.run { visitConst(expression, context) }
 
-    open fun <T> DartTransformContext.visitConst(expression: IrConst<T>, context: DartTransformContext): N =
+    open fun DartTransformContext.visitConst(expression: IrConst<*>, context: DartTransformContext): N =
         super.visitConst(expression, context)
 
     final override fun visitConstructor(declaration: IrConstructor, context: DartTransformContext): N =
