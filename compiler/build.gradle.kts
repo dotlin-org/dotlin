@@ -5,7 +5,7 @@ plugins {
     application
 }
 
-group = "dev.dotlin.compiler"
+group = "org.dotlin.compiler"
 version = "0.0.1"
 
 repositories {
