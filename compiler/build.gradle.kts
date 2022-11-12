@@ -30,12 +30,12 @@ tasks.test {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
-        jvmTarget = "14"
+        jvmTarget = "17"
         freeCompilerArgs = listOf("-Xinline-classes", "-Xopt-in=kotlin.RequiresOptIn")
     }
 }
 
 application {
-    mainClassName = "org.dotlin.compiler.Dotlin"
+    mainClass.set("org.dotlin.compiler.Dotlin")
     applicationName = "dotlin"
 }
