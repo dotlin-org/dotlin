@@ -182,6 +182,29 @@ class Statement : BaseTest {
                 """
             )
         }
+
+        @Test
+        fun `empty if`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    if (0 == 1) {
+
+                    }
+                }
+                """
+            )
+
+            dart(
+                """
+                import "package:meta/meta.dart";
+
+                void main() {
+                  if (0 == 1) {}
+                }
+                """
+            )
+        }
     }
 
     @Nested

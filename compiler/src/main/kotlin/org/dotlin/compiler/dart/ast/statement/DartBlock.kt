@@ -33,4 +33,4 @@ class DartBlock(
     }
 }
 
-fun DartStatement.wrapInBlock(): DartBlock = DartBlock(statements = listOf(this))
+fun DartStatement.wrapInBlock(): DartBlock = if (this is DartBlock) this else DartBlock(statements = listOf(this))

@@ -603,9 +603,7 @@ class List : BaseTest {
 
             void main() {
               final Object obj = calculate();
-              if (obj is! List<int>) {
-                {}
-              }
+              if (obj is! List<int>) {}
             }
             """
         )
@@ -663,9 +661,7 @@ class List : BaseTest {
 
             void main() {
               final Object obj = calculate();
-              if (!obj.isImmutableList<int>()) {
-                {}
-              }
+              if (!obj.isImmutableList<int>()) {}
             }
             """
         )
@@ -723,9 +719,7 @@ class List : BaseTest {
 
             void main() {
               final Object obj = calculate();
-              if (!obj.isWriteableList<int>()) {
-                {}
-              }
+              if (!obj.isWriteableList<int>()) {}
             }
             """
         )
@@ -783,9 +777,7 @@ class List : BaseTest {
 
             void main() {
               final Object obj = calculate();
-              if (!obj.isFixedSizeList<int>()) {
-                {}
-              }
+              if (!obj.isFixedSizeList<int>()) {}
             }
             """
         )
@@ -849,9 +841,7 @@ class List : BaseTest {
 
             void main() {
               final Object obj = calculate();
-              if (!obj.isFixedSizeList<int>()) {
-                {}
-              }
+              if (!obj.isFixedSizeList<int>()) {}
             }
             """
         )
@@ -909,9 +899,7 @@ class List : BaseTest {
 
             void main() {
               final Object obj = calculate();
-              if (!obj.isMutableList<int>()) {
-                {}
-              }
+              if (!obj.isMutableList<int>()) {}
             }
             """
         )

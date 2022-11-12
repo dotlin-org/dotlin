@@ -189,9 +189,7 @@ class Collection : BaseTest {
 
             void main() {
               final dynamic obj = calculate();
-              if (!obj.isCollection<int>()) {
-                {}
-              }
+              if (!obj.isCollection<int>()) {}
             }
             """
         )
@@ -220,9 +218,7 @@ class Collection : BaseTest {
 
             void main() {
               final Object obj = calculate();
-              if (!obj.isCollection<int>()) {
-                {}
-              }
+              if (!obj.isCollection<int>()) {}
             }
             """
         )
@@ -369,9 +365,7 @@ class Collection : BaseTest {
 
             void main() {
               final dynamic obj = calculate();
-              if (!obj.isCollection<int>()) {
-                {}
-              }
+              if (!obj.isCollection<int>()) {}
             }
             """
         )

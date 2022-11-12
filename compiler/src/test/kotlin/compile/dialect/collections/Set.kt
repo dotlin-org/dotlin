@@ -472,9 +472,7 @@ class Set : BaseTest {
 
             void main() {
               final Object obj = calculate();
-              if (obj is! Set<int>) {
-                {}
-              }
+              if (obj is! Set<int>) {}
             }
             """
         )
@@ -530,9 +528,7 @@ class Set : BaseTest {
 
             void main() {
               final Object obj = calculate();
-              if (!obj.isImmutableSet<int>()) {
-                {}
-              }
+              if (!obj.isImmutableSet<int>()) {}
             }
             """
         )
@@ -575,9 +571,7 @@ class Set : BaseTest {
 
             fun main() {
                 val obj = calculate()
-                if (obj !is MutableSet<Int>) {
-                    
-                }
+                if (obj !is MutableSet<Int>) {}
             }
 
             external fun calculate(): Any
@@ -590,9 +584,7 @@ class Set : BaseTest {
 
             void main() {
               final Object obj = calculate();
-              if (!obj.isMutableSet<int>()) {
-                {}
-              }
+              if (!obj.isMutableSet<int>()) {}
             }
             """
         )
