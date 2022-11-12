@@ -51,3 +51,15 @@ abstract class Enum<E : Enum<E>> const constructor(
     override final fun hashCode(): Int
     override fun toString() = name
 }
+
+/**
+ * Returns an array containing enum T entries.
+ */
+@SinceKotlin("1.1")
+external const inline fun <reified T : Enum<T>> enumValues(): Array<T>
+
+/**
+ * Returns an enum entry with specified name.
+ */
+@SinceKotlin("1.1")
+external inline fun <reified T : Enum<T>> enumValueOf(name: String): T

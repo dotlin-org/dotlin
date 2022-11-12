@@ -32,15 +32,3 @@ fun Any?.toString(): String {
  * or the [other] object are null, they are represented as the string "null".
  */
 operator fun String?.plus(other: Any?): String = toString() + other.toString()
-
-/**
- * Returns an array containing enum T entries.
- */
-@SinceKotlin("1.1")
-external const inline fun <reified T : Enum<T>> enumValues(): Array<T>
-
-/**
- * Returns an enum entry with specified name.
- */
-@SinceKotlin("1.1")
-external inline fun <reified T : Enum<T>> enumValueOf(name: String): T
