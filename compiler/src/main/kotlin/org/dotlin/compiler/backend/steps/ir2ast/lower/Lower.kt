@@ -55,7 +55,6 @@ private val lowerings: List<Lowering> = listOf(
     Comparable::PostOperatorsLowering,
     ExtensionsLowering::RemoveReceiverTypeArguments,
     ::ExtensionsLowering,
-    ::ConflictingExtensionCallsLowering,
     ::SortStatementsLowering,
     ::ConstructorPassingComplexParamToSuperLowering,
     ::CompareToCallsLowering,

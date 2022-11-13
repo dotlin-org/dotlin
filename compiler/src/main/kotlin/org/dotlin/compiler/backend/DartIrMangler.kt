@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend
 
+import org.dotlin.compiler.backend.steps.ir2ast.ir.owner
 import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinExportChecker
 import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinMangleComputer
 import org.jetbrains.kotlin.backend.common.serialization.mangle.MangleMode
@@ -26,6 +27,8 @@ import org.jetbrains.kotlin.backend.common.serialization.mangle.ir.IrBasedKotlin
 import org.jetbrains.kotlin.backend.common.serialization.mangle.ir.IrExportCheckerVisitor
 import org.jetbrains.kotlin.backend.common.serialization.mangle.ir.IrMangleComputer
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
+import org.jetbrains.kotlin.ir.types.*
+import org.jetbrains.kotlin.ir.util.render
 
 object DartIrMangler : IrBasedKotlinManglerImpl() {
     override fun getExportChecker(compatibleMode: Boolean): KotlinExportChecker<IrDeclaration> =
@@ -33,6 +36,25 @@ object DartIrMangler : IrBasedKotlinManglerImpl() {
 
     override fun getMangleComputer(mode: MangleMode, compatibleMode: Boolean): KotlinMangleComputer<IrDeclaration> =
         DartIrManglerComputer(StringBuilder(256), mode, compatibleMode)
+
+    fun IrDeclaration.mangledSignatureHexString(): String = signatureMangle(compatibleMode = false).toHexString()
+
+    fun IrType.mangledHexString(): String = hashedMangle().toHexString()
+
+    private fun IrType.hashedMangle(): Long = when (this) {
+        is IrSimpleType -> (arguments.map { it.hashedMangle() } + owner.hashedMangle(compatibleMode = false))
+            .joinToString(separator = "").hashMangle
+
+        is IrDynamicType -> "dynamic".hashMangle
+        else -> error("Unexpected type argument: ${render()}")
+    }
+
+    private fun IrTypeArgument.hashedMangle(): Long = when (this) {
+        is IrTypeProjection -> type.hashedMangle()
+        else -> "*".hashMangle
+    }
+
+    private fun Long.toHexString(): String = toString(radix = 16).replace('-', 'm')
 
     private class DartIrExportChecker(compatibleMode: Boolean) : IrExportCheckerVisitor(compatibleMode) {
         override fun IrDeclaration.isPlatformSpecificExported() = false

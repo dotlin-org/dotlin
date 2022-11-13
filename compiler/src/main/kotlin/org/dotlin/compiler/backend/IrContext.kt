@@ -98,10 +98,10 @@ abstract class IrContext : IrAttributes {
         dartNameGenerator.run { dartNameValueWith(superTypes) }
 
     /**
-     * The path for the (eventually) generated Dart file. The path is relative to its source root ([sourceRoot] if it's
-     * a file in the currently compiling module).
+     * The path for the (eventually) generated Dart file. The path is relative to its source root.
      *
-     * The original Kotlin file name is transformed to snake case, and the `.kt` extension is replaced with `.g.dart`.
+     * The original Kotlin file name is transformed to snake case, and the `.kt` extension is replaced
+     * with `.dt.g.dart`.
      */
     val IrFile.dartPath: Path
         get() = dartNameGenerator.runWith(this) { dartPathOf(it) }

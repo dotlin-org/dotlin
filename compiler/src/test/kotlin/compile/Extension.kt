@@ -43,7 +43,7 @@ class Extension : BaseTest {
             @sealed
             class Test {}
 
-            extension ${'$'}TestExtensions${'$'}b07f86 on Test {
+            extension ${'$'}Extensions${'$'}e82faa8ee9f5630 on Test {
               void doIt() {}
             }
             """
@@ -67,7 +67,7 @@ class Extension : BaseTest {
             @sealed
             class Test {}
 
-            extension ${'$'}TestExtensions${'$'}b07f86 on Test {
+            extension ${'$'}Extensions${'$'}e82faa8ee9f5630 on Test {
               int get number {
                 return 3;
               }
@@ -95,7 +95,7 @@ class Extension : BaseTest {
             @sealed
             class Test {}
 
-            extension ${'$'}TestExtensions${'$'}b07f86 on Test {
+            extension ${'$'}Extensions${'$'}e82faa8ee9f5630 on Test {
               int get number {
                 return 3;
               }
@@ -123,7 +123,7 @@ class Extension : BaseTest {
             @sealed
             class Test<T> {}
 
-            extension ${'$'}TestExtensions${'$'}b07f86<T> on Test<T> {
+            extension ${'$'}Extensions${'$'}m16c83f0fbfe989b5<T> on Test<T> {
               void doIt() {}
             }
             """
@@ -142,6 +142,7 @@ class Extension : BaseTest {
             """
         )
 
+        // TODO?: These could be in a single container, but technically they are different types.
         dart(
             """
             import "package:meta/meta.dart";
@@ -149,8 +150,11 @@ class Extension : BaseTest {
             @sealed
             class Test<T> {}
 
-            extension ${'$'}TestExtensions${'$'}b07f86<T> on Test<T> {
+            extension ${'$'}Extensions${'$'}m16c83f0fbfe989b5<T> on Test<T> {
               void doIt() {}
+            }
+
+            extension ${'$'}Extensions${'$'}37f52dfc25a24d30<T> on Test<T> {
               void doItAgain() {}
             }
             """
@@ -176,11 +180,11 @@ class Extension : BaseTest {
             @sealed
             class Test<T> {}
 
-            extension ${'$'}TestExtensions${'$'}b07f86<T> on Test<T> {
+            extension ${'$'}Extensions${'$'}m16c83f0fbfe989b5<T> on Test<T> {
               void doIt() {}
             }
 
-            extension ${'$'}TestIntExtensions${'$'}b07f86 on Test<int> {
+            extension ${'$'}Extensions${'$'}m2cf093a2f7cb6dc9 on Test<int> {
               void doItAgain() {}
             }
             """
@@ -204,7 +208,7 @@ class Extension : BaseTest {
             @sealed
             class Test<T> {}
 
-            extension ${'$'}TestExtensions${'$'}b07f86<A> on Test<A> {
+            extension ${'$'}Extensions${'$'}1969ba987fc0610b<A> on Test<A> {
               void doIt<B>() {}
             }
             """
@@ -215,7 +219,7 @@ class Extension : BaseTest {
     fun `extension on type from other file`() = assertCompile {
         kotlin(
             """
-            fun String.titlecase() {}
+            fun String.titleCase() {}
             """
         )
 
@@ -223,8 +227,8 @@ class Extension : BaseTest {
             """
             import "package:meta/meta.dart";
 
-            extension ${'$'}KotlinStringExtensions${'$'}b07f86 on String {
-              void titlecase() {}
+            extension ${'$'}Extensions${'$'}m4003f16a123cbc3c on String {
+              void titleCase() {}
             }
             """
         )
@@ -242,7 +246,7 @@ class Extension : BaseTest {
             """
             import "package:meta/meta.dart";
 
-            extension ${'$'}TMustBeAnyExtensions${'$'}b07f86<T> on T {
+            extension ${'$'}Extensions${'$'}1ebfd8e5fb05c28e<T> on T {
               void doIt() {}
             }
             """
@@ -266,7 +270,7 @@ class Extension : BaseTest {
             @sealed
             class Test<T> {}
 
-            extension ${'$'}TMustBeTestWithTExtensions${'$'}b07f86<T extends Test<T>> on T {
+            extension ${'$'}Extensions${'$'}m7d7bc927be75976e<T extends Test<T>> on T {
               void doIt() {}
             }
             """
@@ -290,7 +294,7 @@ class Extension : BaseTest {
             @sealed
             class Test<T> {}
 
-            extension ${'$'}TMustBeTestWithStringExtensions${'$'}b07f86<T extends Test<String>> on T {
+            extension ${'$'}Extensions${'$'}m39f172ecf6739208<T extends Test<String>> on T {
               void doIt() {}
             }
             """
@@ -354,8 +358,7 @@ class Extension : BaseTest {
               SomeItem().buildAndIdentify();
             }
 
-            extension ${'$'}TMustBeBuildableAndIdentifiableExtensions${'$'}b07f86<T extends Object>
-                on T {
+            extension ${'$'}Extensions${'$'}5ed3d873052fe8b3<T extends Object> on T {
               void buildAndIdentify() {
                 (this as Identifiable).identify();
                 (this as Buildable).build();
@@ -378,7 +381,7 @@ class Extension : BaseTest {
             """
             import "package:meta/meta.dart";
 
-            extension ${'$'}KotlinIntExtensions${'$'}b07f86 on int {
+            extension ${'$'}Extensions${'$'}69eeea92bbe1f1f1 on int {
               int shift() {
                 return 0;
               }
@@ -404,7 +407,7 @@ class Extension : BaseTest {
             import "package:meta/meta.dart";
 
             void main() {
-              ${'$'}KotlinIntExtensions${'$'}6745d637(0).absoluteValue;
+              0.absoluteValue;
             }
             """
         )

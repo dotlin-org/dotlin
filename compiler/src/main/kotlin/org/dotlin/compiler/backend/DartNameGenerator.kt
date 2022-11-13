@@ -19,7 +19,7 @@
 
 package org.dotlin.compiler.backend
 
-import org.dotlin.compiler.backend.DartIrMangler.signatureString
+import org.dotlin.compiler.backend.DartIrMangler.mangledSignatureHexString
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.util.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
@@ -29,14 +29,12 @@ import org.dotlin.compiler.dart.ast.expression.identifier.toDartIdentifier
 import org.jetbrains.kotlin.backend.common.lower.parents
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.types.*
-import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.isSetter
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.util.collectionUtils.filterIsInstanceAnd
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.relativeTo
-import kotlin.math.absoluteValue
 
 class DartNameGenerator {
     private val builtInIdentifiers = listOf(
@@ -118,8 +116,7 @@ class DartNameGenerator {
             // Handle function overloads.
             if (name != null && annotatedName == null && this is IrSimpleFunction && isOverload) {
                 name = name.copy(
-                    suffix = "\$" + signatureString(compatibleMode = false)
-                        .hashCode().absoluteValue.toString(radix = 16)
+                    suffix = "$" + mangledSignatureHexString()
                 )
             }
 
@@ -154,18 +151,6 @@ class DartNameGenerator {
                     !isPrivate && name?.isPrivate == true -> name.copy(isPrivate = false)
                     else -> name
                 }
-            }
-
-            if (this is IrClass && isDartExtensionWithGeneratedName) {
-                // A suffix is added to extension containers to prevent name conflicts with extension containers in
-                // other files for the same type.
-                name = name?.copy(
-                    suffix = "$" + file.dartPath
-                        .toString()
-                        .hashCode()
-                        .toUInt()
-                        .toString(radix = 16)
-                )
             }
 
             // If there's a property or field with the same name as a method or function, rename the field/property.

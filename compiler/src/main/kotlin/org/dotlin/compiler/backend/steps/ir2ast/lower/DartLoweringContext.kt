@@ -20,10 +20,10 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
 import org.dotlin.compiler.backend.*
+import org.dotlin.compiler.backend.DartIrMangler.mangledHexString
 import org.dotlin.compiler.backend.attributes.IrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.DartIrBuiltIns
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartNumberPrimitive
 import org.dotlin.compiler.backend.util.sentenceCase
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
@@ -160,44 +160,15 @@ class DartLoweringContext(
             val receiverType = receiver.type
             val receiverTypeParameters = receiverType.typeParametersOrSelf
 
-            val dartExtensionName = dartExtensionName
-            val containerName = dartExtensionName ?: run {
-                val (file, mainName) = when (val classifier = receiverType.classifierOrNull?.owner) {
-                    is IrClass -> classifier.file to classifier.defaultType.let {
-                        // TODO: Not necessary anymore: Only Int and Double can be used.
-                        when {
-                            it.isDartNumberPrimitive() -> classifier.name.identifier
-                            else -> classifier.dartName.escapedValue()
-                        }
-                    }
-                    is IrTypeParameter -> classifier.file to classifier.dartNameValueWith(superTypes = true)
-                    else -> throw UnsupportedOperationException("Cannot handle extension for $this yet")
-                }
-                val prefix = '$'
-                val packagePrefix = when {
-                    file != this.file -> file.fqName.pathSegments()
-                        .map { it.identifier }
-                        .joinToString("") { it.sentenceCase() }
-                    else -> ""
-                }
-                val typeArguments = when (receiverType) {
-                    is IrSimpleType -> receiverType.arguments
-                        .mapNotNull { it.typeOrNull?.classOrNull?.owner?.dartName?.escapedValue() }
-                        .joinToString("") { it.sentenceCase() }
-                    else -> ""
-                }
-                val suffix = "Extensions"
-
-                "$prefix$packagePrefix$mainName$typeArguments$suffix"
-            }
-
             val file = file
+
+            val containerName = dartExtensionName ?: "\$Extensions\$${receiverType.mangledHexString()}"
 
             return extensionContainers
                 .getOrPut(file) { mutableMapOf() }
                 .getOrPut(containerName) {
                     irFactory.buildClass {
-                        origin = IrDartDeclarationOrigin.EXTENSION(hasGeneratedName = dartExtensionName == null)
+                        origin = IrDartDeclarationOrigin.EXTENSION
                         name = Name.identifier(containerName)
                     }.apply {
                         parent = file
@@ -279,6 +250,7 @@ class DartLoweringContext(
                             receiver = getThis,
                             field = backingField!!
                         )
+
                         else -> irSetField(
                             receiver = getThis,
                             field = backingField!!,
@@ -375,14 +347,17 @@ class DartLoweringContext(
                     IrStatementOrigin.GET_LOCAL_PROPERTY -> buildStatement(symbol) {
                         getter(this, exp)
                     }
+
                     else -> when (exp.symbol.owner.origin) {
                         // Must be a 'set' in this case.
                         IrDeclarationOrigin.DELEGATED_PROPERTY_ACCESSOR -> buildStatement(symbol) {
                             setter(this, exp)
                         }
+
                         else -> exp
                     }
                 }
+
                 else -> exp
             }
         }

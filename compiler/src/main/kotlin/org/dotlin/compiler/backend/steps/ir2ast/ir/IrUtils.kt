@@ -22,7 +22,6 @@ package org.dotlin.compiler.backend.steps.ir2ast.ir
 import org.dotlin.compiler.backend.hasDartExtensionAnnotation
 import org.dotlin.compiler.backend.util.falseIfNull
 import org.jetbrains.kotlin.backend.common.ir.*
-import org.jetbrains.kotlin.ir.util.isStatic
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.IrElement
@@ -37,6 +36,7 @@ import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
+import org.jetbrains.kotlin.ir.util.isStatic
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
@@ -416,8 +416,8 @@ val IrField.isExplicitBackingField: Boolean
             correspondingProperty?.backingField == this &&
             origin == IrDeclarationOrigin.PROPERTY_BACKING_FIELD
 
-val IrType.owner: IrDeclarationWithName
-    get() = classifierOrFail.owner as IrDeclarationWithName
+val IrSimpleType.owner: IrDeclarationWithName
+    get() = classifier.owner as IrDeclarationWithName
 
 fun IrBuilderWithScope.irCall(
     callee: IrSimpleFunction,
@@ -491,9 +491,6 @@ fun IrElement.replaceExpressions(block: (IrExpression) -> IrExpression) {
 
 val IrClass.isDartExtensionContainer: Boolean
     get() = origin is IrDartDeclarationOrigin.EXTENSION
-
-val IrClass.isDartExtensionWithGeneratedName: Boolean
-    get() = origin.let { it is IrDartDeclarationOrigin.EXTENSION && it.hasGeneratedName }
 
 fun IrDeclaration.isFakeOverride() = isFakeOverride || origin == IrDeclarationOrigin.FAKE_OVERRIDE
 

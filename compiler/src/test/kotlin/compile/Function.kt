@@ -794,7 +794,7 @@ class Function : BaseTest {
                 import "package:meta/meta.dart";
 
                 void giveCookie() {}
-                void giveCookie${'$'}5ee8c6c0(String message) {}
+                void giveCookie${'$'}m639e992809d99644(String message) {}
                 """
             )
         }
@@ -858,8 +858,8 @@ class Function : BaseTest {
                 import "package:meta/meta.dart";
 
                 void giveCookie() {}
-                void giveCookie${'$'}5ee8c6c0(String message) {}
-                void giveCookie${'$'}55bd19bd(
+                void giveCookie${'$'}m639e992809d99644(String message) {}
+                void giveCookie${'$'}m6543678d01b9145(
                   String message,
                   String wrapping,
                 ) {}
@@ -886,12 +886,12 @@ class Function : BaseTest {
                 import "package:meta/meta.dart";
 
                 void giveCookie() {}
-                void giveCookie${'$'}5ee8c6c0(String message) {}
-                void giveCookie${'$'}55bd19bd(
+                void giveCookie${'$'}m639e992809d99644(String message) {}
+                void giveCookie${'$'}m6543678d01b9145(
                   String message,
                   String wrapping,
                 ) {}
-                void giveCookie${'$'}208e1206(
+                void giveCookie${'$'}4a16651884738102(
                   String message,
                   String wrapping,
                   String extra,
@@ -915,7 +915,7 @@ class Function : BaseTest {
                 import "package:meta/meta.dart";
 
                 void sayHello(String greeting) {}
-                void sayHello${'$'}2e9216ce(
+                void sayHello${'$'}4849c719b52c91b3(
                   String greeting,
                   bool friendly,
                 ) {}
@@ -941,7 +941,7 @@ class Function : BaseTest {
                   int a,
                   int b,
                 ) {}
-                void compare${'$'}7a889453(
+                void compare${'$'}m5fe76181385ff432(
                   String that,
                   String other,
                 ) {}
@@ -967,11 +967,11 @@ class Function : BaseTest {
                   int a,
                   int b,
                 ) {}
-                void compare${'$'}7a889453(
+                void compare${'$'}m5fe76181385ff432(
                   String a,
                   String b,
                 ) {}
-                void compare${'$'}1313942d(
+                void compare${'$'}m28c5005e60a77136(
                   double a,
                   double b,
                 ) {}
@@ -998,11 +998,11 @@ class Function : BaseTest {
                       Set<int> that,
                       Set<int> other,
                     ) {}
-                    void compare${'$'}71611621(
+                    void compare${'$'}7f270b79c3b577da(
                       List<int> that,
                       List<int> other,
                     ) {}
-                    void compare${'$'}20ed612d(
+                    void compare${'$'}67242747a13aa7ae(
                       List<int> that,
                       List<int> other,
                     ) {}
@@ -1029,12 +1029,12 @@ class Function : BaseTest {
                 import "package:meta/meta.dart";
 
                 void giveCookie() {}
-                void giveCookie${'$'}5ee8c6c0(String message) {}
-                void giveCookie${'$'}55bd19bd(
+                void giveCookie${'$'}m639e992809d99644(String message) {}
+                void giveCookie${'$'}m6543678d01b9145(
                   String message,
                   String wrapping,
                 ) {}
-                void giveCookie${'$'}768fabb9(
+                void giveCookie${'$'}f0f03bfebe04b1c(
                   String message,
                   int wrapping,
                 ) {}
@@ -1059,7 +1059,7 @@ class Function : BaseTest {
                   int a,
                   int b,
                 ) {}
-                void compare${'$'}6ed2a113(
+                void compare${'$'}m1e5a0905b7b7657b(
                   int a,
                   int b,
                 ) {}
@@ -1085,7 +1085,7 @@ class Function : BaseTest {
                       int a,
                       int b,
                     ) {}
-                    void compare${'$'}7235d6a8<T extends String>(
+                    void compare${'$'}m1c704916d538b69a<T extends String>(
                       T a,
                       T b,
                     ) {}
@@ -1118,7 +1118,7 @@ class Function : BaseTest {
                       int a,
                       int b,
                     ) {}
-                    void compare${'$'}62c0e263<T extends Object>(
+                    void compare${'$'}1bd3a8ce55bd8b17<T extends Object>(
                       T a,
                       T b,
                     ) {}
@@ -1143,7 +1143,7 @@ class Function : BaseTest {
                   T a,
                   int b,
                 ) {}
-                void compare${'$'}709997fc<T, A extends int>(
+                void compare${'$'}m7891300775455212<T, A extends int>(
                   A a,
                   int b,
                 ) {}
@@ -1169,11 +1169,11 @@ class Function : BaseTest {
                   T a,
                   int b,
                 ) {}
-                void compare${'$'}4a59002<T, A extends Set<int>>(
+                void compare${'$'}53bde3f737855ad9<T, A extends Set<int>>(
                   A a,
                   int b,
                 ) {}
-                void compare${'$'}6d42ebc2<T, A extends Set<int>>(
+                void compare${'$'}330909c5ce1d4043<T, A extends Set<int>>(
                   A a,
                   int b,
                 ) {}
@@ -1200,7 +1200,7 @@ class Function : BaseTest {
                       int a,
                       int b,
                     ) {}
-                    void compare${'$'}33f3d258<T, I, J, K>(
+                    void compare${'$'}m6717f1a76eb95cd5<T, I, J, K>(
                       T a,
                       int b,
                     ) {}
