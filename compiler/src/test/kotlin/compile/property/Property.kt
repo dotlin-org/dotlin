@@ -877,9 +877,9 @@ class Property {
             }
 
             const KMutableProperty0Impl<bool> test${'$'}kProperty0 =
-                KMutableProperty0Impl<bool>("test", _${'$'}381, _${'$'}381With${'$'}value);
+                KMutableProperty0Impl<bool>("test", _${'$'}381, _${'$'}381${'$'}17411610);
             bool _${'$'}381() => test;
-            bool _${'$'}381With${'$'}value(bool ${'$'}value) => test = ${'$'}value;
+            bool _${'$'}381${'$'}17411610(bool ${'$'}value) => test = ${'$'}value;
             """
         )
     }

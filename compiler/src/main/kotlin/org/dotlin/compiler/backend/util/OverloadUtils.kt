@@ -19,90 +19,49 @@
 
 package org.dotlin.compiler.backend.util
 
+import org.dotlin.compiler.backend.dartAnnotatedName
 import org.jetbrains.kotlin.backend.common.lower.parents
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationContainer
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
-import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
-import org.jetbrains.kotlin.ir.declarations.IrValueParameter
-import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.util.isGetter
 import org.jetbrains.kotlin.ir.util.isSetter
 import org.jetbrains.kotlin.util.collectionUtils.filterIsInstanceAnd
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstance
 
-val IrSimpleFunction.isOverload: Boolean
+val IrSimpleFunction.isOverloaded: Boolean
     get() = overloads.isNotEmpty()
 
-// TODO: Handle local functions
-// TODO: Handle extensions
+/**
+ * Whether this function is an overload. False if this is the first occurrence (source-wise) of overloads, the
+ * "original" of the overloads. For example:
+ * ```kotlin
+ * // isOverload = false, isOverloaded = true
+ * fun execute(): Int = ..
+ *
+ * // isOverload = true, isOverloaded = true
+ * fun execute(arg: Int): Int = ..
+ * ```
+ */
+val IrSimpleFunction.isOverload: Boolean
+    get() = overloadsWithSelf.let { it.isNotEmpty() && it.first().attributeOwnerId != attributeOwnerId }
+
+// TODO?: Handle local functions
+// TODO?: Handle extensions
 val IrSimpleFunction.overloadsWithSelf: Collection<IrSimpleFunction>
-    get() = parents.firstIsInstance<IrDeclarationContainer>()
-        .declarations
-        .filterIsInstanceAnd { it.name == name && !it.isGetter && !it.isSetter }
+    get() {
+        // We only care about names the user has given us. This is why we don't use dartNameOrNull.
+        fun IrSimpleFunction.relevantName() = dartAnnotatedName ?: name.identifierOrNullIfSpecial
+
+        return parents.firstIsInstance<IrDeclarationContainer>()
+            .declarations
+            .filterIsInstanceAnd {
+                val ourName = this.relevantName()
+                val theirName = it.relevantName()
+                !it.isGetter && !it.isSetter &&
+                        ourName != null && theirName != null && ourName == theirName
+            }
+    }
+
 
 val IrSimpleFunction.overloads: Collection<IrSimpleFunction>
-    get() = overloadsWithSelf - this
-
-/**
- * The root overload is the overload with the least parameters. Can be this.
- *
- * If multiple overloads have the least amount of parameters of all overloads, but have the same amount, the base
- * overload is the first source occurrence of those overloads.
- */
-val IrSimpleFunction.rootOverload: IrSimpleFunction
-    get() = overloadsWithSelf.minByOrNull { it.valueParameters.size + it.typeParameters.size }!!
-
-val IrSimpleFunction.isRootOverload: Boolean
-    get() = isOverload && this == rootOverload
-
-/**
- * The base overload is the first occurrence overload with the same amount of parameters _and_ parameter names, in the
- * same order. Accounts for both value and type parameters. Can be this.
- */
-val IrSimpleFunction.baseOverload: IrSimpleFunction
-    get() = overloadsWithSelf.asSequence()
-        .filter { it.valueParameters.size == valueParameters.size && it.typeParameters.size == typeParameters.size }
-        .filter { overload ->
-            fun <T> List<T>.allSameSignatureNames(
-                other: List<T>,
-                toOverloadSignature: (T) -> OverloadParameterSignature
-            ) = joinToString { toOverloadSignature(it).name } == other.joinToString { toOverloadSignature(it).name }
-
-            overload.valueParameters.allSameSignatureNames(valueParameters) { it.overloadSignature } &&
-                    overload.typeParameters.allSameSignatureNames(typeParameters) { it.overloadSignature }
-        }
-        .minByOrNull { it.valueParameters.size + it.typeParameters.size }!!
-
-fun <T> List<T>.uniqueParametersComparedTo(
-    parameters: List<T>,
-    toOverloadSignature: (T) -> OverloadParameterSignature
-): List<T> {
-    fun List<T>.overloadSignatures() = map { toOverloadSignature(it) }
-
-    return overloadSignatures()
-        .subtract(parameters.overloadSignatures().toSet())
-        .let {
-            filter { param -> it.any { sig -> sig == toOverloadSignature(param) } }
-        }
-}
-
-fun IrSimpleFunction.uniqueValueParametersComparedTo(function: IrSimpleFunction) =
-    valueParameters.uniqueParametersComparedTo(function.valueParameters) { it.overloadSignature }
-
-fun IrSimpleFunction.uniqueTypeParametersComparedTo(function: IrSimpleFunction) =
-    typeParameters.uniqueParametersComparedTo(function.typeParameters) { it.overloadSignature }
-
-/**
- * Overload signature for [IrValueParameter] or [IrTypeParameter]. If it's a [type] parameter,
- * [type] refers to the upper bounds concatenated.
- */
-data class OverloadParameterSignature(val name: String, val type: String)
-
-val IrValueParameter.overloadSignature: OverloadParameterSignature
-    get() = OverloadParameterSignature(name.toString(), type.classFqName?.asString() ?: "<none>")
-
-val IrTypeParameter.overloadSignature: OverloadParameterSignature
-    get() = OverloadParameterSignature(
-        name.toString(),
-        superTypes.joinToString { it.classFqName?.asString() ?: "<none>" }
-    )
+    get() = overloadsWithSelf - (this.attributeOwnerId as? IrSimpleFunction ?: this)

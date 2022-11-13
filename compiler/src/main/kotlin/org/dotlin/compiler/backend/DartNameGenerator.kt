@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend
 
+import org.dotlin.compiler.backend.DartIrMangler.signatureString
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.util.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
@@ -29,13 +30,13 @@ import org.jetbrains.kotlin.backend.common.lower.parents
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.file
-import org.jetbrains.kotlin.ir.util.isGetter
 import org.jetbrains.kotlin.ir.util.isSetter
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.util.collectionUtils.filterIsInstanceAnd
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.relativeTo
+import kotlin.math.absoluteValue
 
 class DartNameGenerator {
     private val builtInIdentifiers = listOf(
@@ -105,77 +106,21 @@ class DartNameGenerator {
                         else -> null
                     }
                 }
+
                 isSetter -> when {
                     name.isSpecial -> (this as IrSimpleFunction).correspondingProperty!!.simpleDartName
                     else -> dartNameAsSimple
                 }
+
                 else -> null
             }
 
             // Handle function overloads.
-            if (name != null && annotatedName == null &&
-                this is IrSimpleFunction &&
-                !isGetter && !isSetter &&
-                isOverload && !isRootOverload
-            ) {
-                val baseOverload = baseOverload
-                val uniqueParameters = when {
-                    rootOverload != baseOverload -> uniqueValueParametersComparedTo(rootOverload)
-                    else -> emptyList()
-                }
-                val uniqueTypeParameters = uniqueTypeParametersComparedTo(rootOverload)
-
-                var uniqueValueTypeSuffix = ""
-                var needsTypeParamBoundInfo = false
-
-                if (this != baseOverload) {
-                    needsTypeParamBoundInfo = true
-
-                    // Find the first unique type and use that as a suffix.
-                    val ourValueTypes = valueParameters.map { it.type }.toSet()
-                    val overloadValueTypes = overloads
-                        .map { it.valueParameters.map { param -> param.type } }
-                        .flatten()
-                        .toSet()
-
-                    uniqueValueTypeSuffix =
-                        ourValueTypes.subtract(overloadValueTypes).firstOrNull().let {
-                            when (it?.classOrNull) {
-                                null -> ""
-                                else -> it.dartNameValueWith(superTypes = true)
-                            }
-                        }
-                }
-
-                val uniqueParametersPart = when {
-                    uniqueParameters.isNotEmpty() -> "With" + uniqueParameters
-                        .mapIndexed { index, parameter ->
-                            val part = parameter.name.toString().sentenceCase()
-
-                            when {
-                                uniqueParameters.isLastIndexAndNotSingle(index) -> "And$part"
-                                else -> part
-                            }
-                        }
-                        .joinToString(separator = "")
-                    else -> ""
-                }
-
-                val uniqueTypeParametersPart = when {
-                    uniqueParameters.isEmpty() && uniqueTypeParameters.isNotEmpty() -> "WithGeneric" + uniqueTypeParameters
-                        .mapIndexed { index, parameter ->
-                            val part = parameter.dartNameValueWith(needsTypeParamBoundInfo)
-
-                            when {
-                                uniqueTypeParameters.isLastIndexAndNotSingle(index) -> "And$part"
-                                else -> part
-                            }
-                        }
-                        .joinToString(separator = "")
-                    else -> ""
-                }
-
-                name = name.copy(suffix = uniqueParametersPart + uniqueTypeParametersPart + uniqueValueTypeSuffix)
+            if (name != null && annotatedName == null && this is IrSimpleFunction && isOverload) {
+                name = name.copy(
+                    suffix = "\$" + signatureString(compatibleMode = false)
+                        .hashCode().absoluteValue.toString(radix = 16)
+                )
             }
 
             // TODO: Handle case if there's a nested class named "Companion" (error or different name)?

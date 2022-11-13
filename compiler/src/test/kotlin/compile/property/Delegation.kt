@@ -135,9 +135,9 @@ class Delegation : BaseTest {
 
             final Delegate _x${"$"}delegate = Delegate();
             const KMutableProperty0Impl<String> x${"$"}kProperty0 =
-                KMutableProperty0Impl<String>("x", _${"$"}381, _${"$"}381With${"$"}value);
+                KMutableProperty0Impl<String>("x", _${"$"}381, _${'$'}381${'$'}342567d3);
             String _${"$"}381() => x;
-            String _${"$"}381With${"$"}value(String ${"$"}value) => x = ${"$"}value;
+            String _${'$'}381${'$'}342567d3(String ${"$"}value) => x = ${"$"}value;
             """
         )
     }

@@ -22,7 +22,6 @@ package compile
 import BaseTest
 import DefaultValue
 import assertCompile
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -795,7 +794,7 @@ class Function : BaseTest {
                 import "package:meta/meta.dart";
 
                 void giveCookie() {}
-                void giveCookieWithMessage(String message) {}
+                void giveCookie${'$'}5ee8c6c0(String message) {}
                 """
             )
         }
@@ -822,6 +821,27 @@ class Function : BaseTest {
         }
 
         @Test
+        fun `function with @DartName with overload`() = assertCompile {
+            kotlin(
+                """
+                @DartName("gimme")
+                fun giveCookie() {}
+
+                fun giveCookie(message: String) {}
+                """
+            )
+
+            dart(
+                """
+                import "package:meta/meta.dart";
+
+                void gimme() {}
+                void giveCookie(String message) {}
+                """
+            )
+        }
+
+        @Test
         fun `function with two overloads`() = assertCompile {
             kotlin(
                 """
@@ -838,8 +858,8 @@ class Function : BaseTest {
                 import "package:meta/meta.dart";
 
                 void giveCookie() {}
-                void giveCookieWithMessage(String message) {}
-                void giveCookieWithMessageAndWrapping(
+                void giveCookie${'$'}5ee8c6c0(String message) {}
+                void giveCookie${'$'}55bd19bd(
                   String message,
                   String wrapping,
                 ) {}
@@ -866,12 +886,12 @@ class Function : BaseTest {
                 import "package:meta/meta.dart";
 
                 void giveCookie() {}
-                void giveCookieWithMessage(String message) {}
-                void giveCookieWithMessageAndWrapping(
+                void giveCookie${'$'}5ee8c6c0(String message) {}
+                void giveCookie${'$'}55bd19bd(
                   String message,
                   String wrapping,
                 ) {}
-                void giveCookieWithMessageWrappingAndExtra(
+                void giveCookie${'$'}208e1206(
                   String message,
                   String wrapping,
                   String extra,
@@ -895,7 +915,7 @@ class Function : BaseTest {
                 import "package:meta/meta.dart";
 
                 void sayHello(String greeting) {}
-                void sayHelloWithFriendly(
+                void sayHello${'$'}2e9216ce(
                   String greeting,
                   bool friendly,
                 ) {}
@@ -921,7 +941,7 @@ class Function : BaseTest {
                   int a,
                   int b,
                 ) {}
-                void compareWithThatAndOther(
+                void compare${'$'}7a889453(
                   String that,
                   String other,
                 ) {}
@@ -947,11 +967,11 @@ class Function : BaseTest {
                   int a,
                   int b,
                 ) {}
-                void compareString(
+                void compare${'$'}7a889453(
                   String a,
                   String b,
                 ) {}
-                void compareDouble(
+                void compare${'$'}1313942d(
                   double a,
                   double b,
                 ) {}
@@ -959,15 +979,14 @@ class Function : BaseTest {
             )
         }
 
-        @Disabled // TODO: Do this test for Dart interface and its Impl
         @Test
         fun `function with overload that have same amount of parameters, same names and same Dart types`() =
             assertCompile {
                 kotlin(
                     """
-                    fun compare(that: Int, other: Int) {}
-                    fun compare(that: Float, other: Float) {}
-                    fun compare(that: Double, other: Double) {}
+                    fun compare(that: Set<Int>, other: Set<Int>) {}
+                    fun compare(that: List<Int>, other:  List<Int>) {}
+                    fun compare(that: ImmutableList<Int>, other: ImmutableList<Int>) {}
                     """
                 )
 
@@ -976,79 +995,20 @@ class Function : BaseTest {
                     import "package:meta/meta.dart";
 
                     void compare(
-                      int that,
-                      int other,
+                      Set<int> that,
+                      Set<int> other,
                     ) {}
-                    void compareFloat(
-                      double that,
-                      double other,
+                    void compare${'$'}71611621(
+                      List<int> that,
+                      List<int> other,
                     ) {}
-                    void compareDouble(
-                      double that,
-                      double other,
-                    ) {}
-                    """
-                )
-        }
-
-        @Disabled // TODO: Do this test for Dart interface and its Impl
-        @Test
-        fun `function with overload that have same amount of parameters, but not the same names but same Dart types`() =
-            assertCompile {
-                kotlin(
-                    """
-                    fun compare(a: Int, b: Int) {}
-                    fun compare(that: Float, other: Float) {}
-                    fun compare(that: Double, other: Double) {}
-                    """
-                )
-
-                dart(
-                    """
-                    import "package:meta/meta.dart";
-
-                    void compare(
-                      int a,
-                      int b,
-                    ) {}
-                    void compareWithThatAndOther(
-                      double that,
-                      double other,
-                    ) {}
-                    void compareWithThatAndOtherDouble(
-                      double that,
-                      double other,
+                    void compare${'$'}20ed612d(
+                      List<int> that,
+                      List<int> other,
                     ) {}
                     """
                 )
             }
-
-        @Disabled // TODO: Do this test for Dart interface and its Impl
-        @Test
-        fun `function with overload that are equivalent in Dart but not in Kotlin`() = assertCompile {
-            kotlin(
-                """
-                fun compare(a: Int, b: Int) {}
-
-                fun compare(a: Long, b: Long) {}
-                """
-            )
-
-            dart(
-                """
-                import "package:meta/meta.dart";
-
-                void compare(
-                  int a,
-                  int b,
-                ) {}
-                void compareLong(
-                  int a,
-                  int b,
-                ) {}
-                """
-            )
-        }
 
         @Test
         fun `function with three overloads, two of which have similar parameters`() = assertCompile {
@@ -1069,12 +1029,12 @@ class Function : BaseTest {
                 import "package:meta/meta.dart";
 
                 void giveCookie() {}
-                void giveCookieWithMessage(String message) {}
-                void giveCookieWithMessageAndWrapping(
+                void giveCookie${'$'}5ee8c6c0(String message) {}
+                void giveCookie${'$'}55bd19bd(
                   String message,
                   String wrapping,
                 ) {}
-                void giveCookieWithMessageAndWrappingInt(
+                void giveCookie${'$'}768fabb9(
                   String message,
                   int wrapping,
                 ) {}
@@ -1095,11 +1055,11 @@ class Function : BaseTest {
                 """
                 import "package:meta/meta.dart";
 
-                void compareWithGenericT<T>(
+                void compare<T>(
                   int a,
                   int b,
                 ) {}
-                void compare(
+                void compare${'$'}6ed2a113(
                   int a,
                   int b,
                 ) {}
@@ -1125,7 +1085,7 @@ class Function : BaseTest {
                       int a,
                       int b,
                     ) {}
-                    void compareWithGenericTMustBeString<T extends String>(
+                    void compare${'$'}7235d6a8<T extends String>(
                       T a,
                       T b,
                     ) {}
@@ -1133,7 +1093,6 @@ class Function : BaseTest {
                 )
             }
 
-        @Disabled // TODO: Analysis error
         @Test
         fun `function with overload that has the same parameters are generic and have same type parameter name but multiple bounds`() =
             assertCompile {
@@ -1144,6 +1103,25 @@ class Function : BaseTest {
 
                     fun <T> compare(a: Int, b: Int) {}
                     fun <T> compare(a: T, b: T) where T : Marker1, T : Marker2 {}
+                    """
+                )
+
+                dart(
+                    """
+                    import "package:meta/meta.dart";
+
+                    abstract class Marker1 {}
+
+                    abstract class Marker2 {}
+
+                    void compare<T>(
+                      int a,
+                      int b,
+                    ) {}
+                    void compare${'$'}62c0e263<T extends Object>(
+                      T a,
+                      T b,
+                    ) {}
                     """
                 )
             }
@@ -1165,7 +1143,7 @@ class Function : BaseTest {
                   T a,
                   int b,
                 ) {}
-                void compareWithGenericA<T, A extends int>(
+                void compare${'$'}709997fc<T, A extends int>(
                   A a,
                   int b,
                 ) {}
@@ -1173,14 +1151,13 @@ class Function : BaseTest {
             )
         }
 
-        @Disabled // TODO: Do this test but with Dart interface and its Impl
         @Test
         fun `function with two overloads that have the same parameters and are generic`() = assertCompile {
             kotlin(
                 """
                 fun <T, A> compare(a: T, b: Int) {}
-                fun <T, A : Int> compare(a: A, b: Int) {}
-                fun <T, A : Long> compare(a: A, b: Int) {}
+                fun <T, A : Set<Int>> compare(a: A, b: Int) {}
+                fun <T, A : ImmutableSet<Int>> compare(a: A, b: Int) {}
                 """
             )
 
@@ -1192,11 +1169,11 @@ class Function : BaseTest {
                   T a,
                   int b,
                 ) {}
-                void compareWithGenericAMustBeInt<T, A extends int>(
+                void compare${'$'}4a59002<T, A extends Set<int>>(
                   A a,
                   int b,
                 ) {}
-                void compareWithGenericAMustBeLong<T, A extends int>(
+                void compare${'$'}6d42ebc2<T, A extends Set<int>>(
                   A a,
                   int b,
                 ) {}
@@ -1204,7 +1181,7 @@ class Function : BaseTest {
             )
         }
 
-        // TODO (possibly): Not ideal, but correct with the current logic.
+
         @Test
         fun `function with overload that has the same parameters are generic but has more type parameters`() =
             assertCompile {
@@ -1223,7 +1200,7 @@ class Function : BaseTest {
                       int a,
                       int b,
                     ) {}
-                    void compareWithA<T, I, J, K>(
+                    void compare${'$'}33f3d258<T, I, J, K>(
                       T a,
                       int b,
                     ) {}
