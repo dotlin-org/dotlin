@@ -25,8 +25,8 @@ import org.jetbrains.kotlin.ir.expressions.IrExpression
 
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-class SingleExpressionBlocksLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
+class SingleExpressionBlocksLowering(override val context: DotlinLoweringContext) : IrExpressionLowering {
+    override fun DotlinLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
         if (expression !is IrBlock || expression.statements.singleOrNull() !is IrExpression) return noChange()
 
         return replaceWith(expression.statements.single() as IrExpression)

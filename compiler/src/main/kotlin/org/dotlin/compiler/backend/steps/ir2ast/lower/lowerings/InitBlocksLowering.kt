@@ -30,8 +30,8 @@ import org.jetbrains.kotlin.ir.util.primaryConstructor
  * All statements in init blocks are moved to the primary constructor.
  */
 @Suppress("UnnecessaryVariable")
-class InitBlocksLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class InitBlocksLowering(override val context: DotlinLoweringContext) : IrDeclarationLowering {
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrAnonymousInitializer) return noChange()
 
         val initBlock = declaration

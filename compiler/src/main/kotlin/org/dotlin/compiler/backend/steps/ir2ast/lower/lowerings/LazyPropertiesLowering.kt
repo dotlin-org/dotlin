@@ -43,8 +43,8 @@ import org.jetbrains.kotlin.ir.util.statements
 import org.jetbrains.kotlin.utils.addToStdlib.lastIsInstanceOrNull
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-class LazyPropertiesLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class LazyPropertiesLowering(override val context: DotlinLoweringContext) : IrDeclarationLowering {
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if ((declaration !is IrLocalDelegatedProperty || !declaration.isLazy) &&
             (declaration !is IrProperty || !declaration.isLazy)
         ) {

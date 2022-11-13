@@ -38,13 +38,13 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.Name
 
-class ObjectLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
+class ObjectLowering(override val context: DotlinLoweringContext) : IrDeclarationLowering {
     companion object {
         const val INSTANCE_FIELD_NAME = "\$instance"
         const val COMPANION_FIELD_NAME = "\$companion"
     }
 
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrClass || !declaration.isObject) return noChange()
 
         val instanceField: IrField
@@ -147,10 +147,10 @@ class ObjectLowering(override val context: DartLoweringContext) : IrDeclarationL
                     is IrSimpleFunction -> original.deepCopy(remapReferences = false).apply {
                         dispatchReceiverParameter = null
                         body = redirectCall(original)
-                        origin = IrDartDeclarationOrigin.STATIC_OBJECT_MEMBER
+                        origin = IrDotlinDeclarationOrigin.STATIC_OBJECT_MEMBER
                     }
                     is IrProperty -> original.deepCopy(remapReferences = false).apply {
-                        origin = IrDartDeclarationOrigin.STATIC_OBJECT_MEMBER
+                        origin = IrDotlinDeclarationOrigin.STATIC_OBJECT_MEMBER
 
                         when {
                             original.isConst -> {
@@ -202,11 +202,11 @@ class ObjectLowering(override val context: DartLoweringContext) : IrDeclarationL
 
         obj.declarations.transformInPlace {
             when {
-                it.origin != IrDartDeclarationOrigin.STATIC_OBJECT_MEMBER && it is IrProperty && it.isConst ->
+                it.origin != IrDotlinDeclarationOrigin.STATIC_OBJECT_MEMBER && it is IrProperty && it.isConst ->
                     it.deepCopyWith {
                         // Instance members can never be const.
                         isConst = false
-                        origin = IrDartDeclarationOrigin.WAS_CONST_OBJECT_MEMBER
+                        origin = IrDotlinDeclarationOrigin.WAS_CONST_OBJECT_MEMBER
                     }
                 else -> it
             }

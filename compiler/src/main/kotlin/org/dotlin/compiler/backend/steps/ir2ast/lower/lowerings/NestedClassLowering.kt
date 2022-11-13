@@ -24,8 +24,8 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.util.file
 
-class NestedClassLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class NestedClassLowering(override val context: DotlinLoweringContext) : IrDeclarationLowering {
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrClass || declaration.parent !is IrClass || declaration.isInner) return noChange()
 
         // We don't use addChild on purpose: We want to keep parent information.

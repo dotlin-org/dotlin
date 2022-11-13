@@ -35,7 +35,7 @@ import org.jetbrains.kotlin.library.KotlinAbiVersion
 import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.library.containsErrorCode
 
-class DartIrLinker(
+class DotlinIrLinker(
     currentModule: ModuleDescriptor?,
     logger: IrMessageLogger,
     builtIns: IrBuiltIns,
@@ -45,7 +45,7 @@ class DartIrLinker(
     override val fakeOverrideBuilder = FakeOverrideBuilder(
         this,
         symbolTable,
-        DartIrMangler,
+        DotlinIrMangler,
         IrTypeSystemContextImpl(builtIns),
         friendModules = emptyMap()
     )

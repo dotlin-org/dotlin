@@ -22,7 +22,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.ir
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 
 @Suppress("ClassName")
-sealed class IrDartStatementOrigin(private val name: String) : IrStatementOrigin {
+sealed class IrDotlinStatementOrigin(private val name: String) : IrStatementOrigin {
     /**
      * Dart does not support parameters with complex (non-const) default values.
      *
@@ -31,28 +31,28 @@ sealed class IrDartStatementOrigin(private val name: String) : IrStatementOrigin
      * The complex default value will be assigned on the first statement (if the actual default value
      * is identical to `_$DefaultValue`).
      */
-    object COMPLEX_PARAM_INIT_DEFAULT_VALUE : IrDartStatementOrigin("COMPLEX_PARAM_INIT_DEFAULT_VALUE")
+    object COMPLEX_PARAM_INIT_DEFAULT_VALUE : IrDotlinStatementOrigin("COMPLEX_PARAM_INIT_DEFAULT_VALUE")
 
-    object COMPLEX_PARAM_INIT_NULLABLE : IrDartStatementOrigin("COMPLEX_PARAM_INIT_NULLABLE")
+    object COMPLEX_PARAM_INIT_NULLABLE : IrDotlinStatementOrigin("COMPLEX_PARAM_INIT_NULLABLE")
 
     /**
      * The call with this origin was created to call the original operator method for a synthetic operator, e.g.
      * `[]` redirecting to `get`.
      */
-    object OPERATOR_REDIRECT : IrDartStatementOrigin("OPERATOR_REDIRECT")
+    object OPERATOR_REDIRECT : IrDotlinStatementOrigin("OPERATOR_REDIRECT")
 
     /**
      * The constructor of the relevant extension container is called, with the original receiver as the single argument,
      * to prevent extension conflicts in Dart.
      */
-    object EXTENSION_CONSTRUCTOR_CALL : IrDartStatementOrigin("EXTENSION_CONSTRUCTOR")
+    object EXTENSION_CONSTRUCTOR_CALL : IrDotlinStatementOrigin("EXTENSION_CONSTRUCTOR")
 
     /**
      * Related to [PropertyReferenceLowering].
      */
-    object PROPERTY_REFERENCE : IrDartStatementOrigin("PROPERTY_REFERENCE")
+    object PROPERTY_REFERENCE : IrDotlinStatementOrigin("PROPERTY_REFERENCE")
 
-    object IF_NULL : IrDartStatementOrigin("IF_NULL")
+    object IF_NULL : IrDotlinStatementOrigin("IF_NULL")
 
     override fun toString() = name
 }

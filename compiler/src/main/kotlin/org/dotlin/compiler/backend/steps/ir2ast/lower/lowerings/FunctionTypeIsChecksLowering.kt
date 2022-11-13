@@ -35,8 +35,8 @@ import org.jetbrains.kotlin.ir.util.isFunctionTypeOrSubtype
  * interfaces (e.g. `Function1`, `Function2`).
  */
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UnnecessaryVariable")
-class FunctionTypeIsChecksLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun DartLoweringContext.transform(
+class FunctionTypeIsChecksLowering(override val context: DotlinLoweringContext) : IrExpressionLowering {
+    override fun DotlinLoweringContext.transform(
         expression: IrExpression,
         context: IrExpressionContext
     ): Transformation<IrExpression>? {

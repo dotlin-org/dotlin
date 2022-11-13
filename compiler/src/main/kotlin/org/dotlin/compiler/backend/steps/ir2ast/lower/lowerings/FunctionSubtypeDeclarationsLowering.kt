@@ -19,7 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
 import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
@@ -33,8 +33,8 @@ import org.jetbrains.kotlin.ir.util.isFunction
 /**
  * Adds the `Function` subtypes (`Function0`, `Function1`, etc.) to the same file of `Function`.
  */
-class FunctionSubtypeDeclarationsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class FunctionSubtypeDeclarationsLowering(override val context: DotlinLoweringContext) : IrDeclarationLowering {
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrClass || !declaration.defaultType.isFunction()) return noChange()
 
         val file = declaration.file

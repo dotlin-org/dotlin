@@ -45,13 +45,13 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.addIfNotNull
 
 @Suppress("UnnecessaryVariable")
-class OperatorsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class OperatorsLowering(override val context: DotlinLoweringContext) : IrDeclarationLowering {
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrSimpleFunction || !declaration.isOperator) return noChange()
 
         val irFunction = declaration
         val irIdentifier = irFunction.name.identifier
-        val operatorOrigin = IrDartDeclarationOrigin.SYNTHETIC_OPERATOR
+        val operatorOrigin = IrDotlinDeclarationOrigin.SYNTHETIC_OPERATOR
 
         // Invoke can be translated as-is, just change the name to 'call'.
         if (irIdentifier == "invoke") {
@@ -139,7 +139,7 @@ class OperatorsLowering(override val context: DartLoweringContext) : IrDeclarati
             }?.let { operatorIdentifier ->
                 val parameters: List<IrValueParameter>
 
-                val redirectOrigin = IrDartStatementOrigin.OPERATOR_REDIRECT
+                val redirectOrigin = IrDotlinStatementOrigin.OPERATOR_REDIRECT
 
                 val body: (DeclarationIrBuilder) -> IrExpression = when (irIdentifier) {
                     "plus", "minus", "times", "div", "rem", "equals", "get" -> {
@@ -192,7 +192,7 @@ class OperatorsLowering(override val context: DartLoweringContext) : IrDeclarati
                 // This function should not be marked as an operator anymore, since only the newly added operator method
                 // will be the actual Dart operator, if it's added.
                 isOperator = false
-                origin = IrDartDeclarationOrigin.WAS_OPERATOR
+                origin = IrDotlinDeclarationOrigin.WAS_OPERATOR
             }.apply {
                 // The equals method itself is not an override in Dart, only the actual '==' operator method is.
                 if (irIdentifier == "equals" && irFunction.isMethodOfAny()) {
@@ -214,6 +214,6 @@ class OperatorsLowering(override val context: DartLoweringContext) : IrDeclarati
 
     private fun IrValueParameter.copy(parent: IrFunction): IrValueParameter = copy(
         parent = parent,
-        origin = IrDartDeclarationOrigin.SYNTHETIC_OPERATOR
+        origin = IrDotlinDeclarationOrigin.SYNTHETIC_OPERATOR
     )
 }

@@ -19,7 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2klib
 
-import org.dotlin.compiler.backend.DartIrMangler
+import org.dotlin.compiler.backend.DotlinIrMangler
 import org.jetbrains.kotlin.backend.common.serialization.*
 import org.jetbrains.kotlin.ir.IrBuiltIns
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsUniqIdClashTracker
@@ -50,7 +50,7 @@ class DartIrModuleSerializer(
 }
 
 class DartGlobalDeclarationTable(builtIns: IrBuiltIns) :
-    GlobalDeclarationTable(DartIrMangler, JsUniqIdClashTracker() /* TODO: JS reference */) {
+    GlobalDeclarationTable(DotlinIrMangler, JsUniqIdClashTracker() /* TODO: JS reference */) {
     init {
         loadKnownBuiltins(builtIns)
     }

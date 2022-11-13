@@ -19,7 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartStatementOrigin
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDotlinStatementOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.irCall
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
@@ -30,8 +30,8 @@ import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.IrWhen
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UnnecessaryVariable")
-class ElvisLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun DartLoweringContext.transform(
+class ElvisLowering(override val context: DotlinLoweringContext) : IrExpressionLowering {
+    override fun DotlinLoweringContext.transform(
         expression: IrExpression,
         context: IrExpressionContext
     ): Transformation<IrExpression>? {
@@ -48,10 +48,10 @@ class ElvisLowering(override val context: DartLoweringContext) : IrExpressionLow
         return replaceWith(
             buildStatement(context.container.symbol) {
                 irCall(
-                    dartBuiltIns.dotlin.ifNull(irBlock.type),
+                    dotlinIrBuiltIns.ifNull(irBlock.type),
                     receiver = left,
                     right,
-                    origin = IrDartStatementOrigin.IF_NULL
+                    origin = IrDotlinStatementOrigin.IF_NULL
                 )
             }
         )

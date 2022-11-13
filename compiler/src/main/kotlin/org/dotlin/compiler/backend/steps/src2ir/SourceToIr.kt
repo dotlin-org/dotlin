@@ -20,12 +20,12 @@
 package org.dotlin.compiler.backend.steps.src2ir
 
 import org.dotlin.compiler.backend.DartDescriptorBasedMangler
-import org.dotlin.compiler.backend.DartIrLinker
+import org.dotlin.compiler.backend.DotlinIrLinker
 import org.dotlin.compiler.backend.DartNameGenerator
 import org.dotlin.compiler.backend.DartProject
 import org.dotlin.compiler.backend.attributes.IrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.IrExpressionSourceMapper
-import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lower
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.output.AnnotateDartConstDeclarationsLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.output.AnnotateExternalCompanionObjectsLowering
@@ -167,7 +167,7 @@ private fun loadIr(
         override val irBuiltIns = psi2IrContext.irBuiltIns
     }
 
-    val irLinker = DartIrLinker(
+    val irLinker = DotlinIrLinker(
         currentModule = mainModule,
         IrMessageLogger.None,
         psi2IrContext.irBuiltIns,
@@ -241,5 +241,5 @@ data class IrResult(
     /**
      * A lowering context might be available if the IR output was already (partially) lowered.
      */
-    val loweringContext: DartLoweringContext?
+    val loweringContext: DotlinLoweringContext?
 )

@@ -52,8 +52,8 @@ import org.jetbrains.kotlin.ir.types.typeOrNull
  */
 // TODO: Assert in functions that the type is correct
 @Suppress("UnnecessaryVariable")
-class CollectionTypeChecksLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun DartLoweringContext.transform(
+class CollectionTypeChecksLowering(override val context: DotlinLoweringContext) : IrExpressionLowering {
+    override fun DotlinLoweringContext.transform(
         expression: IrExpression,
         context: IrExpressionContext
     ): Transformation<IrExpression>? {
@@ -71,7 +71,7 @@ class CollectionTypeChecksLowering(override val context: DartLoweringContext) : 
         // TODO: Optimize call to intrinsic functions: Inline them directly ourselves.
 
         return replaceWith(
-            with(dartBuiltIns.dotlin) {
+            with(dotlinIrBuiltIns) {
                 buildStatement(context.container.symbol) {
                     val symbol = when (val fqName = expression.typeOperand.classFqName) {
                         Collection -> isCollection

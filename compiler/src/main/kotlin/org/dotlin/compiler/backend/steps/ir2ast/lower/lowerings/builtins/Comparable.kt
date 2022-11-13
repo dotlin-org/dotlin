@@ -20,7 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin.WAS_OPERATOR
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDotlinDeclarationOrigin.WAS_OPERATOR
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.builders.declarations.*
@@ -40,8 +40,8 @@ import org.jetbrains.kotlin.types.Variance
  */
 object Comparable {
     private var compareToExtensionMethod: IrSimpleFunction? = null
-    class PreOperatorsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
-        override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+    class PreOperatorsLowering(override val context: DotlinLoweringContext) : IrDeclarationLowering {
+        override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
             if (declaration !is IrClass || !declaration.defaultType.isComparable()) return noChange()
 
             declaration.file.addChild(
@@ -49,7 +49,7 @@ object Comparable {
                     name = Name.identifier("compareTo")
                     isOperator = true
                     returnType = irBuiltIns.intType
-                    origin = IrDartDeclarationOrigin.COMPARABLE_TEMPORARY_COMPARE_TO
+                    origin = IrDotlinDeclarationOrigin.COMPARABLE_TEMPORARY_COMPARE_TO
                 }.apply {
                     val typeParameter = addTypeParameter {
                         name = Name.identifier("T")
@@ -85,8 +85,8 @@ object Comparable {
         }
     }
 
-    class PostOperatorsLowering(override val context: DartLoweringContext) : IrFileLowering {
-        override fun DartLoweringContext.transform(file: IrFile) {
+    class PostOperatorsLowering(override val context: DotlinLoweringContext) : IrFileLowering {
+        override fun DotlinLoweringContext.transform(file: IrFile) {
             file.declarations.removeIf {
                 it is IrAttributeContainer && it.attributeOwnerId == compareToExtensionMethod &&
                         it.origin == WAS_OPERATOR

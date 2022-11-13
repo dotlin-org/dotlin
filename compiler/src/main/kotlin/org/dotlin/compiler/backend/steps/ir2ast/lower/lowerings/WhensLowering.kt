@@ -32,8 +32,8 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 /**
  * Since a temporary subject is used, smart cast does not work, so explicit casts are added.
  */
-class WhensWithSubjectCastToNonNullLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun DartLoweringContext.transform(
+class WhensWithSubjectCastToNonNullLowering(override val context: DotlinLoweringContext) : IrExpressionLowering {
+    override fun DotlinLoweringContext.transform(
         expression: IrExpression,
         context: IrExpressionContext
     ): Transformation<IrExpression>? {
@@ -89,8 +89,8 @@ class WhensWithSubjectCastToNonNullLowering(override val context: DartLoweringCo
 }
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-class WhensWithSubjectExpressionsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun DartLoweringContext.transform(
+class WhensWithSubjectExpressionsLowering(override val context: DotlinLoweringContext) : IrExpressionLowering {
+    override fun DotlinLoweringContext.transform(
         expression: IrExpression,
         context: IrExpressionContext
     ): Transformation<IrExpression>? {

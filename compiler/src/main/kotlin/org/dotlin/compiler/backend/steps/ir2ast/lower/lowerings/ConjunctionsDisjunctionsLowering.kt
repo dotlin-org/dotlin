@@ -20,7 +20,6 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionContext
-import org.dotlin.compiler.backend.steps.ir2ast.ir.irCall
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
@@ -28,8 +27,8 @@ import org.jetbrains.kotlin.ir.expressions.IrWhen
 
 // TODO: Lower to call to ANDAND/OROR instead of custom element
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UnnecessaryVariable")
-class ConjunctionsDisjunctionsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun DartLoweringContext.transform(
+class ConjunctionsDisjunctionsLowering(override val context: DotlinLoweringContext) : IrExpressionLowering {
+    override fun DotlinLoweringContext.transform(
         expression: IrExpression,
         context: IrExpressionContext
     ): Transformation<IrExpression>? {

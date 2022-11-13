@@ -31,8 +31,8 @@ import org.jetbrains.kotlin.ir.util.copyTypeAndValueArgumentsFrom
 /**
  * Lowers `a === b` into `identical(a, b)`.
  */
-class IdentityChecksLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
+class IdentityChecksLowering(override val context: DotlinLoweringContext) : IrExpressionLowering {
+    override fun DotlinLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
         if (expression !is IrCall || (expression.origin != EQEQEQ && expression.origin != EXCLEQEQ)) return noChange()
 
         // For EXCLEQEQ, we only want to change the 'EQEQEQ' call itself. However, the 'not' call should be fixed
@@ -63,7 +63,7 @@ class IdentityChecksLowering(override val context: DartLoweringContext) : IrExpr
                 UNDEFINED_OFFSET,
                 UNDEFINED_OFFSET,
                 type = irBuiltIns.booleanType,
-                symbol = dartBuiltIns.identical,
+                symbol = dotlinIrBuiltIns.dart.identical,
                 typeArgumentsCount = 0,
                 valueArgumentsCount = 2,
             ).apply {

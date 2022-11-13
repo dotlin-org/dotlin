@@ -56,12 +56,12 @@ fun IrDeclaration.isDartConst(): Boolean = when (this) {
                 .plus(filterIsInstance<IrField>().mapNotNull { it.correspondingProperty })
                 .toSet()
                 .all {
-                    it.isConst || it.origin == IrDartDeclarationOrigin.WAS_CONST_OBJECT_MEMBER ||
+                    it.isConst || it.origin == IrDotlinDeclarationOrigin.WAS_CONST_OBJECT_MEMBER ||
                             (!it.isSimple && !it.hasExplicitBackingField)
                 }
         }
         // Annotations, enums and _$DefaultValue classes are always const.
-        else -> isEnumClass || isAnnotationClass || origin == IrDartDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE
+        else -> isEnumClass || isAnnotationClass || origin == IrDotlinDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE
     }
     is IrVariable -> isConst || hasConstModifierOrAnnotation()
     else -> false

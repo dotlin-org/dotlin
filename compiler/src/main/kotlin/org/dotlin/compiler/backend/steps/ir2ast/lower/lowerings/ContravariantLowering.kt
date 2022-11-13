@@ -20,7 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.parametersByArguments
-import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrFileLowering
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.*
@@ -39,8 +39,8 @@ import org.jetbrains.kotlin.types.Variance
  * necessary.
  */
 // TODO: Add annotation specifying the original type.
-class ContravariantLowering(override val context: DartLoweringContext) : IrFileLowering {
-    override fun DartLoweringContext.transform(file: IrFile) {
+class ContravariantLowering(override val context: DotlinLoweringContext) : IrFileLowering {
+    override fun DotlinLoweringContext.transform(file: IrFile) {
         fun IrType.makeContravariantArgumentsDynamic(): IrType {
             if (this !is IrSimpleType) return this
 

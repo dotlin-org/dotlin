@@ -20,9 +20,9 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
 import org.dotlin.compiler.backend.*
-import org.dotlin.compiler.backend.DartIrMangler.mangledHexString
+import org.dotlin.compiler.backend.DotlinIrMangler.mangledHexString
 import org.dotlin.compiler.backend.attributes.IrAttributes
-import org.dotlin.compiler.backend.steps.ir2ast.DartIrBuiltIns
+import org.dotlin.compiler.backend.steps.ir2ast.DotlinIrBuiltIns
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.util.sentenceCase
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
@@ -52,7 +52,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.BindingContext
 
-class DartLoweringContext(
+class DotlinLoweringContext(
     override val configuration: CompilerConfiguration,
     override val symbolTable: SymbolTable,
     override val bindingContext: BindingContext,
@@ -73,11 +73,11 @@ class DartLoweringContext(
     @PublishedApi
     internal val irBuilders = mutableMapOf<IrSymbol, IrBuilderWithScope>()
 
-    val dartBuiltIns = DartIrBuiltIns(this)
+    val dotlinIrBuiltIns = DotlinIrBuiltIns(this)
 
-    override val ir: Ir<CommonBackendContext> = object : Ir<DartLoweringContext>(this, irModuleFragment) {
-        override val symbols = object : Symbols<DartLoweringContext>(
-            this@DartLoweringContext,
+    override val ir: Ir<CommonBackendContext> = object : Ir<DotlinLoweringContext>(this, irModuleFragment) {
+        override val symbols = object : Symbols<DotlinLoweringContext>(
+            this@DotlinLoweringContext,
             irBuiltIns,
             symbolTable,
         ) {
@@ -168,7 +168,7 @@ class DartLoweringContext(
                 .getOrPut(file) { mutableMapOf() }
                 .getOrPut(containerName) {
                     irFactory.buildClass {
-                        origin = IrDartDeclarationOrigin.EXTENSION
+                        origin = IrDotlinDeclarationOrigin.EXTENSION
                         name = Name.identifier(containerName)
                     }.apply {
                         parent = file

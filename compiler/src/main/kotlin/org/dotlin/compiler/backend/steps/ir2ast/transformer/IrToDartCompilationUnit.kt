@@ -19,7 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
-import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
+import org.dotlin.compiler.backend.steps.ir2ast.DartAstTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.optimizeImports
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
 import org.dotlin.compiler.dart.ast.directive.DartHideCombinator
@@ -31,7 +31,7 @@ import org.jetbrains.kotlin.ir.declarations.IrFile
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UNCHECKED_CAST")
 object IrToDartCompilationUnitTransformer : IrDartAstTransformer<DartCompilationUnit>() {
-    override fun DartTransformContext.visitFile(irFile: IrFile, context: DartTransformContext) = context.run {
+    override fun DartAstTransformContext.visitFile(irFile: IrFile, context: DartAstTransformContext) = context.run {
         DartCompilationUnit(
             declarations = irFile.declarations.map { it.accept(context) },
             directives = irFile.dartImports
@@ -66,4 +66,4 @@ object IrToDartCompilationUnitTransformer : IrDartAstTransformer<DartCompilation
     }
 }
 
-fun IrFile.accept(context: DartTransformContext) = accept(IrToDartCompilationUnitTransformer, context)
+fun IrFile.accept(context: DartAstTransformContext) = accept(IrToDartCompilationUnitTransformer, context)

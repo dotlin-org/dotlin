@@ -29,8 +29,8 @@ import org.jetbrains.kotlin.ir.expressions.IrTypeOperatorCall
 /**
  * No casts are necessary between types of [Byte], [Char], [Short], [Int] or [Long]: They're all `int` in Dart.
  */
-class RemoveIntegerLiteralCastsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
+class RemoveIntegerLiteralCastsLowering(override val context: DotlinLoweringContext) : IrExpressionLowering {
+    override fun DotlinLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
         if (expression !is IrTypeOperatorCall ||
             !expression.type.isDartInt() ||
             !expression.argument.type.isDartInt() ||

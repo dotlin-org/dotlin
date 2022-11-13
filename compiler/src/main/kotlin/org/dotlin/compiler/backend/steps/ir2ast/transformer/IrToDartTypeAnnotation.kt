@@ -20,7 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.dotlin
-import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
+import org.dotlin.compiler.backend.steps.ir2ast.DartAstTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.owner
 import org.dotlin.compiler.backend.util.runWith
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
@@ -37,7 +37,7 @@ import org.jetbrains.kotlin.ir.util.isFunction
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 fun IrType.accept(
-    context: DartTransformContext,
+    context: DartAstTransformContext,
     isConstructorType: Boolean = false,
     useFunctionInterface: Boolean = false,
 ): DartTypeAnnotation =
@@ -84,18 +84,18 @@ fun IrType.accept(
     }
 
 // If the type is null, it's a star projection, which corresponds to dynamic in Dart.
-private fun IrType?.asArgument(context: DartTransformContext) = this ?: context.dynamicType
+private fun IrType?.asArgument(context: DartAstTransformContext) = this ?: context.dynamicType
 
-private fun IrTypeArgument.toIrType(context: DartTransformContext) = typeOrNull.asArgument(context)
+private fun IrTypeArgument.toIrType(context: DartAstTransformContext) = typeOrNull.asArgument(context)
 
-fun IrTypeArgument.accept(context: DartTransformContext): DartTypeAnnotation =
+fun IrTypeArgument.accept(context: DartAstTransformContext): DartTypeAnnotation =
     toIrType(context).accept(context)
 
 @JvmName("acceptTypeArguments")
-fun Iterable<IrTypeArgument>.accept(context: DartTransformContext) =
+fun Iterable<IrTypeArgument>.accept(context: DartAstTransformContext) =
     map { it.toIrType(context) }.accept(context)
 
-fun Iterable<IrType?>.accept(context: DartTransformContext) =
+fun Iterable<IrType?>.accept(context: DartAstTransformContext) =
     DartTypeArgumentList(
         arguments = map { it.asArgument(context).accept(context) }
     )

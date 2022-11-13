@@ -28,8 +28,8 @@ import org.jetbrains.kotlin.ir.declarations.IrPossiblyExternalDeclaration
 import org.jetbrains.kotlin.ir.util.companionObject
 import org.jetbrains.kotlin.ir.util.isEffectivelyExternal
 
-class ExternalDeclarationsLowering(override val context: DartLoweringContext) : IrFileLowering {
-    override fun DartLoweringContext.transform(file: IrFile) {
+class ExternalDeclarationsLowering(override val context: DotlinLoweringContext) : IrFileLowering {
+    override fun DotlinLoweringContext.transform(file: IrFile) {
         file.declarations.apply {
             toList().forEach remove@{
                 if (!it.isEffectivelyExternal()) return@remove

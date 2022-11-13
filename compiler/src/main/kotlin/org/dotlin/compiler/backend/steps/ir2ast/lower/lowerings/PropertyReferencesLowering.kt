@@ -21,7 +21,6 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.jetbrains.kotlin.ir.util.addChild
 import org.jetbrains.kotlin.backend.common.lower.irThrow
 import org.jetbrains.kotlin.ir.builders.IrSingleStatementBuilder
 import org.jetbrains.kotlin.ir.builders.declarations.buildField
@@ -45,6 +44,7 @@ import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
 import org.jetbrains.kotlin.ir.types.impl.buildSimpleType
 import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.util.SYNTHETIC_OFFSET
+import org.jetbrains.kotlin.ir.util.addChild
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.primaryConstructor
 import org.jetbrains.kotlin.name.Name
@@ -53,8 +53,8 @@ import org.jetbrains.kotlin.types.Variance
 /**
  * Convert [IrPropertyReference]s into instances of `KProperty0Impl`, `KProperty1Impl`, etc.
  */
-class PropertyReferencesLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun DartLoweringContext.transform(
+class PropertyReferencesLowering(override val context: DotlinLoweringContext) : IrExpressionLowering {
+    override fun DotlinLoweringContext.transform(
         reference: IrExpression,
         context: IrExpressionContext
     ): Transformation<IrExpression>? {
@@ -124,8 +124,8 @@ class PropertyReferencesLowering(override val context: DartLoweringContext) : Ir
         )
     }
 
-    class Local(override val context: DartLoweringContext) : IrDeclarationLowering {
-        override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+    class Local(override val context: DotlinLoweringContext) : IrDeclarationLowering {
+        override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
             if (declaration !is IrFunction) return noChange()
 
             // TODO: Support IrExpressionBody
@@ -141,7 +141,7 @@ class PropertyReferencesLowering(override val context: DartLoweringContext) : Ir
                 // the KProperty variable _outside_ of that accessor, otherwise the KProperty would be created
                 // everytime an accessor is invoked.
                 val relevantBody = when (declaration.origin) {
-                    IrDartDeclarationOrigin.LOCAL_DELEGATED_PROPERTY_REFERENCE_ACCESSOR -> {
+                    IrDotlinDeclarationOrigin.LOCAL_DELEGATED_PROPERTY_REFERENCE_ACCESSOR -> {
                         // TODO: Support IrExpressionBody
                         (declaration.parent as IrFunction).body as IrBlockBody
                     }
@@ -154,7 +154,7 @@ class PropertyReferencesLowering(override val context: DartLoweringContext) : Ir
                     fun IrSingleStatementBuilder.irThrowUnsupported(message: String) =
                         irThrow(
                             irCallConstructor(
-                                dartBuiltIns.unsupportedError.owner.primaryConstructor!!.symbol,
+                                dotlinIrBuiltIns.dart.unsupportedError.owner.primaryConstructor!!.symbol,
                                 typeArguments = emptyList()
                             ).apply {
                                 putValueArgument(0, message.toIrConst(irBuiltIns.stringType))
@@ -179,7 +179,7 @@ class PropertyReferencesLowering(override val context: DartLoweringContext) : Ir
                     .variableWithNameOrNull(kPropertyVarName)
                     ?: IrVariableImpl(
                         SYNTHETIC_OFFSET, SYNTHETIC_OFFSET,
-                        origin = IrDartDeclarationOrigin.PROPERTY_REFERENCE,
+                        origin = IrDotlinDeclarationOrigin.PROPERTY_REFERENCE,
                         symbol = IrVariableSymbolImpl(),
                         name = Name.identifier(kPropertyVarName),
                         type = kPropertyConstructorCall.constructorCall.type,
@@ -225,7 +225,7 @@ private val IrType.kPropertyMetadata: KPropertyMetadata
         )
     }
 
-private fun DartLoweringContext.createKPropertyInfo(
+private fun DotlinLoweringContext.createKPropertyInfo(
     context: IrExpressionContext,
     containerSymbol: IrSymbol,
     thisReceiver: IrExpression? = null,
@@ -239,7 +239,7 @@ private fun DartLoweringContext.createKPropertyInfo(
 ): KPropertyInfo {
     val (receiverCount, isMutable) = metadata
 
-    val kPropertyClass = with(dartBuiltIns.dotlin) {
+    val kPropertyClass = with(dotlinIrBuiltIns) {
         when (receiverCount) {
             0 -> when {
                 isMutable -> kMutableProperty0Impl
@@ -358,7 +358,7 @@ private fun DartLoweringContext.createKPropertyInfo(
                             )
                         },
                         function = kPropertyGetterLambda,
-                        origin = IrDartStatementOrigin.PROPERTY_REFERENCE
+                        origin = IrDotlinStatementOrigin.PROPERTY_REFERENCE
                     )
                 )
 
@@ -399,7 +399,7 @@ private fun DartLoweringContext.createKPropertyInfo(
                                     }
                                 )
                             },
-                            origin = IrDartStatementOrigin.PROPERTY_REFERENCE
+                            origin = IrDotlinStatementOrigin.PROPERTY_REFERENCE
                         )
                     )
                 }

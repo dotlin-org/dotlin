@@ -30,16 +30,16 @@ import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.name.FqName
 
 object EnumValues {
-    class RemoveDeclarationsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
-        override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+    class RemoveDeclarationsLowering(override val context: DotlinLoweringContext) : IrDeclarationLowering {
+        override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
             if (!declaration.isEnumValues() && !declaration.isEnumValueOf()) return noChange()
 
             return just { remove() }
         }
     }
 
-    class ReplaceExpressionsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-        override fun DartLoweringContext.transform(
+    class ReplaceExpressionsLowering(override val context: DotlinLoweringContext) : IrExpressionLowering {
+        override fun DotlinLoweringContext.transform(
             expression: IrExpression,
             context: IrExpressionContext
         ): Transformation<IrExpression>? {

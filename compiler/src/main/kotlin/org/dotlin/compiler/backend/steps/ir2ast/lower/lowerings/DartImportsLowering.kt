@@ -20,7 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.attributes.DartImport
-import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrFileLowering
 import org.dotlin.compiler.backend.util.importAliasIn
 import org.jetbrains.kotlin.ir.IrElement
@@ -47,8 +47,8 @@ import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
  * Dart import directives are added, based on `@DartLibrary` or `@DartHideFromCore` annotations,
  * or based on Kotlin import directives.
  */
-class DartImportsLowering(override val context: DartLoweringContext) : IrFileLowering {
-    override fun DartLoweringContext.transform(file: IrFile) {
+class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileLowering {
+    override fun DotlinLoweringContext.transform(file: IrFile) {
         val imports = mutableSetOf<DartImport>()
 
         fun maybeAddComparableOperatorImport(

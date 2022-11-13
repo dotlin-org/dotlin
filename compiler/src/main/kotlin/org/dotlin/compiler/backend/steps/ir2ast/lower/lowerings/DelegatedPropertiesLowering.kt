@@ -19,7 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDotlinDeclarationOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.deepCopyWith
 import org.dotlin.compiler.backend.steps.ir2ast.ir.irCall
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
@@ -33,8 +33,8 @@ import org.jetbrains.kotlin.name.Name
  * Must run before [PropertySimplifyingLowering].
  */
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-class DelegatedPropertiesLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class DelegatedPropertiesLowering(override val context: DotlinLoweringContext) : IrDeclarationLowering {
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrProperty || !declaration.isDelegated) return noChange()
 
         val delegateField = declaration.backingField!!
@@ -46,22 +46,22 @@ class DelegatedPropertiesLowering(override val context: DartLoweringContext) : I
         }
     }
 
-    class Local(override val context: DartLoweringContext) : IrDeclarationLowering {
-        override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+    class Local(override val context: DotlinLoweringContext) : IrDeclarationLowering {
+        override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
             if (declaration !is IrLocalDelegatedProperty) return noChange()
 
             var transformations = add(declaration.delegate, before = true) and remove(declaration)
 
             val getter = declaration.getter.deepCopyWith(remapReferences = false) {
                 name = Name.identifier("get\$${declaration.name}")
-                origin = IrDartDeclarationOrigin.LOCAL_DELEGATED_PROPERTY_REFERENCE_ACCESSOR
+                origin = IrDotlinDeclarationOrigin.LOCAL_DELEGATED_PROPERTY_REFERENCE_ACCESSOR
             }.also {
                 transformations += add(it)
             }
 
             val setter = declaration.setter?.deepCopyWith(remapReferences = false) {
                 name = Name.identifier("set\$${declaration.name}")
-                origin = IrDartDeclarationOrigin.LOCAL_DELEGATED_PROPERTY_REFERENCE_ACCESSOR
+                origin = IrDotlinDeclarationOrigin.LOCAL_DELEGATED_PROPERTY_REFERENCE_ACCESSOR
             }?.also {
                 transformations += add(it)
             }

@@ -37,11 +37,11 @@ typealias Transformations<E> = Sequence<Transformation<E>>
 
 interface IrLowering {
     fun lower(irFile: IrFile)
-    val context: DartLoweringContext
+    val context: DotlinLoweringContext
 }
 
 interface IrTransformerLowering<E : IrElement, R> : IrLowering {
-    fun DartLoweringContext.transform(element: E): R
+    fun DotlinLoweringContext.transform(element: E): R
 }
 
 // TODO?: Simplify lowerings, just make it return the transformed declaration or null, and add helper
@@ -56,7 +56,7 @@ interface IrMultipleLowering<E : IrElement> : IrTransformerLowering<E, Transform
 interface IrDeclarationLowering : IrMultipleLowering<IrDeclaration> {
     @Suppress("UNCHECKED_CAST")
     private fun IrDeclarationContainer.transformDeclarations(
-        transform: DartLoweringContext.(IrDeclaration) -> Transformations<IrDeclaration>
+        transform: DotlinLoweringContext.(IrDeclaration) -> Transformations<IrDeclaration>
     ) {
         declarations.transformBy({ transform(context, it) }, also = {
             if (it is IrDeclarationContainer) {
@@ -87,13 +87,13 @@ interface IrDeclarationLowering : IrMultipleLowering<IrDeclaration> {
 
     override fun lower(irFile: IrFile) = irFile.transformDeclarations { context.transform(it) }
 
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration>
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration>
 }
 
 interface IrFileLowering : IrLowering {
     override fun lower(irFile: IrFile) = context.transform(irFile)
 
-    fun DartLoweringContext.transform(file: IrFile)
+    fun DotlinLoweringContext.transform(file: IrFile)
 }
 
 interface IrExpressionLowering : IrSingleLowering<IrExpression> {
@@ -112,8 +112,8 @@ interface IrExpressionLowering : IrSingleLowering<IrExpression> {
         )
     }
 
-    override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? = noChange()
-    fun DartLoweringContext.transform(
+    override fun DotlinLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? = noChange()
+    fun DotlinLoweringContext.transform(
         expression: IrExpression,
         context: IrExpressionContext
     ): Transformation<IrExpression>? =

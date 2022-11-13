@@ -29,8 +29,8 @@ import org.jetbrains.kotlin.ir.util.isThrowable
 /**
  * No casts are necessary to `Throwable`, it does not exist.
  */
-class RemoveThrowableCastsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
+class RemoveThrowableCastsLowering(override val context: DotlinLoweringContext) : IrExpressionLowering {
+    override fun DotlinLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
         if (expression !is IrTypeOperatorCall ||
             !expression.type.isThrowable() ||
             expression.operator != IrTypeOperator.IMPLICIT_CAST) {

@@ -42,8 +42,8 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.Name
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UnnecessaryVariable")
-class ComplexParametersLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class ComplexParametersLowering(override val context: DotlinLoweringContext) : IrDeclarationLowering {
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrValueParameter) return noChange()
 
         val irValueParameter = declaration
@@ -68,7 +68,7 @@ class ComplexParametersLowering(override val context: DartLoweringContext) : IrD
         if (!irValueParameter.isOverride && hasComplexDefaultValue) {
             val originalType = irValueParameter.type
             newIrValueParameter = irValueParameter.asAssignable(
-                origin = IrDartDeclarationOrigin.WAS_COMPLEX_PARAM(originalType)
+                origin = IrDotlinDeclarationOrigin.WAS_COMPLEX_PARAM(originalType)
             )
 
             val newDefaultValue = originalDefaultValue!!.apply {
@@ -159,7 +159,7 @@ class ComplexParametersLowering(override val context: DartLoweringContext) : IrD
                         UNDEFINED_OFFSET,
                         defaultValueConstructor.returnType,
                         defaultValueConstructor.symbol,
-                        origin = IrDartStatementOrigin.COMPLEX_PARAM_INIT_DEFAULT_VALUE
+                        origin = IrDotlinStatementOrigin.COMPLEX_PARAM_INIT_DEFAULT_VALUE
                     ).wrap()
                 }
 
@@ -190,8 +190,8 @@ class ComplexParametersLowering(override val context: DartLoweringContext) : IrD
                         elsePart = assignmentEqualsElsePart
                     ),
                     origin = when {
-                        originalIsNullable -> IrDartStatementOrigin.COMPLEX_PARAM_INIT_DEFAULT_VALUE
-                        else -> IrDartStatementOrigin.COMPLEX_PARAM_INIT_NULLABLE
+                        originalIsNullable -> IrDotlinStatementOrigin.COMPLEX_PARAM_INIT_DEFAULT_VALUE
+                        else -> IrDotlinStatementOrigin.COMPLEX_PARAM_INIT_NULLABLE
                     }
                 )
             }
@@ -224,7 +224,7 @@ class ComplexParametersLowering(override val context: DartLoweringContext) : IrD
                     "\$Default${type.getClass()!!.dartName}Value"
             )
             visibility = DescriptorVisibilities.PRIVATE
-            origin = IrDartDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE
+            origin = IrDotlinDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE
         }.apply {
             val irClass = this
 

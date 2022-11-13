@@ -29,8 +29,8 @@ import org.jetbrains.kotlin.ir.declarations.IrVariable
  * "Const" variables that are not actually const are made non-const.
  */
 @Suppress("UnnecessaryVariable")
-class ConstInlineFunctionsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class ConstInlineFunctionsLowering(override val context: DotlinLoweringContext) : IrDeclarationLowering {
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrVariable || !declaration.parent.isDartConstInlineFunction()) {
             return noChange()
         }

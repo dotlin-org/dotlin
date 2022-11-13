@@ -40,9 +40,9 @@ import org.jetbrains.kotlin.name.Name
  * to then pass the correctly initialized parameters to the real constructor.
  */
 @Suppress("UnnecessaryVariable")
-class ConstructorPassingComplexParamToSuperLowering(override val context: DartLoweringContext) :
+class ConstructorPassingComplexParamToSuperLowering(override val context: DotlinLoweringContext) :
     IrDeclarationLowering {
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrConstructor) return noChange()
 
         val originalConstructor = declaration
@@ -74,7 +74,7 @@ class ConstructorPassingComplexParamToSuperLowering(override val context: DartLo
                 .associateWith { old ->
                     old.deepCopyWith {
                         when (val itsOrigin = old.origin) {
-                            is IrDartDeclarationOrigin.WAS_COMPLEX_PARAM -> {
+                            is IrDotlinDeclarationOrigin.WAS_COMPLEX_PARAM -> {
                                 origin = IrDeclarationOrigin.DEFINED
                                 type = itsOrigin.originalType
                             }
@@ -135,7 +135,7 @@ class ConstructorPassingComplexParamToSuperLowering(override val context: DartLo
         }
 
         val factoryConstructor = originalConstructor.deepCopy().apply {
-            origin = IrDartDeclarationOrigin.FACTORY
+            origin = IrDotlinDeclarationOrigin.FACTORY
             valueParameters = originalConstructor.valueParameters.copy(parent = this@apply)
 
             body = irFactory.createBlockBody(

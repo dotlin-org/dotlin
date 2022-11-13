@@ -19,7 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrExpressionLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformation
 import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
@@ -31,8 +31,8 @@ import org.jetbrains.kotlin.ir.expressions.IrExpression
  * Add default values of parameters marked with `@DartDifferentDefaultValue` explicitly.
  */
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-class DartDifferentDefaultValueArgumentsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
+class DartDifferentDefaultValueArgumentsLowering(override val context: DotlinLoweringContext) : IrExpressionLowering {
+    override fun DotlinLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
         if (expression !is IrCall) return noChange()
 
         val owner = expression.symbol.owner

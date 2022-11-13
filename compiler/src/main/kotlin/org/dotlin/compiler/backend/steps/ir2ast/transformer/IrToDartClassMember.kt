@@ -19,7 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
-import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
+import org.dotlin.compiler.backend.steps.ir2ast.DartAstTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartAnnotations
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartFactory
@@ -41,7 +41,7 @@ import org.jetbrains.kotlin.ir.util.parentAsClass
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?>() {
-    override fun DartTransformContext.visitSimpleFunction(irFunction: IrSimpleFunction, context: DartTransformContext) =
+    override fun DartAstTransformContext.visitSimpleFunction(irFunction: IrSimpleFunction, context: DartAstTransformContext) =
         irFunction.transformBy(context) {
             DartMethodDeclaration(
                 name,
@@ -56,7 +56,7 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?>()
             )
         }
 
-    override fun DartTransformContext.visitConstructor(irConstructor: IrConstructor, context: DartTransformContext) =
+    override fun DartAstTransformContext.visitConstructor(irConstructor: IrConstructor, context: DartAstTransformContext) =
         context.run {
             irConstructor.transformBy(context) {
                 val initializers = (irConstructor.body as? IrBlockBody)?.run {
@@ -123,9 +123,9 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?>()
             }
         }
 
-    override fun DartTransformContext.visitField(
+    override fun DartAstTransformContext.visitField(
         irField: IrField,
-        context: DartTransformContext
+        context: DartAstTransformContext
     ): DartFieldDeclaration = context.run {
         val fieldName = irField.dartName
         val fieldType = irField.type.accept(context)
@@ -170,4 +170,4 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?>()
     }
 }
 
-fun IrDeclaration.acceptAsClassMember(context: DartTransformContext) = accept(IrToDartClassMemberTransformer, context)
+fun IrDeclaration.acceptAsClassMember(context: DartAstTransformContext) = accept(IrToDartClassMemberTransformer, context)

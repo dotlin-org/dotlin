@@ -57,7 +57,7 @@ fun irToDartAst(
         it.throwIfHasErrors()
     }
 
-    val context = DartTransformContext(loweringContext)
+    val context = DartAstTransformContext(loweringContext)
     val units = mutableMapOf<Path, DartCompilationUnit>()
     for (file in ir.module.files) {
         context.enterFile(file)

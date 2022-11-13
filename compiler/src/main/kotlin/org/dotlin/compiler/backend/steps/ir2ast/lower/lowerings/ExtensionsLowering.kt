@@ -38,8 +38,8 @@ import org.jetbrains.kotlin.ir.util.copyValueArgumentsFrom
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.remapTypes
 
-class ExtensionsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class ExtensionsLowering(override val context: DotlinLoweringContext) : IrDeclarationLowering {
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         val extensionContainer = declaration.extensionContainer ?: return noChange()
 
         declaration.file.apply {
@@ -86,8 +86,8 @@ class ExtensionsLowering(override val context: DartLoweringContext) : IrDeclarat
     /**
      * Removes the receiver type parameter from function calls.
      */
-    class RemoveReceiverTypeArguments(override val context: DartLoweringContext) : IrExpressionLowering {
-        override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
+    class RemoveReceiverTypeArguments(override val context: DotlinLoweringContext) : IrExpressionLowering {
+        override fun DotlinLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
             if (expression !is IrCall) return noChange()
 
             val receiverParameter = expression.symbol.owner.extensionReceiverParameterOrNull ?: return noChange()

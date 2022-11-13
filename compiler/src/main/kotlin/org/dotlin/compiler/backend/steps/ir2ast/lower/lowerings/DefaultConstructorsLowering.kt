@@ -35,8 +35,8 @@ import org.jetbrains.kotlin.name.Name
  * Default constructors (primary, no parameters, nothing passed to super, etc.) are removed.
  */
 @Suppress("UnnecessaryVariable")
-class DefaultConstructorsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class DefaultConstructorsLowering(override val context: DotlinLoweringContext) : IrDeclarationLowering {
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrConstructor) return noChange()
 
         if (!declaration.isPrimary ||

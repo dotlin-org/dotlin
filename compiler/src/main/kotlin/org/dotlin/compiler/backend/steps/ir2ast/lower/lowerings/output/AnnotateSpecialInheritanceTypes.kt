@@ -20,7 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.output
 
 import org.dotlin.compiler.backend.SuperTypeKind
-import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
 import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
@@ -37,8 +37,8 @@ import org.jetbrains.kotlin.utils.addToStdlib.safeAs
  * Because source information is not available for code in dependencies, we have to add
  * the `@SpecialInheritance` annotation to super types that use this mechanism.
  */
-class AnnotateSpecialInheritanceTypes(override val context: DartLoweringContext) : IrDeclarationLowering {
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class AnnotateSpecialInheritanceTypes(override val context: DotlinLoweringContext) : IrDeclarationLowering {
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrClass) return noChange()
 
         val specialSuperTypes = declaration.superTypes().filter { it.kind is SuperTypeKind.Special }
@@ -50,7 +50,7 @@ class AnnotateSpecialInheritanceTypes(override val context: DartLoweringContext)
                     annotations = annotations + listOf(
                         buildStatement(declaration.symbol) {
                             createAnnotation(
-                                dartBuiltIns.dotlin.specialInheritedType,
+                                dotlinIrBuiltIns.specialInheritedType,
                                 superTypeInfo.kind.toString().toIrConst(irBuiltIns.stringType)
                             )
                         }

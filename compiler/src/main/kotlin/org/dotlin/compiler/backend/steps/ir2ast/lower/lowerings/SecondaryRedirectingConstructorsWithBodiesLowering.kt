@@ -19,9 +19,9 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDotlinDeclarationOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.transformExpressions
-import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
 import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
@@ -43,9 +43,9 @@ import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
  * Constructors that redirect cannot
  */
 @Suppress("UnnecessaryVariable")
-class SecondaryRedirectingConstructorsWithBodiesLowering(override val context: DartLoweringContext) :
+class SecondaryRedirectingConstructorsWithBodiesLowering(override val context: DotlinLoweringContext) :
     IrDeclarationLowering {
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrConstructor || declaration.isPrimary) return noChange()
 
         val body = declaration.body
@@ -56,7 +56,7 @@ class SecondaryRedirectingConstructorsWithBodiesLowering(override val context: D
         // If the only statement is the delegating constructor call, there's no body.
         if (body.statements.size <= 1) return noChange()
 
-        declaration.origin = IrDartDeclarationOrigin.FACTORY
+        declaration.origin = IrDotlinDeclarationOrigin.FACTORY
 
         val classType = declaration.parentAsClass.defaultType
 

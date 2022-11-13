@@ -28,8 +28,8 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
 /**
  * [IrComposite]s are converted to [IrBlock].
  */
-class IrCompositesToIrBlocksLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
+class IrCompositesToIrBlocksLowering(override val context: DotlinLoweringContext) : IrExpressionLowering {
+    override fun DotlinLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
         if (expression !is IrComposite || !expression.isTransparentScope) return noChange()
 
         return replaceWith(

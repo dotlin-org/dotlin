@@ -19,11 +19,11 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDotlinDeclarationOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.deepCopyWith
 import org.dotlin.compiler.backend.steps.ir2ast.ir.firstNonFakeOverrideOrNull
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isFakeOverride
-import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
 import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
@@ -38,8 +38,8 @@ import org.jetbrains.kotlin.ir.util.parentAsClass
  * all default implementations of interfaces are copied into the implementer.
  */
 @Suppress("UnnecessaryVariable")
-class DefaultInterfaceImplementationsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class DefaultInterfaceImplementationsLowering(override val context: DotlinLoweringContext) : IrDeclarationLowering {
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrClass || declaration.isInterface) return noChange()
 
         val irClass = declaration
@@ -55,7 +55,7 @@ class DefaultInterfaceImplementationsLowering(override val context: DartLowering
                     return function.deepCopyWith { isFakeOverride = false }.apply {
                         body = superFunction.moveBodyTo(this)
                         origin = when (origin) {
-                            IrDeclarationOrigin.FAKE_OVERRIDE -> IrDartDeclarationOrigin.COPIED_OVERRIDE
+                            IrDeclarationOrigin.FAKE_OVERRIDE -> IrDotlinDeclarationOrigin.COPIED_OVERRIDE
                             else -> origin
                         }
                     }

@@ -19,7 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
-import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
+import org.dotlin.compiler.backend.steps.ir2ast.DartAstTransformContext
 import org.dotlin.compiler.backend.util.dartIndex
 import org.dotlin.compiler.dart.ast.DartLabel
 import org.dotlin.compiler.dart.ast.expression.DartArgumentList
@@ -31,9 +31,9 @@ import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartArgumentListTransformer : IrDartAstTransformer<DartArgumentList>() {
-    override fun DartTransformContext.visitFunctionAccess(
+    override fun DartAstTransformContext.visitFunctionAccess(
         irCallLike: IrFunctionAccessExpression,
-        context: DartTransformContext
+        context: DartAstTransformContext
     ) = DartArgumentList(
         irCallLike.symbol.owner.valueParameters
             .sortedBy { it.dartIndex }

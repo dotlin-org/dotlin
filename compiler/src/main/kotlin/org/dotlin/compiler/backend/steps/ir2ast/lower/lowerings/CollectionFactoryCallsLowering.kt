@@ -43,8 +43,8 @@ import org.jetbrains.kotlin.ir.util.primaryConstructor
  * in [IrToDartExpressionTransformer].
  */
 @Suppress("UnnecessaryVariable")
-class CollectionFactoryCallsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun DartLoweringContext.transform(
+class CollectionFactoryCallsLowering(override val context: DotlinLoweringContext) : IrExpressionLowering {
+    override fun DotlinLoweringContext.transform(
         expression: IrExpression,
         context: IrExpressionContext
     ): Transformation<IrExpression>? = context.run {
@@ -124,8 +124,8 @@ class CollectionFactoryCallsLowering(override val context: DartLoweringContext) 
                         when (fqName) {
                             listOf, emptyList, setOf, emptySet -> {
                                 val immutableView = when (fqName) {
-                                    listOf, emptyList -> dartBuiltIns.immutableListView.owner
-                                    setOf, emptySet -> dartBuiltIns.immutableSetView.owner
+                                    listOf, emptyList -> dotlinIrBuiltIns.dart.immutableListView.owner
+                                    setOf, emptySet -> dotlinIrBuiltIns.dart.immutableSetView.owner
                                     else -> throw UnsupportedOperationException("Unsupported: $fqName")
                                 }
 

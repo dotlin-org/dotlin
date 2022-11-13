@@ -30,9 +30,9 @@ import org.dotlin.compiler.backend.kotlin.collections.MutableMap
 import org.dotlin.compiler.backend.kotlin.collections.MutableSet
 import org.dotlin.compiler.backend.kotlin.collections.Set
 import org.dotlin.compiler.backend.kotlin.collections.WriteableList
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDotlinDeclarationOrigin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.deepCopyWith
-import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.InterfaceKind.*
@@ -42,7 +42,6 @@ import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
 import org.dotlin.compiler.backend.util.isDotlinExternal
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.toDartIdentifier
-import org.jetbrains.kotlin.ir.util.addChild
 import org.jetbrains.kotlin.backend.common.lower.irThrow
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrBlockBody
@@ -66,15 +65,15 @@ import org.jetbrains.kotlin.util.collectionUtils.filterIsInstanceAnd
  * Must run before [OperatorsLowering], [PropertySimplifyingLowering] and [OverriddenParametersLowering].
  */
 @Suppress("UnnecessaryVariable")
-class CollectionImplementersLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class CollectionImplementersLowering(override val context: DotlinLoweringContext) : IrDeclarationLowering {
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrClass || declaration.isDotlinExternal) return noChange()
 
         val implementedInterfaces = mutableListOf<FqName>()
 
         // Implement marker interface.
         declaration.superTypes = declaration.superTypes.flatMap {
-            with(dartBuiltIns.dotlin) {
+            with(dotlinIrBuiltIns) {
                 val marker = when (it.classFqName) {
                     ImmutableList -> immutableListMarker
                     WriteableList -> writeableListMarker
@@ -194,7 +193,7 @@ class CollectionImplementersLowering(override val context: DartLoweringContext) 
     // Error if: Same name as Dart mutable List method but different signature
     // Warning if: Same name AND same signature as Dart mutable List method
 
-    private fun DartLoweringContext.addMissingMethods(
+    private fun DotlinLoweringContext.addMissingMethods(
         targetInfo: InterfaceTargetInfo,
         fullInterfaces: List<IrClass>,
         possibleMissingMembersInfo: Set<MemberInfo>,
@@ -252,8 +251,8 @@ class CollectionImplementersLowering(override val context: DartLoweringContext) 
                         irThrow(
                             IrConstructorCallImpl(
                                 SYNTHETIC_OFFSET, SYNTHETIC_OFFSET,
-                                type = dartBuiltIns.unsupportedError.defaultType,
-                                symbol = dartBuiltIns.unsupportedError.owner.primaryConstructor!!.symbol,
+                                type = dotlinIrBuiltIns.dart.unsupportedError.defaultType,
+                                symbol = dotlinIrBuiltIns.dart.unsupportedError.owner.primaryConstructor!!.symbol,
                                 valueArgumentsCount = 1,
                                 typeArgumentsCount = 0,
                                 constructorTypeArgumentsCount = 0
@@ -310,13 +309,13 @@ class CollectionImplementersLowering(override val context: DartLoweringContext) 
                     val copy = when (member) {
                         is IrProperty -> member.deepCopyWith(remapReferences = false) {
                             isFakeOverride = false
-                            origin = IrDartDeclarationOrigin.COPIED_OVERRIDE
+                            origin = IrDotlinDeclarationOrigin.COPIED_OVERRIDE
                         }.apply {
                             overriddenSymbols = listOf(member.symbol)
                         }
                         is IrSimpleFunction -> member.deepCopyWith(remapReferences = false) {
                             isFakeOverride = false
-                            origin = IrDartDeclarationOrigin.COPIED_OVERRIDE
+                            origin = IrDotlinDeclarationOrigin.COPIED_OVERRIDE
                         }.apply {
                             overriddenSymbols = listOf(member.symbol)
                             body = throwingBody(symbol)

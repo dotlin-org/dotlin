@@ -63,8 +63,8 @@ private object Documentation {
 }
 
 @Suppress("UnnecessaryVariable")
-class EnumClassLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class EnumClassLowering(override val context: DotlinLoweringContext) : IrDeclarationLowering {
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrClass || !declaration.isEnumClass) return noChange()
 
         // TODO: Handle enum entry classes

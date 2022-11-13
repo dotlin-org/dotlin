@@ -37,9 +37,9 @@ import org.jetbrains.kotlin.name.Name
  * would literally be `Infinity`. This lowering makes the unrepresentable decimals their equations again.
  */
 @Suppress("UnnecessaryVariable")
-class UnrepresentableDecimalConstsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
+class UnrepresentableDecimalConstsLowering(override val context: DotlinLoweringContext) : IrExpressionLowering {
     @Suppress("ConvertNaNEquality")
-    override fun DartLoweringContext.transform(
+    override fun DotlinLoweringContext.transform(
         expression: IrExpression,
         context: IrExpressionContext
     ): Transformation<IrExpression>? {

@@ -21,8 +21,8 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.dart
 import org.dotlin.compiler.backend.kotlin
-import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartStatementOrigin.*
+import org.dotlin.compiler.backend.steps.ir2ast.DartAstTransformContext
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDotlinStatementOrigin.*
 import org.dotlin.compiler.backend.steps.ir2ast.ir.extensionReceiverOrNull
 import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.createDartAssignment
@@ -54,9 +54,9 @@ import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
-    override fun DartTransformContext.visitSimpleFunction(
+    override fun DartAstTransformContext.visitSimpleFunction(
         irFunction: IrSimpleFunction,
-        context: DartTransformContext
+        context: DartAstTransformContext
     ) = irFunction.transformBy(context) {
         DartLocalFunctionDeclaration(
             name,
@@ -67,7 +67,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
         )
     }
 
-    override fun DartTransformContext.visitReturn(expression: IrReturn, context: DartTransformContext) =
+    override fun DartAstTransformContext.visitReturn(expression: IrReturn, context: DartAstTransformContext) =
         DartReturnStatement(
             expression = expression.value.let {
                 when {
@@ -77,7 +77,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
             }
         )
 
-    override fun DartTransformContext.visitWhen(irWhen: IrWhen, context: DartTransformContext) =
+    override fun DartAstTransformContext.visitWhen(irWhen: IrWhen, context: DartAstTransformContext) =
         irWhen.branches.reversed().toList().run {
             drop(1).fold(
                 initial = first().let {
@@ -101,7 +101,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
             )
         }
 
-    override fun DartTransformContext.visitVariable(irVariable: IrVariable, context: DartTransformContext) =
+    override fun DartAstTransformContext.visitVariable(irVariable: IrVariable, context: DartAstTransformContext) =
         irVariable.let {
             DartVariableDeclarationStatement(
                 variables = DartVariableDeclarationList(
@@ -117,7 +117,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
             )
         }
 
-    override fun DartTransformContext.visitTry(irTry: IrTry, context: DartTransformContext) = irTry.let {
+    override fun DartAstTransformContext.visitTry(irTry: IrTry, context: DartAstTransformContext) = irTry.let {
         fun IrExpression.acceptAsBlock() = DartBlock(
             statements = (this as IrBlock).statements.accept(context)
         )
@@ -135,7 +135,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
         )
     }
 
-    override fun DartTransformContext.visitLoop(loop: IrLoop, context: DartTransformContext): DartStatement {
+    override fun DartAstTransformContext.visitLoop(loop: IrLoop, context: DartAstTransformContext): DartStatement {
         val condition = loop.condition.accept(context)
         val body = loop.body!!.acceptAsStatement(context)
 
@@ -146,7 +146,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
         }
     }
 
-    override fun DartTransformContext.visitBlock(irBlock: IrBlock, context: DartTransformContext): DartStatement {
+    override fun DartAstTransformContext.visitBlock(irBlock: IrBlock, context: DartAstTransformContext): DartStatement {
         when (irBlock.origin) {
             FOR_LOOP -> {
                 val irPossibleSubject =
@@ -284,7 +284,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
         }
     }
 
-    override fun DartTransformContext.visitExpression(expression: IrExpression, context: DartTransformContext) =
+    override fun DartAstTransformContext.visitExpression(expression: IrExpression, context: DartAstTransformContext) =
         expression.accept(context).asStatement()
 
     private fun IrExpression?.findCallInReceivers(block: (IrExpression?) -> IrCall?): IrCall? =
@@ -342,8 +342,8 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
     private fun IrExpression?.hasOrIsPrimitiveNumberRangeToCall() = primitiveNumberRangeToCall() != null
 }
 
-fun IrStatement.accept(context: DartTransformContext) = accept(IrToDartStatementTransformer, context)
-fun Iterable<IrStatement>.accept(context: DartTransformContext) = map { it.accept(context) }
-fun IrExpression.acceptAsStatement(context: DartTransformContext) = accept(IrToDartStatementTransformer, context)
-fun IrVariable.acceptAsStatement(context: DartTransformContext) =
+fun IrStatement.accept(context: DartAstTransformContext) = accept(IrToDartStatementTransformer, context)
+fun Iterable<IrStatement>.accept(context: DartAstTransformContext) = map { it.accept(context) }
+fun IrExpression.acceptAsStatement(context: DartAstTransformContext) = accept(IrToDartStatementTransformer, context)
+fun IrVariable.acceptAsStatement(context: DartAstTransformContext) =
     accept(IrToDartStatementTransformer, context) as DartVariableDeclarationStatement

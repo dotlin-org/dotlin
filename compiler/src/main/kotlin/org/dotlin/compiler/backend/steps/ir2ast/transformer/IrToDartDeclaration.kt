@@ -19,7 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
-import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
+import org.dotlin.compiler.backend.steps.ir2ast.DartAstTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.*
 import org.dotlin.compiler.backend.util.isDartConst
@@ -45,7 +45,7 @@ import org.jetbrains.kotlin.ir.util.*
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnitMember>() {
-    override fun DartTransformContext.visitSimpleFunction(irFunction: IrSimpleFunction, context: DartTransformContext) =
+    override fun DartAstTransformContext.visitSimpleFunction(irFunction: IrSimpleFunction, context: DartAstTransformContext) =
         irFunction.transformBy(context) {
             DartTopLevelFunctionDeclaration(
                 name,
@@ -58,9 +58,9 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
             )
         }
 
-    override fun DartTransformContext.visitClass(
+    override fun DartAstTransformContext.visitClass(
         irClass: IrClass,
-        context: DartTransformContext
+        context: DartAstTransformContext
     ): DartCompilationUnitMember {
         // Extensions are handled differently.
         if (irClass.isDartExtensionContainer) {
@@ -70,7 +70,7 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
         return when (irClass.kind) {
             ClassKind.CLASS, ClassKind.INTERFACE, ClassKind.OBJECT, ClassKind.ANNOTATION_CLASS, ClassKind.ENUM_CLASS -> {
                 val name = irClass.simpleDartName
-                val isDefaultValueClass = irClass.origin == IrDartDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE
+                val isDefaultValueClass = irClass.origin == IrDotlinDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE
 
                 val superTypes = irClass.superTypes()
 
@@ -160,9 +160,9 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
         }
     }
 
-    private fun DartTransformContext.visitExtension(
+    private fun DartAstTransformContext.visitExtension(
         irClass: IrClass,
-        context: DartTransformContext
+        context: DartAstTransformContext
     ): DartCompilationUnitMember {
         return DartExtensionDeclaration(
             name = irClass.simpleDartName,
@@ -177,7 +177,7 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
         )
     }
 
-    override fun DartTransformContext.visitField(irField: IrField, context: DartTransformContext) =
+    override fun DartAstTransformContext.visitField(irField: IrField, context: DartAstTransformContext) =
         DartTopLevelVariableDeclaration(
             variables = DartVariableDeclarationList(
                 listOf(
@@ -194,9 +194,9 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
             annotations = irField.dartAnnotations,
         )
 
-    override fun DartTransformContext.visitTypeAlias(
+    override fun DartAstTransformContext.visitTypeAlias(
         irAlias: IrTypeAlias,
-        context: DartTransformContext
+        context: DartAstTransformContext
     ) = irAlias.let {
         val name = it.dartNameAsSimple
         val typeParameters = it.typeParameters.accept(context)
@@ -216,4 +216,4 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
     }
 }
 
-fun IrDeclaration.accept(context: DartTransformContext) = accept(IrToDartDeclarationTransformer, context)
+fun IrDeclaration.accept(context: DartAstTransformContext) = accept(IrToDartDeclarationTransformer, context)

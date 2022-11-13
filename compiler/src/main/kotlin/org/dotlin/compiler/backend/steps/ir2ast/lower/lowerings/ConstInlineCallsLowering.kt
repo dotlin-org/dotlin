@@ -39,8 +39,8 @@ import org.jetbrains.kotlin.ir.expressions.IrGetValue
  * Must run before [ConstLambdaLiteralsLowering].
  */
 @Suppress("UnnecessaryVariable")
-class ConstInlineCallsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun DartLoweringContext.transform(
+class ConstInlineCallsLowering(override val context: DotlinLoweringContext) : IrExpressionLowering {
+    override fun DotlinLoweringContext.transform(
         expression: IrExpression,
         context: IrExpressionContext
     ): Transformation<IrExpression>? = context.run {

@@ -23,7 +23,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.allSuperTypes
 import org.dotlin.compiler.backend.steps.ir2ast.ir.firstNonFakeOverrideOrSelf
 import org.dotlin.compiler.backend.steps.ir2ast.ir.polymorphicallyIs
 import org.dotlin.compiler.backend.steps.ir2ast.ir.typeParameterOrNull
-import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
 import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
@@ -45,10 +45,10 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.types.Variance
 
-class TypeParametersWithMultipleSuperTypesLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
+class TypeParametersWithMultipleSuperTypesLowering(override val context: DotlinLoweringContext) : IrDeclarationLowering {
     private val originalSuperTypes = mutableMapOf<IrTypeParameter, List<IrType>>()
 
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrTypeParametersContainer || declaration.typeParameters.all { it.superTypes.size < 2 }) {
             return noChange()
         }

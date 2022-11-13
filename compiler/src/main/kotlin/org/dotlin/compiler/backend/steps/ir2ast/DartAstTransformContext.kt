@@ -21,7 +21,7 @@ package org.dotlin.compiler.backend.steps.ir2ast
 
 import org.dotlin.compiler.backend.IrContext
 import org.dotlin.compiler.backend.attributes.IrAttributes
-import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.accept
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartAnnotations
 import org.dotlin.compiler.backend.util.isDartGetter
@@ -37,18 +37,18 @@ import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 
-class DartTransformContext(
-    loweringContext: DartLoweringContext,
+class DartAstTransformContext(
+    loweringContext: DotlinLoweringContext,
 ) : IrContext(), IrAttributes by loweringContext {
     override val bindingContext = loweringContext.bindingContext
     override val symbolTable = loweringContext.symbolTable
-    val dartBuiltIns = loweringContext.dartBuiltIns
+    val dotlinIrBuiltIns = loweringContext.dotlinIrBuiltIns
     override val irBuiltIns = loweringContext.irBuiltIns
     override val dartNameGenerator = loweringContext.dartNameGenerator
     override val dartProject = loweringContext.dartProject
 
     private fun <N : DartAstNode> IrFunction.transformBy(
-        context: DartTransformContext,
+        context: DartAstTransformContext,
         isNamed: Boolean,
         isLocal: Boolean,
         block: DartFunctionDeclarationDefaults.() -> N
@@ -87,13 +87,13 @@ class DartTransformContext(
     }
 
     fun <N : DartAstNode> IrSimpleFunction.transformBy(
-        context: DartTransformContext,
+        context: DartAstTransformContext,
         isLocal: Boolean = false,
         block: DartFunctionDeclarationDefaults.Named.() -> N
     ): N = transformBy(context, isNamed = true, isLocal) { block(this as DartFunctionDeclarationDefaults.Named) }
 
     fun <N : DartAstNode> IrConstructor.transformBy(
-        context: DartTransformContext,
+        context: DartAstTransformContext,
         block: DartFunctionDeclarationDefaults.PossiblyNamed.() -> N
     ): N = transformBy(
         context,

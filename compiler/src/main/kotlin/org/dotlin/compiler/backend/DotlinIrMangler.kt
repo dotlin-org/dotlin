@@ -30,7 +30,7 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.render
 
-object DartIrMangler : IrBasedKotlinManglerImpl() {
+object DotlinIrMangler : IrBasedKotlinManglerImpl() {
     override fun getExportChecker(compatibleMode: Boolean): KotlinExportChecker<IrDeclaration> =
         DartIrExportChecker(compatibleMode)
 

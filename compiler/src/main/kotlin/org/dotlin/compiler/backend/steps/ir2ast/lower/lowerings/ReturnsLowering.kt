@@ -51,8 +51,8 @@ import org.jetbrains.kotlin.types.Variance
  * Return expressions are thrown in Dart as a `$Return` instance. The function body is wrapped in a try-catch, and
  * if a `$Return` is caught, the function will return the value given with the `$Return`.
  */
-class ReturnsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class ReturnsLowering(override val context: DotlinLoweringContext) : IrDeclarationLowering {
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrFunction) return noChange()
 
         transformReturnExpressionsIn(declaration)
@@ -61,8 +61,8 @@ class ReturnsLowering(override val context: DartLoweringContext) : IrDeclaration
     }
 }
 
-class ReturnsInFunctionExpressionsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun DartLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
+class ReturnsInFunctionExpressionsLowering(override val context: DotlinLoweringContext) : IrExpressionLowering {
+    override fun DotlinLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
         if (expression !is IrFunctionExpression) return noChange()
 
         transformReturnExpressionsIn(expression.function)
@@ -71,13 +71,13 @@ class ReturnsInFunctionExpressionsLowering(override val context: DartLoweringCon
     }
 }
 
-private fun DartLoweringContext.transformReturnExpressionsIn(function: IrFunction) {
+private fun DotlinLoweringContext.transformReturnExpressionsIn(function: IrFunction) {
     val body = function.body as? IrBlockBody ?: return
 
     var hasReturnAsExpression = false
 
     val returnType = function.returnType
-    val returnClass = dartBuiltIns.dotlin.returnClass.owner
+    val returnClass = dotlinIrBuiltIns.returnClass.owner
     val returnClassType = returnClass.defaultType.let {
         IrSimpleTypeImpl(
             it.originalKotlinType,

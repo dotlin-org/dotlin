@@ -42,8 +42,8 @@ import org.jetbrains.kotlin.name.Name
  * Properties get simplified to either a field or their getter and setter.
  */
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UnnecessaryVariable")
-class PropertySimplifyingLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class PropertySimplifyingLowering(override val context: DotlinLoweringContext) : IrDeclarationLowering {
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrProperty) return noChange()
 
         val irProperty = declaration

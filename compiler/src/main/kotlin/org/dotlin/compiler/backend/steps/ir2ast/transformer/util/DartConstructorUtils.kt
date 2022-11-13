@@ -19,8 +19,8 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer.util
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDartDeclarationOrigin
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDotlinDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 
 val IrConstructor.isDartFactory: Boolean
-    get() = origin == IrDartDeclarationOrigin.FACTORY
+    get() = origin == IrDotlinDeclarationOrigin.FACTORY

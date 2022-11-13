@@ -19,7 +19,7 @@
 
 package org.dotlin.compiler.backend
 
-import org.dotlin.compiler.backend.DartIrMangler.mangledSignatureHexString
+import org.dotlin.compiler.backend.DotlinIrMangler.mangledSignatureHexString
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.util.*
 import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier

@@ -20,7 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.isDartPositional
-import org.dotlin.compiler.backend.steps.ir2ast.DartTransformContext
+import org.dotlin.compiler.backend.steps.ir2ast.DartAstTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartFactory
 import org.dotlin.compiler.backend.util.dartIndex
@@ -28,7 +28,7 @@ import org.dotlin.compiler.dart.ast.parameter.*
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 
-fun IrValueParameter.accept(context: DartTransformContext): DartFormalParameter = context.run {
+fun IrValueParameter.accept(context: DartAstTransformContext): DartFormalParameter = context.run {
     val irValueParameter = this@accept
 
     val correspondingIrProperty = irValueParameter.correspondingProperty
@@ -72,6 +72,6 @@ fun IrValueParameter.accept(context: DartTransformContext): DartFormalParameter 
     )
 }
 
-fun List<IrValueParameter>.accept(context: DartTransformContext) = DartFormalParameterList(
+fun List<IrValueParameter>.accept(context: DartAstTransformContext) = DartFormalParameterList(
     sortedBy { it.dartIndex }.map { it.accept(context) }
 )

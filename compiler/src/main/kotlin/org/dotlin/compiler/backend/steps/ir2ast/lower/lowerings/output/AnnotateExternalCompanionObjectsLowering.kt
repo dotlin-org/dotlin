@@ -19,7 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.output
 
-import org.dotlin.compiler.backend.steps.ir2ast.lower.DartLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
 import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
@@ -36,13 +36,13 @@ import org.jetbrains.kotlin.ir.util.primaryConstructor
  * Because source information is not available for code in dependencies, we have to add the `@DotlinExternal` annotation
  * to companion objects (or its members) that are marked explicitly `external`.
  */
-class AnnotateExternalCompanionObjectsLowering(override val context: DartLoweringContext) : IrDeclarationLowering {
-    override fun DartLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
+class AnnotateExternalCompanionObjectsLowering(override val context: DotlinLoweringContext) : IrDeclarationLowering {
+    override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         return declaration.let {
             if (((it is IrClass && it.isCompanion) || (it.parentClassOrNull?.isCompanion == true)) &&
                 it.isDotlinExternal
             ) {
-                val dotlinExternal = dartBuiltIns.dotlin.dotlinExternal
+                val dotlinExternal = dotlinIrBuiltIns.dotlinExternal
                 it.annotations = it.annotations + IrConstructorCallImpl(
                     UNDEFINED_OFFSET, UNDEFINED_OFFSET,
                     type = dotlinExternal.defaultType,

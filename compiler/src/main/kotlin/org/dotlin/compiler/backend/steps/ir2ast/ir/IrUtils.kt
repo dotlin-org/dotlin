@@ -371,8 +371,8 @@ val IrStatement.parameterItAssignsTo: IrValueParameter?
 
 val IrStatement.isInitializerForComplexParameter: Boolean
     get() = this is IrSetValue &&
-            (origin == IrDartStatementOrigin.COMPLEX_PARAM_INIT_DEFAULT_VALUE
-                    || origin == IrDartStatementOrigin.COMPLEX_PARAM_INIT_NULLABLE)
+            (origin == IrDotlinStatementOrigin.COMPLEX_PARAM_INIT_DEFAULT_VALUE
+                    || origin == IrDotlinStatementOrigin.COMPLEX_PARAM_INIT_NULLABLE)
 
 val IrProperty.hasImplicitGetter: Boolean
     get() = getter != null && getter!!.isImplicitGetter
@@ -465,7 +465,7 @@ fun List<IrValueParameter>.copy(parent: IrFunction? = null) =
     map { it.copy(parent = parent ?: it.parent as IrFunction) }
 
 val IrValueParameter.wasComplex: Boolean
-    get() = origin is IrDartDeclarationOrigin.WAS_COMPLEX_PARAM
+    get() = origin is IrDotlinDeclarationOrigin.WAS_COMPLEX_PARAM
 
 val IrFunctionAccessExpression.valueArguments: List<IrExpression?>
     get() = (0 until valueArgumentsCount).map { getValueArgument(it) }
@@ -490,7 +490,7 @@ fun IrElement.replaceExpressions(block: (IrExpression) -> IrExpression) {
 }
 
 val IrClass.isDartExtensionContainer: Boolean
-    get() = origin is IrDartDeclarationOrigin.EXTENSION
+    get() = origin is IrDotlinDeclarationOrigin.EXTENSION
 
 fun IrDeclaration.isFakeOverride() = isFakeOverride || origin == IrDeclarationOrigin.FAKE_OVERRIDE
 

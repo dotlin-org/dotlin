@@ -37,8 +37,8 @@ import org.jetbrains.kotlin.name.Name
  * Only applies to lambda literals that do not capture closure values, and only have local returns.
  */
 @Suppress("UnnecessaryVariable")
-class ConstLambdaLiteralsLowering(override val context: DartLoweringContext) : IrExpressionLowering {
-    override fun DartLoweringContext.transform(
+class ConstLambdaLiteralsLowering(override val context: DotlinLoweringContext) : IrExpressionLowering {
+    override fun DotlinLoweringContext.transform(
         expression: IrExpression,
         context: IrExpressionContext
     ): Transformation<IrExpression>? = context.run {
