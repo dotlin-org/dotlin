@@ -15,11 +15,8 @@
  * limitations under the License.
  */
 
-@file:Suppress("EXTERNAL_TYPE_EXTENDS_NON_EXTERNAL_TYPE")
-
 package kotlin.collections
 
-internal external interface Iterator
 private external interface ByteIterator
 private external interface CharIterator
 private external interface ShortIterator

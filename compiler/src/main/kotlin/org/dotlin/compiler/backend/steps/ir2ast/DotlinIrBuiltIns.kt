@@ -20,7 +20,6 @@
 package org.dotlin.compiler.backend.steps.ir2ast
 
 import org.dotlin.compiler.backend.dart
-import org.dotlin.compiler.backend.kotlin
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -49,7 +48,6 @@ class DotlinIrBuiltIns(private val context: DotlinLoweringContext) {
     private val symbolTable = context.symbolTable
 
     val dart = Dart(this)
-    val kotlin = Kotlin(this)
 
     private val operatorsPackage = IrExternalPackageFragmentImpl.createEmptyExternalPackageFragment(
         builtInsModule,
@@ -128,19 +126,13 @@ class DotlinIrBuiltIns(private val context: DotlinLoweringContext) {
     val immutableMapMarker = classSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.ImmutableMapMarker)
     val mutableMapMarker = classSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.MutableMapMarker)
 
-    class Dart(private val builtIns: DotlinIrBuiltIns) {
+    class Dart(builtIns: DotlinIrBuiltIns) {
         val identical = builtIns.functionSymbolAt(dart.core.identical)
-        val iterator = builtIns.classSymbolAt(dart.core.Iterator)
 
         val unsupportedError = builtIns.classSymbolAt(dart.core.UnsupportedError)
 
         val immutableListView = builtIns.classSymbolAt(dart.collection.ImmutableListView)
         val immutableSetView = builtIns.classSymbolAt(dart.collection.ImmutableSetView)
-    }
-
-    class Kotlin(builtIns: DotlinIrBuiltIns) {
-        val writeableList = builtIns.classSymbolAt(kotlin.collections.WriteableList)
-        val immutableList = builtIns.classSymbolAt(kotlin.collections.ImmutableList)
     }
 
     private inline fun <reified S : IrSymbol> symbolAt(name: FqName): S =

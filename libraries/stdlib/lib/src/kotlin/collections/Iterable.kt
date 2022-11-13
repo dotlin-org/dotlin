@@ -30,7 +30,7 @@ external abstract class Iterable<out E> const constructor() {
     constructor(implement: Interface)
 
     @DartGetter
-    abstract operator fun iterator(): dart.core.Iterator<E>
+    abstract operator fun iterator(): Iterator<E>
 
     open fun <R> cast(): Iterable<R>
 

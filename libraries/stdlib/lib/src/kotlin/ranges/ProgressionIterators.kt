@@ -22,7 +22,7 @@ package kotlin.ranges
  * @property step the number by which the value is incremented on each step.
  */
 // TODO: Add behavior test
-internal class IntProgressionIterator(private val first: Int, private val last: Int, val step: Int) : Iterator<Int>() {
+internal class IntProgressionIterator(private val first: Int, private val last: Int, val step: Int) : Iterator<Int> {
     private var hasNext: Boolean = if (step > 0) first <= last else first >= last
 
     override fun moveNext(): Boolean {
