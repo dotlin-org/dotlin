@@ -19,20 +19,15 @@
 
 package org.dotlin.compiler.dart.ast
 
-import org.dotlin.compiler.dart.ast.`typealias`.DartTypeAlias
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.collection.DartCollectionElementList
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
-import org.dotlin.compiler.dart.ast.declaration.classormixin.DartClassDeclaration
-import org.dotlin.compiler.dart.ast.declaration.classormixin.DartExtendsClause
-import org.dotlin.compiler.dart.ast.declaration.classormixin.DartImplementsClause
-import org.dotlin.compiler.dart.ast.declaration.classormixin.DartWithClause
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartMethodDeclaration
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartConstructorDeclaration
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartConstructorFieldInitializer
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartConstructorInvocation
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartFieldDeclaration
-import org.dotlin.compiler.dart.ast.declaration.extension.DartExtensionDeclaration
+import org.dotlin.compiler.dart.ast.declaration.classlike.*
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.DartFieldDeclaration
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.DartMethodDeclaration
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.constructor.DartConstructorDeclaration
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.constructor.DartConstructorFieldInitializer
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.constructor.DartConstructorInvocation
 import org.dotlin.compiler.dart.ast.declaration.function.DartNamedFunctionDeclaration
 import org.dotlin.compiler.dart.ast.declaration.function.DartTopLevelFunctionDeclaration
 import org.dotlin.compiler.dart.ast.declaration.function.body.DartBlockFunctionBody
@@ -61,6 +56,7 @@ import org.dotlin.compiler.dart.ast.type.DartNamedType
 import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
 import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameter
 import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameterList
+import org.dotlin.compiler.dart.ast.`typealias`.DartTypeAlias
 
 interface DartAstNodeVisitor<R, C> {
     private fun throwUnsupported(): Nothing = throw UnsupportedOperationException()
@@ -86,11 +82,20 @@ interface DartAstNodeVisitor<R, C> {
     fun visitLocalFunctionDeclaration(functionDeclaration: DartLocalFunctionDeclaration, context: C): R =
         visitNamedFunctionDeclaration(functionDeclaration, context)
 
+    fun visitClassLikeDeclaration(classLikeDeclaration: DartClassLikeDeclaration, context: C): R =
+        visitAstNode(classLikeDeclaration, context)
+
     fun visitClassDeclaration(classDeclaration: DartClassDeclaration, context: C): R =
-        visitAstNode(classDeclaration, context)
+        visitClassLikeDeclaration(classDeclaration, context)
+
+    fun visitEnumDeclaration(enumDeclaration: DartEnumDeclaration, context: C): R =
+        visitClassLikeDeclaration(enumDeclaration, context)
+
+    fun visitEnumConstantDeclaration(enumConstant: DartEnumDeclaration.Constant, context: C): R =
+        visitAstNode(enumConstant, context)
 
     fun visitExtensionDeclaration(extensionDeclaration: DartExtensionDeclaration, context: C): R =
-        visitAstNode(extensionDeclaration, context)
+        visitClassLikeDeclaration(extensionDeclaration, context)
 
     fun visitMethodDeclaration(methodDeclaration: DartMethodDeclaration, context: C): R =
         visitNamedFunctionDeclaration(methodDeclaration, context)

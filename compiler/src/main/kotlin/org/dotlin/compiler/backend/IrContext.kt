@@ -265,7 +265,7 @@ abstract class IrContext : IrAttributes {
             }
         }
 
-        val needConst by lazy { (implicit || hasAnnotation(dotlin.const)) }
+        val needConst by lazy { (implicit || hasAnnotation(dotlin.const) || isDartConst) }
 
         return when (this) {
             // Enums are always constructed as const.

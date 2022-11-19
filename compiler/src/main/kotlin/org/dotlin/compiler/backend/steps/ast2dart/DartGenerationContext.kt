@@ -28,11 +28,12 @@ import org.dotlin.compiler.dart.ast.collection.DartCollectionElement
 import org.dotlin.compiler.dart.ast.collection.DartCollectionElementList
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
 import org.dotlin.compiler.dart.ast.declaration.DartDeclaration
-import org.dotlin.compiler.dart.ast.declaration.classormixin.DartExtendsClause
-import org.dotlin.compiler.dart.ast.declaration.classormixin.DartImplementsClause
-import org.dotlin.compiler.dart.ast.declaration.classormixin.DartWithClause
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartClassMember
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartConstructorInitializer
+import org.dotlin.compiler.dart.ast.declaration.classlike.DartClassLikeDeclaration
+import org.dotlin.compiler.dart.ast.declaration.classlike.DartExtendsClause
+import org.dotlin.compiler.dart.ast.declaration.classlike.DartImplementsClause
+import org.dotlin.compiler.dart.ast.declaration.classlike.DartWithClause
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.DartClassMember
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.constructor.DartConstructorInitializer
 import org.dotlin.compiler.dart.ast.declaration.function.DartNamedFunctionDeclaration
 import org.dotlin.compiler.dart.ast.declaration.function.body.DartFunctionBody
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
@@ -76,11 +77,14 @@ class DartGenerationContext {
             is DartCollectionElement, is DartCollectionElementList -> DartCollectionElementTransformer
             is DartNamedFunctionDeclaration, is DartFunctionBody -> DartFunctionDeclarationTransformer
             is DartClassMember -> DartClassMemberTransformer
+            is DartClassLikeDeclaration, is DartExtendsClause, is DartImplementsClause, is DartWithClause -> {
+                DartClassLikeTransformer
+            }
             is DartDeclaration, is DartVariableDeclarationList -> DartDeclarationTransformer
             is DartCompilationUnit, is DartDirective, is DartCombinator -> DartCompilationUnitTransformer
             is DartConstructorInitializer -> DartConstructorInitializerTransformer
             is DartFormalParameter, is DartFormalParameterList -> DartFormalParameterTransformer
-            is DartExtendsClause, is DartImplementsClause, is DartWithClause, is DartLabel, is DartAnnotation -> {
+           is DartLabel, is DartAnnotation -> {
                 DartMiscTransformer
             }
             is DartStatement, is DartCatchClause, is DartForLoopParts -> DartStatementTransformer
@@ -95,25 +99,39 @@ class DartGenerationContext {
         }
     }
 
-    fun <N : DartAstNode, C : DartAstNode> N.acceptChild(
+    fun <N : DartAstNode> N.acceptChild(
         prefix: String = "",
         suffix: String = "",
-        block: N.() -> C?
+        block: N.() -> DartAstNode?
     ): String = acceptChildOrNull(prefix, suffix, block) ?: ""
 
-    fun <N : DartAstNode, C : DartAstNode> N.acceptChildOrNull(
+    fun <N : DartAstNode> N.acceptChildOrNull(
         prefix: String = "",
         suffix: String = "",
-        block: N.() -> C?
+        block: N.() -> DartAstNode?
     ): String? = block(this)?.accept(this)?.let { "$prefix$it$suffix" }
 
-    fun <N : DartAstNode, C : Collection<DartAstNode>> N.acceptChild(
+    inline fun <reified N : DartAstNode> DartAstNode.acceptChildIf(
+        prefix: String = "",
+        suffix: String = "",
+        noinline block: N.() -> DartAstNode?
+    ): String = if (this is N) acceptChild(prefix, suffix, block) else ""
+
+    fun <N : DartAstNode> N.acceptChild(
         separator: String,
         prefix: String = "",
         suffix: String = "",
         ifEmpty: String = "$prefix$suffix",
-        block: N.() -> C
+        block: N.() -> Collection<DartAstNode>
     ): String = block(this).acceptAll(parent = this@acceptChild, separator, prefix, suffix, ifEmpty)
+
+    inline fun <reified N : DartAstNode> DartAstNode.acceptChildIf(
+        separator: String,
+        prefix: String = "",
+        suffix: String = "",
+        ifEmpty: String = "$prefix$suffix",
+        noinline block: N.() -> Collection<DartAstNode>
+    ): String = if (this is N) acceptChild(separator, prefix, suffix, ifEmpty, block) else ""
 
     fun <N, C : DartAstNode> N.accept(
         separator: String = "",

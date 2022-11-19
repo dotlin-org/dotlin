@@ -17,35 +17,26 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.dart.ast.declaration.classormixin
+package org.dotlin.compiler.dart.ast.declaration.classlike.member
 
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 import org.dotlin.compiler.dart.ast.accept
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartClassMember
-import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
-import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameterList
+import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
 
-data class DartClassDeclaration(
+data class DartFieldDeclaration(
+    val fields: DartVariableDeclarationList,
+    val isStatic: Boolean = false,
+    val isCovariant: Boolean = false,
     val isAbstract: Boolean = false,
-    override val name: DartSimpleIdentifier,
-    override val typeParameters: DartTypeParameterList = DartTypeParameterList(),
-    val extendsClause: DartExtendsClause? = null,
-    val implementsClause: DartImplementsClause? = null,
-    val withClause: DartWithClause? = null,
-    override val members: List<DartClassMember> = listOf(),
     override val annotations: List<DartAnnotation> = listOf(),
     override val documentationComment: String? = null,
-) : DartClassOrMixinDeclaration {
+) : DartClassMember {
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
-        visitor.visitClassDeclaration(this, data)
+        visitor.visitFieldDeclaration(this, data)
 
     override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
-        name.accept(visitor, data)
-        typeParameters.accept(visitor, data)
-        extendsClause?.accept(visitor, data)
-        implementsClause?.accept(visitor, data)
-        members.accept(visitor, data)
+        fields.accept(visitor, data)
         annotations.accept(visitor, data)
     }
 }

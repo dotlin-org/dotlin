@@ -23,14 +23,11 @@ import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrDeclarationLowering
 import org.dotlin.compiler.backend.steps.ir2ast.lower.Transformations
 import org.dotlin.compiler.backend.steps.ir2ast.lower.noChange
+import org.dotlin.compiler.backend.util.annotate
 import org.dotlin.compiler.backend.util.isDotlinExternal
-import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
-import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
-import org.jetbrains.kotlin.ir.util.primaryConstructor
 
 /**
  * Because source information is not available for code in dependencies, we have to add the `@DotlinExternal` annotation
@@ -42,15 +39,7 @@ class AnnotateExternalCompanionObjectsLowering(override val context: DotlinLower
             if (((it is IrClass && it.isCompanion) || (it.parentClassOrNull?.isCompanion == true)) &&
                 it.isDotlinExternal
             ) {
-                val dotlinExternal = dotlinIrBuiltIns.dotlinExternal
-                it.annotations = it.annotations + IrConstructorCallImpl(
-                    UNDEFINED_OFFSET, UNDEFINED_OFFSET,
-                    type = dotlinExternal.defaultType,
-                    symbol = dotlinExternal.owner.primaryConstructor!!.symbol,
-                    typeArgumentsCount = 0,
-                    constructorTypeArgumentsCount = 0,
-                    valueArgumentsCount = 0,
-                )
+                it.annotate(dotlinIrBuiltIns.dotlinExternal)
             }
 
             noChange()

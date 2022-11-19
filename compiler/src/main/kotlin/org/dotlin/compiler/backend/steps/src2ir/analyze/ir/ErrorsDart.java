@@ -116,6 +116,13 @@ public interface ErrorsDart {
     DiagnosticFactory0<KtExpression> NON_CONSTANT_DEFAULT_VALUE_IN_CONST_FUNCTION =
             DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
 
+    DiagnosticFactory0<PsiElement> DUPLICATE_ENUM_MEMBER_NAME =
+            DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
+
+    // Original name: NON_FINAL_FIELD_IN_ENUM
+    DiagnosticFactory0<PsiElement> VAR_IN_ENUM =
+            DiagnosticFactory0.create(Severity.ERROR, DEFAULT);
+
     @SuppressWarnings("UnusedDeclaration")
     Object _initializer = new Object() {
         {

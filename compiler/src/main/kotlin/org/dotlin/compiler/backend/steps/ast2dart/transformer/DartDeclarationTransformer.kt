@@ -20,46 +20,12 @@
 package org.dotlin.compiler.backend.steps.ast2dart.transformer
 
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
-import org.dotlin.compiler.dart.ast.`typealias`.DartTypeAlias
-import org.dotlin.compiler.dart.ast.declaration.classormixin.DartClassDeclaration
-import org.dotlin.compiler.dart.ast.declaration.extension.DartExtensionDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartTopLevelVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
+import org.dotlin.compiler.dart.ast.`typealias`.DartTypeAlias
 
 object DartDeclarationTransformer : DartAstNodeTransformer() {
-    override fun DartGenerationContext.visitClassDeclaration(classDeclaration: DartClassDeclaration): String {
-        val annotations = classDeclaration.acceptChildAnnotations()
-        val abstract = if (classDeclaration.isAbstract) "abstract " else ""
-        val name = classDeclaration.acceptChild { name }
-
-        val typeParameters = classDeclaration.acceptChild { typeParameters }
-
-        val extends = classDeclaration.acceptChild(prefix = " ") { extendsClause }
-        val implements = classDeclaration.acceptChild(prefix = " ") { implementsClause }
-        val with = classDeclaration.acceptChild(prefix = " ") { withClause }
-
-        val members = classDeclaration.acceptChild(
-            separator = "",
-            prefix = " {",
-            suffix = "}",
-        ) { members }
-
-        return "$annotations${abstract}class $name$typeParameters$extends$with$implements$members"
-    }
-
-    override fun DartGenerationContext.visitExtensionDeclaration(extensionDeclaration: DartExtensionDeclaration) =
-        extensionDeclaration.run {
-            val annotations = acceptChildAnnotations()
-            val name = acceptChild { name }
-            val typeParameters = acceptChild { typeParameters }
-            val type = acceptChild { extendedType }
-
-            val members = acceptChild(separator = "", prefix = "{", suffix = "}") { members }
-
-            "${annotations}extension $name$typeParameters on $type$members"
-        }
-
     override fun DartGenerationContext.visitTopLevelVariableDeclaration(variableDeclaration: DartTopLevelVariableDeclaration) =
         variableDeclaration.acceptChild(suffix = ";") { variables }
 
@@ -83,7 +49,6 @@ object DartDeclarationTransformer : DartAstNodeTransformer() {
                     else -> "final$type "
                 }
                 isLate -> "late$type "
-                type == null -> "var "
                 else -> "$type "
             }
 

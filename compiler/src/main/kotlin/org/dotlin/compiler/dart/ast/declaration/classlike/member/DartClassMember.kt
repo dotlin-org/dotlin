@@ -17,8 +17,8 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor
+package org.dotlin.compiler.dart.ast.declaration.classlike.member
 
-import org.dotlin.compiler.dart.ast.DartAstNode
+import org.dotlin.compiler.dart.ast.declaration.DartDeclaration
 
-interface DartConstructorInitializer : DartAstNode
+interface DartClassMember : DartDeclaration

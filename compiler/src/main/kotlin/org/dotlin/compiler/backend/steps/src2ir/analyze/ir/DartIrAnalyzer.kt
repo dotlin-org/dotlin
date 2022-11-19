@@ -71,6 +71,7 @@ open class DartIrAnalyzer(
         ConstInlineChecker,
         DartConstructorChecker,
         ConstFunctionWithoutInlineChecker,
+        EnumChecker,
     ),
 ) {
     private val messageCollector = config[CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY] ?: MessageCollector.NONE

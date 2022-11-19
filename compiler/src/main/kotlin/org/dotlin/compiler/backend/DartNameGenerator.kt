@@ -88,19 +88,20 @@ class DartNameGenerator {
             var name = annotatedName ?: when {
                 this is IrSimpleFunction && isOperator && name.identifier == "invoke" -> "call".toDartIdentifier()
                 !name.isSpecial -> name.identifier.toDartIdentifier()
-                this is IrConstructor -> {
-                    val constructors = parentClassOrNull?.declarations?.filterIsInstance<IrConstructor>() ?: emptyList()
+                this is IrConstructor -> when {
+                    // If there are multiple constructors (and this is not the primary constructor, which by
+                    // default has no name), they're numbered in the order of appearance,
+                    // e.g. `MyClass.$constructor$0`.
+                    !isPrimary -> {
+                        val constructors = parentClassOrNull?.declarations?.filterIsInstance<IrConstructor>()
+                            ?: emptyList()
 
-                    when {
-                        constructors.size <= 1 -> when {
-                            // If a constructor is private with no name, we set the name to "_".
-                            isPrivate -> DartSimpleIdentifier("_")
-                            else -> null
-                        }
-                        // If there are multiple constructors (and this is not the primary constructor, which by
-                        // default has no name), they're numbered in the order of appearance,
-                        // e.g. `MyClass.$constructor$0`.
-                        !isPrimary -> DartSimpleIdentifier("\$constructor$${constructors.indexOf(this)}")
+                        DartSimpleIdentifier("\$constructor$${constructors.indexOf(this)}")
+                    }
+
+                    else -> when {
+                        // If the primary constructor is private with no name, we set the name to "_".
+                        isPrivate -> DartSimpleIdentifier("_")
                         else -> null
                     }
                 }
@@ -190,8 +191,10 @@ class DartNameGenerator {
                         else -> ""
                     }
                 }
+
                 else -> classifier.name.toString()
             }
+
             is IrTypeParameter -> classifier.dartNameValueWith(superTypes = false)
             else -> ""
         }

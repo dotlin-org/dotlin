@@ -20,6 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.attributes.CollectionLiteralKind.*
+import org.dotlin.compiler.backend.dotlin
 import org.dotlin.compiler.backend.kotlin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
@@ -55,20 +56,6 @@ class CollectionFactoryCallsLowering(override val context: DotlinLoweringContext
         val fqName = function.fqNameWhenAvailable ?: return noChange()
         if (fqName !in loweredFactories) return noChange()
 
-        val isDartConst by lazy {
-            expression.isDartConst(
-                initializedIn = context.initializerContainer?.declaration,
-                constInlineContainer = when {
-                    context.container.isDartConstInlineFunction() -> context.container
-                    else -> null
-                }
-            )
-        }
-
-        val mutableListCompanion by lazy {
-            irBuiltIns.mutableListClass.owner.companionObject()!!
-        }
-
         val arrayCompanion by lazy {
             irBuiltIns.arrayClass.owner.companionObject()!!
         }
@@ -87,16 +74,23 @@ class CollectionFactoryCallsLowering(override val context: DotlinLoweringContext
             }
         }
 
-        fun IrVararg.makeDartConst() = also {
-            // Copy the source so that later isDartConst checks are true on the irVararg.
-            // TODO?: Use IrAttributes for this
-            it.ktExpression = expression.ktExpression
-        }
+        val isDartConst = expression.isDartConst(
+            initializedIn = context.initializerContainer?.declaration,
+            constInlineContainer = when {
+                context.container.isDartConstInlineFunction() -> context.container
+                else -> null
+            }
+        )
 
         // Const calls are always just literals.
         if (isDartConst) {
             return replaceWith(
-                irVarargOrEmpty.makeDartConst()
+                irVarargOrEmpty.also {
+                    // We only mark the expression as const if it has been explicitly marked @const.
+                    if (expression.hasAnnotation(dotlin.const)) {
+                        it.isDartConst = true
+                    }
+                }
             )
         }
 
@@ -137,6 +131,7 @@ class CollectionFactoryCallsLowering(override val context: DotlinLoweringContext
                                     putValueArgument(index = 0, irVarargOrEmpty)
                                 }
                             }
+
                             mutableListOf, mutableSetOf -> irVarargOrEmpty
                             arrayOf -> when (expression.valueArgumentsCount) {
                                 0 -> emptyArrayCall
@@ -149,6 +144,7 @@ class CollectionFactoryCallsLowering(override val context: DotlinLoweringContext
                                     type = callType()
                                 }
                             }
+
                             emptyArray -> emptyArrayCall
                             else -> throw UnsupportedOperationException("Unknown collection creation call: $fqName")
                         }

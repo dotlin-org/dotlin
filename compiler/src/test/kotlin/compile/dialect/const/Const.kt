@@ -197,46 +197,32 @@ class Const : BaseTest {
         kotlin(
             """
             enum class Temperature {
-                COLD,
-                CHILLY,
-                WARM,
-                HOT
+                cold,
+                chilly,
+                warm,
+                hot
             }
 
-            const val temp = Temperature.WARM
+            const val temp = Temperature.warm
             """
         )
 
         dart(
             """
-            import "dart:core" hide Enum;
             import "package:meta/meta.dart";
 
-            @sealed
-            class Temperature extends Enum<Temperature> {
-              const Temperature._(
-                String name,
-                int ordinal,
-              ) : super(name, ordinal);
-              static const Temperature COLD = const Temperature._("COLD", 0);
-              static const Temperature CHILLY = const Temperature._("CHILLY", 1);
-              static const Temperature WARM = const Temperature._("WARM", 2);
-              static const Temperature HOT = const Temperature._("HOT", 3);
-              static List<Temperature> values() {
-                return <Temperature>[
-                  Temperature.COLD,
-                  Temperature.CHILLY,
-                  Temperature.WARM,
-                  Temperature.HOT
-                ];
-              }
+            enum Temperature {
+              cold._(),
+              chilly._(),
+              warm._(),
+              hot._();
             
-              static Temperature valueOf(String value) {
-                return this.values().firstWhere((Temperature v) => v.name == value);
-              }
+              const Temperature._();
             }
-            
-            const Temperature temp = Temperature.WARM;
+
+            const Temperature temp = Temperature.warm;
+            Temperature ${'$'}Temperature${'$'}valueOf(String value) =>
+                Temperature.values.firstWhere((Temperature v) => v.name == value);
             """
         )
     }

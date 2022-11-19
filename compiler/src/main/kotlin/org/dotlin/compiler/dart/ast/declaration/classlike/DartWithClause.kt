@@ -17,27 +17,20 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor
+package org.dotlin.compiler.dart.ast.declaration.classlike
 
+import org.dotlin.compiler.dart.ast.DartAstNode
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 import org.dotlin.compiler.dart.ast.accept
-import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartClassMember
-import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
+import org.dotlin.compiler.dart.ast.type.DartNamedType
 
-data class DartFieldDeclaration(
-    val fields: DartVariableDeclarationList,
-    val isStatic: Boolean = false,
-    val isCovariant: Boolean = false,
-    val isAbstract: Boolean = false,
-    override val annotations: List<DartAnnotation> = listOf(),
-    override val documentationComment: String? = null,
-) : DartClassMember {
+data class DartWithClause(
+    val mixins: List<DartNamedType>,
+) : DartAstNode {
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
-        visitor.visitFieldDeclaration(this, data)
+        visitor.visitWithClause(this, data)
 
     override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
-        fields.accept(visitor, data)
-        annotations.accept(visitor, data)
+        mixins.accept(visitor, data)
     }
 }

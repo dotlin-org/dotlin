@@ -17,27 +17,39 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.dart.ast.declaration.classormixin.member
+package org.dotlin.compiler.dart.ast.declaration.classlike.member.constructor
 
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
+import org.dotlin.compiler.dart.ast.accept
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
-import org.dotlin.compiler.dart.ast.declaration.function.DartNamedFunctionDeclaration
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.DartClassMember
+import org.dotlin.compiler.dart.ast.declaration.function.DartFunctionDeclaration
 import org.dotlin.compiler.dart.ast.expression.DartFunctionExpression
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
-import org.dotlin.compiler.dart.ast.type.DartTypeAnnotation
+import org.dotlin.compiler.dart.ast.type.DartNamedType
 
-class DartMethodDeclaration(
-    override val name: DartSimpleIdentifier,
-    override val returnType: DartTypeAnnotation,
+data class DartConstructorDeclaration(
+    override val returnType: DartNamedType,
+    override val name: DartSimpleIdentifier? = null,
     override val function: DartFunctionExpression = DartFunctionExpression(),
-    override val isGetter: Boolean = false,
-    override val isSetter: Boolean = false,
+    val initializers: List<DartConstructorInitializer> = listOf(),
     override val isExternal: Boolean = false,
-    val isOperator: Boolean = false,
-    val isStatic: Boolean = false,
+    val isConst: Boolean = false,
+    val isFactory: Boolean = false,
     override val annotations: List<DartAnnotation> = listOf(),
     override val documentationComment: String? = null,
-) : DartClassMember, DartNamedFunctionDeclaration {
+) : DartClassMember, DartFunctionDeclaration {
+    override val isGetter: Boolean = false
+    override val isSetter: Boolean = false
+
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
-        visitor.visitMethodDeclaration(this, data)
+        visitor.visitConstructorDeclaration(this, data)
+
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
+        returnType.accept(visitor, data)
+        name?.accept(visitor, data)
+        function.accept(visitor, data)
+        initializers.accept(visitor, data)
+        annotations.accept(visitor, data)
+    }
 }

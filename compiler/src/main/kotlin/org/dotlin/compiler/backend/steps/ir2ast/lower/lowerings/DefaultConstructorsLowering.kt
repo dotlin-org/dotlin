@@ -28,6 +28,8 @@ import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.expressions.IrDelegatingConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrGetObjectValue
+import org.jetbrains.kotlin.ir.util.isEnumClass
+import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.ir.util.statements
 import org.jetbrains.kotlin.name.Name
 
@@ -39,15 +41,22 @@ class DefaultConstructorsLowering(override val context: DotlinLoweringContext) :
     override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
         if (declaration !is IrConstructor) return noChange()
 
+        val inEnum = declaration.parentClassOrNull?.isEnumClass == true
+
         if (!declaration.isPrimary ||
             declaration.name != Name.special("<init>") ||
             declaration.visibility != DescriptorVisibilities.PUBLIC ||
             declaration.annotations.isNotEmpty() ||
             declaration.valueParameters.isNotEmpty() ||
             declaration.typeParameters.isNotEmpty() ||
-            declaration.isDartConst()
+            (!inEnum && declaration.isDartConst())
         ) {
             return noChange()
+        }
+
+        // Primary enum constructors with no value parameters can always be removed.
+        if (inEnum) {
+            return just { remove() }
         }
 
         val body = declaration.body

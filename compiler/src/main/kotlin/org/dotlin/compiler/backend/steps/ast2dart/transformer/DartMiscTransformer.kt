@@ -22,28 +22,9 @@ package org.dotlin.compiler.backend.steps.ast2dart.transformer
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
 import org.dotlin.compiler.dart.ast.DartLabel
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
-import org.dotlin.compiler.dart.ast.declaration.classormixin.DartExtendsClause
-import org.dotlin.compiler.dart.ast.declaration.classormixin.DartImplementsClause
-import org.dotlin.compiler.dart.ast.declaration.classormixin.DartWithClause
 
 object DartMiscTransformer : DartAstNodeTransformer() {
     override fun DartGenerationContext.visitLabel(label: DartLabel) = "${label.acceptChild { value }}: "
-
-    override fun DartGenerationContext.visitExtendsClause(extendsClause: DartExtendsClause) = extendsClause.run {
-        val type = acceptChild { type }
-        "extends $type"
-    }
-
-    override fun DartGenerationContext.visitImplementsClause(implementsClause: DartImplementsClause) =
-        implementsClause.run {
-            val types = acceptChild(separator = ", ") { interfaces }
-            "implements $types"
-        }
-
-    override fun DartGenerationContext.visitWithClause(withClause: DartWithClause) = withClause.run {
-        val types = acceptChild(separator = ", ") { mixins }
-        "with $types"
-    }
 
     override fun DartGenerationContext.visitAnnotation(annotation: DartAnnotation) = annotation.run {
         val name = acceptChild { name }

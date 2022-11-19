@@ -84,7 +84,7 @@ class LazyPropertiesLowering(override val context: DotlinLoweringContext) : IrDe
                                 type = it.type
                             }
 
-                            getter = createDefaultGetter(backingField!!.type)
+                            getter = createDefaultGetter()
                             setter = null
                         }
                         is IrLocalDelegatedProperty -> IrVariableImpl(

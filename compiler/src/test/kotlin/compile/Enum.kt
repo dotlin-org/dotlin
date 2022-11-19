@@ -31,33 +31,25 @@ class Enum : BaseTest {
         kotlin(
             """
             enum class Test {
-                ALPHA,
-                BETA,
+                alpha,
+                beta,
             }
             """
         )
 
         dart(
             """
-            import "dart:core" hide Enum;
             import "package:meta/meta.dart";
 
-            @sealed
-            class Test extends Enum<Test> {
-              const Test._(
-                String name,
-                int ordinal,
-              ) : super(name, ordinal);
-              static const Test ALPHA = const Test._("ALPHA", 0);
-              static const Test BETA = const Test._("BETA", 1);
-              static List<Test> values() {
-                return <Test>[Test.ALPHA, Test.BETA];
-              }
-
-              static Test valueOf(String value) {
-                return this.values().firstWhere((Test v) => v.name == value);
-              }
+            enum Test {
+              alpha._(),
+              beta._();
+            
+              const Test._();
             }
+
+            Test ${'$'}Test${'$'}valueOf(String value) =>
+                Test.values.firstWhere((Test v) => v.name == value);
             """
         )
     }
@@ -67,36 +59,27 @@ class Enum : BaseTest {
         kotlin(
             """
             enum class Test(val lowercase: String) {
-                ALPHA("α"),
-                BETA("β"),
+                alpha("α"),
+                beta("β"),
             }
             """
         )
 
         dart(
             """
-            import "dart:core" hide Enum;
             import "package:meta/meta.dart";
 
-            @sealed
-            class Test extends Enum<Test> {
-              const Test._(
-                String name,
-                int ordinal,
-                this.lowercase,
-              ) : super(name, ordinal);
+            enum Test {
+              alpha._("α"),
+              beta._("β");
+
+              const Test._(this.lowercase);
               @nonVirtual
               final String lowercase;
-              static const Test ALPHA = const Test._("ALPHA", 0, "α");
-              static const Test BETA = const Test._("BETA", 1, "β");
-              static List<Test> values() {
-                return <Test>[Test.ALPHA, Test.BETA];
-              }
-
-              static Test valueOf(String value) {
-                return this.values().firstWhere((Test v) => v.name == value);
-              }
             }
+
+            Test ${'$'}Test${'$'}valueOf(String value) =>
+                Test.values.firstWhere((Test v) => v.name == value);
             """
         )
     }
@@ -106,39 +89,32 @@ class Enum : BaseTest {
         kotlin(
             """
             enum class Test(val lowercase: String, val uppercase: String) {
-                ALPHA("α", "Α"),
-                BETA("β", "Β"),
+                alpha("α", "Α"),
+                beta("β", "Β"),
             }
             """
         )
 
         dart(
             """
-            import "dart:core" hide Enum;
             import "package:meta/meta.dart";
 
-            @sealed
-            class Test extends Enum<Test> {
+            enum Test {
+              alpha._("α", "Α"),
+              beta._("β", "Β");
+            
               const Test._(
-                String name,
-                int ordinal,
                 this.lowercase,
                 this.uppercase,
-              ) : super(name, ordinal);
+              );
               @nonVirtual
               final String lowercase;
               @nonVirtual
               final String uppercase;
-              static const Test ALPHA = const Test._("ALPHA", 0, "α", "Α");
-              static const Test BETA = const Test._("BETA", 1, "β", "Β");
-              static List<Test> values() {
-                return <Test>[Test.ALPHA, Test.BETA];
-              }
-
-              static Test valueOf(String value) {
-                return this.values().firstWhere((Test v) => v.name == value);
-              }
             }
+
+            Test ${'$'}Test${'$'}valueOf(String value) =>
+                Test.values.firstWhere((Test v) => v.name == value);
             """
         )
     }
@@ -148,41 +124,33 @@ class Enum : BaseTest {
         kotlin(
             """
             enum class Test {
-                ALPHA,
-                BETA,
+                alpha,
+                beta,
             }
 
             fun main() {
-                Test.ALPHA
+                Test.alpha
             }
             """
         )
 
         dart(
             """
-            import "dart:core" hide Enum;
             import "package:meta/meta.dart";
 
-            @sealed
-            class Test extends Enum<Test> {
-              const Test._(
-                String name,
-                int ordinal,
-              ) : super(name, ordinal);
-              static const Test ALPHA = const Test._("ALPHA", 0);
-              static const Test BETA = const Test._("BETA", 1);
-              static List<Test> values() {
-                return <Test>[Test.ALPHA, Test.BETA];
-              }
-
-              static Test valueOf(String value) {
-                return this.values().firstWhere((Test v) => v.name == value);
-              }
+            enum Test {
+              alpha._(),
+              beta._();
+            
+              const Test._();
             }
 
             void main() {
-              Test.ALPHA;
+              Test.alpha;
             }
+
+            Test ${'$'}Test${'$'}valueOf(String value) =>
+                Test.values.firstWhere((Test v) => v.name == value);
             """
         )
     }
@@ -192,8 +160,8 @@ class Enum : BaseTest {
         kotlin(
             """
             enum class Test {
-                ALPHA,
-                BETA,
+                alpha,
+                beta,
             }
 
             fun main() {
@@ -204,29 +172,21 @@ class Enum : BaseTest {
 
         dart(
             """
-            import "dart:core" hide Enum;
             import "package:meta/meta.dart";
 
-            @sealed
-            class Test extends Enum<Test> {
-              const Test._(
-                String name,
-                int ordinal,
-              ) : super(name, ordinal);
-              static const Test ALPHA = const Test._("ALPHA", 0);
-              static const Test BETA = const Test._("BETA", 1);
-              static List<Test> values() {
-                return <Test>[Test.ALPHA, Test.BETA];
-              }
-
-              static Test valueOf(String value) {
-                return this.values().firstWhere((Test v) => v.name == value);
-              }
+            enum Test {
+              alpha._(),
+              beta._();
+            
+              const Test._();
             }
 
             void main() {
-              Test.values();
+              Test.values;
             }
+
+            Test ${'$'}Test${'$'}valueOf(String value) =>
+                Test.values.firstWhere((Test v) => v.name == value);
             """
         )
     }
@@ -236,41 +196,33 @@ class Enum : BaseTest {
         kotlin(
             """
             enum class Test {
-                ALPHA,
-                BETA,
+                alpha,
+                beta,
             }
 
             fun main() {
-                Test.valueOf("ALPHA")
+                Test.valueOf("alpha")
             }
             """
         )
 
         dart(
             """
-            import "dart:core" hide Enum;
             import "package:meta/meta.dart";
 
-            @sealed
-            class Test extends Enum<Test> {
-              const Test._(
-                String name,
-                int ordinal,
-              ) : super(name, ordinal);
-              static const Test ALPHA = const Test._("ALPHA", 0);
-              static const Test BETA = const Test._("BETA", 1);
-              static List<Test> values() {
-                return <Test>[Test.ALPHA, Test.BETA];
-              }
-
-              static Test valueOf(String value) {
-                return this.values().firstWhere((Test v) => v.name == value);
-              }
+            enum Test {
+              alpha._(),
+              beta._();
+            
+              const Test._();
             }
 
             void main() {
-              Test.valueOf("ALPHA");
+              ${'$'}Test${'$'}valueOf("alpha");
             }
+
+            Test ${'$'}Test${'$'}valueOf(String value) =>
+                Test.values.firstWhere((Test v) => v.name == value);
             """
         )
     }
@@ -280,8 +232,8 @@ class Enum : BaseTest {
         kotlin(
             """
             enum class Test {
-                ALPHA,
-                BETA,
+                alpha,
+                beta,
             }
 
             fun main() {
@@ -292,29 +244,21 @@ class Enum : BaseTest {
 
         dart(
             """
-            import "dart:core" hide Enum;
             import "package:meta/meta.dart";
 
-            @sealed
-            class Test extends Enum<Test> {
-              const Test._(
-                String name,
-                int ordinal,
-              ) : super(name, ordinal);
-              static const Test ALPHA = const Test._("ALPHA", 0);
-              static const Test BETA = const Test._("BETA", 1);
-              static List<Test> values() {
-                return <Test>[Test.ALPHA, Test.BETA];
-              }
-
-              static Test valueOf(String value) {
-                return this.values().firstWhere((Test v) => v.name == value);
-              }
+            enum Test {
+              alpha._(),
+              beta._();
+            
+              const Test._();
             }
 
             void main() {
-              const List<Test> values = Test.values();
+              const List<Test> values = Test.values;
             }
+
+            Test ${'$'}Test${'$'}valueOf(String value) =>
+                Test.values.firstWhere((Test v) => v.name == value);
             """
         )
     }
@@ -324,40 +268,305 @@ class Enum : BaseTest {
         kotlin(
             """
             enum class Test {
-                ALPHA,
-                BETA,
+                alpha,
+                beta,
             }
 
             fun main() {
-                enumValueOf<Test>("ALPHA")
+                enumValueOf<Test>("alpha")
             }
             """
         )
 
         dart(
             """
-            import "dart:core" hide Enum;
             import "package:meta/meta.dart";
 
-            @sealed
-            class Test extends Enum<Test> {
-              const Test._(
-                String name,
-                int ordinal,
-              ) : super(name, ordinal);
-              static const Test ALPHA = const Test._("ALPHA", 0);
-              static const Test BETA = const Test._("BETA", 1);
-              static List<Test> values() {
-                return <Test>[Test.ALPHA, Test.BETA];
-              }
-
-              static Test valueOf(String value) {
-                return this.values().firstWhere((Test v) => v.name == value);
-              }
+            enum Test {
+              alpha._(),
+              beta._();
+            
+              const Test._();
             }
 
             void main() {
-              Test.valueOf("ALPHA");
+              ${'$'}Test${'$'}valueOf("alpha");
+            }
+
+            Test ${'$'}Test${'$'}valueOf(String value) =>
+                Test.values.firstWhere((Test v) => v.name == value);
+            """
+        )
+    }
+
+    @Test
+    fun `enum with method`() = assertCompile {
+        kotlin(
+            """
+            enum class Test(val lowercase: String, val uppercase: String) {
+                alpha("α", "Α"),
+                beta("β", "Β");
+
+                fun toUppercase() = uppercase
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            enum Test {
+              alpha._("α", "Α"),
+              beta._("β", "Β");
+
+              const Test._(
+                this.lowercase,
+                this.uppercase,
+              );
+              @nonVirtual
+              final String lowercase;
+              @nonVirtual
+              final String uppercase;
+              @nonVirtual
+              String toUppercase() {
+                return this.uppercase;
+              }
+            }
+
+            Test ${'$'}Test${'$'}valueOf(String value) =>
+                Test.values.firstWhere((Test v) => v.name == value);
+            """
+        )
+    }
+
+    @Test
+    fun `enum with anonymous class`() = assertCompile {
+        kotlin(
+            """
+            class Person
+
+            enum class Temperature(val average: Int) {
+                cool(10) {
+                    override val min = 3
+                    override val max = 15
+            
+                    override fun isTooCoolFor(person: Person) = true
+                },
+
+                lukewarm(30) {
+                    override val min = 15
+                    override val max = 19
+            
+                    override fun isTooCoolFor(person: Person) = false
+            
+                    fun lukewarmOnlyMethod(): Int = 234
+                },
+
+                warm(40) {
+                    override val min = 20
+                    override val max = 25
+            
+                    override fun isTooCoolFor(person: Person) = false
+                    override fun isTooHotFor(person: Person) = false
+                },
+
+                hot {
+                    override val min = 25
+                    override val max = 35
+            
+                    override fun isTooCoolFor(person: Person) = false
+                    override fun isTooHotFor(person: Person) = true
+                };
+
+                constructor() : this(100)
+
+                abstract val min: Int
+                abstract val max: Int
+
+                abstract fun isTooCoolFor(person: Person): Boolean
+
+                open fun isTooHotFor(person: Person) = false
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            @sealed
+            class Person {}
+
+            enum Temperature {
+              cool._(10, const _${'$'}Temperature${'$'}cool()),
+              lukewarm._(30, const _${'$'}Temperature${'$'}lukewarm()),
+              warm._(40, const _${'$'}Temperature${'$'}warm()),
+              hot._${'$'}constructor${'$'}1(const _${'$'}Temperature${'$'}hot());
+
+              const Temperature._(
+                this.average,
+                this._${'$'}delegate,
+              );
+              @nonVirtual
+              final int average;
+              const Temperature._${'$'}constructor${'$'}1(_${'$'}Temperature ${'$'}delegate)
+                  : this._(100, ${'$'}delegate);
+              int get min => this._${'$'}delegate.min;
+              int get max => this._${'$'}delegate.max;
+              @nonVirtual
+              bool isTooCoolFor(Person person) => this._${'$'}delegate.isTooCoolFor(person);
+              @nonVirtual
+              bool isTooHotFor(Person person) => this._${'$'}delegate.isTooHotFor(person);
+              @nonVirtual
+              final _${'$'}Temperature _${'$'}delegate;
+            }
+
+            Temperature ${'$'}Temperature${'$'}valueOf(String value) =>
+                Temperature.values.firstWhere((Temperature v) => v.name == value);
+
+            abstract class _${'$'}Temperature {
+              abstract final int min;
+              abstract final int max;
+              bool isTooCoolFor(Person person);
+              bool isTooHotFor(Person person) {
+                return false;
+              }
+
+              const _${'$'}Temperature();
+            }
+
+            @sealed
+            class _${'$'}Temperature${'$'}cool extends _${'$'}Temperature {
+              const _${'$'}Temperature${'$'}cool();
+              @override
+              final int min = 3;
+              @override
+              final int max = 15;
+              @override
+              bool isTooCoolFor(Person person) {
+                return true;
+              }
+            }
+
+            @sealed
+            class _${'$'}Temperature${'$'}lukewarm extends _${'$'}Temperature {
+              const _${'$'}Temperature${'$'}lukewarm();
+              @override
+              final int min = 15;
+              @override
+              final int max = 19;
+              @override
+              bool isTooCoolFor(Person person) {
+                return false;
+              }
+
+              @nonVirtual
+              int lukewarmOnlyMethod() {
+                return 234;
+              }
+            }
+
+            @sealed
+            class _${'$'}Temperature${'$'}warm extends _${'$'}Temperature {
+              const _${'$'}Temperature${'$'}warm();
+              @override
+              final int min = 20;
+              @override
+              final int max = 25;
+              @override
+              bool isTooCoolFor(Person person) {
+                return false;
+              }
+
+              @override
+              bool isTooHotFor(Person person) {
+                return false;
+              }
+            }
+
+            @sealed
+            class _${'$'}Temperature${'$'}hot extends _${'$'}Temperature {
+              const _${'$'}Temperature${'$'}hot();
+              @override
+              final int min = 25;
+              @override
+              final int max = 35;
+              @override
+              bool isTooCoolFor(Person person) {
+                return false;
+              }
+
+              @override
+              bool isTooHotFor(Person person) {
+                return true;
+              }
+            }
+
+            extension ${'$'}Extensions${'$'}610f18433f4785ee on Temperature {
+              int lukewarmOnlyMethod() =>
+                  (this._${'$'}delegate as _${'$'}Temperature${'$'}lukewarm).lukewarmOnlyMethod();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `enum with overridden members`() = assertCompile {
+        kotlin(
+            """
+            enum class Test(val x: Int) {
+                alpha(30) {
+                     override val y: Int = 30  
+                },
+                beta(50) {
+                    override val y: Int = 50
+                };
+
+                abstract val y: Int
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            enum Test {
+              alpha._(30, const _${'$'}Test${'$'}alpha()),
+              beta._(50, const _${'$'}Test${'$'}beta());
+
+              const Test._(
+                this.x,
+                this._${'$'}delegate,
+              );
+              @nonVirtual
+              final int x;
+              int get y => this._${'$'}delegate.y;
+              @nonVirtual
+              final _${'$'}Test _${'$'}delegate;
+            }
+
+            Test ${'$'}Test${'$'}valueOf(String value) =>
+                Test.values.firstWhere((Test v) => v.name == value);
+
+            abstract class _${'$'}Test {
+              abstract final int y;
+              const _${'$'}Test();
+            }
+
+            @sealed
+            class _${'$'}Test${'$'}alpha extends _${'$'}Test {
+              const _${'$'}Test${'$'}alpha();
+              @override
+              final int y = 30;
+            }
+
+            @sealed
+            class _${'$'}Test${'$'}beta extends _${'$'}Test {
+              const _${'$'}Test${'$'}beta();
+              @override
+              final int y = 50;
             }
             """
         )

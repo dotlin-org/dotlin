@@ -20,7 +20,7 @@
 package org.dotlin.compiler.backend.steps.ast2dart.transformer
 
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartMethodDeclaration
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.DartMethodDeclaration
 import org.dotlin.compiler.dart.ast.declaration.function.DartNamedFunctionDeclaration
 import org.dotlin.compiler.dart.ast.declaration.function.body.DartBlockFunctionBody
 import org.dotlin.compiler.dart.ast.declaration.function.body.DartEmptyFunctionBody

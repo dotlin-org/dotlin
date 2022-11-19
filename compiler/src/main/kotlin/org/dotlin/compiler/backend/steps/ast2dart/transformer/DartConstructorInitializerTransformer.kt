@@ -20,8 +20,8 @@
 package org.dotlin.compiler.backend.steps.ast2dart.transformer
 
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartConstructorFieldInitializer
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartConstructorInvocation
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.constructor.DartConstructorFieldInitializer
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.constructor.DartConstructorInvocation
 
 object DartConstructorInitializerTransformer : DartAstNodeTransformer() {
     override fun DartGenerationContext.visitConstructorInvocation(invocation: DartConstructorInvocation) =

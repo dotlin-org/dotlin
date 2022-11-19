@@ -19,20 +19,15 @@ package org.dotlin.compiler.backend.steps.ast2dart.transformer
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 import org.dotlin.compiler.dart.ast.DartLabel
-import org.dotlin.compiler.dart.ast.`typealias`.DartTypeAlias
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.dotlin.compiler.dart.ast.collection.DartCollectionElementList
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
-import org.dotlin.compiler.dart.ast.declaration.classormixin.DartClassDeclaration
-import org.dotlin.compiler.dart.ast.declaration.classormixin.DartExtendsClause
-import org.dotlin.compiler.dart.ast.declaration.classormixin.DartImplementsClause
-import org.dotlin.compiler.dart.ast.declaration.classormixin.DartWithClause
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartMethodDeclaration
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartConstructorDeclaration
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartConstructorFieldInitializer
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartConstructorInvocation
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartFieldDeclaration
-import org.dotlin.compiler.dart.ast.declaration.extension.DartExtensionDeclaration
+import org.dotlin.compiler.dart.ast.declaration.classlike.*
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.DartFieldDeclaration
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.DartMethodDeclaration
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.constructor.DartConstructorDeclaration
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.constructor.DartConstructorFieldInitializer
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.constructor.DartConstructorInvocation
 import org.dotlin.compiler.dart.ast.declaration.function.DartNamedFunctionDeclaration
 import org.dotlin.compiler.dart.ast.declaration.function.DartTopLevelFunctionDeclaration
 import org.dotlin.compiler.dart.ast.declaration.function.body.DartBlockFunctionBody
@@ -60,6 +55,7 @@ import org.dotlin.compiler.dart.ast.type.DartNamedType
 import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
 import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameter
 import org.dotlin.compiler.dart.ast.type.parameter.DartTypeParameterList
+import org.dotlin.compiler.dart.ast.`typealias`.DartTypeAlias
 
 abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGenerationContext> {
     final override fun visitCompilationUnit(unit: DartCompilationUnit, context: DartGenerationContext): String =
@@ -97,6 +93,14 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     open fun DartGenerationContext.visitTopLevelFunctionDeclaration(functionDeclaration: DartTopLevelFunctionDeclaration) =
         super.visitTopLevelFunctionDeclaration(functionDeclaration, this)
 
+    final override fun visitClassLikeDeclaration(
+        classLikeDeclaration: DartClassLikeDeclaration,
+        context: DartGenerationContext
+    ): String = with(context) { visitClassLikeDeclaration(classLikeDeclaration) }
+
+    open fun DartGenerationContext.visitClassLikeDeclaration(classLikeDeclaration: DartClassLikeDeclaration) =
+        super.visitClassLikeDeclaration(classLikeDeclaration, this)
+
     final override fun visitClassDeclaration(
         classDeclaration: DartClassDeclaration,
         context: DartGenerationContext
@@ -104,6 +108,22 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
 
     open fun DartGenerationContext.visitClassDeclaration(classDeclaration: DartClassDeclaration) =
         super.visitClassDeclaration(classDeclaration, this)
+
+    final override fun visitEnumDeclaration(
+        enumDeclaration: DartEnumDeclaration,
+        context: DartGenerationContext
+    ): String = with(context) { visitEnumDeclaration(enumDeclaration) }
+
+    open fun DartGenerationContext.visitEnumDeclaration(enumDeclaration: DartEnumDeclaration) =
+        super.visitEnumDeclaration(enumDeclaration, this)
+
+    final override fun visitEnumConstantDeclaration(
+        enumConstant: DartEnumDeclaration.Constant,
+        context: DartGenerationContext
+    ): String = with(context) { visitEnumConstantDeclaration(enumConstant) }
+
+    open fun DartGenerationContext.visitEnumConstantDeclaration(enumConstant: DartEnumDeclaration.Constant) =
+        super.visitEnumConstantDeclaration(enumConstant, this)
 
     final override fun visitExtensionDeclaration(
         extensionDeclaration: DartExtensionDeclaration,

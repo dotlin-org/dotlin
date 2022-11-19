@@ -18,9 +18,7 @@
 
 package dart.core
 
-external open class Exception {
-    constructor(message: String)
-}
+external open class Exception(message: String)
 
 /**
  * Exception thrown when a string or some other data does not have an expected

@@ -20,6 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast
 
 import org.dotlin.compiler.backend.dart
+import org.dotlin.compiler.backend.dotlin
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -83,48 +84,51 @@ class DotlinIrBuiltIns(private val context: DotlinLoweringContext) {
         parent = operatorsPackage
     }
 
-    val const = classSymbolAt(org.dotlin.compiler.backend.dotlin.const)
-    val dartFun = functionSymbolAt(org.dotlin.compiler.backend.dotlin.dart)
+    val const = classSymbolAt(dotlin.const)
+    val dartFun = functionSymbolAt(dotlin.dart)
+
+    val dartGetter = classSymbolAt(dotlin.DartGetter)
+    val dartExtension = classSymbolAt(dotlin.DartExtension)
 
     // Reflect
-    val kProperty0Impl = classSymbolAt(org.dotlin.compiler.backend.dotlin.reflect.KProperty0Impl)
-    val kMutableProperty0Impl = classSymbolAt(org.dotlin.compiler.backend.dotlin.reflect.KMutableProperty0Impl)
-    val kProperty1Impl = classSymbolAt(org.dotlin.compiler.backend.dotlin.reflect.KProperty1Impl)
-    val kMutableProperty1Impl = classSymbolAt(org.dotlin.compiler.backend.dotlin.reflect.KMutableProperty1Impl)
-    val kProperty2Impl = classSymbolAt(org.dotlin.compiler.backend.dotlin.reflect.KProperty2Impl)
-    val kMutableProperty2Impl = classSymbolAt(org.dotlin.compiler.backend.dotlin.reflect.KMutableProperty2Impl)
+    val kProperty0Impl = classSymbolAt(dotlin.reflect.KProperty0Impl)
+    val kMutableProperty0Impl = classSymbolAt(dotlin.reflect.KMutableProperty0Impl)
+    val kProperty1Impl = classSymbolAt(dotlin.reflect.KProperty1Impl)
+    val kMutableProperty1Impl = classSymbolAt(dotlin.reflect.KMutableProperty1Impl)
+    val kProperty2Impl = classSymbolAt(dotlin.reflect.KProperty2Impl)
+    val kMutableProperty2Impl = classSymbolAt(dotlin.reflect.KMutableProperty2Impl)
 
     // Interop
-    val returnClass = classSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.`$Return`)
-    val dotlinExternal = classSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.DotlinExternal)
-    val specialInheritedType = classSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.SpecialInheritedType)
+    val returnClass = classSymbolAt(dotlin.intrinsics.`$Return`)
+    val dotlinExternal = classSymbolAt(dotlin.intrinsics.DotlinExternal)
+    val specialInheritedType = classSymbolAt(dotlin.intrinsics.SpecialInheritedType)
 
-    val anyCollection = typeAliasSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.AnyCollection)
+    val anyCollection = typeAliasSymbolAt(dotlin.intrinsics.AnyCollection)
 
-    val isCollection = functionSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.isCollection)
-    val isMutableCollection = functionSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.isMutableCollection)
+    val isCollection = functionSymbolAt(dotlin.intrinsics.isCollection)
+    val isMutableCollection = functionSymbolAt(dotlin.intrinsics.isMutableCollection)
 
-    val isImmutableList = functionSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.isImmutableList)
-    val isWriteableList = functionSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.isWriteableList)
-    val isFixedSizeList = functionSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.isFixedSizeList)
-    val isMutableList = functionSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.isMutableList)
+    val isImmutableList = functionSymbolAt(dotlin.intrinsics.isImmutableList)
+    val isWriteableList = functionSymbolAt(dotlin.intrinsics.isWriteableList)
+    val isFixedSizeList = functionSymbolAt(dotlin.intrinsics.isFixedSizeList)
+    val isMutableList = functionSymbolAt(dotlin.intrinsics.isMutableList)
 
-    val isImmutableSet = functionSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.isImmutableSet)
-    val isMutableSet = functionSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.isMutableSet)
+    val isImmutableSet = functionSymbolAt(dotlin.intrinsics.isImmutableSet)
+    val isMutableSet = functionSymbolAt(dotlin.intrinsics.isMutableSet)
 
-    val isImmutableMap = functionSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.isImmutableMap)
-    val isMutableMap = functionSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.isMutableMap)
+    val isImmutableMap = functionSymbolAt(dotlin.intrinsics.isImmutableMap)
+    val isMutableMap = functionSymbolAt(dotlin.intrinsics.isMutableMap)
 
-    val immutableListMarker = classSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.ImmutableListMarker)
-    val writeableListMarker = classSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.WriteableListMarker)
-    val mutableListMarker = classSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.MutableListMarker)
-    val fixedSizeListMarker = classSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.FixedSizeListMarker)
+    val immutableListMarker = classSymbolAt(dotlin.intrinsics.ImmutableListMarker)
+    val writeableListMarker = classSymbolAt(dotlin.intrinsics.WriteableListMarker)
+    val mutableListMarker = classSymbolAt(dotlin.intrinsics.MutableListMarker)
+    val fixedSizeListMarker = classSymbolAt(dotlin.intrinsics.FixedSizeListMarker)
 
-    val immutableSetMarker = classSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.ImmutableSetMarker)
-    val mutableSetMarker = classSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.MutableSetMarker)
+    val immutableSetMarker = classSymbolAt(dotlin.intrinsics.ImmutableSetMarker)
+    val mutableSetMarker = classSymbolAt(dotlin.intrinsics.MutableSetMarker)
 
-    val immutableMapMarker = classSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.ImmutableMapMarker)
-    val mutableMapMarker = classSymbolAt(org.dotlin.compiler.backend.dotlin.intrinsics.MutableMapMarker)
+    val immutableMapMarker = classSymbolAt(dotlin.intrinsics.ImmutableMapMarker)
+    val mutableMapMarker = classSymbolAt(dotlin.intrinsics.MutableMapMarker)
 
     class Dart(builtIns: DotlinIrBuiltIns) {
         val identical = builtIns.functionSymbolAt(dart.core.identical)

@@ -260,9 +260,7 @@ class SpecialInheritance : BaseTest {
     fun `implement regular external class, implicit interface and mixin`() = assertCompile {
         kotlin(
             """
-            open external class Bird {
-                constructor(isCool: Boolean)
-            }
+            open external class Bird(isCool: Boolean)
 
             open external class Pigeon {
                 constructor()

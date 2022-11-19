@@ -43,6 +43,8 @@ import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.util.collectionUtils.filterIsInstanceAnd
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 val IrSimpleFunction.correspondingProperty: IrProperty?
     get() = correspondingPropertySymbol?.owner
@@ -610,3 +612,21 @@ val IrMemberAccessExpression<*>.receiver: IrExpression?
 
 val IrDeclaration.containerParent: IrDeclarationContainer?
     get() = parent as? IrDeclarationContainer ?: (parent as? IrDeclaration)?.containerParent
+
+@OptIn(ExperimentalContracts::class)
+fun IrDeclaration.isVirtual(): Boolean {
+    contract {
+        returns(true) implies (this@isVirtual is IrOverridableDeclaration<*>)
+    }
+
+    return this is IrOverridableDeclaration<*> && modality.let { it == Modality.ABSTRACT || it == Modality.OPEN }
+}
+
+/**
+ * Returns true if this declaration is a function or property and not a (fake) override, meaning it's an
+ * _original_ declaration.
+ */
+fun IrDeclaration.isOriginalFunctionOrProperty(): Boolean =
+    (this is IrSimpleFunction || this is IrProperty) &&
+            !isFakeOverride() &&
+            !(this as IrOverridableDeclaration<*>).isOverride

@@ -20,8 +20,9 @@
 package org.dotlin.compiler.backend.steps.ast2dart.transformer
 
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartConstructorDeclaration
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.DartFieldDeclaration
+import org.dotlin.compiler.dart.ast.declaration.classlike.DartEnumDeclaration
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.DartFieldDeclaration
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.constructor.DartConstructorDeclaration
 
 object DartClassMemberTransformer : DartAstNodeTransformer() {
     override fun DartGenerationContext.visitConstructorDeclaration(constructorDeclaration: DartConstructorDeclaration) =
@@ -63,5 +64,14 @@ object DartClassMemberTransformer : DartAstNodeTransformer() {
             val fields = acceptChild { fields }
 
             "$annotations$keywords$fields;"
+        }
+
+    override fun DartGenerationContext.visitEnumConstantDeclaration(enumConstant: DartEnumDeclaration.Constant) =
+        enumConstant.run {
+            val name = acceptChild { name }
+            val arguments = acceptChild { arguments }
+            val constructor = acceptChild(prefix = ".") { constructorName }
+
+            "$name$constructor$arguments"
         }
 }

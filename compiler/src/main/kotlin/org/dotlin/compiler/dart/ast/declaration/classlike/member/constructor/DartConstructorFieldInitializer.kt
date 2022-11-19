@@ -17,19 +17,21 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.dart.ast.declaration.classormixin
+package org.dotlin.compiler.dart.ast.declaration.classlike.member.constructor
 
-import org.dotlin.compiler.dart.ast.DartAstNode
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
-import org.dotlin.compiler.dart.ast.type.DartNamedType
+import org.dotlin.compiler.dart.ast.expression.DartExpression
+import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 
-data class DartExtendsClause(
-    val type: DartNamedType,
-) : DartAstNode {
+data class DartConstructorFieldInitializer(
+    val fieldName: DartSimpleIdentifier,
+    val expression: DartExpression,
+) : DartConstructorInitializer {
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
-        visitor.visitExtendsClause(this, data)
+        visitor.visitConstructorFieldInitializer(this, data)
 
     override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
-        type.accept(visitor, data)
+        fieldName.accept(visitor, data)
+        expression.accept(visitor, data)
     }
 }

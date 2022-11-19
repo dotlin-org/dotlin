@@ -51,6 +51,7 @@ interface IrAttributes  {
         override var IrTypeOperatorCall.isFunctionTypeCheck by attribute(default = false)
         override var IrVararg.literalKind by attribute(default = CollectionLiteralKind.LIST)
         override var IrMemberAccessExpression<*>.isNullSafe by attribute(default = false)
+        override var IrExpression.isDartConst by attribute(default = false)
     }
 
     /**
@@ -101,6 +102,8 @@ interface IrAttributes  {
      * Whether this member is accessed null-safely (e.g. `x?.y`).
      */
     var IrMemberAccessExpression<*>.isNullSafe: Boolean
+
+    var IrExpression.isDartConst: Boolean
 }
 
 @Suppress("UNCHECKED_CAST")

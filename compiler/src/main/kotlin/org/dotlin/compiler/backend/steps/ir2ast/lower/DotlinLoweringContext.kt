@@ -24,8 +24,6 @@ import org.dotlin.compiler.backend.DotlinIrMangler.mangledHexString
 import org.dotlin.compiler.backend.attributes.IrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.DotlinIrBuiltIns
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
-import org.dotlin.compiler.backend.util.sentenceCase
-import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.DefaultMapping
 import org.jetbrains.kotlin.backend.common.ir.*
@@ -207,8 +205,9 @@ class DotlinLoweringContext(
                 }
         }
 
-    private fun IrProperty.createDefaultGetterOrSetter(type: IrType, isGetter: Boolean): IrSimpleFunction {
+    private fun IrProperty.createDefaultGetterOrSetter(isGetter: Boolean): IrSimpleFunction {
         val property = this
+        val type = property.backingField!!.type
         return irFactory.buildFun {
             name = when {
                 isGetter -> Name.special("<get-${property.name}>")
@@ -268,14 +267,14 @@ class DotlinLoweringContext(
     }
 
     /**
-     * Create backing field first.
+     * Make sure `backingField` is initialized.
      */
-    fun IrProperty.createDefaultGetter(type: IrType) = createDefaultGetterOrSetter(type, isGetter = true)
+    fun IrProperty.createDefaultGetter() = createDefaultGetterOrSetter(isGetter = true)
 
     /**
-     * Create backing field first.
+     * Make sure `backingField` is initialized.
      */
-    fun IrProperty.createDefaultSetter(type: IrType) = createDefaultGetterOrSetter(type, isGetter = false)
+    fun IrProperty.createDefaultSetter() = createDefaultGetterOrSetter(isGetter = false)
 
     fun wrapInAnonymousFunctionInvocation(
         exp: IrExpression,
@@ -381,6 +380,4 @@ class DotlinLoweringContext(
 
         return irCall(symbol.owner, receiver = left, right, origin = origin)
     }
-
-    private fun DartIdentifier.escapedValue() = value.replace(".", "").sentenceCase()
 }

@@ -24,11 +24,14 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartAnnotations
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartFactory
 import org.dotlin.compiler.backend.util.isDartConst
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartClassMember
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.DartMethodDeclaration
-import org.dotlin.compiler.dart.ast.declaration.classormixin.member.constructor.*
+import org.dotlin.compiler.dart.ast.declaration.classlike.DartEnumDeclaration
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.DartClassMember
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.DartFieldDeclaration
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.DartMethodDeclaration
+import org.dotlin.compiler.dart.ast.declaration.classlike.member.constructor.*
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
+import org.dotlin.compiler.dart.ast.expression.DartArgumentList
 import org.dotlin.compiler.dart.ast.expression.DartFunctionExpression
 import org.dotlin.compiler.dart.ast.type.DartNamedType
 import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
@@ -36,11 +39,12 @@ import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrBlockBody
 import org.jetbrains.kotlin.ir.expressions.IrDelegatingConstructorCall
+import org.jetbrains.kotlin.ir.expressions.IrEnumConstructorCall
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.parentAsClass
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?>() {
+object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember>() {
     override fun DartAstTransformContext.visitSimpleFunction(irFunction: IrSimpleFunction, context: DartAstTransformContext) =
         irFunction.transformBy(context) {
             DartMethodDeclaration(
@@ -166,6 +170,22 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember?>()
             isStatic = irField.isStatic,
             isAbstract = isAbstract,
             annotations = irField.dartAnnotations
+        )
+    }
+
+    override fun DartAstTransformContext.visitEnumEntry(
+        declaration: IrEnumEntry,
+        context: DartAstTransformContext
+    ): DartClassMember {
+        val irEnumConstructorCall = declaration.initializerExpression?.expression as? IrEnumConstructorCall
+        val irEnumConstructor = irEnumConstructorCall?.symbol?.owner
+
+        return DartEnumDeclaration.Constant(
+            name = declaration.simpleDartName,
+            constructorName = irEnumConstructor?.dartNameOrNull,
+            arguments = DartArgumentList(
+                irEnumConstructorCall?.valueArguments?.mapNotNull { it?.accept(context) }.orEmpty()
+            )
         )
     }
 }

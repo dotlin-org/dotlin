@@ -17,20 +17,8 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.dart.ast.declaration.classormixin
+package org.dotlin.compiler.dart.ast.declaration.classlike.member.constructor
 
 import org.dotlin.compiler.dart.ast.DartAstNode
-import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
-import org.dotlin.compiler.dart.ast.accept
-import org.dotlin.compiler.dart.ast.type.DartNamedType
 
-data class DartWithClause(
-    val mixins: List<DartNamedType>,
-) : DartAstNode {
-    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
-        visitor.visitWithClause(this, data)
-
-    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {
-        mixins.accept(visitor, data)
-    }
-}
+interface DartConstructorInitializer : DartAstNode

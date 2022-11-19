@@ -23,21 +23,17 @@ import org.dotlin.compiler.backend.steps.ir2ast.DartAstTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.*
 import org.dotlin.compiler.backend.util.isDartConst
-import org.dotlin.compiler.dart.ast.`typealias`.DartClassTypeAlias
-import org.dotlin.compiler.dart.ast.`typealias`.DartFunctionTypeAlias
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnitMember
-import org.dotlin.compiler.dart.ast.declaration.classormixin.DartClassDeclaration
-import org.dotlin.compiler.dart.ast.declaration.classormixin.DartExtendsClause
-import org.dotlin.compiler.dart.ast.declaration.classormixin.DartImplementsClause
-import org.dotlin.compiler.dart.ast.declaration.classormixin.DartWithClause
-import org.dotlin.compiler.dart.ast.declaration.extension.DartExtensionDeclaration
+import org.dotlin.compiler.dart.ast.declaration.classlike.*
 import org.dotlin.compiler.dart.ast.declaration.function.DartTopLevelFunctionDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartTopLevelVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclarationList
 import org.dotlin.compiler.dart.ast.type.DartFunctionType
 import org.dotlin.compiler.dart.ast.type.DartNamedType
-import org.jetbrains.kotlin.descriptors.ClassKind
+import org.dotlin.compiler.dart.ast.`typealias`.DartClassTypeAlias
+import org.dotlin.compiler.dart.ast.`typealias`.DartFunctionTypeAlias
+import org.jetbrains.kotlin.descriptors.ClassKind.*
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.types.*
@@ -45,7 +41,10 @@ import org.jetbrains.kotlin.ir.util.*
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnitMember>() {
-    override fun DartAstTransformContext.visitSimpleFunction(irFunction: IrSimpleFunction, context: DartAstTransformContext) =
+    override fun DartAstTransformContext.visitSimpleFunction(
+        irFunction: IrSimpleFunction,
+        context: DartAstTransformContext
+    ) =
         irFunction.transformBy(context) {
             DartTopLevelFunctionDeclaration(
                 name,
@@ -62,119 +61,124 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
         irClass: IrClass,
         context: DartAstTransformContext
     ): DartCompilationUnitMember {
-        // Extensions are handled differently.
-        if (irClass.isDartExtensionContainer) {
-            return visitExtension(irClass, context)
+        val name = irClass.simpleDartName
+        val isDefaultValueClass = irClass.origin == IrDotlinDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE
+
+        val superTypes = irClass.superTypes()
+
+        val typeParameters = irClass.typeParameters.accept(context)
+
+        // If the class is a default value for a complex parameter, we want to implement
+        // it and not extend it, so we don't extend anything.
+        val extendsClause = when {
+            !isDefaultValueClass -> superTypes
+                .baseClass()
+                ?.let { if (it.isAny()) null else it }
+                ?.accept(context, useFunctionInterface = true)
+                ?.let { DartExtendsClause(it as DartNamedType) }
+
+            else -> null
         }
 
-        return when (irClass.kind) {
-            ClassKind.CLASS, ClassKind.INTERFACE, ClassKind.OBJECT, ClassKind.ANNOTATION_CLASS, ClassKind.ENUM_CLASS -> {
-                val name = irClass.simpleDartName
-                val isDefaultValueClass = irClass.origin == IrDotlinDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE
-
-                val superTypes = irClass.superTypes()
-
-                DartClassDeclaration(
-                    name = name,
-                    isAbstract = irClass.modality == Modality.ABSTRACT || irClass.isInterface,
-                    typeParameters = irClass.typeParameters.accept(context),
-                    // If the class is a default value for a complex parameter, we want to implement
-                    // it and not extend it, so we don't extend anything.
-                    extendsClause = when {
-                        !isDefaultValueClass -> superTypes
-                            .baseClass()
-                            ?.let { if (it.isAny()) null else it }
-                            ?.accept(context, useFunctionInterface = true)
-                            ?.let { DartExtendsClause(it as DartNamedType) }
-                        else -> null
-                    },
-                    implementsClause = when {
-                        // If our class is a default value for a complex parameter, we want it to implement
-                        // the type is a default value for, even if that type is a class and not an interface.
-                        isDefaultValueClass -> irClass.superTypes
-                        else -> superTypes.interfaces()
-                    }
-                    .mapNotNull { it.accept(context, useFunctionInterface = true) as? DartNamedType }
-                    .let {
-                        when {
-                            it.isNotEmpty() -> DartImplementsClause(it)
-                            else -> null
-                        }
-                    },
-                    withClause = superTypes.mixins()
-                        .mapNotNull { it.accept(context, useFunctionInterface = true) as? DartNamedType }
-                        .let {
-                            when {
-                                it.isNotEmpty() -> DartWithClause(it)
-                                else -> null
-                            }
-                        },
-                    members = irClass.declarations
-                        .asSequence()
-                        // We handle fake overrides only from regular interfaces and if this itself is not a
-                        // a regular interface.
-                        .filter {
-                            if (!it.isFakeOverride()) {
-                                return@filter true
-                            }
-
-                            // We don't want any fake overrides if we are ourselves an interface.
-                            if (irClass.isInterface) {
-                                return@filter false
-                            }
-
-                            fun isFakeOverrideOfInterface(overridable: IrOverridableDeclaration<*>): Boolean {
-                                if (overridable.overriddenSymbols.isEmpty()) return false
-
-                                // If somewhere in a super type it is not fake overridden, there's
-                                // already an implementation there and we don't have to include it.
-                                if (!overridable.isFakeOverride()) return false
-
-                                return overridable.overriddenSymbols.all { symbol ->
-                                    val owner = symbol.owner as IrOverridableDeclaration<*>
-
-                                    if (owner.overriddenSymbols.isEmpty() && owner.parentAsClass.isInterface) {
-                                        return@all true
-                                    }
-
-                                    return isFakeOverrideOfInterface(owner)
-                                }
-                            }
-
-                            val overridable =
-                                it as? IrOverridableDeclaration<*> ?: when (it) {
-                                    is IrProperty -> it.getter ?: it.setter ?: return@filter false
-                                    else -> return@filter false
-                                }
-
-                            return@filter isFakeOverrideOfInterface(overridable)
-                        }
-                        .mapNotNull { it.accept(IrToDartClassMemberTransformer, context) }
-                        .toList(),
-                    annotations = irClass.dartAnnotations
-                )
+        val implementsClause = when {
+            // If our class is a default value for a complex parameter, we want it to implement
+            // the type is a default value for, even if that type is a class and not an interface.
+            isDefaultValueClass -> irClass.superTypes
+            else -> superTypes.interfaces()
+        }
+            .mapNotNull { it.accept(context, useFunctionInterface = true) as? DartNamedType }
+            .let {
+                when {
+                    it.isNotEmpty() -> DartImplementsClause(it)
+                    else -> null
+                }
             }
-            ClassKind.ENUM_ENTRY -> throw UnsupportedOperationException(
-                "This should never throw: Enum entries should have been lowered into something else."
-            )
-        }
-    }
 
-    private fun DartAstTransformContext.visitExtension(
-        irClass: IrClass,
-        context: DartAstTransformContext
-    ): DartCompilationUnitMember {
-        return DartExtensionDeclaration(
-            name = irClass.simpleDartName,
-            extendedType = irClass.extensionTypeOrNull!!.accept(context),
-            typeParameters = irClass.typeParameters.accept(context),
-            members = irClass.declarations
+        val withClause = superTypes.mixins()
+            .mapNotNull { it.accept(context, useFunctionInterface = true) as? DartNamedType }
+            .let {
+                when {
+                    it.isNotEmpty() -> DartWithClause(it)
+                    else -> null
+                }
+            }
+
+        val members = irClass.declarations
+            .asSequence()
+            .filter {
                 // A constructor is added in the IR, which is used when an extension has a conflicting overload
                 // with another one. We don't want to add the constructor to the extension container in Dart.
-                .filter { it !is IrConstructor }
-                .mapNotNull { it.acceptAsClassMember(context) },
-            annotations = irClass.dartAnnotations
-        )
+                !irClass.isDartExtensionContainer || it !is IrConstructor
+            }
+            // We handle fake overrides only from regular interfaces and if this itself is not a
+            // a regular interface.
+            .filter {
+                if (!it.isFakeOverride()) {
+                    return@filter true
+                }
+
+                // We don't want any fake overrides if we are ourselves an interface.
+                if (irClass.isInterface) {
+                    return@filter false
+                }
+
+                fun isFakeOverrideOfInterface(overridable: IrOverridableDeclaration<*>): Boolean {
+                    if (overridable.overriddenSymbols.isEmpty()) return false
+
+                    // If somewhere in a super type it is not fake overridden, there's
+                    // already an implementation there, and we don't have to include it.
+                    if (!overridable.isFakeOverride()) return false
+
+                    return overridable.overriddenSymbols.all { symbol ->
+                        val owner = symbol.owner as IrOverridableDeclaration<*>
+
+                        if (owner.overriddenSymbols.isEmpty() && owner.parentAsClass.isInterface) {
+                            return@all true
+                        }
+
+                        return isFakeOverrideOfInterface(owner)
+                    }
+                }
+
+                val overridable = it as? IrOverridableDeclaration<*> ?: return@filter false
+
+                return@filter isFakeOverrideOfInterface(overridable)
+            }
+            .map { it.acceptAsClassMember(context) }
+            .toList()
+
+        val annotations = irClass.dartAnnotations
+
+        return when {
+            irClass.isEnumClass -> DartEnumDeclaration(
+                name,
+                typeParameters,
+                implementsClause,
+                withClause,
+                constants = members.filterIsInstance<DartEnumDeclaration.Constant>(),
+                members.filter { it !is DartEnumDeclaration.Constant },
+                annotations,
+            )
+
+            irClass.isDartExtensionContainer -> DartExtensionDeclaration(
+                irClass.simpleDartName,
+                typeParameters,
+                extendedType = irClass.extensionTypeOrNull!!.accept(context),
+                members,
+                annotations
+            )
+
+            else -> DartClassDeclaration(
+                isAbstract = irClass.modality == Modality.ABSTRACT || irClass.isInterface,
+                name,
+                typeParameters,
+                extendsClause,
+                implementsClause,
+                withClause,
+                members,
+                annotations,
+            )
+        }
     }
 
     override fun DartAstTransformContext.visitField(irField: IrField, context: DartAstTransformContext) =
@@ -207,6 +211,7 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
                 aliased = it.expandedType.accept(context) as DartFunctionType,
                 annotations = irAlias.dartAnnotations
             )
+
             else -> DartClassTypeAlias(
                 name, typeParameters,
                 aliased = it.expandedType.accept(context) as DartNamedType,

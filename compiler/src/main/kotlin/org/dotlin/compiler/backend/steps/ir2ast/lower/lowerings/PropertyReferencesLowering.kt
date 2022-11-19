@@ -110,7 +110,7 @@ class PropertyReferencesLowering(override val context: DotlinLoweringContext) : 
                     initializer = IrExpressionBodyImpl(kPropertyInfo.constructorCall)
                 }
 
-                getter = createDefaultGetter(type)
+                getter = createDefaultGetter()
             }
 
         return replaceWith(

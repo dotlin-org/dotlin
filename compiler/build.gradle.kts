@@ -31,7 +31,7 @@ tasks.test {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         jvmTarget = "17"
-        freeCompilerArgs = listOf("-Xinline-classes", "-Xopt-in=kotlin.RequiresOptIn")
+        freeCompilerArgs = listOf("-Xinline-classes", "-Xopt-in=kotlin.RequiresOptIn", "-Xcontext-receivers")
     }
 }
 

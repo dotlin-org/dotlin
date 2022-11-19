@@ -28,6 +28,7 @@ import org.jetbrains.kotlin.descriptors.Modality.FINAL
 import org.jetbrains.kotlin.descriptors.Modality.SEALED
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.util.isAnnotationClass
+import org.jetbrains.kotlin.ir.util.isEnumClass
 import org.jetbrains.kotlin.ir.util.isLocal
 
 val IrDeclaration.dartAnnotations: List<DartAnnotation>
@@ -65,7 +66,8 @@ val IrDeclaration.dartAnnotations: List<DartAnnotation>
             !isExtension -> when (modality) {
                 SEALED, FINAL -> when {
                     // Sealed as well as final classes get marked @sealed.
-                    this is IrClass && !isDartExtensionContainer -> DartAnnotation.SEALED
+                    // Enum classes don't have to be marked @sealed, they are always sealed in Dart.
+                    this is IrClass && !isDartExtensionContainer && !isEnumClass -> DartAnnotation.SEALED
                     // Non-top-level, non-static and non-local final declarations get marked @nonVirtual.
                     parent !is IrFile && !isStatic && !isLocal -> DartAnnotation.NON_VIRTUAL
                     else -> null

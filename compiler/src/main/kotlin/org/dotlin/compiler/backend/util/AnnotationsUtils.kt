@@ -89,6 +89,10 @@ private fun <R> Any.getFromOverride(block: (IrDeclaration) -> R): R? {
     }
 }
 
+fun IrMutableAnnotationContainer.annotate(symbol: IrClassSymbol, vararg arguments: IrExpression) {
+    annotations = annotations + createAnnotation(symbol, *arguments)
+}
+
 fun createAnnotation(symbol: IrClassSymbol, vararg arguments: IrExpression) = IrConstructorCallImpl(
     SYNTHETIC_OFFSET, SYNTHETIC_OFFSET,
     type = symbol.owner.defaultType,

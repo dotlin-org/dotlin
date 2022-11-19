@@ -17,6 +17,8 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+@file:Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+
 package org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isBackingField
@@ -27,7 +29,6 @@ import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart.IMPLICIT_L
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart.LONG_REFERENCE
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.types.isLong
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
@@ -39,7 +40,6 @@ import org.jetbrains.kotlin.psi.KtTypeReference
 object LongTypeReferenceChecker : IrDeclarationChecker {
     override val reports = listOf(LONG_REFERENCE, IMPLICIT_LONG_REFERENCE)
 
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun IrAnalyzerContext.check(source: KtDeclaration, declaration: IrDeclaration) {
         // Stdlib can use Long.
         if (isCurrentModuleBuiltIns) return

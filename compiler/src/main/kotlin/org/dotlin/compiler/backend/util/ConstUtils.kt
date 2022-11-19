@@ -21,6 +21,7 @@ package org.dotlin.compiler.backend.util
 
 import org.dotlin.compiler.backend.hasDartConstAnnotation
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.jetbrains.kotlin.backend.jvm.ir.psiElement
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
@@ -94,3 +95,8 @@ fun IrDeclaration.isDartConstInlineFunction(): Boolean {
     return this is IrSimpleFunction && isInline &&
             !isPropertyAccessor && isDartConst()
 }
+
+context(DotlinLoweringContext)
+var IrDeclaration.isDartConst: Boolean
+    get() = isDartConst()
+    set(value) = annotate(dotlinIrBuiltIns.const)
