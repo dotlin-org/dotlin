@@ -24,7 +24,7 @@ import org.jetbrains.kotlin.resolve.ImportPath
 import org.jetbrains.kotlin.resolve.PlatformDependentAnalyzerServices
 import org.jetbrains.kotlin.storage.StorageManager
 
-object DartPlatformAnalyzerServices : PlatformDependentAnalyzerServices() {
+object DotlinPlatformAnalyzerServices : PlatformDependentAnalyzerServices() {
     override fun computePlatformSpecificDefaultImports(
         storageManager: StorageManager,
         result: MutableList<ImportPath>
@@ -37,7 +37,7 @@ object DartPlatformAnalyzerServices : PlatformDependentAnalyzerServices() {
         )
     }
 
-    override val platformConfigurator = DartPlatformConfigurator
+    override val platformConfigurator = DotlinPlatformConfigurator
     override val excludedImports = listOf(
         dart.core.Iterable,
         dart.core.List, dart.core.Set,

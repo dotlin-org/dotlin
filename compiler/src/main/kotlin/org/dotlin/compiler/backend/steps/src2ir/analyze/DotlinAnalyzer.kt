@@ -46,7 +46,7 @@ import org.jetbrains.kotlin.resolve.*
 import org.jetbrains.kotlin.resolve.lazy.ResolveSession
 import org.jetbrains.kotlin.resolve.lazy.declarations.FileBasedDeclarationProviderFactory
 
-class DartKotlinAnalyzer(
+class DotlinAnalyzer(
     private val env: KotlinCoreEnvironment,
     private val config: CompilerConfiguration,
 ) {
@@ -78,12 +78,12 @@ class DartKotlinAnalyzer(
 
         val container = createContainer(
             id = "DartKotlinAnalyzer",
-            analyzerServices = DartPlatformAnalyzerServices,
+            analyzerServices = DotlinPlatformAnalyzerServices,
         ) {
             configureModule(
                 moduleContext,
                 platform = DartPlatform,
-                analyzerServices = DartPlatformAnalyzerServices,
+                analyzerServices = DotlinPlatformAnalyzerServices,
                 trace = trace,
                 languageVersionSettings = config.languageVersionSettings,
             )

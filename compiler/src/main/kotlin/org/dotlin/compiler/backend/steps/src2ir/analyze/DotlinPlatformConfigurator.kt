@@ -32,7 +32,7 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.resolve.PlatformConfiguratorBase
 import org.jetbrains.kotlin.types.DynamicTypesAllowed
 
-object DartPlatformConfigurator : PlatformConfiguratorBase(
+object DotlinPlatformConfigurator : PlatformConfiguratorBase(
     DynamicTypesAllowed(),
     platformToKotlinClassMapper = PlatformClassMapper,
     additionalDeclarationCheckers = listOf(

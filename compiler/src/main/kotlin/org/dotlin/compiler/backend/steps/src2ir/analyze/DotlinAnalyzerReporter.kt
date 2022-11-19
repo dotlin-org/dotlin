@@ -51,7 +51,7 @@ class DartKotlinAnalyzerReporter(
 
         val report = AnalyzerWithCompilerReport(config).also {
             it.analyzeAndReport(files) {
-                DartKotlinAnalyzer(env, config).analyze(
+                DotlinAnalyzer(env, config).analyze(
                     files,
                     dependencies,
                     isBuiltInsModule,
