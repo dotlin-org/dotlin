@@ -137,11 +137,7 @@ class PropertySimplifyingLowering(override val context: DotlinLoweringContext) :
 
                         valueParameters.single().let { param ->
                             if (param.name.asString() == "<set-?>") {
-                                valueParameters = listOf(
-                                    param.deepCopyWith {
-                                        name = Name.identifier("\$value")
-                                    }
-                                )
+                                param.name = Name.identifier("\$value")
                             }
                         }
                     }
