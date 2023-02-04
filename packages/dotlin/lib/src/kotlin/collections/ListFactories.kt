@@ -51,6 +51,7 @@ inline fun <T> mutableListOfNulls(size: Int): MutableList<T?> = MutableList.fill
  * @sample samples.collections.Collections.Lists.readOnlyListFromInitializer
  */
 @SinceKotlin("1.1")
+@DartName("generateList")
 inline fun <T> List(size: Int, init: (index: Int) -> T): ImmutableListView<T> =
     ImmutableListView<T>(MutableList(size, init))
 
@@ -64,5 +65,6 @@ inline fun <T> List(size: Int, init: (index: Int) -> T): ImmutableListView<T> =
  * @sample samples.collections.Collections.Lists.mutableListFromInitializer
  */
 @SinceKotlin("1.1")
+@DartName("generateMutableList")
 inline fun <T> MutableList(size: Int, init: (index: Int) -> T): MutableList<T> =
     MutableList.generate<T>(size, init, growable = true)

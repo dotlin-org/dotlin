@@ -113,7 +113,7 @@ external interface List<out E> : Collection<E> {
  */
 @DartName("List")
 @DartLibrary("dart:core")
-interface ImmutableList<out E> : List<E>, ImmutableCollection<E>
+external interface ImmutableList<out E> : List<E>, ImmutableCollection<E>
 
 /**
  * A generic ordered collection of elements that supports changing elements.

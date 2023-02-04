@@ -24,9 +24,7 @@ import assertCanCompileProject
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import stdlibPath
-import kotlin.io.path.ExperimentalPathApi
 
-@OptIn(ExperimentalPathApi::class)
 @DisplayName("Compile: Klib: Standard Library")
 class StandardLibrary : BaseTest {
     @Test
