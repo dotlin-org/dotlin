@@ -12,7 +12,7 @@ Dotlin is still in development. You can track overall development on the [projec
 
 ## Features
 
-- Supports all Kotlin language features (WIP: #25)
+- Supports all Kotlin language features (WIP: [#25](https://github.com/dotlin-org/dotlin/issues/25))
 - Supports the Kotlin standard library (WIP)
 - Use any dependency written in Dart, without conversion or writing type definitions (WIP)
 - Integrates with Dart's build system (use `pubspec.yaml` to define dependencies)
