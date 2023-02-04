@@ -31,12 +31,15 @@ fun IrDeclaration.hasDartConstAnnotation() = hasAnnotation(dotlin.const)
 fun IrDeclaration.hasDartGetterAnnotation() = hasOverriddenAnnotation(dotlin.DartGetter)
 fun IrDeclaration.hasDartExtensionAnnotation() = hasOverriddenAnnotation(dotlin.DartExtension)
 fun IrFunction.hasDartPositionalAnnotation() = hasOverriddenAnnotation(dotlin.DartPositional)
-fun IrDeclaration.hasDartHideNameFromCoreAnnotation() = hasAnnotation(dotlin.DartHideNameFromCore)
 fun IrDeclaration.hasDartExtensionNameAnnotation() = hasAnnotation(dotlin.DartExtensionName)
 
 private fun IrDeclaration.hasDartStaticAnnotation() = hasAnnotation(dotlin.DartStatic)
 
-val IrDeclaration.dartAnnotatedName: String?
+val IrDeclaration.annotatedDartLibrary: String?
+    get() = getSingleAnnotationStringArgumentOf(dotlin.DartLibrary)
+        ?: fileOrNull?.getSingleAnnotationStringArgumentOf(dotlin.DartLibrary)
+
+val IrDeclaration.annotatedDartName: String?
     get() = when (this) {
         is IrField -> correspondingProperty ?: this
         is IrSimpleFunction -> when {
@@ -44,6 +47,7 @@ val IrDeclaration.dartAnnotatedName: String?
             isSetter -> correspondingProperty!!
             else -> this
         }
+
         else -> this
     }.run { getSingleOverriddenAnnotationStringArgumentOf(dotlin.DartName) }
 

@@ -19,6 +19,8 @@
 
 package org.dotlin.compiler.backend.util
 
+import kotlin.reflect.KProperty
+
 fun Boolean?.falseIfNull() = this ?: false
 
 fun <T> MutableList<T>.replace(old: T, new: T) {
@@ -41,3 +43,13 @@ operator fun <E> List<E>.component9(): E = this[8]
 operator fun <E> List<E>.component10(): E = this[9]
 
 fun <T, V, R> T.runWith(value: V, block: T.(V) -> R): R = block(this, value)
+
+class LazyVar<T : Any>(private val initializer: () -> T) {
+    var value: T? = null
+
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value ?: initializer().also { value = it }
+
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+        this.value = value
+    }
+}

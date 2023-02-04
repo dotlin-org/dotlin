@@ -19,11 +19,12 @@
 
 package org.dotlin.compiler.dart.ast.expression.identifier
 
+import kotlinx.serialization.Serializable
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 import org.dotlin.compiler.dart.ast.expression.DartExpression
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
+import org.dotlin.compiler.dart.element.DartSimpleIdentifierSerializer
 
+@Serializable
 sealed interface DartIdentifier : DartExpression {
     val value: String
 
@@ -34,11 +35,8 @@ sealed interface DartIdentifier : DartExpression {
 }
 
 @JvmInline
+@Serializable(with = DartSimpleIdentifierSerializer::class)
 value class DartSimpleIdentifier(override val value: String) : DartIdentifier {
-    init {
-        require(value.isNotEmpty())
-    }
-
     fun copy(
         isPrivate: Boolean = this.isPrivate,
         isGenerated: Boolean = this.isGenerated,
@@ -88,27 +86,7 @@ data class DartPrefixedIdentifier(
     val prefix: DartSimpleIdentifier,
     val identifier: DartSimpleIdentifier
 ) : DartIdentifier {
-
     override val value = "${prefix}.${identifier}"
 
     override fun toString() = value
-}
-
-
-@OptIn(ExperimentalContracts::class)
-fun DartIdentifier.isSimple(): Boolean {
-    contract {
-        returns(true) implies (this@isSimple is DartSimpleIdentifier)
-    }
-
-    return this is DartSimpleIdentifier
-}
-
-@OptIn(ExperimentalContracts::class)
-fun DartIdentifier.isPrefixed(): Boolean {
-    contract {
-        returns(true) implies (this@isPrefixed is DartPrefixedIdentifier)
-    }
-
-    return this is DartPrefixedIdentifier
 }

@@ -19,7 +19,7 @@
 
 package org.dotlin.compiler.backend.util
 
-import org.dotlin.compiler.backend.dartAnnotatedName
+import org.dotlin.compiler.backend.annotatedDartName
 import org.jetbrains.kotlin.backend.common.lower.parents
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationContainer
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
@@ -50,7 +50,7 @@ val IrSimpleFunction.isOverload: Boolean
 val IrSimpleFunction.overloadsWithSelf: Collection<IrSimpleFunction>
     get() {
         // We only care about names the user has given us. This is why we don't use dartNameOrNull.
-        fun IrSimpleFunction.relevantName() = dartAnnotatedName ?: name.identifierOrNullIfSpecial
+        fun IrSimpleFunction.relevantName() = annotatedDartName ?: name.identifierOrNullIfSpecial
 
         return parents.firstIsInstance<IrDeclarationContainer>()
             .declarations

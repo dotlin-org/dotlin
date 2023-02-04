@@ -17,121 +17,51 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+@file:OptIn(ObsoleteDescriptorBasedAPI::class)
+
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
+import org.dotlin.compiler.backend.annotatedDartLibrary
 import org.dotlin.compiler.backend.attributes.DartImport
+import org.dotlin.compiler.backend.descriptors.DartDescriptor
+import org.dotlin.compiler.backend.dotlin
+import org.dotlin.compiler.backend.steps.ir2ast.ir.remapTypes
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrFileLowering
+import org.dotlin.compiler.backend.steps.src2ir.dotlinModule
 import org.dotlin.compiler.backend.util.importAliasIn
 import org.jetbrains.kotlin.ir.IrElement
-import org.jetbrains.kotlin.ir.declarations.IrConstructor
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationWithName
-import org.jetbrains.kotlin.ir.declarations.IrFile
-import org.jetbrains.kotlin.ir.declarations.IrTypeParametersContainer
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrDeclarationReference
 import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin.*
-import org.jetbrains.kotlin.ir.types.IrSimpleType
-import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.classOrNull
-import org.jetbrains.kotlin.ir.types.typeOrNull
-import org.jetbrains.kotlin.ir.util.TypeRemapper
-import org.jetbrains.kotlin.ir.util.file
-import org.jetbrains.kotlin.ir.util.parentClassOrNull
-import org.jetbrains.kotlin.ir.util.remapTypes
+import org.jetbrains.kotlin.ir.types.*
+import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
+import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
+import org.jetbrains.kotlin.psi.KtImportDirective
+import org.jetbrains.kotlin.psi.KtNameReferenceExpression
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
+import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
 /**
- * Dart import directives are added, based on `@DartLibrary` or `@DartHideFromCore` annotations,
- * or based on Kotlin import directives.
+ * Dart import directives are added, based on types used in files.
  */
 class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileLowering {
+    /**
+     * FQNs of declarations that should never be imported.
+     */
+    private val ignore = listOf(
+        dotlin.typeOf,
+        dotlin.intrinsics.Dynamic,
+        dotlin.dart,
+    )
+
     override fun DotlinLoweringContext.transform(file: IrFile) {
-        val imports = mutableSetOf<DartImport>()
-
-        fun maybeAddComparableOperatorImport(
-            declaration: IrDeclarationWithName,
-            reference: IrDeclarationReference? = null
-        ) {
-            // In the stdlib, we need to import the file where the Comparable<T> '>', '<', '>=', '<=' extensions live.
-            val isBuiltInsAndComparableOperatorCall =
-                isCurrentModuleBuiltIns &&
-                        reference is IrCall && reference.origin in listOf(GT, GTEQ, LT, LTEQ) &&
-                        declaration.parentClassOrNull?.symbol == irBuiltIns.comparableClass
-
-            if (isBuiltInsAndComparableOperatorCall) {
-                imports += DartImport(
-                    library = declaration.file.relativeDartPath.toString()
-                )
-            }
-        }
-
-        fun maybeAddDartImports(declaration: IrDeclarationWithName, reference: IrDeclarationReference? = null) {
-            val unresolvedImport = declaration.dartUnresolvedImport
-            val hiddenNameFromCore = declaration.dartHiddenNameFromCore
-            val kotlinImportAlias = declaration.importAliasIn(currentFile)
-
-            maybeAddComparableOperatorImport(declaration, reference)
-
-            // We don't need to import "dart:core" if there's no alias or hidden names.
-            if (kotlinImportAlias == null &&
-                unresolvedImport?.library == "dart:core" &&
-                unresolvedImport.alias == null &&
-                !unresolvedImport.hidden
-            ) {
-                return
-            }
-
-            val hiddenName by lazy { declaration.simpleDartNameOrNull?.value }
-
-            unresolvedImport?.let {
-                when (kotlinImportAlias) {
-                    null -> imports.addAll(
-                        listOfNotNull(
-                            DartImport(
-                                library = it.library,
-                                alias = it.alias
-                            ),
-                            when {
-                                it.hidden -> DartImport(
-                                    it.library,
-                                    hide = hiddenName
-                                )
-                                else -> null
-                            }
-                        )
-                    )
-                    else -> {
-                        val originalDartNameValue = declaration.simpleDartNameWithoutKotlinImportAlias.value
-
-                        imports.addAll(
-                            listOfNotNull(
-                                DartImport(
-                                    library = it.library,
-                                    alias = kotlinImportAlias,
-                                    show = originalDartNameValue
-                                ),
-                                DartImport(
-                                    library = it.library,
-                                    hide = originalDartNameValue
-                                )
-                            )
-                        )
-                    }
-                }
-            }
-
-            hiddenNameFromCore?.let {
-                imports += DartImport(
-                    library = "dart:core",
-                    alias = null,
-                    hide = hiddenName
-                )
-            }
-        }
-
+        // Add imports through declaration references and types.
         file.acceptChildrenVoid(
             object : IrElementVisitorVoid {
                 override fun visitDeclarationReference(expression: IrDeclarationReference) {
@@ -142,7 +72,10 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
                         else -> owner as? IrDeclarationWithName
                     } ?: return
 
-                    maybeAddDartImports(referenced, expression)
+                    file.apply {
+                        maybeAddDartImportsFor(referenced)
+                        maybeAddComparableOperatorImport(referenced, expression)
+                    }
                 }
 
                 override fun visitMemberAccess(expression: IrMemberAccessExpression<*>) =
@@ -152,29 +85,121 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
             }
         )
 
-        file.remapTypes(
-            object : TypeRemapper {
-                override fun remapType(type: IrType): IrType {
-                    fun maybeAddImport(type: IrType) {
-                        type.classOrNull?.let { maybeAddDartImports(it.owner) }
-                        if (type is IrSimpleType) {
-                            type.arguments.forEach {
-                                it.typeOrNull?.let { t -> maybeAddImport(t) }
-                            }
-                        }
+        file.remapTypes { type ->
+            fun maybeAddImport(type: IrType) {
+                if (type is IrSimpleType) {
+                    // Add import for type alias or class.
+                    type.abbreviation?.typeAlias?.owner?.let { file.maybeAddDartImportsFor(it) }
+                        ?: type.classOrNull?.owner?.let { file.maybeAddDartImportsFor(it) }
+
+                    // Add imports for type arguments.
+                    type.arguments.forEach {
+                        it.typeOrNull?.let { t -> maybeAddImport(t) }
                     }
-
-                    maybeAddImport(type)
-
-                    return type
                 }
-
-                override fun enterScope(irTypeParametersContainer: IrTypeParametersContainer) {}
-                override fun leaveScope() {}
-
             }
-        )
 
-        file.dartImports.addAll(imports)
+            maybeAddImport(type)
+
+            type
+        }
     }
+
+    context(DotlinLoweringContext)
+    fun IrFile.maybeAddComparableOperatorImport(
+        declaration: IrDeclarationWithName,
+        reference: IrDeclarationReference
+    ) {
+        // In the stdlib, we need to import the file where the Comparable<T> '>', '<', '>=', '<=' extensions live.
+        val isBuiltInsAndComparableOperatorCall =
+            isCurrentModuleBuiltIns &&
+                    reference is IrCall && reference.origin in listOf(GT, GTEQ, LT, LTEQ) &&
+                    declaration.parentClassOrNull?.symbol == irBuiltIns.comparableClass
+
+        if (isBuiltInsAndComparableOperatorCall) {
+            dartImports += DartImport(
+                library = declaration.file.relativeDartPath.toString()
+            )
+        }
+    }
+
+    context(DotlinLoweringContext)
+    private fun IrFile.maybeAddDartImportsFor(
+        declaration: IrDeclarationWithName
+    ) {
+        if (declaration.name.isSpecial) return
+        if (declaration.fqNameWhenAvailable in ignore) return
+        if (declaration is IrValueParameter) return
+        // TODO: Handle Unit
+        if (declaration is IrClass && declaration.defaultType.isUnit()) return
+        // Don't import methods.
+        if (declaration is IrSimpleFunction && declaration.dispatchReceiverParameter != null) return
+
+        // If the file is null, it's most likely Kotlin intrinsics (ANDAND, OROR, EQEQ, etc.)
+        val fileOfDeclaration = declaration.fileOrNull ?: return
+
+        // We don't need to import declarations defined in the same file.
+        if (this == fileOfDeclaration) return
+
+        // Import the extension container class if it's an extension.
+        val relevantDeclaration = declaration.extensionContainer ?: declaration
+
+        val descriptor = relevantDeclaration.descriptor
+
+        val libraryUri = relevantDeclaration.annotatedDartLibrary ?: run {
+            var module = descriptor.module
+
+            // If the imported declaration is from our module, or if we know it's written in Kotlin
+            // we cannot build the file path based on the fq name, because the `package`
+            // and path might not match.
+            if (module == currentFile.module.descriptor) {
+                return@run fileOfDeclaration.relativeDartPath.toString()
+            }
+
+            // At this point, the declaration is from a dependency and thus the module must be a
+            // DotlinModule.
+            module = module.dotlinModule ?: return
+
+            val fileName = when (descriptor) {
+                !is DartDescriptor -> fileOfDeclaration.dartPath
+                else -> run {
+                    val fqNameWithoutPackageAndDeclaration = descriptor.fqNameSafe
+                        .toString()
+                        .replace("${module.fqName}.", "")
+                        .replace(".${relevantDeclaration.name.identifier}", "")
+
+                    val extension = descriptor.element.location.library.name.split(".").lastOrNull()
+
+                    fqNameWithoutPackageAndDeclaration
+                        .split(".")
+                        .joinToString("/", postfix = ".$extension")
+                }
+            }
+
+            val packageName = module.dartPackage.name
+
+            "package:$packageName/$fileName"
+        }
+
+        val showName = relevantDeclaration.simpleDartNameWithoutKotlinImportAlias.value
+        val alias = relevantDeclaration.importAliasIn(currentFile)
+
+        // We don't need to import "dart:core" if there's no alias, it's a default import in Dart.
+        if (libraryUri == "dart:core" && alias == null) return
+
+        dartImports.apply {
+            add(DartImport(libraryUri, alias, hide = null, showName))
+
+            if (alias != null) {
+                add(DartImport(libraryUri, hide = showName))
+            }
+        }
+    }
+
+    private val KtImportDirective.declarationReference: KtNameReferenceExpression
+        get() = when (val firstChild = children[0]) {
+            is KtNameReferenceExpression -> firstChild
+            is KtDotQualifiedExpression -> firstChild.lastChild as KtNameReferenceExpression
+            else -> throw UnsupportedOperationException("Unsupported child: ${firstChild::class.simpleName}")
+        }
 }

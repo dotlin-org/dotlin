@@ -182,7 +182,7 @@ class FunctionType : BaseTest {
         dart(
             """
             import "package:meta/meta.dart";
-            
+
             @sealed
             class Test implements Function2<int, double, String> {
               @override

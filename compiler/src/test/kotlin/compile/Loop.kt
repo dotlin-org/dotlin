@@ -24,7 +24,7 @@ import assertCompile
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
-@DisplayName("Compile: Extension")
+@DisplayName("Compile: Loop")
 class Loop : BaseTest {
     @Test
     fun `while loop`() = assertCompile {
@@ -129,8 +129,12 @@ class Loop : BaseTest {
             """
         )
 
+        // TODO: Remove unnecessary imports.
         dart(
             """
+            import "package:dotlin/lib/src/kotlin/ranges/ranges_ext.dt.g.dart"
+                show ${'$'}Extensions${'$'}69eeea92bbe1f1f1;
+            import "package:dotlin/lib/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
             import "package:meta/meta.dart";
 
             void main() {
@@ -157,10 +161,12 @@ class Loop : BaseTest {
             """
         )
 
+        // TODO: IntRange does not need to be imported here.
         dart(
             """
+            import "package:dotlin/lib/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
             import "package:meta/meta.dart";
-            
+
             void main() {
               for (int i = 0; i <= 10; i += 1) {
                 process(i);
@@ -188,8 +194,13 @@ class Loop : BaseTest {
             """
         )
 
+        // TODO: Remove unnecessary imports.
         dart(
             """
+            import "package:dotlin/lib/src/kotlin/ranges/ranges_ext.dt.g.dart"
+                show ${'$'}Extensions${'$'}69eeea92bbe1f1f1;
+            import "package:dotlin/lib/src/kotlin/ranges/progressions.dt.g.dart"
+                show IntProgression;
             import "package:meta/meta.dart";
 
             void main() {
@@ -218,8 +229,14 @@ class Loop : BaseTest {
             """
         )
 
+        // TODO: Remove unnecessary imports.
         dart(
             """
+            import "package:dotlin/lib/src/kotlin/ranges/ranges_ext.dt.g.dart"
+                show ${'$'}Extensions${'$'}69eeea92bbe1f1f1, ${'$'}Extensions${'$'}67ac9ef171a899d4;
+            import "package:dotlin/lib/src/kotlin/ranges/progressions.dt.g.dart"
+                show IntProgression;
+            import "package:dotlin/lib/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
             import "package:meta/meta.dart";
 
             void main() {
@@ -247,8 +264,14 @@ class Loop : BaseTest {
             """
         )
 
+        // TODO: Remove unnecessary imports.
         dart(
             """
+            import "package:dotlin/lib/src/kotlin/ranges/ranges_ext.dt.g.dart"
+                show ${'$'}Extensions${'$'}69eeea92bbe1f1f1, ${'$'}Extensions${'$'}67ac9ef171a899d4;
+            import "package:dotlin/lib/src/kotlin/ranges/progressions.dt.g.dart"
+                show IntProgression;
+            import "package:dotlin/lib/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
             import "package:meta/meta.dart";
 
             void main() {

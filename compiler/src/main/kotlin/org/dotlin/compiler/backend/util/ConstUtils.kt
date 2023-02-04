@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.util
 
+import org.dotlin.compiler.backend.IrContext
 import org.dotlin.compiler.backend.hasDartConstAnnotation
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
@@ -31,6 +32,7 @@ import org.jetbrains.kotlin.psi.KtModifierListOwner
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
+context(IrContext)
 fun IrDeclaration.isDartConst(): Boolean = when (this) {
     is IrField -> when {
         // Enum fields are always const.
@@ -42,13 +44,16 @@ fun IrDeclaration.isDartConst(): Boolean = when (this) {
             is IrConstructorCall -> init.symbol.owner.isDartConst()
             else -> throw UnsupportedOperationException("Invalid FIELD_FOR_OBJECT_INSTANCE")
         }
+
         isBackingField -> correspondingProperty?.isDartConst() == true
         else -> false
     }
+
     is IrFunction -> hasConstModifierOrAnnotation() || when (this) {
         is IrConstructor -> parentAsClass.isDartConst()
         else -> false
     }
+
     is IrProperty -> isConst
     // Only add cases here if a certain class should _always_ be const constructed.
     is IrClass -> when {
@@ -64,7 +69,8 @@ fun IrDeclaration.isDartConst(): Boolean = when (this) {
         // Annotations, enums and _$DefaultValue classes are always const.
         else -> isEnumClass || isAnnotationClass || origin == IrDotlinDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE
     }
-    is IrVariable -> isConst || hasConstModifierOrAnnotation()
+
+    is IrVariable -> !isDefinitelyNotDartConst && (isConst || hasConstModifierOrAnnotation())
     else -> false
 }
 
@@ -77,6 +83,7 @@ fun IrDeclaration.hasConstModifierOrAnnotation(): Boolean {
     return source.modifierList?.hasModifier(KtTokens.CONST_KEYWORD) == true
 }
 
+context(IrContext)
 @OptIn(ExperimentalContracts::class)
 fun IrDeclarationParent.isDartConstInlineFunction(): Boolean {
     contract {
@@ -86,6 +93,7 @@ fun IrDeclarationParent.isDartConstInlineFunction(): Boolean {
     return this is IrDeclaration && (this as IrDeclaration).isDartConstInlineFunction()
 }
 
+context(IrContext)
 @OptIn(ExperimentalContracts::class)
 fun IrDeclaration.isDartConstInlineFunction(): Boolean {
     contract {
@@ -99,4 +107,7 @@ fun IrDeclaration.isDartConstInlineFunction(): Boolean {
 context(DotlinLoweringContext)
 var IrDeclaration.isDartConst: Boolean
     get() = isDartConst()
-    set(value) = annotate(dotlinIrBuiltIns.const)
+    set(value) = when (value) {
+        true -> annotate(dotlinIrBuiltIns.const)
+        false -> annotations = annotations.filter { it.type != dotlinIrBuiltIns.const.owner.defaultType }
+    }

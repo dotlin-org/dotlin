@@ -48,6 +48,10 @@ class Delegation : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/reflect/kproperty_impl.dt.g.dart"
+                show KProperty0Impl;
+            import "package:dotlin/lib/src/kotlin/reflect/kproperty.dt.g.dart"
+                show KProperty;
             import "package:meta/meta.dart";
 
             @sealed
@@ -103,6 +107,10 @@ class Delegation : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/reflect/kproperty_impl.dt.g.dart"
+                show KMutableProperty0Impl;
+            import "package:dotlin/lib/src/kotlin/reflect/kproperty.dt.g.dart"
+                show KProperty;
             import "package:meta/meta.dart";
 
             @sealed
@@ -166,6 +174,10 @@ class Delegation : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/reflect/kproperty_impl.dt.g.dart"
+                show KProperty1Impl;
+            import "package:dotlin/lib/src/kotlin/reflect/kproperty.dt.g.dart"
+                show KProperty;
             import "package:meta/meta.dart";
 
             @sealed
@@ -228,6 +240,10 @@ class Delegation : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/reflect/kproperty_impl.dt.g.dart"
+                show KMutableProperty1Impl;
+            import "package:dotlin/lib/src/kotlin/reflect/kproperty.dt.g.dart"
+                show KProperty;
             import "package:meta/meta.dart";
 
             @sealed
@@ -304,6 +320,10 @@ class Delegation : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/reflect/kproperty_impl.dt.g.dart"
+                show KProperty0Impl;
+            import "package:dotlin/lib/src/kotlin/reflect/kproperty.dt.g.dart"
+                show KProperty;
             import "package:meta/meta.dart";
 
             @sealed
@@ -366,6 +386,10 @@ class Delegation : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/reflect/kproperty_impl.dt.g.dart"
+                show KMutableProperty0Impl;
+            import "package:dotlin/lib/src/kotlin/reflect/kproperty.dt.g.dart"
+                show KProperty;
             import "package:meta/meta.dart";
 
             @sealed

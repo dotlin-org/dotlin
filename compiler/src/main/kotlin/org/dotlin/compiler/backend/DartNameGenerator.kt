@@ -73,7 +73,7 @@ class DartNameGenerator {
                 }
             }
 
-            val aliasPrefix = dartLibraryAlias?.toDartIdentifier() ?: when {
+            val aliasPrefix = when {
                 useKotlinAlias -> importAliasIn(currentFile)?.toDartIdentifier()
                 else -> null
             }?.let {
@@ -83,7 +83,7 @@ class DartNameGenerator {
                     else -> it
                 }
             }
-            val annotatedName = dartAnnotatedName?.toDartIdentifier()
+            val annotatedName = annotatedDartName?.toDartIdentifier()
 
             var name = annotatedName ?: when {
                 this is IrSimpleFunction && isOperator && name.identifier == "invoke" -> "call".toDartIdentifier()

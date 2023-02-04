@@ -21,6 +21,7 @@ package org.dotlin.compiler.backend.steps.ir2klib
 
 import org.dotlin.compiler.backend.DartProject
 import org.dotlin.compiler.backend.steps.src2ir.IrResult
+import org.dotlin.compiler.backend.steps.src2ir.klib
 import org.jetbrains.kotlin.backend.common.serialization.KlibIrVersion
 import org.jetbrains.kotlin.backend.common.serialization.metadata.KlibMetadataMonolithicSerializer
 import org.jetbrains.kotlin.backend.common.serialization.metadata.KlibMetadataVersion
@@ -69,11 +70,12 @@ fun writeToKlib(
             project = env.project,
             exportKDoc = true,
             skipExpects = true,
-            allowErrorTypes = false
+            allowErrorTypes = false,
+            includeOnlyModuleContent = true
         ).serializeModule(irResult.module.descriptor)
 
         buildKotlinLibrary(
-            linkDependencies = irResult.resolvedLibs.getFullList(),
+            linkDependencies = irResult.module.descriptor.allDependencyModules.mapNotNull { it.klib },
             metadata = serializedMetadata,
             ir = serializedIr,
             versions = versions,

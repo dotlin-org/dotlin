@@ -20,7 +20,6 @@ object dotlin : PackageFqNameWrapper {
     val const = self.child("const")
     val DartName = self.child("DartName")
     val DartPositional = self.child("DartPositional")
-    val DartLibrary = self.child("DartLibrary")
     val DartStatic = self.child("DartStatic")
     val DartExtensionName = self.child("DartExtensionName")
     val DartIndex = self.child("DartIndex")
@@ -28,9 +27,9 @@ object dotlin : PackageFqNameWrapper {
     val DartConstructor = self.child("DartConstructor")
 
     // Internal annotations.
+    val DartLibrary = self.child("DartLibrary")
     val DartGetter = self.child("DartGetter")
     val DartExtension = self.child("DartExtension")
-    val DartHideNameFromCore = self.child("DartHideNameFromCore")
 
     object intrinsics : PackageFqNameWrapper {
         override val self = dotlin.self.child("intrinsics")

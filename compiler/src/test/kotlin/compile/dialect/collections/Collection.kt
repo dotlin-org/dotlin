@@ -43,6 +43,8 @@ class Collection : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/flex.dt.g.dart"
+                show AnyCollection;
             import "package:meta/meta.dart";
 
             void main() {
@@ -66,6 +68,8 @@ class Collection : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/flex.dt.g.dart"
+                show AnyCollection;
             import "package:meta/meta.dart";
 
             final AnyCollection<int> myCollection = calculate();
@@ -92,6 +96,8 @@ class Collection : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/flex.dt.g.dart"
+                show AnyCollection;
             import "package:meta/meta.dart";
 
             void main() {
@@ -123,6 +129,12 @@ class Collection : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+                show DotlinTypeIntrinsics;
+            import "package:dotlin/lib/src/kotlin/collections/collection.dt.g.dart"
+                show Collection;
+            import "package:dotlin/lib/src/dotlin/intrinsics/flex.dt.g.dart"
+                show AnyCollection;
             import "package:meta/meta.dart";
 
             void main() {
@@ -154,6 +166,12 @@ class Collection : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+                show DotlinTypeIntrinsics;
+            import "package:dotlin/lib/src/kotlin/collections/collection.dt.g.dart"
+                show Collection;
+            import "package:dotlin/lib/src/dotlin/intrinsics/flex.dt.g.dart"
+                show AnyCollection;
             import "package:meta/meta.dart";
 
             void main() {
@@ -185,6 +203,8 @@ class Collection : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+                show DotlinTypeIntrinsics;
             import "package:meta/meta.dart";
 
             void main() {
@@ -214,6 +234,8 @@ class Collection : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+                show DotlinTypeIntrinsics;
             import "package:meta/meta.dart";
 
             void main() {
@@ -330,6 +352,8 @@ class Collection : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/flex.dt.g.dart"
+                show AnyCollection;
             import "package:meta/meta.dart";
 
             void main() {

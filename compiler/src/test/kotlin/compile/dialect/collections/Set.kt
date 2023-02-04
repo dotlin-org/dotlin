@@ -38,7 +38,7 @@ class Set : BaseTest {
 
         dart(
             """
-            import "dart:collection";
+            import "dart:collection" show UnmodifiableSetView;
             import "package:meta/meta.dart";
 
             void main() {
@@ -102,7 +102,7 @@ class Set : BaseTest {
 
         dart(
             """
-            import "dart:collection";
+            import "dart:collection" show UnmodifiableSetView;
             import "package:meta/meta.dart";
 
             void main() {
@@ -192,7 +192,7 @@ class Set : BaseTest {
 
         dart(
             """
-            import "dart:collection";
+            import "dart:collection" show UnmodifiableSetView;
             import "package:meta/meta.dart";
 
             void main() {
@@ -495,6 +495,8 @@ class Set : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+                show DotlinTypeIntrinsics;
             import "package:meta/meta.dart";
 
             void main() {
@@ -524,6 +526,8 @@ class Set : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+                show DotlinTypeIntrinsics;
             import "package:meta/meta.dart";
 
             void main() {
@@ -551,6 +555,8 @@ class Set : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+                show DotlinTypeIntrinsics;
             import "package:meta/meta.dart";
 
             void main() {
@@ -567,8 +573,6 @@ class Set : BaseTest {
     fun `!is MutableSet`() = assertCompile {
         kotlin(
             """
-            import dotlin.intrinsics.*
-
             fun main() {
                 val obj = calculate()
                 if (obj !is MutableSet<Int>) {}
@@ -580,6 +584,8 @@ class Set : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+                show DotlinTypeIntrinsics;
             import "package:meta/meta.dart";
 
             void main() {
@@ -654,6 +660,10 @@ class Set : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/collection_markers.dt.g.dart"
+                show ImmutableSetMarker;
+            import "package:dotlin/lib/src/kotlin/collections/collection.dt.g.dart"
+                show MutableCollection;
             import "package:meta/meta.dart";
 
             @sealed
@@ -970,8 +980,12 @@ class Set : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/collection_markers.dt.g.dart"
+                show MutableSetMarker;
+            import "package:dotlin/lib/src/kotlin/collections/iterator.dt.g.dart"
+                show MutableIterator;
             import "package:meta/meta.dart";
-            
+
             @sealed
             class EmptyMutableSet<E> implements Set<E>, MutableSetMarker {
               @override

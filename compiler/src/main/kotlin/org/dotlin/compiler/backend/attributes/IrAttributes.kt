@@ -24,6 +24,7 @@ import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrAttributeContainer
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrProperty
+import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
@@ -52,6 +53,7 @@ interface IrAttributes  {
         override var IrVararg.literalKind by attribute(default = CollectionLiteralKind.LIST)
         override var IrMemberAccessExpression<*>.isNullSafe by attribute(default = false)
         override var IrExpression.isDartConst by attribute(default = false)
+        override var IrVariable.isDefinitelyNotDartConst by attribute(default = false)
     }
 
     /**
@@ -104,6 +106,12 @@ interface IrAttributes  {
     var IrMemberAccessExpression<*>.isNullSafe: Boolean
 
     var IrExpression.isDartConst: Boolean
+
+    /**
+     * Set by [ConstInlineFunctionsLowering], to mark that "`const`" variables in `const inline` functions that reference
+     * arguments are actually `final`.
+     */
+    var IrVariable.isDefinitelyNotDartConst: Boolean
 }
 
 @Suppress("UNCHECKED_CAST")

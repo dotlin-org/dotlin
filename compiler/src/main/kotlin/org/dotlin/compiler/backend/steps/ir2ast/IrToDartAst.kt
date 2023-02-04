@@ -72,7 +72,8 @@ fun irToDartAst(
     val dartProject = ir.dartProject
 
     // TODO: Only do this if we're not mixing public Dart/Kotlin code.
-    if (dartProject.isLibrary) {
+    // TODO: Make separate option in pubspec
+    if (/*dartProject.compileKlib*/false) {
         // Add exports file.
         units[Path("lib/${dartProject.name}.${DartNameGenerator.FILE_EXTENSION}")] = DartCompilationUnit(
             directives = units.mapNotNull { (path, unit) ->

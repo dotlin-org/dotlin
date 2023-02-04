@@ -285,7 +285,7 @@ class SpecialInheritance : BaseTest {
         dart(
             """
             import "package:meta/meta.dart";
-            
+
             @sealed
             class CarrierPigeon extends Bird with Carrier implements Pigeon {
               CarrierPigeon() : super(true);

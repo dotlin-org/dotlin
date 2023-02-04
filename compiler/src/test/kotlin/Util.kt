@@ -1,3 +1,5 @@
+import kotlin.io.path.Path
+
 /*
  * Copyright 2021-2022 Wilko Manger
  *
@@ -17,17 +19,10 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import org.dotlin.compiler.backend.DartPackage
-import java.nio.file.Files
-import java.nio.file.Path
-import kotlin.io.path.Path
-
-val stdlib = DartPackage(name = "dotlin", Path("../libraries/stdlib"))
-
 /**
  * Used to reference the `_$DefaultValue` Dart type in multiline
  * code strings. Note that you have to add the `_` prefix yourself.
  */
 const val DefaultValue = "\$DefaultValue"
 
-fun Path.singleChildFile(): Path = Files.newDirectoryStream(this).single()
+val stdlibPath = Path("../packages/dotlin")

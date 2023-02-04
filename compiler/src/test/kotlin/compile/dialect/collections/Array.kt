@@ -59,6 +59,8 @@ class Array : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/kotlin/collections/array_factories.dt.g.dart"
+                show arrayOfNulls;
             import "package:meta/meta.dart";
 
             void main() {

@@ -178,7 +178,7 @@ class Constructor : BaseTest {
         dart(
             """
             import "package:meta/meta.dart";
-            
+
             abstract class Marker {}
 
             @sealed

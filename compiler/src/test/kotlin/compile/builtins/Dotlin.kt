@@ -670,217 +670,23 @@ class Dotlin : BaseTest {
             """
             @DartLibrary("dart:typed_data")
             external class Something
+            """
+        )
 
+        dart("")
+
+        kotlin(
+            """
             fun test(s: Something) {}
             """
         )
 
         dart(
             """
-            import "dart:typed_data";
+            import "dart:typed_data" show Something;
             import "package:meta/meta.dart";
 
             void test(Something s) {}
-            """
-        )
-    }
-
-    @Test
-    fun `@DartLibrary aliased`() = assertCompile {
-        kotlin(
-            """
-            @DartLibrary("dart:core", aliased = true)
-            external class List
-
-            fun main() {
-                List()
-            }
-            """
-        )
-
-        dart(
-            """
-            import "dart:core" as core;
-            import "dart:core" hide List;
-            import "package:meta/meta.dart";
-
-            void main() {
-              core.List();
-            }
-            """
-        )
-    }
-
-    @Test
-    fun `@DartLibrary aliased separate input files`() = assertCompile {
-        kotlin(
-            """
-            package test
-
-            @DartLibrary("dart:core", aliased = true)
-            external class List
-            """
-        )
-
-        kotlin(
-            """
-            package test
-
-            fun main() {
-                List()
-            }
-            """
-        )
-
-        dart(
-            """
-            import "dart:core" as core;
-            import "dart:core" hide List;
-            import "package:meta/meta.dart";
-
-            void main() {
-              core.List();
-            }
-            """
-        )
-    }
-
-    @Test
-    fun `@DartLibrary aliased type reference only`() = assertCompile {
-        kotlin(
-            """
-            @DartLibrary("dart:core", aliased = true)
-            external class List
-
-            fun test(list: List) {}
-            """
-        )
-
-        dart(
-            """
-            import "dart:core" as core;
-            import "dart:core" hide List;
-            import "package:meta/meta.dart";
-
-            void test(core.List list) {}
-            """
-        )
-    }
-
-    @Test
-    fun `@DartHideNameFromCore`() = assertCompile {
-        kotlin(
-            """
-            @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
-
-            @DartHideNameFromCore
-            class Enum
-
-            fun main() {
-                Enum()
-            }
-            """
-        )
-
-        dart(
-            """
-            import "dart:core" hide Enum;
-            import "package:meta/meta.dart";
-
-            @sealed
-            class Enum {}
-
-            void main() {
-              Enum();
-            }
-            """
-        )
-    }
-
-    @Test
-    fun `@DartHideNameFromCore twice`() = assertCompile {
-        kotlin(
-            """
-            @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
-
-            @DartHideNameFromCore
-            class Enum
-
-            @DartHideNameFromCore
-            class List
-
-            fun main() {
-                Enum()
-            }
-            """
-        )
-
-        dart(
-            """
-            import "dart:core" hide Enum, List;
-            import "package:meta/meta.dart";
-
-            @sealed
-            class Enum {}
-
-            @sealed
-            class List {}
-
-            void main() {
-              Enum();
-            }
-            """
-        )
-    }
-
-    @Test
-    fun `@DartHideNameFromCore twice, multiple files`() = assertCompile {
-        kotlin(
-            """
-            @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
-
-            package test
-
-            @DartHideNameFromCore
-            class Something
-
-            @DartHideNameFromCore
-            class SomethingElse
-            """
-        )
-
-        kotlin(
-            """
-            package test
-
-            fun main() {
-                Something()
-            }
-            """
-        )
-
-        dart(
-            """
-            import "dart:core" hide Something, SomethingElse;
-            import "package:meta/meta.dart";
-
-            @sealed
-            class Something {}
-
-            @sealed
-            class SomethingElse {}
-            """
-        )
-
-        dart(
-            """
-            import "0.dt.g.dart";
-            import "dart:core" hide Something;
-            import "package:meta/meta.dart";
-
-            void main() {
-              Something();
-            }
             """
         )
     }

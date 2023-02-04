@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.src2ir.analyze
 
+import org.dotlin.compiler.backend.steps.src2ir.DartPlatform
 import org.dotlin.compiler.backend.steps.src2ir.DotlinTypeTransformer
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
@@ -39,8 +40,6 @@ import org.jetbrains.kotlin.frontend.di.configureStandardResolveComponents
 import org.jetbrains.kotlin.incremental.components.ExpectActualTracker
 import org.jetbrains.kotlin.incremental.components.InlineConstTracker
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.platform.SimplePlatform
-import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.*
 import org.jetbrains.kotlin.resolve.lazy.ResolveSession
@@ -120,11 +119,5 @@ class DotlinAnalyzer(
             }
             else -> AnalysisResult.success(trace.bindingContext, thisModule)
         }
-    }
-}
-
-private object DartPlatform : TargetPlatform(setOf(Simple)) {
-    object Simple : SimplePlatform("Dart") {
-        override val oldFashionedDescription = "Dart"
     }
 }

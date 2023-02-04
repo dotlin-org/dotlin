@@ -19,7 +19,6 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.deepCopyWith
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.dotlin.compiler.backend.util.isDartConstInlineFunction
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
@@ -38,13 +37,7 @@ class ConstInlineFunctionsLowering(override val context: DotlinLoweringContext) 
         // We don't supply the const inline container on purpose: If it's not considered const without it,
         // it's not actually Dart const. Thus, we make it 'final'.
         if (declaration.initializer?.isDartConst(implicit = true) != true) {
-            return just {
-                replaceWith(
-                    declaration.deepCopyWith {
-                        isConst = false
-                    }
-                )
-            }
+            declaration.isDefinitelyNotDartConst = true
         }
 
         return noChange()

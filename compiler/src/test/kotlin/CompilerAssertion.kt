@@ -19,9 +19,9 @@
 
 import org.dotlin.compiler.CompilationResult
 import org.dotlin.compiler.KotlinToDartCompiler
-import org.dotlin.compiler.backend.DartPackage
-import org.dotlin.compiler.backend.DartProject
 import org.dotlin.compiler.backend.DotlinCompilerError
+import org.dotlin.compiler.backend.bin.DotlinGenerator
+import org.dotlin.compiler.backend.util.LazyVar
 import org.dotlin.compiler.factories
 import org.dotlin.compiler.warnings
 import org.intellij.lang.annotations.Language
@@ -30,25 +30,531 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import java.nio.file.Files
 import java.nio.file.Path
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 import kotlin.io.path.*
-import kotlin.streams.toList
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.text.RegexOption.MULTILINE
 
-abstract class CompilerAssertion {
-    abstract val path: Path
-    protected open val dependencies: Set<DartPackage> = setOf(stdlib)
-    protected open val format: Boolean = true
-    protected open val isLibrary: Boolean = false
+abstract class DartTestProject {
+    companion object {
+        private val pubCachePath: Path = System.getenv()["PUB_CACHE"]?.let { Path(it) }
+            ?: Path(System.getProperty("user.home")).resolve(".pub-cache")
 
-    protected fun compile(): CompilationResult {
+        @Language("yaml")
+        private fun defaultPubspec(name: String): String =
+            """
+            name: $name
+            version: 1.0.0
+            
+            environment:
+              sdk: '>=2.18.0 <3.0.0'
+    
+            dependencies:
+              dotlin:
+                path: ${stdlibPath.toRealPath()}
+                
+            dev_dependencies:
+              dotlin_generator:
+                path: ${DotlinGenerator.projectPath.toRealPath()}
+            """.trimIndent()
+
+        private fun defaultPackageConfig(name: String, path: Path): String {
+            fun pubCache(path: String) = "file://${pubCachePath.resolve("hosted/pub.dartlang.org").resolve(path)}"
+            fun relative(path: String) = "file://${Path(path).toRealPath()}"
+
+            // language=json
+            @Suppress("JsonStandardCompliance")
+            return """
+            {
+              "configVersion": 2,
+              "packages": [
+                {
+                  "name": "_fe_analyzer_shared",
+                  "rootUri": "${pubCache("_fe_analyzer_shared-52.0.0")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.17"
+                },
+                {
+                  "name": "analyzer",
+                  "rootUri": "${pubCache("analyzer-5.4.0")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.17"
+                },
+                {
+                  "name": "async",
+                  "rootUri": "${pubCache("async-2.10.0")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.18"
+                },
+                {
+                  "name": "characters",
+                  "rootUri": "${pubCache("characters-1.2.1")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.12"
+                },
+                {
+                  "name": "clock",
+                  "rootUri": "${pubCache("clock-1.1.1")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.12"
+                },
+                {
+                  "name": "collection",
+                  "rootUri": "${pubCache("collection-1.17.1")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.18"
+                },
+                {
+                  "name": "convert",
+                  "rootUri": "${pubCache("convert-3.1.1")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.18"
+                },
+                {
+                  "name": "crypto",
+                  "rootUri": "${pubCache("crypto-3.0.2")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.14"
+                },
+                {
+                  "name": "dartx",
+                  "rootUri": "${pubCache("dartx-1.1.0")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.12"
+                },
+                {
+                  "name": "dotlin",
+                  "rootUri": "${relative(stdlibPath.toString())}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.18"
+                },
+                {
+                  "name": "dotlin_generator",
+                  "rootUri": "${relative(DotlinGenerator.projectPath.toString())}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.18"
+                },
+                {
+                  "name": "file",
+                  "rootUri": "${pubCache("file-6.1.4")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.12"
+                },
+                {
+                  "name": "fixnum",
+                  "rootUri": "${pubCache("fixnum-1.0.1")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.12"
+                },
+                {
+                  "name": "glob",
+                  "rootUri": "${pubCache("glob-2.1.1")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.15"
+                },
+                {
+                  "name": "meta",
+                  "rootUri": "${pubCache("meta-1.8.0")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.12"
+                },
+                {
+                  "name": "package_config",
+                  "rootUri": "${pubCache("package_config-2.1.0")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.12"
+                },
+                {
+                  "name": "path",
+                  "rootUri": "${pubCache("path-1.8.3")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.12"
+                },
+                {
+                  "name": "protobuf",
+                  "rootUri": "${pubCache("protobuf-2.1.0")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.12"
+                },
+                {
+                  "name": "pub_semver",
+                  "rootUri": "${pubCache("pub_semver-2.1.3")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.17"
+                },
+                {
+                  "name": "source_span",
+                  "rootUri": "${pubCache("source_span-1.9.1")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.14"
+                },
+                {
+                  "name": "string_scanner",
+                  "rootUri": "${pubCache("string_scanner-1.2.0")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.18"
+                },
+                {
+                  "name": "term_glyph",
+                  "rootUri": "${pubCache("term_glyph-1.2.1")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.12"
+                },
+                {
+                  "name": "time",
+                  "rootUri": "${pubCache("time-2.1.3")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.12"
+                },
+                {
+                  "name": "typed_data",
+                  "rootUri": "${pubCache("typed_data-1.3.1")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.12"
+                },
+                {
+                  "name": "watcher",
+                  "rootUri": "${pubCache("watcher-1.0.2")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.14"
+                },
+                {
+                  "name": "yaml",
+                  "rootUri": "${pubCache("yaml-3.1.1")}",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.12"
+                },
+                {
+                  "name": "$name",
+                  "rootUri": "../",
+                  "packageUri": "lib/",
+                  "languageVersion": "2.18"
+                }
+              ],
+              "generated": "${LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)}",
+              "generator": "pub",
+              "generatorVersion": "2.18.2"
+            }
+            """
+        }
+    }
+
+    open val name: String = "test"
+    open val path = createTempDirectory()
+
+    open var pubspec: String by LazyVar { defaultPubspec(name) }
+
+    @Language("yaml")
+    private var pubspecLock: String =
+        """
+        packages:
+          _fe_analyzer_shared:
+            dependency: transitive
+            description:
+              name: _fe_analyzer_shared
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "52.0.0"
+          analyzer:
+            dependency: transitive
+            description:
+              name: analyzer
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "5.4.0"
+          async:
+            dependency: transitive
+            description:
+              name: async
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "2.10.0"
+          characters:
+            dependency: transitive
+            description:
+              name: characters
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "1.2.1"
+          clock:
+            dependency: transitive
+            description:
+              name: clock
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "1.1.1"
+          collection:
+            dependency: transitive
+            description:
+              name: collection
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "1.17.1"
+          convert:
+            dependency: transitive
+            description:
+              name: convert
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "3.1.1"
+          crypto:
+            dependency: transitive
+            description:
+              name: crypto
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "3.0.2"
+          dartx:
+            dependency: transitive
+            description:
+              name: dartx
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "1.1.0"
+          dotlin:
+            dependency: "direct main"
+            description:
+              path: "${stdlibPath.toRealPath()}"
+              relative: false
+            source: path
+            version: "0.0.1"
+          dotlin_generator:
+            dependency: "direct dev"
+            description:
+              path: "${DotlinGenerator.projectPath.toRealPath()}"
+              relative: false
+            source: path
+            version: "0.0.1"
+          file:
+            dependency: transitive
+            description:
+              name: file
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "6.1.4"
+          fixnum:
+            dependency: transitive
+            description:
+              name: fixnum
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "1.0.1"
+          glob:
+            dependency: transitive
+            description:
+              name: glob
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "2.1.1"
+          meta:
+            dependency: transitive
+            description:
+              name: meta
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "1.8.0"
+          package_config:
+            dependency: transitive
+            description:
+              name: package_config
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "2.1.0"
+          path:
+            dependency: transitive
+            description:
+              name: path
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "1.8.3"
+          protobuf:
+            dependency: transitive
+            description:
+              name: protobuf
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "2.1.0"
+          pub_semver:
+            dependency: transitive
+            description:
+              name: pub_semver
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "2.1.3"
+          source_span:
+            dependency: transitive
+            description:
+              name: source_span
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "1.9.1"
+          string_scanner:
+            dependency: transitive
+            description:
+              name: string_scanner
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "1.2.0"
+          term_glyph:
+            dependency: transitive
+            description:
+              name: term_glyph
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "1.2.1"
+          time:
+            dependency: transitive
+            description:
+              name: time
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "2.1.3"
+          typed_data:
+            dependency: transitive
+            description:
+              name: typed_data
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "1.3.1"
+          watcher:
+            dependency: transitive
+            description:
+              name: watcher
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "1.0.2"
+          yaml:
+            dependency: transitive
+            description:
+              name: yaml
+              url: "https://pub.dartlang.org"
+            source: hosted
+            version: "3.1.1"
+        sdks:
+          dart: ">=2.18.2 <3.0.0"
+        """.trimIndent()
+
+    private var packageConfig: String by LazyVar { defaultPackageConfig(name, path) }
+
+    fun writeConfigFiles(writeLockFiles: Boolean = true) {
+        path.resolve("pubspec.yaml").writeText(pubspec)
+
+        if (writeLockFiles) {
+            if (pubspecLock.isNotBlank()) {
+                path.resolve("pubspec.lock").writeText(pubspecLock)
+            }
+
+            if (packageConfig.isNotBlank()) {
+                path.resolve(".dart_tool")
+                    .createDirectories()
+                    .resolve("package_config.json")
+                    .writeText(packageConfig)
+            }
+        }
+    }
+
+    abstract fun kotlin(@Language("kotlin") kotlin: String, path: Path? = null)
+    abstract fun dart(@Language("dart") dart: String, path: Path? = null)
+
+    protected val dependencies = mutableListOf<Dependency>()
+
+    fun dependency(block: Dependency.() -> Unit) {
+        val dependency = Dependency()
+        block(dependency)
+
+        dependency.writeConfigFiles()
+
+        // pubspec.lock and dart_tool/package_config.json are invalidated.
+        // TODO: Update them accordingly to prevent a "dart pub get" instead of clearing
+        pubspecLock = ""
+        packageConfig = ""
+
+        pubspec = pubspec.replace(
+            Regex("^dependencies:\n", MULTILINE),
+            // language=yaml
+            """
+            dependencies:
+              ${dependency.name}:
+                path: ${dependency.path}
+
+            """.trimIndent(),
+        )
+
+        dependencies.add(dependency)
+    }
+
+    class Dependency : DartTestProject() {
+        private val nameRegex = Regex("^name: *([A-Za-z_]+)")
+
+        override var name: String = super.name
+            set(value) {
+                field = value
+                pubspec = nameRegex.replace(pubspec, "name: $value")
+            }
+
+        var needsCompile: Boolean = false
+            private set
+
+        private fun Path?.writeSource(source: String, extension: String) {
+            val projectPath = this@Dependency.path
+            val filePath = this ?: Path("lib/${System.currentTimeMillis()}$extension")
+
+            projectPath.resolve(filePath).apply {
+                parent.createDirectories()
+                writeText(source)
+            }
+        }
+
+        override fun kotlin(@Language("kotlin") kotlin: String, path: Path?) {
+            path.writeSource(kotlin, ".kt")
+            needsCompile = true
+        }
+
+        override fun dart(@Language("dart") dart: String, path: Path?) = path.writeSource(dart, ".dart")
+    }
+}
+
+sealed class CompilerAssertion : DartTestProject() {
+    protected val kotlinSources = mutableMapOf<Path, String>()
+    protected val dartSources = mutableMapOf<Path, String>()
+
+    private var unnamedKotlinFiles = 0
+    private var unnamedDartFiles = 0
+
+    override fun kotlin(@Language("kotlin") kotlin: String, path: Path?) {
+        val p = path ?: Path("lib/${unnamedKotlinFiles++}.kt")
+        kotlinSources[p] = kotlin.trimIndent()
+    }
+
+    override fun dart(@Language("dart") dart: String, path: Path?) {
+        val p = path ?: Path("lib/${unnamedDartFiles++}.dt.g.dart")
+        dartSources[p] = dart.trimIndent()
+    }
+
+    open fun compile(): CompilationResult {
+        writeConfigFiles()
+
+        dependencies.forEach {
+            if (it.needsCompile) {
+                println("Compiling dependency: ${it.name} (${it.path})")
+                KotlinToDartCompiler.compile(it.path)
+            }
+        }
+
+        kotlinSources.forEach { (sourcePath, source) ->
+            path.resolve(sourcePath).apply {
+                parent.createDirectories()
+                writeText(source)
+            }
+        }
+
+        println("Compiling project: $path")
+
         return KotlinToDartCompiler.compile(
-            DartProject(
-                name = "test",
-                path,
-                isLibrary,
-                dependencies,
-            ),
+            path,
             format = true
         )
     }
@@ -56,45 +562,42 @@ abstract class CompilerAssertion {
     abstract fun assert()
 }
 
-abstract class AssertCompileFiles : CompilerAssertion() {
-    private val kotlinSources = mutableListOf<String>()
+class AssertCompilesTo : CompilerAssertion() {
+    override fun assert() {
+        assertDoesNotThrow { compile() }
 
-    public override var isLibrary: Boolean = false
+        val compiledDartSources =
+            Files.walk(path)
+                .filter { it.name.endsWith(".dt.g.dart") && it.isRegularFile() }
+                .toList()
+                .map { it to it.readText().removeSuffix("\n") }
 
-    fun kotlin(@Language("kotlin") kotlin: String) {
-        kotlinSources += kotlin.trimIndent()
-    }
+        val projectPath = this.path
 
-    override val path: Path
-        get() = createTempDirectory().apply {
-            kotlinSources.forEachIndexed { index, source ->
-                resolve("$index.kt").createFile().writeText(source)
-            }
+        compiledDartSources.forEach { (path, source) ->
+            assertEquals(dartSources[path.relativeTo(projectPath)], source)
         }
+    }
 }
 
-class AssertCompilesTo : AssertCompileFiles() {
-    private val dartSources = mutableListOf<String>()
+class AssertCanCompileProject : CompilerAssertion() {
+    public override lateinit var path: Path
 
-    fun dart(@Language("dart") dart: String) {
-        dartSources += dart.trimIndent()
-    }
+    override var pubspec: String
+        get() = throw UnsupportedOperationException()
+        set(_) = throw UnsupportedOperationException()
+
+    override fun kotlin(kotlin: String, path: Path?) = throw UnsupportedOperationException()
+    override fun dart(dart: String, path: Path?) = throw UnsupportedOperationException()
+
+    override fun compile() = KotlinToDartCompiler.compile(path)
 
     override fun assert() {
-        val compiledDartSources =
-            Files.walk(assertDoesNotThrow { compile() }.project.path)
-                .filter { it.extension == "dart" && it.isRegularFile() }
-                .toList()
-                .sortedBy { it.nameWithoutExtension }
-                .map { it.readText().removeSuffix("\n") }
-
-        compiledDartSources.forEachIndexed { index, source ->
-            assertEquals(dartSources[index], source)
-        }
+        assertDoesNotThrow { compile() }
     }
 }
 
-abstract class AssertCompilesWithDiagnostics : AssertCompileFiles() {
+sealed class AssertCompilesWithDiagnostics : CompilerAssertion() {
     abstract var diagnostics: List<DiagnosticFactory<*>>
 }
 
@@ -120,20 +623,7 @@ class AssertCompilesWithWarning : AssertCompilesWithDiagnostics() {
     }
 }
 
-class AssertCanCompile : AssertCompileFiles() {
-    override fun assert() {
-        assertDoesNotThrow { compile() }
-    }
-}
-
-abstract class AssertCompileLibrary<O> : CompilerAssertion() {
-    public override var dependencies = setOf(stdlib)
-    override val isLibrary = true
-}
-
-class AssertCanCompileLibraryFromPath : AssertCompileLibrary<Unit>() {
-    override lateinit var path: Path
-
+class AssertCanCompile : CompilerAssertion() {
     override fun assert() {
         assertDoesNotThrow { compile() }
     }
@@ -145,6 +635,11 @@ inline fun assertCompile(block: AssertCompilesTo.() -> Unit) = AssertCompilesTo(
 }
 
 inline fun assertCanCompile(block: AssertCanCompile.() -> Unit) = AssertCanCompile().let {
+    block(it)
+    it.assert()
+}
+
+inline fun assertCanCompileProject(block: AssertCanCompileProject.() -> Unit) = AssertCanCompileProject().let {
     block(it)
     it.assert()
 }
@@ -170,12 +665,6 @@ inline fun assertCompilesWithWarnings(
     AssertCompilesWithWarning().let {
         require(factories.isNotEmpty())
         it.diagnostics = factories.toList()
-        block(it)
-        it.assert()
-    }
-
-inline fun assertCanCompileLib(block: AssertCanCompileLibraryFromPath.() -> Unit) =
-    AssertCanCompileLibraryFromPath().let {
         block(it)
         it.assert()
     }

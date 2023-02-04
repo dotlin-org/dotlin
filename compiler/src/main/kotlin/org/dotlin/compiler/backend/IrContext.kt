@@ -26,7 +26,6 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.resolve.BindingContext
@@ -114,96 +113,6 @@ abstract class IrContext : IrAttributes {
      */
     val IrFile.relativeDartPath: Path
         get() = dartNameGenerator.runWith(this) { relativeDartPathOf(it) }
-
-    // Annotation utils
-    val IrDeclaration.dartHiddenNameFromCore: String?
-        get() = when {
-            hasDartHideNameFromCoreAnnotation() -> (this as? IrDeclarationWithName)?.simpleDartNameOrNull?.value
-            else -> null
-        }
-
-    private fun IrAnnotationContainer.getUnresolvedImportFromAnnotation() =
-        getTwoAnnotationArgumentsOf<String, Boolean>(dotlin.DartLibrary)
-            ?.let { (library, aliased) ->
-                DartUnresolvedImport(
-                    library,
-                    alias = when {
-                        aliased -> library.split(':')[1] // TODO: Improve for non Dart SDK imports.
-                        else -> null
-                    },
-                    hidden = aliased
-                )
-            }
-
-    private fun IrDeclarationWithName.getDartLibraryImport(): DartUnresolvedImport? {
-        if (isDotlinExternal) {
-            val fromDeclarationAnnotation = getUnresolvedImportFromAnnotation()
-            // Try the containing class (in case it's a nested/inner class), see if it has the annotation.
-                ?: when {
-                    // We don't want to look at the parent's class @DartLibrary annotation for companion objects,
-                    // because we never need to import an external companion object
-                    // (it's an error to use it as an instance instead of as static container).
-                    (this as? IrClass)?.isCompanion != true -> parentClassOrNull?.let {
-                        // Aliases and hidings for class member imports are ignored.
-                        it.getUnresolvedImportFromAnnotation()?.copy(alias = null, hidden = false)
-                    }
-                    else -> null
-                }
-
-            if (fromDeclarationAnnotation != null) return fromDeclarationAnnotation
-
-            return fileOrNull?.getUnresolvedImportFromAnnotation()
-            // Convert package fqName to a valid Dart import string if there's no annotation.
-                ?: getPackageFragment()?.fqName?.let { fqName ->
-                    when {
-                        // TODO: (TEMP when branch): Support package imports
-                        !fqName.startsWith(Name.identifier("dart")) -> null
-                        fqName.isRoot -> null
-                        else -> {
-                            val parts = fqName.pathSegments().map { it.identifier }
-
-                            DartUnresolvedImport(
-                                library = when (parts[0]) {
-                                    "dart" -> "dart:${parts[1]}"
-                                    else -> "" // TODO: Package imports
-                                },
-                                alias = null,
-                                hidden = false,
-                            )
-                        }
-                    }
-                }
-        }
-
-        val file = fileOrNull ?: return null
-        if (file != currentFile) {
-            return when {
-                file.isInCurrentModule -> file.relativeDartPath.toString().let { importPath ->
-                    when {
-                        importPath.isNotBlank() -> DartUnresolvedImport(
-                            library = importPath,
-                            alias = null,
-                            hidden = false
-                        )
-                        else -> null
-                    }
-                }
-                // TODO: Package/Dart stdlib imports
-                else -> null
-            }
-        }
-
-        return null
-    }
-
-    val IrDeclaration.dartUnresolvedImport: DartUnresolvedImport?
-        get() = (this as? IrDeclarationWithName)?.getDartLibraryImport()
-
-    val IrDeclaration.dartLibrary: String?
-        get() = dartUnresolvedImport?.library
-
-    val IrDeclaration.dartLibraryAlias: String?
-        get() = dartUnresolvedImport?.alias
 
     val IrFile.isInCurrentModule: Boolean
         get() = module == currentFile.module

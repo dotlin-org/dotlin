@@ -1635,6 +1635,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/internal.dt.g.dart"
+                show ${'$'}Return;
             import "package:meta/meta.dart";
 
             @pragma("vm:always-consider-inlining")
@@ -1696,6 +1698,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/internal.dt.g.dart"
+                show ${'$'}Return;
             import "package:meta/meta.dart";
 
             @pragma("vm:always-consider-inlining")
@@ -1771,6 +1775,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/internal.dt.g.dart"
+                show ${'$'}Return;
             import "package:meta/meta.dart";
 
             @pragma("vm:always-consider-inlining")
@@ -1842,6 +1848,8 @@ class Function : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/internal.dt.g.dart"
+                show ${'$'}Return;
             import "package:meta/meta.dart";
 
             @pragma("vm:always-consider-inlining")

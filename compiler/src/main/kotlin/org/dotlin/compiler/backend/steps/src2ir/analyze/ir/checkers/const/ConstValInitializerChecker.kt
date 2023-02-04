@@ -24,7 +24,6 @@ import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
 import org.dotlin.compiler.backend.util.isDartConst
 import org.dotlin.compiler.backend.util.isDartConstInlineFunction
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrField
 import org.jetbrains.kotlin.ir.declarations.IrProperty
@@ -34,7 +33,6 @@ import org.jetbrains.kotlin.psi.KtDeclaration
 object ConstValInitializerChecker : IrDeclarationChecker {
     override val reports = listOf(CONST_INITIALIZED_WITH_NON_CONSTANT_VALUE)
 
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun IrAnalyzerContext.check(source: KtDeclaration, declaration: IrDeclaration) {
         if (declaration !is IrVariable && declaration !is IrProperty && declaration !is IrField) return
         if (!declaration.isDartConst()) return

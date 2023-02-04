@@ -20,18 +20,17 @@
 package compile.klib
 
 import BaseTest
-import assertCanCompileLib
+import assertCanCompileProject
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import stdlib
+import stdlibPath
 import kotlin.io.path.ExperimentalPathApi
 
 @OptIn(ExperimentalPathApi::class)
 @DisplayName("Compile: Klib: Standard Library")
 class StandardLibrary : BaseTest {
     @Test
-    fun `compile stdlib`() = assertCanCompileLib {
-        path = stdlib.path
-        dependencies = setOf()
+    fun `compile stdlib`() = assertCanCompileProject {
+        path = stdlibPath
     }
 }

@@ -95,7 +95,7 @@ class Const : BaseTest {
         dart(
             """
             import "package:meta/meta.dart";
-            
+
             @sealed
             class Test {
               const Test(this.message) : super();
@@ -123,7 +123,7 @@ class Const : BaseTest {
         dart(
             """
             import "package:meta/meta.dart";
-            
+
             @sealed
             class Test {
               const Test(this.message) : super();
@@ -186,7 +186,7 @@ class Const : BaseTest {
         dart(
             """
             import "package:meta/meta.dart";
-            
+
             const int x = 9223372036854775780;
             """
         )
@@ -390,6 +390,8 @@ class Const : BaseTest {
         )
     }
 
+    // TODO?: For some reason, Kotlin resolves the `x + x` plus method call to the extension `String?.plus(Any?)`,
+    // instead of the method `String.plus(Any?)`.
     @Test
     fun `lambda literal passed to const constructor referencing own local val`() = assertCompile {
         kotlin(
@@ -407,6 +409,7 @@ class Const : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/kotlin/library.dt.g.dart" show SafeStringPlus;
             import "package:meta/meta.dart";
 
             @sealed

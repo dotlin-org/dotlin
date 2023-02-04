@@ -35,7 +35,7 @@ object DartExtensionWithoutProperAnnotationChecker : IrDeclarationChecker {
 
     override fun IrAnalyzerContext.check(source: KtDeclaration, declaration: IrDeclaration) {
         // TODO: Report if mixing Dart and Kotlin code
-        if (!dartProject.isLibrary) return
+        if (!dartProject.compileKlib) return
         if (!declaration.isExtension) return
         if (declaration !is IrSimpleFunction && declaration !is IrProperty) return
 

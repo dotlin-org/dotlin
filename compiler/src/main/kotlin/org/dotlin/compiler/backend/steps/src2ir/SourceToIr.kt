@@ -19,8 +19,6 @@
 
 package org.dotlin.compiler.backend.steps.src2ir
 
-import org.dotlin.compiler.backend.DartDescriptorBasedMangler
-import org.dotlin.compiler.backend.DotlinIrLinker
 import org.dotlin.compiler.backend.DartNameGenerator
 import org.dotlin.compiler.backend.DartProject
 import org.dotlin.compiler.backend.attributes.IrAttributes
@@ -34,27 +32,21 @@ import org.dotlin.compiler.backend.steps.src2ir.analyze.DartKotlinAnalyzerReport
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.DartIrAnalyzer
 import org.jetbrains.kotlin.backend.common.serialization.DeserializationStrategy
 import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDescriptor
-import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
-import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.languageVersionSettings
+import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.descriptors.konan.kotlinLibrary
-import org.jetbrains.kotlin.ir.backend.js.isBuiltIns
 import org.jetbrains.kotlin.ir.builders.TranslationPluginContext
 import org.jetbrains.kotlin.ir.declarations.IrFactory
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.impl.IrFactoryImpl
 import org.jetbrains.kotlin.ir.util.IrMessageLogger
 import org.jetbrains.kotlin.ir.util.SymbolTable
-import org.jetbrains.kotlin.konan.util.KlibMetadataFactories
-import org.jetbrains.kotlin.library.resolver.KotlinLibraryResolveResult
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi2ir.Psi2IrConfiguration
 import org.jetbrains.kotlin.psi2ir.Psi2IrTranslator
 import org.jetbrains.kotlin.resolve.BindingTraceContext
-import org.jetbrains.kotlin.storage.LockBasedStorageManager
-import org.jetbrains.kotlin.util.DummyLogger
 
 fun sourceToIr(
     env: KotlinCoreEnvironment,
@@ -63,23 +55,17 @@ fun sourceToIr(
 ): IrResult {
     val sourceFiles = env.getSourceFiles()
 
-    val resolvedKlibs = resolveKlibs(
-        dartProject.dependencies.map { it.klibPath },
-        DummyLogger,
-    )
-
     var ir = loadIr(
         env,
         config,
         sourceFiles,
         irFactory = IrFactoryImpl,
-        resolvedKlibs,
         dartProject,
     )
 
     // If the Dart package is a library, we must specify const declarations
-    // that are not normally const in Kotlin. Otherwise this information is lost in the output IR.
-    if (dartProject.isLibrary) {
+    // that are not normally const in Kotlin. Otherwise, this information is lost in the output IR.
+    if (dartProject.compileKlib) {
         ir = ir.copy(
             loweringContext = ir.lower(
                 config,
@@ -101,47 +87,29 @@ private fun loadIr(
     config: CompilerConfiguration,
     files: List<KtFile>,
     irFactory: IrFactory,
-    resolvedKlibs: KotlinLibraryResolveResult,
     dartProject: DartProject
 ): IrResult {
-    val isCompilingBuiltIns = resolvedKlibs.getFullList().none { it.isBuiltIns }
+    val elementLocator = DartElementLocator()
+    val builtIns = DotlinBuiltIns()
+    val dependencyDartModules = DartPackageModuleResolver.resolve(dartProject, builtIns, elementLocator)
 
-    val createBuiltIns = ::DotlinBuiltIns
+    val isCompilingBuiltIns = dependencyDartModules.none { it.isStdlib }
 
-    lateinit var builtIns: KotlinBuiltIns
-
-    if (isCompilingBuiltIns) {
-        builtIns = createBuiltIns()
-        config.put(CommonConfigurationKeys.MODULE_NAME, "kotlin")
-    }
-
-    val dependencyModules = when {
-        !isCompilingBuiltIns -> KlibMetadataFactories(
-            // TODO?: It might be possible that this is called for just the first module instead of the built-ins one,
-            // if that's the case, resolve the built-ins module separately.
-            createBuiltIns = { createBuiltIns().also { builtIns = it } },
-            DynamicTypeDeserializer,
-        ).DefaultResolvedDescriptorsFactory.createResolved(
-            resolvedKlibs,
-            storageManager = LockBasedStorageManager("ResolvedModules"),
-            builtIns = when {
-                isCompilingBuiltIns -> builtIns
-                else -> null
-            },
-            config.languageVersionSettings,
-            additionalDependencyModules = listOf(),
-            friendModuleFiles = emptySet(),
-            includedLibraryFiles = emptySet(),
-            isForMetadataCompilation = false
-        ).resolvedDescriptors
-        else -> emptyList()
+    if (!isCompilingBuiltIns) {
+        dependencyDartModules.setDependencies()
     }
 
     val trace = BindingTraceContext()
 
     val analysisResult = DartKotlinAnalyzerReporter(env, config).analyzeAndReport(
         files,
-        dependencyModules,
+        dependencies = when {
+            // We don't pass dependencies to the analyzer when compiling built-ins, because the only dependency
+            // the built-ins have is the "meta" package, which is not used in Kotlin code. However, we must not pass
+            // it as a dependency to the analyzer, we'll get errors otherwise.
+            isCompilingBuiltIns -> emptyList()
+            else -> dependencyDartModules.map { it.impl }
+        },
         isCompilingBuiltIns,
         builtIns,
         trace
@@ -149,11 +117,15 @@ private fun loadIr(
 
     val mainModule = analysisResult.moduleDescriptor
 
+    if (isCompilingBuiltIns) {
+        dependencyDartModules.setDependencies(builtInsModule = mainModule as ModuleDescriptorImpl)
+    }
+
     val psi2Ir = Psi2IrTranslator(
         config.languageVersionSettings,
         Psi2IrConfiguration(ignoreErrors = false)
     )
-    val symbolTable = SymbolTable(IdSignatureDescriptor(DartDescriptorBasedMangler), irFactory)
+    val symbolTable = SymbolTable(IdSignatureDescriptor(DotlinDescriptorBasedMangler), irFactory)
     val psi2IrContext = psi2Ir.createGeneratorContext(
         mainModule,
         analysisResult.bindingContext,
@@ -186,11 +158,9 @@ private fun loadIr(
         }
     }
 
-    dependencyModules
-        .filter { !it.kotlinLibrary.isBuiltIns }
-        .forEach {
-            irLinker.deserializeIrModuleHeader(it, it.kotlinLibrary)
-        }
+    dependencyDartModules.forEach {
+        irLinker.deserializeIrModuleHeader(it, it.klib, _moduleName = it.name.asString())
+    }
 
     val module = psi2Ir.generateModuleFragment(
         context = psi2IrContext,
@@ -220,7 +190,6 @@ private fun loadIr(
 
     return IrResult(
         module,
-        resolvedKlibs,
         trace,
         symbolTable,
         extraIrAttributes,
@@ -232,7 +201,6 @@ private fun loadIr(
 
 data class IrResult(
     val module: IrModuleFragment,
-    val resolvedLibs: KotlinLibraryResolveResult,
     val bindingTrace: BindingTraceContext,
     val symbolTable: SymbolTable,
     val irAttributes: IrAttributes,

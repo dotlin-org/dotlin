@@ -1,0 +1,160 @@
+syntax = "proto2";
+
+
+// serial name 'org.dotlin.compiler.dart.element.DartPackageElement'
+message DartPackageElement {
+  // WARNING: a default value decoded when value is missing
+  repeated DartLibraryElement libraries = 1;
+}
+
+// serial name 'org.dotlin.compiler.dart.element.DartLibraryElement'
+message DartLibraryElement {
+  required string location = 1;
+  required string path = 2;
+  // WARNING: a default value decoded when value is missing
+  repeated DartCompilationUnitElement units = 3;
+}
+
+// serial name 'org.dotlin.compiler.dart.element.DartCompilationUnitElement'
+message DartCompilationUnitElement {
+  required string location = 1;
+  // WARNING: a default value decoded when value is missing
+  repeated DartClassElement classes = 2;
+  // WARNING: a default value decoded when value is missing
+  repeated DartFunctionElement functions = 3;
+}
+
+// serial name 'org.dotlin.compiler.dart.element.DartClassElement'
+message DartClassElement {
+  required string location = 1;
+  required string name = 2;
+  repeated DartTypeParameterElement typeParameters = 3;
+  required bool isAbstract = 4;
+  // WARNING: a default value decoded when value is missing
+  repeated DartFieldElement fields = 5;
+}
+
+// serial name 'org.dotlin.compiler.dart.element.DartFieldElement'
+message DartFieldElement {
+  required string location = 1;
+  required string name = 2;
+  required bool isAbstract = 3;
+  required bool isCovariant = 4;
+  required bool isConst = 5;
+  required bool isFinal = 6;
+  required bool isLate = 7;
+  required bool isStatic = 8;
+  required DartType type = 9;
+}
+
+// serial name 'org.dotlin.compiler.dart.element.DartFunctionElement'
+message DartFunctionElement {
+  required string location = 1;
+  required string name = 2;
+  required bool isAsync = 3;
+  required bool isGenerator = 4;
+  required bool isAbstract = 5;
+  required bool isStatic = 6;
+  required bool isOperator = 7;
+  // WARNING: a default value decoded when value is missing
+  repeated DartParameterElement parameters = 8;
+  // WARNING: a default value decoded when value is missing
+  repeated DartTypeParameterElement typeParameters = 9;
+  required DartFunctionType type = 10;
+}
+
+// serial name 'org.dotlin.compiler.dart.element.DartConstructorElement'
+message DartConstructorElement {
+  required string location = 1;
+  required string name = 2;
+  required bool isConst = 3;
+  required DartFunctionType type = 4;
+  // WARNING: a default value decoded when value is missing
+  repeated DartParameterElement parameters = 5;
+  // WARNING: a default value decoded when value is missing
+  optional bool isAbstract = 6;
+  // WARNING: a default value decoded when value is missing
+  optional bool isStatic = 7;
+  // WARNING: a default value decoded when value is missing
+  optional bool isAsync = 8;
+  // WARNING: a default value decoded when value is missing
+  optional bool isGenerator = 9;
+  // WARNING: a default value decoded when value is missing
+  repeated DartTypeParameterElement typeParameters = 10;
+}
+
+// serial name 'org.dotlin.compiler.dart.element.DartParameterElement'
+message DartParameterElement {
+  required string location = 1;
+  required string name = 2;
+  required DartType type = 3;
+  required bool isCovariant = 4;
+  required bool isNamed = 5;
+  required bool isRequired = 6;
+  // WARNING: a default value decoded when value is missing
+  optional string fieldLocation = 7;
+  // WARNING: a default value decoded when value is missing
+  optional string superConstructorParameterLocation = 8;
+}
+
+// serial name 'org.dotlin.compiler.dart.element.DartType'
+message DartType {
+  required string type = 1;
+  // decoded as message with one of these types:
+  //   message DartDynamicType, serial name 'org.dotlin.compiler.dart.element.DartDynamicType'
+  //   message DartFunctionType, serial name 'org.dotlin.compiler.dart.element.DartFunctionType'
+  //   message DartInterfaceType, serial name 'org.dotlin.compiler.dart.element.DartInterfaceType'
+  //   message DartNeverType, serial name 'org.dotlin.compiler.dart.element.DartNeverType'
+  //   message DartVoidType, serial name 'org.dotlin.compiler.dart.element.DartVoidType'
+  required bytes value = 2;
+}
+
+// serial name 'org.dotlin.compiler.dart.element.DartTypeParameterElement'
+message DartTypeParameterElement {
+  required string name = 1;
+  required string location = 2;
+  // WARNING: a default value decoded when value is missing
+  optional DartType bound = 3;
+}
+
+// serial name 'org.dotlin.compiler.dart.element.DartFunctionType'
+message DartFunctionType {
+  // WARNING: a default value decoded when value is missing
+  repeated DartParameterElement parameters = 1;
+  // WARNING: a default value decoded when value is missing
+  repeated DartTypeParameterElement typeParameters = 2;
+  required DartType returnType = 3;
+  required DartNullabilitySuffix nullabilitySuffix = 4;
+}
+
+// serial name 'org.dotlin.compiler.dart.element.DartDynamicType'
+message DartDynamicType {
+}
+
+// serial name 'org.dotlin.compiler.dart.element.DartInterfaceType'
+message DartInterfaceType {
+  required string elementLocation = 1;
+  // WARNING: a default value decoded when value is missing
+  repeated DartType typeArguments = 2;
+  optional DartInterfaceType superClass = 3;
+  // WARNING: a default value decoded when value is missing
+  repeated DartInterfaceType superInterfaceTypes = 4;
+  // WARNING: a default value decoded when value is missing
+  repeated DartInterfaceType superMixinTypes = 5;
+  required DartNullabilitySuffix nullabilitySuffix = 6;
+}
+
+// serial name 'org.dotlin.compiler.dart.element.DartNeverType'
+message DartNeverType {
+}
+
+// serial name 'org.dotlin.compiler.dart.element.DartVoidType'
+message DartVoidType {
+}
+
+// serial name 'org.dotlin.compiler.dart.element.DartNullabilitySuffix'
+enum DartNullabilitySuffix {
+  QUESTION_MARK = 0;
+  STAR = 1;
+  NONE = 2;
+}

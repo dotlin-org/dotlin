@@ -144,6 +144,7 @@ class ConstInline : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/kotlin/library.dt.g.dart" show SafeStringPlus;
             import "package:meta/meta.dart";
 
             @sealed
@@ -186,6 +187,7 @@ class ConstInline : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/kotlin/library.dt.g.dart" show SafeStringPlus;
             import "package:meta/meta.dart";
 
             @sealed
@@ -228,6 +230,7 @@ class ConstInline : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/kotlin/library.dt.g.dart" show SafeStringPlus;
             import "package:meta/meta.dart";
 
             @sealed
@@ -270,6 +273,7 @@ class ConstInline : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/kotlin/library.dt.g.dart" show SafeStringPlus;
             import "package:meta/meta.dart";
 
             @sealed

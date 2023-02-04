@@ -881,6 +881,8 @@ class Expression : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/internal.dt.g.dart"
+                show ${'$'}Return;
             import "package:meta/meta.dart";
 
             void main() {
@@ -915,6 +917,8 @@ class Expression : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/internal.dt.g.dart"
+                show ${'$'}Return;
             import "package:meta/meta.dart";
 
             void main() {
@@ -954,6 +958,8 @@ class Expression : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/internal.dt.g.dart"
+                show ${'$'}Return;
             import "package:meta/meta.dart";
 
             void main() {
@@ -1003,6 +1009,8 @@ class Expression : BaseTest {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/intrinsics/internal.dt.g.dart"
+                show ${'$'}Return;
             import "package:meta/meta.dart";
 
             void main() {

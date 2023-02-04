@@ -869,6 +869,8 @@ class Property {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/reflect/kproperty_impl.dt.g.dart"
+                show KMutableProperty0Impl;
             import "package:meta/meta.dart";
 
             late bool test;
@@ -901,6 +903,8 @@ class Property {
 
         dart(
             """
+            import "package:dotlin/lib/src/dotlin/reflect/kproperty_impl.dt.g.dart"
+                show KMutableProperty0Impl;
             import "package:meta/meta.dart";
 
             @sealed

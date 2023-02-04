@@ -17,10 +17,12 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import kotlinx.coroutines.runBlocking
 import org.dotlin.compiler.KotlinToDartCompiler
-import org.dotlin.compiler.backend.DartProject
+import org.dotlin.compiler.backend.bin.dart
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayNameGeneration
+import java.nio.file.Path
 
 @DisplayNameGeneration(FunctionDisplayNameGenerator::class)
 interface BaseTest {
@@ -28,15 +30,27 @@ interface BaseTest {
         @BeforeAll
         @JvmStatic
         fun compileStdlib() {
-            KotlinToDartCompiler.compile(
-                DartProject(
-                    stdlib.name,
-                    stdlib.path,
-                    isLibrary = true,
-                    dependencies = emptySet(),
-                ),
-                format = true
-            )
+            println("Compiling stdlib..")
+            KotlinToDartCompiler.compile(stdlibPath)
+        }
+
+        @BeforeAll
+        @JvmStatic
+        fun runDartPubGet() {
+            // We run "dart pub get" once, to create the .pub-cache with the default dependencies for test projects.
+            // In [DartTestProject], we create the pubspec.lock and package_config.json ourselves, to prevent
+            // a "pub get" for every test.
+
+            val project = object : DartTestProject() {
+                override fun kotlin(kotlin: String, path: Path?) { /* Nothing. */ }
+                override fun dart(dart: String, path: Path?) { /* Nothing. */ }
+            }.apply {
+                writeConfigFiles()
+            }
+
+            println("Running 'dart pub get' in ${project.path}")
+
+            runBlocking { dart.pub.get(project.path) }
         }
     }
 }

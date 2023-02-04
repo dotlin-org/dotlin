@@ -21,6 +21,7 @@ package org.dotlin.compiler
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.util.Disposer
+import kotlinx.coroutines.runBlocking
 import org.dotlin.compiler.backend.DartNameGenerator
 import org.dotlin.compiler.backend.DartPackage
 import org.dotlin.compiler.backend.DartProject
@@ -42,7 +43,6 @@ import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.diagnostics.Diagnostic
-import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.*
 
@@ -50,11 +50,10 @@ object KotlinToDartCompiler {
     /**
      * Compiles the given Kotlin code and returns the output path.
      */
-    @OptIn(ExperimentalPathApi::class)
     fun compile(
         kotlin: String,
         format: Boolean = false,
-        isLibrary: Boolean = false,
+        isLibrary: Boolean = true, // TODO: Read from pubspec
         dependencies: Set<DartPackage>,
     ): CompilationResult {
         val tmpDir = createTempDirectory().also {
@@ -67,22 +66,18 @@ object KotlinToDartCompiler {
         return compile(
             DartProject(
                 name = "main",
+                dependencies,
                 path = tmpDir,
                 isLibrary,
-                dependencies,
             ),
             format,
             showPathsInDiagnostics = false
         )
     }
 
-    fun compile(path: Path) = compile(
-        DartProject(
-            name = "TODO", // TODO: Load from pubspec
-            path,
-            isLibrary = false, // TODO: Load from pubspec
-            dependencies = emptySet() // TODO: Load from pubspec
-        )
+    fun compile(path: Path, format: Boolean = false): CompilationResult = compile(
+        runBlocking { DartProject.from(path, compileKlib = true) },
+        format
     )
 
     fun compile(
@@ -101,7 +96,7 @@ object KotlinToDartCompiler {
                 project
             )
 
-            if (project.isLibrary) {
+            if (project.compileKlib) {
                 writeToKlib(env, config, ir, project)
             }
 
@@ -181,21 +176,8 @@ object KotlinToDartCompiler {
 
     class Arguments : CommonCompilerArguments()
 
-    private fun dartFormat(vararg args: String): Int {
-        val home = System.getenv("HOME").let {
-            if (!it.endsWith(File.separator)) it + File.separator else it
-        }
-        val paths = System.getenv("PATH")
-            .split(File.pathSeparator)
-            .map { it.replaceFirst(Regex("^~" + File.separator), home) }
-
-        val dart = paths
-            .map { File(it, "dart") }
-            .firstOrNull { it.exists() && it.isFile && it.canExecute() }
-            ?: throw IllegalStateException("dart could not be found or cannot be executed")
-
-        return Runtime.getRuntime().exec("$dart format ${args.joinToString(" ")}").waitFor()
-    }
+    private fun dartFormat(vararg args: String): Int =
+        Runtime.getRuntime().exec("dart format ${args.joinToString(" ")}").waitFor()
 }
 
 data class CompilationResult(

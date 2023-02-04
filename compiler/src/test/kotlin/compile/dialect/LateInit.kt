@@ -73,7 +73,7 @@ class LateInit : BaseTest {
         dart(
             """
             import "package:meta/meta.dart";
-            
+
             @sealed
             class Test<T> {
               @nonVirtual

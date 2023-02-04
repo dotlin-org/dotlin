@@ -20,11 +20,11 @@
 package org.dotlin.compiler.cli.command
 
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.parameters.options.*
-import com.github.ajalt.clikt.parameters.types.path
+import com.github.ajalt.clikt.parameters.options.flag
+import com.github.ajalt.clikt.parameters.options.help
+import com.github.ajalt.clikt.parameters.options.option
 import org.dotlin.compiler.KotlinToDartCompiler
 import org.dotlin.compiler.backend.DartProject
-import java.nio.file.Path
 import kotlin.io.path.Path
 
 class Compile : CliktCommand(name = "dotlin") {
@@ -32,24 +32,14 @@ class Compile : CliktCommand(name = "dotlin") {
         .help("Whether to format the output Dart code using dart format")
         .flag("--no-format", default = false)
 
-    private val dependencies: Set<Path> by option("-d", "--dependency")
-        .help("A path to a dependency Dart project")
-        .path(
-            mustExist = true,
-            mustBeReadable = true,
-            canBeDir = false,
-        )
-        .multiple()
-        .unique()
-
     override fun run() {
         // TODO: Support compiling non-project Dart files and STDIN
 
         KotlinToDartCompiler.compile(
             DartProject(
                 name = "TODO", // TODO
-                path = Path(""), // TODO: Find nearest pubspec,
-                isLibrary = false, // TODO
+                path = Path(""),
+                compileKlib = false, // TODO
                 dependencies = emptySet() // TODO
             ),
             format,
