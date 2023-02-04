@@ -7,19 +7,16 @@ and the Dart ecosystem & build system.
 ## About Dotlin
 
 Dotlin makes use of Kotlin's IR (Immediate Representation) compiler, and uses that to generate Dart source code.
-At the moment not all of Kotlin's features are supported; to see what exactly is or isn't implemented, you can
-look at the [TODO](TODO.md) list.
 
-## Goals
+Dotlin is still in development. You can track overall development on the [project board](https://github.com/orgs/dotlin-org/projects/1).
 
-- Support all Kotlin language features
-- Support the Kotlin standard library
-- Allow the use of any library written in Dart by generating `external` Kotlin APIs
-- Generate code that is still readable and pleasant to use for Dart consumers
-- Integrate with Dart's build system (e.g. use `pubspec.yaml` to define dependencies)
-- Create an IntelliJ/Fleet plugin
-- Support Flutter
-    - Flutter: Create a fluent widget builder DSL using Kotlin's scope functions on top of the generated `external` API
+## Features
+
+- Supports all Kotlin language features (WIP: #25)
+- Supports the Kotlin standard library (WIP)
+- Use any dependency written in Dart, without conversion or writing type definitions (WIP)
+- Integrates with Dart's build system (use `pubspec.yaml` to define dependencies)
+- Generates code that is still readable and pleasant to use for Dart consumers (WIP)
 
 ## Differences from Kotlin
 
