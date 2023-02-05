@@ -20,7 +20,8 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.deepCopyWith
-import org.dotlin.compiler.backend.steps.ir2ast.lower.*
+import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
+import org.dotlin.compiler.backend.steps.ir2ast.lower.IrFileLowering
 import org.dotlin.compiler.backend.util.isExplicitlyExternal
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFile

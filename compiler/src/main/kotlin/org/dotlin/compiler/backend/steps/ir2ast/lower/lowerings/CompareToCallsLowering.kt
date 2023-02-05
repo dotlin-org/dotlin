@@ -29,9 +29,14 @@ import org.jetbrains.kotlin.ir.expressions.*
  */
 class CompareToCallsLowering(override val context: DotlinLoweringContext) : IrExpressionLowering {
     override fun DotlinLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
-        // Conditions for match: `expression` must be IrCall and a built in operator. First arg must be IrCall and have
-        // the same `origin` as `expression`. First arg must be an operator and must have name "compareTo".
-        // `expression` must have origins of either LT, GT, LTEQ or GTEQ.
+        // Conditions for match:
+        // - `expression` must be IrCall and a built-in operator;
+        // - `expression` must be built-in operator;
+        // - first arg must be `IrCall`;
+        // - first arg must have the same `origin` as `expression`;
+        // - first arg method must be an operator
+        // - first arg method must have name "compareTo";
+        // - `expression` must have origins of either LT, GT, LTEQ or GTEQ.
 
         if (expression !is IrCall || expression.symbol.owner.origin != IrBuiltIns.BUILTIN_OPERATOR) return noChange()
 

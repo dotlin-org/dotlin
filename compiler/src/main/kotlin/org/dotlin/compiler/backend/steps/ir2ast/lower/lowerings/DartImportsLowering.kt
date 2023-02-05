@@ -33,7 +33,6 @@ import org.dotlin.compiler.backend.util.importAliasIn
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrDeclarationReference
 import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin.*
@@ -41,9 +40,6 @@ import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
-import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
-import org.jetbrains.kotlin.psi.KtImportDirective
-import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
@@ -72,10 +68,7 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
                         else -> owner as? IrDeclarationWithName
                     } ?: return
 
-                    file.apply {
-                        maybeAddDartImportsFor(referenced)
-                        maybeAddComparableOperatorImport(referenced, expression)
-                    }
+                    file.maybeAddDartImportsFor(referenced)
                 }
 
                 override fun visitMemberAccess(expression: IrMemberAccessExpression<*>) =
@@ -102,24 +95,6 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
             maybeAddImport(type)
 
             type
-        }
-    }
-
-    context(DotlinLoweringContext)
-    fun IrFile.maybeAddComparableOperatorImport(
-        declaration: IrDeclarationWithName,
-        reference: IrDeclarationReference
-    ) {
-        // In the stdlib, we need to import the file where the Comparable<T> '>', '<', '>=', '<=' extensions live.
-        val isBuiltInsAndComparableOperatorCall =
-            isCurrentModuleBuiltIns &&
-                    reference is IrCall && reference.origin in listOf(GT, GTEQ, LT, LTEQ) &&
-                    declaration.parentClassOrNull?.symbol == irBuiltIns.comparableClass
-
-        if (isBuiltInsAndComparableOperatorCall) {
-            dartImports += DartImport(
-                library = declaration.file.relativeDartPath.toString()
-            )
         }
     }
 
@@ -195,11 +170,4 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
             }
         }
     }
-
-    private val KtImportDirective.declarationReference: KtNameReferenceExpression
-        get() = when (val firstChild = children[0]) {
-            is KtNameReferenceExpression -> firstChild
-            is KtDotQualifiedExpression -> firstChild.lastChild as KtNameReferenceExpression
-            else -> throw UnsupportedOperationException("Unsupported child: ${firstChild::class.simpleName}")
-        }
 }

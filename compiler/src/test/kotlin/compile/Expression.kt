@@ -2208,4 +2208,236 @@ class Expression : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `less than`() = assertCompile {
+        kotlin(
+            """
+            fun main () {
+                val x = 0 < 1
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            void main() {
+              final bool x = 0 < 1;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `less than or equals`() = assertCompile {
+        kotlin(
+            """
+            fun main () {
+                val x = 0 <= 1
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            void main() {
+              final bool x = 0 <= 1;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `greater than`() = assertCompile {
+        kotlin(
+            """
+            fun main () {
+                val x = 0 > 1
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            void main() {
+              final bool x = 0 > 1;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `greater than or equals`() = assertCompile {
+        kotlin(
+            """
+            fun main () {
+                val x = 0 >= 1
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            void main() {
+              final bool x = 0 >= 1;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `less than on instance implementing Comparable`() = assertCompile {
+        kotlin(
+            """
+            class MyComp : Comparable<MyComp> {
+                override fun compareTo(other: MyComp): Int = 1
+            }
+
+            fun main () {
+                val a = MyComp()
+                val b = MyComp()
+                val x = a < b
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            @sealed
+            class MyComp implements Comparable<MyComp> {
+              @override
+              int compareTo(MyComp other) {
+                return 1;
+              }
+            }
+
+            void main() {
+              final MyComp a = MyComp();
+              final MyComp b = MyComp();
+              final bool x = a.compareTo(b) < 0;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `less than or equals on instance implementing Comparable`() = assertCompile {
+        kotlin(
+            """
+            class MyComp : Comparable<MyComp> {
+                override fun compareTo(other: MyComp): Int = 1
+            }
+
+            fun main () {
+                val a = MyComp()
+                val b = MyComp()
+                val x = a <= b
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            @sealed
+            class MyComp implements Comparable<MyComp> {
+              @override
+              int compareTo(MyComp other) {
+                return 1;
+              }
+            }
+
+            void main() {
+              final MyComp a = MyComp();
+              final MyComp b = MyComp();
+              final bool x = a.compareTo(b) <= 0;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `greater than on instance implementing Comparable`() = assertCompile {
+        kotlin(
+            """
+            class MyComp : Comparable<MyComp> {
+                override fun compareTo(other: MyComp): Int = 1
+            }
+
+            fun main () {
+                val a = MyComp()
+                val b = MyComp()
+                val x = a > b
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            @sealed
+            class MyComp implements Comparable<MyComp> {
+              @override
+              int compareTo(MyComp other) {
+                return 1;
+              }
+            }
+
+            void main() {
+              final MyComp a = MyComp();
+              final MyComp b = MyComp();
+              final bool x = a.compareTo(b) > 0;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `greater than or equals on instance implementing Comparable`() = assertCompile {
+        kotlin(
+            """
+            class MyComp : Comparable<MyComp> {
+                override fun compareTo(other: MyComp): Int = 1
+            }
+
+            fun main () {
+                val a = MyComp()
+                val b = MyComp()
+                val x = a >= b
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            @sealed
+            class MyComp implements Comparable<MyComp> {
+              @override
+              int compareTo(MyComp other) {
+                return 1;
+              }
+            }
+
+            void main() {
+              final MyComp a = MyComp();
+              final MyComp b = MyComp();
+              final bool x = a.compareTo(b) >= 0;
+            }
+            """
+        )
+    }
 }

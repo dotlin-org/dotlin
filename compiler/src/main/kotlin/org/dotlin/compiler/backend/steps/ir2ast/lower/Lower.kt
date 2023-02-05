@@ -20,7 +20,6 @@
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.*
-import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.Comparable
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.ReplaceEnumValuesCalls
 import org.dotlin.compiler.backend.steps.src2ir.IrResult
 import org.jetbrains.kotlin.config.CompilerConfiguration
@@ -30,7 +29,6 @@ private typealias Lowering = KFunction1<DotlinLoweringContext, IrLowering>
 
 private val lowerings: List<Lowering> = listOf(
     ::UnrepresentableDecimalConstsLowering,
-    Comparable::PreOperatorsLowering,
     ::DartExtensionsLowering,
     ::ExternalDeclarationsLowering,
     ::IdentityChecksLowering,
@@ -48,11 +46,11 @@ private val lowerings: List<Lowering> = listOf(
     ::OverriddenParametersLowering,
     ::DefaultInterfaceImplementationsLowering,
     ::OperatorsLowering,
-    Comparable::PostOperatorsLowering,
     ExtensionsLowering::RemoveReceiverTypeArguments,
     ::ExtensionsLowering,
     ::SortStatementsLowering,
     ::ConstructorPassingComplexParamToSuperLowering,
+    ::ComparableCompareToCallsLowering,
     ::CompareToCallsLowering,
     ::RemoveInstanceInitializersLowering,
     ::SecondaryRedirectingConstructorsWithBodiesLowering,
