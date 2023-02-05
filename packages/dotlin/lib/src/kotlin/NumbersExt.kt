@@ -18,22 +18,6 @@
 package kotlin
 
 /**
- * Returns `true` if the specified number is a
- * Not-a-Number (NaN) value, `false` otherwise.
- */
-fun Double.isNaN(): Boolean = this != this
-
-/**
- * Returns `true` if this value is infinitely large in magnitude.
- */
-fun Double.isInfinite(): Boolean = this == Double.POSITIVE_INFINITY || this == Double.NEGATIVE_INFINITY
-
-/**
- * Returns `true` if the argument is a finite floating-point value; returns `false` otherwise (for `NaN` and infinity arguments).
- */
-fun Double.isFinite(): Boolean = !isInfinite() && !isNaN()
-
-/**
  * Counts the number of set bits in the binary representation of this [Int] number.
  */
 @SinceKotlin("1.4")

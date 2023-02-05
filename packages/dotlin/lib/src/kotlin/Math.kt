@@ -373,7 +373,7 @@ import dart.math.log as dartLog
 @SinceKotlin("1.2")
 /*actual*/ val Double.ulp: Double get() = when {
     this < 0 -> (-this).ulp
-    this.isNaN() || this == Double.POSITIVE_INFINITY -> this
+    this.isNaN || this == Double.POSITIVE_INFINITY -> this
     this == Double.MAX_VALUE -> this - this.nextDown()
     else -> this.nextUp() - this
 }
@@ -383,7 +383,7 @@ import dart.math.log as dartLog
  */
 @SinceKotlin("1.2")
 /*actual*/ fun Double.nextUp(): Double = when {
-    this.isNaN() || this == Double.POSITIVE_INFINITY -> this
+    this.isNaN || this == Double.POSITIVE_INFINITY -> this
     this == 0.0 -> Double.MIN_VALUE
     else -> Double.fromBits(this.toRawBits() + if (this > 0) 1 else -1)
 }
@@ -393,7 +393,7 @@ import dart.math.log as dartLog
  */
 @SinceKotlin("1.2")
 /*actual*/ fun Double.nextDown(): Double = when {
-    this.isNaN() || this == Double.NEGATIVE_INFINITY -> this
+    this.isNaN || this == Double.NEGATIVE_INFINITY -> this
     this == 0.0 -> -Double.MIN_VALUE
     else -> Double.fromBits(this.toRawBits() + if (this > 0) -1 else 1)
 }
@@ -409,7 +409,7 @@ import dart.math.log as dartLog
  */
 @SinceKotlin("1.2")
 /*actual*/ fun Double.nextTowards(to: Double): Double = when {
-    this.isNaN() || to.isNaN() -> Double.NaN
+    this.isNaN || to.isNaN -> Double.NaN
     to == this -> to
     to > this -> this.nextUp()
     else /* to < this */ -> this.nextDown()

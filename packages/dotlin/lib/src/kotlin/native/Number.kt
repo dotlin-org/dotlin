@@ -81,5 +81,40 @@ external abstract class Number : Comparable<Number> {
     ```
      */
     override fun compareTo(other: Number): Int
+
+    /**
+     * Whether this number is a Not-a-Number value.
+     *
+     * Is `true` if this number is the [Double.NaN] value
+     * or any other of the possible [double] NaN values.
+     * Is `false` if this number is an integer,
+     * a finite double or an infinite double ([double.infinity]
+     * or [double.negativeInfinity]).
+     *
+     * All numbers satisfy exactly one of [isInfinite], [isFinite]
+     * and `isNaN`.
+     */
+    val isNaN: Boolean
+
+    /**
+     * Whether this number is positive infinity or negative infinity.
+     *
+     * Only satisfied by [Double.infinity] and [Double.negativeInfinity].
+     *
+     * All numbers satisfy exactly one of `isInfinite`, [isFinite]
+     * and [isNaN].
+     */
+    val isInfinite: Boolean
+
+    /**
+     * Whether this number is finite.
+     *
+     * The only non-finite numbers are NaN values, positive infinity, and
+     * negative infinity. All integers are finite.
+     *
+     * All numbers satisfy exactly one of [isInfinite], `isFinite`
+     * and [isNaN].
+     */
+    val isFinite: Boolean
 }
 

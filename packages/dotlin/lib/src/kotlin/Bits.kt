@@ -25,7 +25,7 @@ import dart.typed_data.ByteData
  */
 @SinceKotlin("1.2")
 fun Double.toBits(): Int =
-    doubleToRawBits(if (this.isNaN()) Double.NaN else this)
+    doubleToRawBits(if (this.isNaN) Double.NaN else this)
 
 /**
  * Returns a bit representation of the specified floating-point value as [Int]
