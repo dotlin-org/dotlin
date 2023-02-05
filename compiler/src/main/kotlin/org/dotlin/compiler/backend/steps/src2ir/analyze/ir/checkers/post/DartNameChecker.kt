@@ -19,12 +19,16 @@
 
 package org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.post
 
+import org.dotlin.compiler.backend.steps.ir2ast.ir.isFakeOverride
+import org.dotlin.compiler.backend.steps.ir2ast.ir.resolveOverride
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrAnalyzerContext
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.IrDeclarationChecker
 import org.jetbrains.kotlin.backend.common.lower.parents
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.util.isPropertyAccessor
+import org.jetbrains.kotlin.ir.util.render
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.util.collectionUtils.filterIsInstanceAnd
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
@@ -32,6 +36,7 @@ import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
 object DartNameChecker : IrDeclarationChecker {
     override val reports = listOf(ErrorsDart.DART_NAME_CLASH)
 
+    @ObsoleteDescriptorBasedAPI
     override fun IrAnalyzerContext.check(source: KtDeclaration, declaration: IrDeclaration) {
         if (declaration !is IrDeclarationWithName) return
         val scope = declaration.parents.firstIsInstanceOrNull<IrDeclarationContainer>() ?: return
@@ -72,7 +77,13 @@ object DartNameChecker : IrDeclarationChecker {
                 continue
             }
 
-            trace.report(ErrorsDart.DART_NAME_CLASH.on(source, dartName.value, clash.name.toString()))
+            // For fake overrides, we render the original overridden method.
+            val clashToRender = when {
+                clash is IrSimpleFunction && clash.isFakeOverride() -> clash.resolveOverride() ?: clash
+                else -> clash
+            }
+
+            trace.report(ErrorsDart.DART_NAME_CLASH.on(source, dartName.value, clashToRender.render()))
         }
     }
 }

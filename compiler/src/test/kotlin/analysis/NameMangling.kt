@@ -79,4 +79,24 @@ class NameMangling : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `override with same name clash`() =
+        assertCompilesWithError(ErrorsDart.DART_NAME_CLASH) {
+            kotlin(
+                """
+                abstract class A {
+                    fun execute(arg: Any?) {}
+                }
+
+                interface B<T> {
+                    fun execute(arg: T)
+                }
+
+                class C : A(), B<C> {
+                    override fun execute(arg: C) {}
+                }
+                """
+            )
+        }
 }

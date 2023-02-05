@@ -30,7 +30,6 @@ class DefaultErrorMessagesDart : DefaultErrorMessages.Extension {
 
 private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
     DiagnosticFactoryToRendererMap("Dart").run {
-
         put(
             DART_NAME_CLASH,
             "Dart name ''{0}'' generated for this declaration clashes with another declaration: {1}",

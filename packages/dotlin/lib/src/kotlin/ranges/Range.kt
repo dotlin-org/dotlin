@@ -35,6 +35,7 @@ interface ClosedRange<T : Comparable<T>> {
     /**
      * Checks whether the specified [value] belongs to the range.
      */
+    @DartName("has") // We change the name in Dart to prevent a clash in IntProgression.
     operator fun contains(value: T): Boolean = value >= start && value <= endInclusive
 
     /**

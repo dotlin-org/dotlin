@@ -115,7 +115,7 @@ class DartNameGenerator {
             }
 
             // Handle function overloads.
-            if (name != null && annotatedName == null && this is IrSimpleFunction && isOverload) {
+            if (name != null && annotatedName == null && this is IrSimpleFunction && isOverload && !isOverride ) {
                 name = name.copy(
                     suffix = "$" + mangledSignatureHexString()
                 )
