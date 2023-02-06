@@ -27,7 +27,7 @@ sealed class IrDotlinStatementOrigin(private val name: String) : IrStatementOrig
      * Dart does not support parameters with complex (non-const) default values.
      *
      * The parameter will be made `dynamic`, and a
-     * const constructor call of the type `_$DefaultValueMarker` will be the actual default type on the Dart side.
+     * const constructor call of the type `_$DefaultValue` will be the actual default type on the Dart side.
      * The complex default value will be assigned on the first statement (if the actual default value
      * is identical to `_$DefaultValue`).
      */

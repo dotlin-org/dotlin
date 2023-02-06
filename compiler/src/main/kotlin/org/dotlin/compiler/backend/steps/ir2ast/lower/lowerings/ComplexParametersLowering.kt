@@ -95,9 +95,11 @@ class ComplexParametersLowering(override val context: DotlinLoweringContext) : I
                                         }
                                     }
                                 }
+
                                 else -> exp
                             }
                         }
+
                         else -> exp
                     }
                 }
@@ -133,7 +135,7 @@ class ComplexParametersLowering(override val context: DotlinLoweringContext) : I
                 assignmentConditionRhs = nullConst
             } else {
                 // If the type is nullable on the Kotlin side, we will make the parameter dynamic on the Dart side, and
-                // add a private _$DefaultValueMarker class with a const constructor, which will be used as the
+                // add a private _$DefaultValue class with a const constructor, which will be used as the
                 // default value. Then, null can be passed (and stay null).
                 //
                 // Depending on whether the parameter type is a Dart built-in or not, the default value class and the
@@ -153,7 +155,7 @@ class ComplexParametersLowering(override val context: DotlinLoweringContext) : I
                 val defaultValueConstructor = defaultValueClass.primaryConstructor!!
 
                 newIrValueParameter.apply {
-                    type = if (originalType.isDartPrimitive(orNullable = true)) context.dynamicType else originalType
+                    type = if (originalType.isImplementableInDart()) originalType else context.dynamicType
                     defaultValue = IrConstructorCallImpl.fromSymbolOwner(
                         UNDEFINED_OFFSET,
                         UNDEFINED_OFFSET,
@@ -168,7 +170,7 @@ class ComplexParametersLowering(override val context: DotlinLoweringContext) : I
                 }
 
                 assignmentEqualsElsePart = when {
-                    originalType.isDartPrimitive(orNullable = true) -> irBuilder.buildStatement {
+                    !originalType.isImplementableInDart() -> irBuilder.buildStatement {
                         irAs(
                             argument = irGetParam,
                             type = originalType
@@ -212,16 +214,21 @@ class ComplexParametersLowering(override val context: DotlinLoweringContext) : I
         } ?: noChange()
     }
 
+    private fun IrType.isImplementableInDart(): Boolean =
+        !isDartPrimitive(orNullable = true) && superTypes().none { it.isEnum() }
+
+    context(DotlinLoweringContext)
     private fun createDefaultValueClass(
         type: IrType,
         file: IrFile
-    ): IrClass = context.run {
-        context.irFactory.buildClass {
+    ): IrClass {
+        val isImplementable = type.isImplementableInDart()
+        return irFactory.buildClass {
             name = Name.identifier(
-                if (type.isDartPrimitive(orNullable = true))
-                    "\$DefaultValue"
-                else
-                    "\$Default${type.getClass()!!.dartName}Value"
+                when {
+                    isImplementable -> "\$Default${type.getClass()!!.dartName}Value"
+                    else -> "\$DefaultValue"
+                }
             )
             visibility = DescriptorVisibilities.PRIVATE
             origin = IrDotlinDeclarationOrigin.COMPLEX_PARAM_DEFAULT_VALUE
@@ -232,7 +239,7 @@ class ComplexParametersLowering(override val context: DotlinLoweringContext) : I
 
             createParameterDeclarations()
 
-            superTypes = if (!type.isDartPrimitive(orNullable = true)) listOf(type.makeNotNull()) else emptyList()
+            superTypes = if (isImplementable) listOf(type.makeNotNull()) else emptyList()
 
             declarations += context.irFactory.buildConstructor {
                 isPrimary = true

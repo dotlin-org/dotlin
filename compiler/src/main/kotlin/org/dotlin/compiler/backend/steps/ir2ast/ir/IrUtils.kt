@@ -19,7 +19,9 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.ir
 
+import org.dotlin.compiler.backend.IrContext
 import org.dotlin.compiler.backend.hasDartExtensionAnnotation
+import org.dotlin.compiler.backend.kotlin
 import org.dotlin.compiler.backend.util.falseIfNull
 import org.jetbrains.kotlin.backend.common.ir.*
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
@@ -269,6 +271,8 @@ fun IrType.isNullableLong() = isNullableType(IdSignatureValues._long)
 fun IrType.isNullableFloat() = isNullableType(IdSignatureValues._float)
 fun IrType.isNullableDouble() = isNullableType(IdSignatureValues._double)
 fun IrType.isNullableChar() = isNullableType(IdSignatureValues._char)
+
+fun IrType.isEnum() = classFqName == kotlin.Enum
 
 val IrDeclarationWithVisibility.isPrivate
     get() = visibility == DescriptorVisibilities.PRIVATE || visibility == DescriptorVisibilities.PRIVATE_TO_THIS

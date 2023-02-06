@@ -153,6 +153,92 @@ class Function : BaseTest {
     }
 
     @Test
+    fun `function with single nullable implementable parameter with complex non-null default value`() = assertCompile {
+        kotlin(
+            """
+            class Something
+
+            fun returnsSomething(): Something = Something()
+
+            fun test(arg: Something? = returnsSomething()) {}
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            @sealed
+            class Something {}
+
+            Something returnsSomething() {
+              return Something();
+            }
+
+            void test({Something? arg = const _${'$'}DefaultSomethingValue()}) {
+              arg = arg == const _${'$'}DefaultSomethingValue() ? returnsSomething() : arg;
+            }
+
+            @sealed
+            class _${'$'}DefaultSomethingValue implements Something {
+              const _${'$'}DefaultSomethingValue();
+              @nonVirtual
+              dynamic noSuchMethod(Invocation invocation) {}
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `function with single nullable enum parameter with complex non-null default value`() = assertCompile {
+        kotlin(
+            """
+            enum class CharacterType {
+                protagonist,
+                antagonist,
+            }
+
+            fun returnsCharacterType(): CharacterType = CharacterType.protagonist
+
+            fun test(arg: CharacterType? = returnsCharacterType()) {}
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            enum CharacterType {
+              protagonist._(),
+              antagonist._();
+
+              const CharacterType._();
+            }
+
+            CharacterType returnsCharacterType() {
+              return CharacterType.protagonist;
+            }
+
+            void test({dynamic arg = const _$DefaultValue()}) {
+              arg = arg == const _$DefaultValue()
+                  ? returnsCharacterType()
+                  : arg as CharacterType?;
+            }
+
+            CharacterType ${'$'}CharacterType${'$'}valueOf(String value) =>
+                CharacterType.values.firstWhere((CharacterType v) => v.name == value);
+
+            @sealed
+            class _$DefaultValue {
+              const _$DefaultValue();
+              @nonVirtual
+              dynamic noSuchMethod(Invocation invocation) {}
+            }
+            """
+        )
+    }
+
+    @Test
     fun `function with two parameters`() = assertCompile {
         kotlin("fun test(arg1: String, arg2: Int) {}")
 

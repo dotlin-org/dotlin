@@ -129,6 +129,8 @@ object kotlin : PackageFqNameWrapper {
     val arrayOfNulls = self.child("arrayOfNulls")
     val emptyArray = self.child("emptyArray")
 
+    val Enum = self.child("Enum")
+
     object collections : PackageFqNameWrapper {
         override val self = kotlin.self.child("collections")
 
