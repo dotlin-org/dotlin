@@ -25,6 +25,7 @@ import org.dotlin.compiler.backend.annotatedDartLibrary
 import org.dotlin.compiler.backend.attributes.DartImport
 import org.dotlin.compiler.backend.descriptors.DartDescriptor
 import org.dotlin.compiler.backend.dotlin
+import org.dotlin.compiler.backend.steps.ir2ast.ir.isNonExtensionMethod
 import org.dotlin.compiler.backend.steps.ir2ast.ir.remapTypes
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrFileLowering
@@ -108,7 +109,7 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
         // TODO: Handle Unit
         if (declaration is IrClass && declaration.defaultType.isUnit()) return
         // Don't import methods.
-        if (declaration is IrSimpleFunction && declaration.dispatchReceiverParameter != null) return
+        if (declaration is IrSimpleFunction && declaration.isNonExtensionMethod) return
 
         // If the file is null, it's most likely Kotlin intrinsics (ANDAND, OROR, EQEQ, etc.)
         val fileOfDeclaration = declaration.fileOrNull ?: return

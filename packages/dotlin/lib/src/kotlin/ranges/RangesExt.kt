@@ -74,6 +74,7 @@ fun IntRange.randomOrNull(random: Random): Int? {
  */
 @SinceKotlin("1.3")
 //@kotlin.internal.InlineOnly TODO
+@DartExtensionName("IntRangeExt")
 inline operator fun IntRange.contains(element: Int?): Boolean {
     return element != null && contains(element)
 }
@@ -84,6 +85,7 @@ inline operator fun IntRange.contains(element: Int?): Boolean {
  * The [to] value should be less than or equal to `this` value.
  * If the [to] value is greater than `this` value the returned progression is empty.
  */
+@DartExtensionName("IntRangeFactoryExt")
 infix fun Int.downTo(to: Int): IntProgression {
     return IntProgression.fromClosedRange(this, to, -1)
 }
@@ -91,6 +93,7 @@ infix fun Int.downTo(to: Int): IntProgression {
 /**
  * Returns a progression that goes over the same range in the opposite direction with the same step.
  */
+@DartExtensionName("IntProgressionExt")
 fun IntProgression.reversed(): IntProgression {
     return IntProgression.fromClosedRange(last, first, -step)
 }
@@ -98,6 +101,7 @@ fun IntProgression.reversed(): IntProgression {
 /**
  * Returns a progression that goes over the same range with the given step.
  */
+@DartExtensionName("IntProgressionExt")
 infix fun IntProgression.step(step: Int): IntProgression {
     checkStepIsPositive(step > 0, step)
     return IntProgression.fromClosedRange(first, last, if (this.step > 0) step else -step)
@@ -108,6 +112,7 @@ infix fun IntProgression.step(step: Int): IntProgression {
  *
  * If the [to] value is less than or equal to `this` value, then the returned range is empty.
  */
+@DartExtensionName("IntRangeFactoryExt")
 infix fun Int.until(to: Int): IntRange {
     if (to <= Int.MIN_VALUE) return IntRange.EMPTY
     return this .. (to - 1).toInt()
@@ -120,6 +125,7 @@ infix fun Int.until(to: Int): IntRange {
  *
  * @sample samples.comparisons.ComparableOps.coerceAtLeastComparable
  */
+@DartExtensionName("ComparableCoerceExt")
 fun <T : Comparable<T>> T.coerceAtLeast(minimumValue: T): T {
     return if (this < minimumValue) minimumValue else this
 }
@@ -131,6 +137,7 @@ fun <T : Comparable<T>> T.coerceAtLeast(minimumValue: T): T {
  *
  * @sample samples.comparisons.ComparableOps.coerceAtLeast
  */
+@DartExtensionName("IntCoerceExt")
 fun Int.coerceAtLeast(minimumValue: Int): Int {
     return if (this < minimumValue) minimumValue else this
 }
@@ -142,6 +149,7 @@ fun Int.coerceAtLeast(minimumValue: Int): Int {
  *
  * @sample samples.comparisons.ComparableOps.coerceAtLeast
  */
+@DartExtensionName("DoubleCoerceExt")
 fun Double.coerceAtLeast(minimumValue: Double): Double {
     return if (this < minimumValue) minimumValue else this
 }
@@ -153,6 +161,7 @@ fun Double.coerceAtLeast(minimumValue: Double): Double {
  *
  * @sample samples.comparisons.ComparableOps.coerceAtMostComparable
  */
+@DartExtensionName("ComparableCoerceExt")
 fun <T : Comparable<T>> T.coerceAtMost(maximumValue: T): T {
     return if (this > maximumValue) maximumValue else this
 }
@@ -164,6 +173,7 @@ fun <T : Comparable<T>> T.coerceAtMost(maximumValue: T): T {
  *
  * @sample samples.comparisons.ComparableOps.coerceAtMost
  */
+@DartExtensionName("IntCoerceExt")
 fun Int.coerceAtMost(maximumValue: Int): Int {
     return if (this > maximumValue) maximumValue else this
 }
@@ -175,6 +185,7 @@ fun Int.coerceAtMost(maximumValue: Int): Int {
  *
  * @sample samples.comparisons.ComparableOps.coerceAtMost
  */
+@DartExtensionName("DoubleCoerceExt")
 fun Double.coerceAtMost(maximumValue: Double): Double {
     return if (this > maximumValue) maximumValue else this
 }
@@ -186,6 +197,7 @@ fun Double.coerceAtMost(maximumValue: Double): Double {
  *
  * @sample samples.comparisons.ComparableOps.coerceInComparable
  */
+@DartExtensionName("ComparableCoerceExt")
 fun <T : Comparable<T>> T.coerceIn(minimumValue: T?, maximumValue: T?): T {
     if (minimumValue !== null && maximumValue !== null) {
         if (minimumValue > maximumValue) throw ArgumentError("Cannot coerce value to an empty range: maximum $maximumValue is less than minimum $minimumValue.")
@@ -206,6 +218,7 @@ fun <T : Comparable<T>> T.coerceIn(minimumValue: T?, maximumValue: T?): T {
  *
  * @sample samples.comparisons.ComparableOps.coerceIn
  */
+@DartExtensionName("IntCoerceExt")
 fun Int.coerceIn(minimumValue: Int, maximumValue: Int): Int {
     if (minimumValue > maximumValue) throw ArgumentError("Cannot coerce value to an empty range: maximum $maximumValue is less than minimum $minimumValue.")
     if (this < minimumValue) return minimumValue
@@ -220,6 +233,7 @@ fun Int.coerceIn(minimumValue: Int, maximumValue: Int): Int {
  *
  * @sample samples.comparisons.ComparableOps.coerceIn
  */
+@DartExtensionName("DoubleCoerceExt")
 fun Double.coerceIn(minimumValue: Double, maximumValue: Double): Double {
     if (minimumValue > maximumValue) throw ArgumentError("Cannot coerce value to an empty range: maximum $maximumValue is less than minimum $minimumValue.")
     if (this < minimumValue) return minimumValue
@@ -235,6 +249,7 @@ fun Double.coerceIn(minimumValue: Double, maximumValue: Double): Double {
  * @sample samples.comparisons.ComparableOps.coerceInFloatingPointRange
  */
 @SinceKotlin("1.1")
+@DartExtensionName("ComparableCoerceExt")
 fun <T : Comparable<T>> T.coerceIn(range: ClosedFloatingPointRange<T>): T {
     if (range.isEmpty()) throw ArgumentError("Cannot coerce value to an empty range: $range.")
     return when {
@@ -253,6 +268,7 @@ fun <T : Comparable<T>> T.coerceIn(range: ClosedFloatingPointRange<T>): T {
  *
  * @sample samples.comparisons.ComparableOps.coerceInComparable
  */
+@DartExtensionName("ComparableCoerceExt")
 fun <T : Comparable<T>> T.coerceIn(range: ClosedRange<T>): T {
     if (range is ClosedFloatingPointRange) {
         return this.coerceIn<T>(range)
@@ -272,6 +288,7 @@ fun <T : Comparable<T>> T.coerceIn(range: ClosedRange<T>): T {
  *
  * @sample samples.comparisons.ComparableOps.coerceIn
  */
+@DartExtensionName("IntCoerceExt")
 fun Int.coerceIn(range: ClosedRange<Int>): Int {
     if (range is ClosedFloatingPointRange) {
         return this.coerceIn<Int>(range)

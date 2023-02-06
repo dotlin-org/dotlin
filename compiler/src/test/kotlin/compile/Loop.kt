@@ -133,7 +133,7 @@ class Loop : BaseTest {
         dart(
             """
             import "package:dotlin/lib/src/kotlin/ranges/ranges_ext.dt.g.dart"
-                show ${'$'}Extensions${'$'}69eeea92bbe1f1f1;
+                show IntRangeFactoryExt;
             import "package:dotlin/lib/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
             import "package:meta/meta.dart";
 
@@ -161,9 +161,10 @@ class Loop : BaseTest {
             """
         )
 
-        // TODO: IntRange does not need to be imported here.
+        // TODO: Remove unnecessary imports.
         dart(
             """
+            import "package:dotlin/lib/src/kotlin/native/int.dt.g.dart" show IntRangeTo;
             import "package:dotlin/lib/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
             import "package:meta/meta.dart";
 
@@ -198,7 +199,7 @@ class Loop : BaseTest {
         dart(
             """
             import "package:dotlin/lib/src/kotlin/ranges/ranges_ext.dt.g.dart"
-                show ${'$'}Extensions${'$'}69eeea92bbe1f1f1;
+                show IntRangeFactoryExt;
             import "package:dotlin/lib/src/kotlin/ranges/progressions.dt.g.dart"
                 show IntProgression;
             import "package:meta/meta.dart";
@@ -233,7 +234,7 @@ class Loop : BaseTest {
         dart(
             """
             import "package:dotlin/lib/src/kotlin/ranges/ranges_ext.dt.g.dart"
-                show ${'$'}Extensions${'$'}69eeea92bbe1f1f1, ${'$'}Extensions${'$'}67ac9ef171a899d4;
+                show IntRangeFactoryExt, IntProgressionExt;
             import "package:dotlin/lib/src/kotlin/ranges/progressions.dt.g.dart"
                 show IntProgression;
             import "package:dotlin/lib/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
@@ -268,7 +269,7 @@ class Loop : BaseTest {
         dart(
             """
             import "package:dotlin/lib/src/kotlin/ranges/ranges_ext.dt.g.dart"
-                show ${'$'}Extensions${'$'}69eeea92bbe1f1f1, ${'$'}Extensions${'$'}67ac9ef171a899d4;
+                show IntRangeFactoryExt, IntProgressionExt;
             import "package:dotlin/lib/src/kotlin/ranges/progressions.dt.g.dart"
                 show IntProgression;
             import "package:dotlin/lib/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;

@@ -550,6 +550,13 @@ val IrDeclaration.extensionReceiverParameterOrNull: IrValueParameter?
 val IrDeclaration.isExtension: Boolean
     get() = extensionReceiverParameterOrNull != null
 
+val IrDeclaration.isNonExtensionMethod: Boolean
+    get() = isMethod && !isExtension
+
+val IrDeclaration.isMethod: Boolean
+    get() = this is IrSimpleFunction && parentClassOrNull != null
+
+
 /**
  * Accounts for the `@DartExtension` annotation.
  */

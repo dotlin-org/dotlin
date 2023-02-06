@@ -127,10 +127,14 @@ external class Int private constructor() : Number() {
     /** Returns the negative of this value. */
     operator fun unaryMinus(): Int
 
-     /** Creates a range from this value to the specified [other] value. */
-    operator fun rangeTo(other: Int): IntRange
-     /** Creates a range from this value to the specified [other] value. */
-    operator fun rangeTo(other: Long): IntRange
+    /** Creates a range from this value to the specified [other] value. */
+    @DartExtension
+    @DartExtensionName("IntRangeTo")
+    operator fun rangeTo(other: Int): IntRange = IntRange(this, other)
+    /** Creates a range from this value to the specified [other] value. */
+    @DartExtension
+    @DartExtensionName("IntRangeTo")
+    operator fun rangeTo(other: Long): IntRange = IntRange(this, other)
 
     /**
      * Shifts this value left by the [bitCount] number of bits.

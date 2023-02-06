@@ -2440,4 +2440,51 @@ class Expression : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `int range`() = assertCompile {
+        kotlin(
+            """
+            fun main () {
+                val range = 0..10
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:dotlin/lib/src/kotlin/native/int.dt.g.dart" show IntRangeTo;
+            import "package:dotlin/lib/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
+            import "package:meta/meta.dart";
+
+            void main() {
+              final IntRange range = 0.rangeTo(10);
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `int until range`() = assertCompile {
+        kotlin(
+            """
+            fun main () {
+                val range = 0 until 10
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:dotlin/lib/src/kotlin/ranges/ranges_ext.dt.g.dart"
+                show IntRangeFactoryExt;
+            import "package:dotlin/lib/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
+            import "package:meta/meta.dart";
+
+            void main() {
+              final IntRange range = 0.until(10);
+            }
+            """
+        )
+    }
 }
