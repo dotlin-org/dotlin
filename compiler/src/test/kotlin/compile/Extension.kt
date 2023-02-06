@@ -412,4 +412,25 @@ class Extension : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `extension function with always nullable generic return type which is also the receiver type`() = assertCompile {
+        kotlin(
+            """
+            fun <T> T.execute(): T? = null
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            extension ${'$'}Extensions${'$'}23387b3b44ac6b48<T> on T {
+              T? execute() {
+                return null;
+              }
+            }
+            """
+        )
+    }
 }

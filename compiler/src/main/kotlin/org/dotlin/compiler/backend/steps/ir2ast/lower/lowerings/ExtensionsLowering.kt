@@ -24,7 +24,6 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.typeArguments
 import org.dotlin.compiler.backend.steps.ir2ast.ir.typeParameterOrNull
 import org.dotlin.compiler.backend.steps.ir2ast.ir.typeParametersOrSelf
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
-import org.jetbrains.kotlin.ir.util.addChild
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrTypeParametersContainer
@@ -33,10 +32,8 @@ import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.defaultType
-import org.jetbrains.kotlin.ir.util.TypeRemapper
-import org.jetbrains.kotlin.ir.util.copyValueArgumentsFrom
-import org.jetbrains.kotlin.ir.util.file
-import org.jetbrains.kotlin.ir.util.remapTypes
+import org.jetbrains.kotlin.ir.types.mergeNullability
+import org.jetbrains.kotlin.ir.util.*
 
 class ExtensionsLowering(override val context: DotlinLoweringContext) : IrDeclarationLowering {
     override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration> {
@@ -74,7 +71,8 @@ class ExtensionsLowering(override val context: DotlinLoweringContext) : IrDeclar
 
                     override fun remapType(type: IrType): IrType {
                         val typeParameter = type.typeParameterOrNull ?: return type
-                        return newToOldReceiverTypeParameters[typeParameter]?.defaultType ?: return type
+                        return newToOldReceiverTypeParameters[typeParameter]?.defaultType?.mergeNullability(type)
+                            ?: return type
                     }
                 }
             )

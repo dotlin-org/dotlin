@@ -1975,4 +1975,23 @@ class Function : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `function with always nullable generic return type`() = assertCompile {
+        kotlin(
+            """
+            fun <T> execute(): T? = null
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            T? execute<T>() {
+              return null;
+            }
+            """
+        )
+    }
 }
