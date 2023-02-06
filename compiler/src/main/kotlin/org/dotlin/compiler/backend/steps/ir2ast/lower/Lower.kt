@@ -35,6 +35,7 @@ private val lowerings: List<Lowering> = listOf(
     ::IdentityChecksLowering,
     ::ReplaceEnumValuesCalls,
     ::EnumClassLowering,
+    ::DataClassLowering,
     ::ConjunctionsDisjunctionsLowering,
     ::ComplexParametersLowering,
     ::LazyPropertiesLowering,

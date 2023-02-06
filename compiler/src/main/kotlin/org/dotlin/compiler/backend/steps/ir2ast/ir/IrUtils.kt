@@ -31,6 +31,7 @@ import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.builders.declarations.*
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
@@ -456,6 +457,33 @@ fun IrBuilderWithScope.irCallSet(property: IrProperty, value: IrExpression): IrC
     ).apply {
         type = property.type
     }
+
+fun IrCall.copy(
+    origin: IrStatementOrigin? = this.origin,
+    mapValueArg: (Int) -> IrExpression? = { getValueArgument(it) }
+): IrCall {
+    val copy = IrCallImpl(
+        startOffset,
+        endOffset,
+        type,
+        symbol,
+        typeArgumentsCount,
+        valueArgumentsCount,
+        origin,
+        superQualifierSymbol,
+    )
+
+    val original = this@copy
+
+    for (i in 0 until original.valueArgumentsCount) {
+        copy.putValueArgument(i, mapValueArg(i))
+    }
+
+    copy.dispatchReceiver = original.dispatchReceiver
+    copy.extensionReceiver = original.extensionReceiver
+
+    return copy
+}
 
 fun IrValueParameter.copy(
     parent: IrFunction = this.parent as IrFunction,

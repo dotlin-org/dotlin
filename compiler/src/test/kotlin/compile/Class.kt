@@ -3112,4 +3112,96 @@ class Class : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `data class`() = assertCompile {
+        kotlin(
+            """
+            data class Vector3(val x: Double, val y: Double, val z: Double)
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            @sealed
+            class Vector3 {
+              Vector3(
+                this.x,
+                this.y,
+                this.z,
+              ) : super();
+              @nonVirtual
+              final double x;
+              @nonVirtual
+              final double y;
+              @nonVirtual
+              final double z;
+              @nonVirtual
+              double component1() {
+                return this.x;
+              }
+
+              @nonVirtual
+              double component2() {
+                return this.y;
+              }
+
+              @nonVirtual
+              double component3() {
+                return this.z;
+              }
+
+              @nonVirtual
+              Vector3 copy({
+                double? x = null,
+                double? y = null,
+                double? z = null,
+              }) {
+                x = x == null ? this.x : x;
+                y = y == null ? this.y : y;
+                z = z == null ? this.z : z;
+                return Vector3(x, y, z);
+              }
+
+              @override
+              String toString() {
+                return "Vector3(x=${'$'}{this.x}, y=${'$'}{this.y}, z=${'$'}{this.z})";
+              }
+
+              @override
+              int get hashCode {
+                int result = this.x.hashCode;
+                result = result * 31 + this.y.hashCode;
+                result = result * 31 + this.z.hashCode;
+                return result;
+              }
+
+              bool equals(Object? other) {
+                if (identical(this, other)) {
+                  return true;
+                }
+                if (other is! Vector3) {
+                  return false;
+                }
+                final Vector3 tmp0_other_with_cast = other as Vector3;
+                if (this.x != tmp0_other_with_cast.x) {
+                  return false;
+                }
+                if (this.y != tmp0_other_with_cast.y) {
+                  return false;
+                }
+                if (this.z != tmp0_other_with_cast.z) {
+                  return false;
+                }
+                return true;
+              }
+
+              @override
+              bool operator ==(Object? other) => this.equals(other);
+            }
+            """
+        )
+    }
 }

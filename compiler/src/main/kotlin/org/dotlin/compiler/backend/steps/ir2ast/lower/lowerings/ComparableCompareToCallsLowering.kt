@@ -19,14 +19,13 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
+import org.dotlin.compiler.backend.steps.ir2ast.ir.copy
 import org.dotlin.compiler.backend.steps.ir2ast.ir.resolveRootOverride
 import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin.*
-import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.types.isComparable
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
@@ -62,31 +61,4 @@ class ComparableCompareToCallsLowering(override val context: DotlinLoweringConte
             }
         )
     }
-}
-
-private fun IrCall.copy(
-    origin: IrStatementOrigin? = this.origin,
-    mapValueArg: (Int) -> IrExpression? = { getValueArgument(it) }
-): IrCall {
-    val copy = IrCallImpl(
-        startOffset,
-        endOffset,
-        type,
-        symbol,
-        typeArgumentsCount,
-        valueArgumentsCount,
-        origin,
-        superQualifierSymbol,
-    )
-
-    val original = this@copy
-
-    for (i in 0 until original.valueArgumentsCount) {
-        copy.putValueArgument(i, mapValueArg(i))
-    }
-
-    copy.dispatchReceiver = original.dispatchReceiver
-    copy.extensionReceiver = original.extensionReceiver
-
-    return copy
 }
