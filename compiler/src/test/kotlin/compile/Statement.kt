@@ -88,6 +88,29 @@ class Statement : BaseTest {
         }
 
         @Test
+        fun `empty if`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    if (0 == 1) {
+
+                    }
+                }
+                """
+            )
+
+            dart(
+                """
+                import "package:meta/meta.dart";
+
+                void main() {
+                  if (0 == 1) {}
+                }
+                """
+            )
+        }
+
+        @Test
         fun `when`() = assertCompile {
             kotlin(
                 """
@@ -184,12 +207,21 @@ class Statement : BaseTest {
         }
 
         @Test
-        fun `empty if`() = assertCompile {
+        fun `exhaustive when`() = assertCompile {
             kotlin(
                 """
-                fun main() {
-                    if (0 == 1) {
+                enum class PowerStatus {
+                    OFF,
+                    ON,
+                    STANDBY
+                }
 
+                fun main() {
+                    val status = PowerStatus.OFF
+                    when (status) {
+                        PowerStatus.OFF -> {}
+                        PowerStatus.ON -> {}
+                        PowerStatus.STANDBY -> {}
                     }
                 }
                 """
@@ -199,9 +231,26 @@ class Statement : BaseTest {
                 """
                 import "package:meta/meta.dart";
 
-                void main() {
-                  if (0 == 1) {}
+                enum PowerStatus {
+                  OFF._(),
+                  ON._(),
+                  STANDBY._();
+
+                  const PowerStatus._();
                 }
+
+                void main() {
+                  final PowerStatus status = PowerStatus.OFF;
+                  {
+                    final PowerStatus tmp0_subject = status;
+                    if (tmp0_subject == PowerStatus.OFF) {
+                    } else if (tmp0_subject == PowerStatus.ON) {
+                    } else if (tmp0_subject == PowerStatus.STANDBY) {}
+                  }
+                }
+
+                PowerStatus ${'$'}PowerStatus${'$'}valueOf(String value) =>
+                    PowerStatus.values.firstWhere((PowerStatus v) => v.name == value);
                 """
             )
         }

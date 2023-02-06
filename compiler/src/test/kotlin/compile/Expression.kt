@@ -1153,6 +1153,61 @@ class Expression : BaseTest {
     }
 
     @Test
+    fun `exhaustive when`() = assertCompile {
+        kotlin(
+            """
+            enum class PowerStatus {
+                OFF,
+                ON,
+                STANDBY
+            }
+
+            fun main() {
+                val status = PowerStatus.OFF
+                val x = when (status) {
+                    PowerStatus.OFF -> 0
+                    PowerStatus.ON -> 1
+                    PowerStatus.STANDBY -> 2
+                }
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:dotlin/lib/src/dotlin/intrinsics/errors.dt.g.dart"
+                show NoWhenBranchMatchedError;
+            import "package:meta/meta.dart";
+
+            enum PowerStatus {
+              OFF._(),
+              ON._(),
+              STANDBY._();
+
+              const PowerStatus._();
+            }
+
+            void main() {
+              final PowerStatus status = PowerStatus.OFF;
+              final int x = () {
+                final PowerStatus tmp0_subject = status;
+                return tmp0_subject == PowerStatus.OFF
+                    ? 0
+                    : tmp0_subject == PowerStatus.ON
+                        ? 1
+                        : tmp0_subject == PowerStatus.STANDBY
+                            ? 2
+                            : throw NoWhenBranchMatchedError();
+              }.call();
+            }
+
+            PowerStatus ${'$'}PowerStatus${'$'}valueOf(String value) =>
+                PowerStatus.values.firstWhere((PowerStatus v) => v.name == value);
+            """
+        )
+    }
+
+    @Test
     fun `not-null assertion`() = assertCompile {
         kotlin(
             """

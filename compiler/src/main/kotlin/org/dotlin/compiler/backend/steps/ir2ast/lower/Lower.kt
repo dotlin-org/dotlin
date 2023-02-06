@@ -29,6 +29,7 @@ private typealias Lowering = KFunction1<DotlinLoweringContext, IrLowering>
 
 private val lowerings: List<Lowering> = listOf(
     ::UnrepresentableDecimalConstsLowering,
+    ::NoWhenBranchMatchedExceptionCallLowering,
     ::DartExtensionsLowering,
     ::ExternalDeclarationsLowering,
     ::IdentityChecksLowering,

@@ -71,6 +71,8 @@ object dotlin : PackageFqNameWrapper {
         val DotlinExternal = self.child("DotlinExternal")
         val SpecialInheritedType = self.child("SpecialInheritedType")
 
+        val NoWhenBranchMatchedError = self.child("NoWhenBranchMatchedError")
+
         val Dynamic = self.child("Dynamic")
 
         // This package only exists while compiling.

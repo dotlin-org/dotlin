@@ -98,10 +98,12 @@ class DotlinIrBuiltIns(private val context: DotlinLoweringContext) {
     val kProperty2Impl = classSymbolAt(dotlin.reflect.KProperty2Impl)
     val kMutableProperty2Impl = classSymbolAt(dotlin.reflect.KMutableProperty2Impl)
 
-    // Interop
+    // Intrinsics
     val returnClass = classSymbolAt(dotlin.intrinsics.`$Return`)
     val dotlinExternal = classSymbolAt(dotlin.intrinsics.DotlinExternal)
     val specialInheritedType = classSymbolAt(dotlin.intrinsics.SpecialInheritedType)
+
+    val noWhenBranchMatchedError = classSymbolAt(dotlin.intrinsics.NoWhenBranchMatchedError)
 
     val anyCollection = typeAliasSymbolAt(dotlin.intrinsics.AnyCollection)
 
