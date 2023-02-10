@@ -404,6 +404,8 @@ class Extension : BaseTest {
 
         dart(
             """
+            import "package:dotlin/src/kotlin/math.dt.g.dart"
+                show ${'$'}Extensions${'$'}69eeea92bbe1f1f1;
             import "package:meta/meta.dart";
 
             void main() {

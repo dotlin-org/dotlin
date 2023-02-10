@@ -20,7 +20,6 @@
 package analysis.dialect
 
 import BaseTest
-import assertCanCompile
 import assertCompilesWithError
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
 import org.jetbrains.kotlin.diagnostics.Errors
@@ -29,58 +28,6 @@ import org.junit.jupiter.api.Test
 
 @DisplayName("Analysis: Dialect: Special Inheritance")
 class SpecialInheritance : BaseTest {
-    @Test
-    fun `implement multiple implicit interfaces`() = assertCanCompile {
-        kotlin(
-            """
-            open external class Pigeon {
-                constructor(implement: Interface)
-            
-                open fun fly(): Unit = definedExternally
-            }
-
-            open external class Carrier {
-                constructor(implement: Interface)
-            
-                constructor(message: String)
-            
-                open fun send(): Unit = definedExternally
-            }
-
-            class CarrierPigeon : Pigeon(Interface), Carrier(Interface) {
-                override fun send() {}
-                override fun fly() {}
-            }
-            """
-        )
-    }
-
-    @Test
-    fun `implement multiple implicit interfaces that can be mixed in`() = assertCanCompile {
-        kotlin(
-            """
-            open external class Pigeon {
-                constructor(implement: Interface)
-            
-                open fun fly(): Unit = definedExternally
-            }
-
-            open external class Carrier {
-                constructor(implement: Interface)
-            
-                constructor(message: String)
-            
-                open fun send(): Unit = definedExternally
-            }
-
-            class CarrierPigeon : Pigeon(Interface), Carrier(Interface) {
-                override fun send() {}
-                override fun fly() {}
-            }
-            """
-        )
-    }
-
     // TODO: Raise more specific error ("class should be first in super type list")
     @Test
     fun `error if regular class inheritance is not first in list`() =
@@ -168,22 +115,6 @@ class SpecialInheritance : BaseTest {
                 interface Carrier : Pigeon(Interface)
     
                 class CarrierPigeon : Carrier
-                """
-            )
-        }
-
-    @Test
-    fun `interface can implement implicit interface`() =
-        assertCanCompile {
-            kotlin(
-                """
-                open external class Pigeon {
-                    constructor(implement: InterfaceOrMixin)
-                
-                    open fun fly(): Unit = definedExternally
-                }
-    
-                interface CarrierPigeon : Pigeon(Interface)
                 """
             )
         }

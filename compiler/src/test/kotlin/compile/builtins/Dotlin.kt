@@ -23,6 +23,7 @@ import BaseTest
 import assertCompile
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import kotlin.io.path.Path
 
 @DisplayName("Compile: Built-ins: Dotlin")
 class Dotlin : BaseTest {
@@ -351,6 +352,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             void process(bool Function(int) test) {
@@ -376,6 +378,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             void process({bool Function(int)? test = null}) {
@@ -419,6 +422,7 @@ class Dotlin : BaseTest {
 
         dart(
             """
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             class Processor {
@@ -632,11 +636,13 @@ class Dotlin : BaseTest {
                 "INVISIBLE_REFERENCE"
             )
 
+            @DartLibrary("hobbits.dart")
             abstract external class Hobbit {
                 @DartExtension
                 abstract fun isProudfoot(): Boolean
             }
 
+            @DartLibrary("hobbits.dart")
             external class Proudfoot : Hobbit() {
                 override fun isProudfoot(): Boolean = true
             }
@@ -649,6 +655,17 @@ class Dotlin : BaseTest {
 
         dart(
             """
+            class Hobbit {}
+
+            class Proudfoot extends Hobbit {}
+            """,
+            Path("lib/hobbits.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "hobbits.dart" show Proudfoot;
             import "package:meta/meta.dart";
 
             void main() {
@@ -666,24 +683,26 @@ class Dotlin : BaseTest {
 
     @Test
     fun `@DartLibrary`() = assertCompile {
-        kotlin(
+        dart(
             """
-            @DartLibrary("dart:typed_data")
-            external class Something
-            """
+            class Something {}
+            """,
+            Path("lib/something.dart"),
+            assert = false
         )
 
-        dart("")
-
         kotlin(
             """
+            @DartLibrary("something.dart")
+            external class Something
+
             fun test(s: Something) {}
             """
         )
 
         dart(
             """
-            import "dart:typed_data" show Something;
+            import "something.dart" show Something;
             import "package:meta/meta.dart";
 
             void test(Something s) {}
@@ -1096,6 +1115,7 @@ class Dotlin : BaseTest {
     fun `@DartDifferentDefaultValue`() = assertCompile {
         kotlin(
             """
+            @DartLibrary("test.dart")
             external fun test(@DartDifferentDefaultValue param: Int = 3) {}
 
             fun main() {
@@ -1107,6 +1127,15 @@ class Dotlin : BaseTest {
 
         dart(
             """
+            void test({int param = 7}) {}
+            """,
+            Path("lib/test.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "test.dart" show test;
             import "package:meta/meta.dart";
 
             void main() {
@@ -1121,6 +1150,7 @@ class Dotlin : BaseTest {
     fun `@DartDifferentDefaultValue on overridden method`() = assertCompile {
         kotlin(
             """
+            @DartLibrary("test.dart")
             open external class Test {
                 open fun difference(@DartDifferentDefaultValue param: Int = 5) {}
             }
@@ -1141,6 +1171,17 @@ class Dotlin : BaseTest {
 
         dart(
             """
+            class Test {
+              void difference({int param = 3}) {}
+            }
+            """,
+            Path("lib/test.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "test.dart" show Test;
             import "package:meta/meta.dart";
 
             @sealed

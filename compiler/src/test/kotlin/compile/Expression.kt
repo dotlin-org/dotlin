@@ -310,6 +310,7 @@ class Expression : BaseTest {
 
         dart(
             """
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function0;
             import "package:meta/meta.dart";
 
             void main() {
@@ -335,6 +336,7 @@ class Expression : BaseTest {
 
         dart(
             """
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             void main() {
@@ -881,8 +883,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/internal.dt.g.dart"
-                show ${'$'}Return;
+            import "package:dotlin/src/dotlin/intrinsics/internal.dt.g.dart" show ${'$'}Return;
             import "package:meta/meta.dart";
 
             void main() {
@@ -917,8 +918,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/internal.dt.g.dart"
-                show ${'$'}Return;
+            import "package:dotlin/src/dotlin/intrinsics/internal.dt.g.dart" show ${'$'}Return;
             import "package:meta/meta.dart";
 
             void main() {
@@ -958,8 +958,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/internal.dt.g.dart"
-                show ${'$'}Return;
+            import "package:dotlin/src/dotlin/intrinsics/internal.dt.g.dart" show ${'$'}Return;
             import "package:meta/meta.dart";
 
             void main() {
@@ -1009,8 +1008,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/internal.dt.g.dart"
-                show ${'$'}Return;
+            import "package:dotlin/src/dotlin/intrinsics/internal.dt.g.dart" show ${'$'}Return;
             import "package:meta/meta.dart";
 
             void main() {
@@ -1175,8 +1173,9 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/errors.dt.g.dart"
+            import "package:dotlin/src/dotlin/intrinsics/errors.dt.g.dart"
                 show NoWhenBranchMatchedError;
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             enum PowerStatus {
@@ -2508,8 +2507,8 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/kotlin/native/int.dt.g.dart" show IntRangeTo;
-            import "package:dotlin/lib/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
+            import "package:dotlin/src/kotlin/native/int.dt.g.dart" show IntRangeTo;
+            import "package:dotlin/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
             import "package:meta/meta.dart";
 
             void main() {
@@ -2531,9 +2530,9 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/kotlin/ranges/ranges_ext.dt.g.dart"
+            import "package:dotlin/src/kotlin/ranges/ranges_ext.dt.g.dart"
                 show IntRangeFactoryExt;
-            import "package:dotlin/lib/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
+            import "package:dotlin/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
             import "package:meta/meta.dart";
 
             void main() {

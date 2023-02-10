@@ -231,8 +231,8 @@ class Import : BaseTest {
 
         dart(
             """
-            import "package:yad/lib/test1.dt.g.dart" show yetAnotherFunction1;
-            import "package:yad/lib/test2.dt.g.dart" show yetAnotherFunction2;
+            import "package:yad/test1.dt.g.dart" show yetAnotherFunction1;
+            import "package:yad/test2.dt.g.dart" show yetAnotherFunction2;
             import "package:meta/meta.dart";
 
             void main() {

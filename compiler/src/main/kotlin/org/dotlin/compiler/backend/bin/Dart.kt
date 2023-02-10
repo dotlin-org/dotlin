@@ -34,4 +34,7 @@ object dart {
         "dart", "run", executable, *args,
         workingDirectory = workingDirectory
     )
+
+    suspend fun analyze(workingDirectory: Path? = null) =
+        runCommand("dart", "analyze", workingDirectory = workingDirectory)
 }

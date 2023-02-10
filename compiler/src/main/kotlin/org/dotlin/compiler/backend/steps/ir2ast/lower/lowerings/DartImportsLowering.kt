@@ -25,6 +25,7 @@ import org.dotlin.compiler.backend.annotatedDartLibrary
 import org.dotlin.compiler.backend.attributes.DartImport
 import org.dotlin.compiler.backend.descriptors.DartDescriptor
 import org.dotlin.compiler.backend.dotlin
+import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isNonExtensionMethod
 import org.dotlin.compiler.backend.steps.ir2ast.ir.remapTypes
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
@@ -103,26 +104,49 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
     private fun IrFile.maybeAddDartImportsFor(
         declaration: IrDeclarationWithName
     ) {
-        if (declaration.name.isSpecial) return
+        if (declaration is IrConstructor) return
         if (declaration.fqNameWhenAvailable in ignore) return
         if (declaration is IrValueParameter) return
         // TODO: Handle Unit
         if (declaration is IrClass && declaration.defaultType.isUnit()) return
-        // Don't import methods.
-        if (declaration is IrSimpleFunction && declaration.isNonExtensionMethod) return
 
-        // If the file is null, it's most likely Kotlin intrinsics (ANDAND, OROR, EQEQ, etc.)
-        val fileOfDeclaration = declaration.fileOrNull ?: return
+        val isDartConstructor by lazy { declaration.hasAnnotation(dotlin.DartConstructor) }
 
-        // We don't need to import declarations defined in the same file.
-        if (this == fileOfDeclaration) return
+        // Don't import methods (except if it's annotated with @DartConstructor).
+        if (declaration is IrSimpleFunction && !isDartConstructor && declaration.isNonExtensionMethod) return
 
         // Import the extension container class if it's an extension.
-        val relevantDeclaration = declaration.extensionContainer ?: declaration
+        val relevantDeclaration = declaration.extensionContainer ?: when (declaration) {
+            is IrSimpleFunction -> when {
+                // For `@DartConstructor`s, we want to import the parent class of the companion object it's in.
+                isDartConstructor -> declaration.parentClassOrNull?.parentClassOrNull
+                else -> null
+            } ?: declaration.correspondingProperty ?: declaration
+
+            else -> declaration
+        }
+
+        // If the file is null, it's most likely Kotlin intrinsics (ANDAND, OROR, EQEQ, etc.)
+        val fileOfDeclaration = when {
+            // Function1, Function2, etc. are in an "external package fragment", but are in reality located
+            // in the same file as the Function interface.
+            relevantDeclaration is IrClass && relevantDeclaration.defaultType.isFunction() -> {
+                irBuiltIns.functionClass.owner.fileOrNull
+            }
+
+            else -> relevantDeclaration.fileOrNull
+        } ?: return
+
+        if (relevantDeclaration.name.isSpecial) return
+
+        val annotatedLibraryUri = relevantDeclaration.annotatedDartLibrary
+
+        // We don't need to import declarations defined in the same file, unless there's an `@DartLibrary` annotation.
+        if (this == fileOfDeclaration && annotatedLibraryUri == null) return
 
         val descriptor = relevantDeclaration.descriptor
 
-        val libraryUri = relevantDeclaration.annotatedDartLibrary ?: run {
+        val libraryUri = annotatedLibraryUri ?: run {
             var module = descriptor.module
 
             // If the imported declaration is from our module, or if we know it's written in Kotlin
@@ -135,9 +159,14 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
             // At this point, the declaration is from a dependency and thus the module must be a
             // DotlinModule.
             module = module.dotlinModule ?: return
+            val pkg = module.dartPackage
 
-            val fileName = when (descriptor) {
-                !is DartDescriptor -> fileOfDeclaration.dartPath
+            val filePath = when (descriptor) {
+                // Relativize to the package root, example:
+                // Package root: ${pkg.path}/lib/
+                // File Dart path: ${pkg.path}/lib/somewhere/else.dart
+                // Result: somewhere/else.dart
+                !is DartDescriptor -> pkg.packagePath.relativize(pkg.path.resolve(fileOfDeclaration.dartPath))
                 else -> run {
                     val fqNameWithoutPackageAndDeclaration = descriptor.fqNameSafe
                         .toString()
@@ -154,7 +183,7 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
 
             val packageName = module.dartPackage.name
 
-            "package:$packageName/$fileName"
+            "package:$packageName/$filePath"
         }
 
         val showName = relevantDeclaration.simpleDartNameWithoutKotlinImportAlias.value

@@ -17,10 +17,12 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import kotlinx.coroutines.runBlocking
 import org.dotlin.compiler.CompilationResult
 import org.dotlin.compiler.KotlinToDartCompiler
 import org.dotlin.compiler.backend.DotlinCompilerError
 import org.dotlin.compiler.backend.bin.DotlinGenerator
+import org.dotlin.compiler.backend.bin.dart
 import org.dotlin.compiler.backend.util.LazyVar
 import org.dotlin.compiler.factories
 import org.dotlin.compiler.warnings
@@ -51,6 +53,8 @@ abstract class DartTestProject {
             
             environment:
               sdk: '>=2.18.0 <3.0.0'
+
+            publish_to: none
     
             dependencies:
               dotlin:
@@ -61,7 +65,7 @@ abstract class DartTestProject {
                 path: ${DotlinGenerator.projectPath.toRealPath()}
             """.trimIndent()
 
-        private fun defaultPackageConfig(name: String, path: Path): String {
+        private fun defaultPackageConfig(name: String): String {
             fun pubCache(path: String) = "file://${pubCachePath.resolve("hosted/pub.dartlang.org").resolve(path)}"
             fun relative(path: String) = "file://${Path(path).toRealPath()}"
 
@@ -437,10 +441,23 @@ abstract class DartTestProject {
           dart: ">=2.18.2 <3.0.0"
         """.trimIndent()
 
-    private var packageConfig: String by LazyVar { defaultPackageConfig(name, path) }
+    private var packageConfig: String by LazyVar { defaultPackageConfig(name) }
+
+    @Language("yaml")
+    private val analysisOptions: String =
+        """
+        analyzer:
+          language:
+            strict-casts: true
+            strict-inference: true
+            strict-raw-types: true
+          errors:
+            unnecessary_non_null_assertion: info
+        """.trimIndent()
 
     fun writeConfigFiles(writeLockFiles: Boolean = true) {
         path.resolve("pubspec.yaml").writeText(pubspec)
+        path.resolve("analysis_options.yaml").writeText(analysisOptions)
 
         if (writeLockFiles) {
             if (pubspecLock.isNotBlank()) {
@@ -534,6 +551,17 @@ sealed class CompilerAssertion : DartTestProject() {
         dartSources[p] = dart.trimIndent()
     }
 
+    fun dart(@Language("dart") dart: String, path: Path, assert: Boolean) {
+        dart(dart, path)
+
+        if (!assert) {
+            this.path.resolve(path).apply {
+                parent.createDirectories()
+                writeText(dart)
+            }
+        }
+    }
+
     open fun compile(): CompilationResult {
         writeConfigFiles()
 
@@ -559,6 +587,9 @@ sealed class CompilerAssertion : DartTestProject() {
         )
     }
 
+    fun assertDartAnalysis() =
+        runBlocking { assertEquals(0, dart.analyze(workingDirectory = path), message = "Dart analysis errors") }
+
     abstract fun assert()
 }
 
@@ -577,6 +608,8 @@ class AssertCompilesTo : CompilerAssertion() {
         compiledDartSources.forEach { (path, source) ->
             assertEquals(dartSources[path.relativeTo(projectPath)], source)
         }
+
+        assertDartAnalysis()
     }
 }
 
@@ -594,6 +627,7 @@ class AssertCanCompileProject : CompilerAssertion() {
 
     override fun assert() {
         assertDoesNotThrow { compile() }
+        assertDartAnalysis()
     }
 }
 
@@ -626,6 +660,7 @@ class AssertCompilesWithWarning : AssertCompilesWithDiagnostics() {
 class AssertCanCompile : CompilerAssertion() {
     override fun assert() {
         assertDoesNotThrow { compile() }
+        assertDartAnalysis()
     }
 }
 

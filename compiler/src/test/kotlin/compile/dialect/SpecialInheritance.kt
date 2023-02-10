@@ -23,24 +23,61 @@ import BaseTest
 import assertCompile
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import kotlin.io.path.Path
 
 @DisplayName("Compile: Dialect: Special Inheritance")
 class SpecialInheritance : BaseTest {
     @Test
-    fun `implement multiple implicit interfaces`() = assertCompile {
+    fun `interface can implement Kotlin external implicit interface`() = assertCompile {
         kotlin(
             """
+            @DartLibrary("pigeon.dart")
             open external class Pigeon {
-                constructor(useAs: Interface)
-            
+                constructor(implement: InterfaceOrMixin)
                 open fun fly(): Unit = definedExternally
             }
 
+            interface CarrierPigeon : Pigeon(Interface)
+            """
+        )
+
+        dart(
+            """
+            class Pigeon {
+              void fly() {}
+            }
+            """,
+            Path("lib/pigeon.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "pigeon.dart" show Pigeon;
+            import "package:meta/meta.dart";
+
+            abstract class CarrierPigeon implements Pigeon {}
+            """
+        )
+    }
+
+    @Test
+    fun `implement multiple Kotlin external implicit interfaces`() = assertCompile {
+        kotlin(
+            """
+            @DartLibrary("pigeons.dart")
+            open external class Pigeon {
+                constructor(implement: Interface)
+
+                open fun fly(): Unit = definedExternally
+            }
+
+            @DartLibrary("pigeons.dart")
             open external class Carrier {
-                constructor(useAs: Interface)
-            
+                constructor(implement: Interface)
+
                 constructor(message: String)
-            
+
                 open fun send(): Unit = definedExternally
             }
 
@@ -53,6 +90,23 @@ class SpecialInheritance : BaseTest {
 
         dart(
             """
+            class Pigeon {
+              void fly() {}
+            }
+
+            class Carrier {
+              Carrier(String message);
+
+              void send() {}
+            }
+            """,
+            Path("lib/pigeons.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "pigeons.dart" show Pigeon, Carrier;
             import "package:meta/meta.dart";
 
             @sealed
@@ -67,20 +121,20 @@ class SpecialInheritance : BaseTest {
     }
 
     @Test
-    fun `implement multiple implicit interfaces that can be mixed in`() = assertCompile {
+    fun `implement multiple Kotlin external implicit interfaces that can be mixed in`() = assertCompile {
         kotlin(
             """
+            @DartLibrary("pigeons.dart")
             open external class Pigeon {
                 constructor(useAs: InterfaceOrMixin)
             
                 open fun fly(): Unit = definedExternally
             }
 
+            @DartLibrary("pigeons.dart")
             open external class Carrier {
                 constructor(useAs: InterfaceOrMixin)
-            
-                constructor(message: String)
-            
+
                 open fun send(): Unit = definedExternally
             }
 
@@ -93,6 +147,21 @@ class SpecialInheritance : BaseTest {
 
         dart(
             """
+            class Pigeon {
+              void fly() {}
+            }
+
+            class Carrier {
+              void send() {}
+            }
+            """,
+            Path("lib/pigeons.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "pigeons.dart" show Pigeon, Carrier;
             import "package:meta/meta.dart";
 
             @sealed
@@ -107,18 +176,20 @@ class SpecialInheritance : BaseTest {
     }
 
     @Test
-    fun `implement multiple mixins`() = assertCompile {
+    fun `implement multiple Kotlin external mixins`() = assertCompile {
         kotlin(
             """
+            @DartLibrary("pigeons.dart")
             open external class Pigeon {
                 constructor(useAs: InterfaceOrMixin)
-            
+
                 open fun fly(): Unit = definedExternally
             }
 
+            @DartLibrary("pigeons.dart")
             open external class Carrier {
                 constructor(useAs: InterfaceOrMixin)
-            
+
                 open fun send(): Unit = definedExternally
             }
 
@@ -128,6 +199,21 @@ class SpecialInheritance : BaseTest {
 
         dart(
             """
+            class Pigeon {
+              void fly() {}
+            }
+
+            class Carrier {
+              void send() {}
+            }
+            """,
+            Path("lib/pigeons.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "pigeons.dart" show Pigeon, Carrier;
             import "package:meta/meta.dart";
 
             @sealed
@@ -137,22 +223,24 @@ class SpecialInheritance : BaseTest {
     }
 
     @Test
-    fun `implement implicit interface and regular external class`() = assertCompile {
+    fun `implement Kotlin external implicit interface and Kotlin external regular class`() = assertCompile {
         kotlin(
             """
+            @DartLibrary("pigeons.dart")
             open external class Pigeon {
                 constructor()
                 constructor(implement: Interface)
-            
+
                 open fun fly(): Unit = definedExternally
             }
 
+            @DartLibrary("pigeons.dart")
             open external class Carrier {
                 constructor()
                 constructor(implement: Interface)
-            
+
                 constructor(message: String)
-            
+
                 open fun send(): Unit = definedExternally
             }
 
@@ -165,6 +253,23 @@ class SpecialInheritance : BaseTest {
 
         dart(
             """
+            class Pigeon {
+              void fly() {}
+            }
+
+            class Carrier {
+              Carrier(String message);
+
+              void send() {}
+            }
+            """,
+            Path("lib/pigeons.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "pigeons.dart" show Pigeon, Carrier;
             import "package:meta/meta.dart";
 
             @sealed
@@ -179,19 +284,21 @@ class SpecialInheritance : BaseTest {
     }
 
     @Test
-    fun `implement mixin and regular external class`() = assertCompile {
+    fun `implement Kotlin external mixin and Kotlin external regular class`() = assertCompile {
         kotlin(
             """
+            @DartLibrary("pigeons.dart")
             open external class Pigeon {
                 constructor()
                 constructor(implement: InterfaceOrMixin)
-            
+
                 open fun fly(): Unit = definedExternally
             }
 
+            @DartLibrary("pigeons.dart")
             open external class Carrier {
                 constructor(implement: InterfaceOrMixin)
-            
+
                 open fun send(): Unit = definedExternally
             }
 
@@ -204,6 +311,21 @@ class SpecialInheritance : BaseTest {
 
         dart(
             """
+            class Pigeon {
+              void fly() {}
+            }
+
+            class Carrier {
+              void send() {}
+            }
+            """,
+            Path("lib/pigeons.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "pigeons.dart" show Pigeon, Carrier;
             import "package:meta/meta.dart";
 
             @sealed
@@ -218,19 +340,21 @@ class SpecialInheritance : BaseTest {
     }
 
     @Test
-    fun `implement implicit interface and mixin`() = assertCompile {
+    fun `implement Kotlin external implicit interface and Kotlin external mixin`() = assertCompile {
         kotlin(
             """
+            @DartLibrary("pigeons.dart")
             open external class Pigeon {
                 constructor()
                 constructor(implement: InterfaceOrMixin)
-            
+
                 open fun fly(): Unit = definedExternally
             }
 
+            @DartLibrary("pigeons.dart")
             open external class Carrier {
                 constructor(implement: InterfaceOrMixin)
-            
+
                 open fun send(): Unit = definedExternally
             }
 
@@ -243,6 +367,21 @@ class SpecialInheritance : BaseTest {
 
         dart(
             """
+            class Pigeon {
+              void fly() {}
+            }
+
+            class Carrier {
+              void send() {}
+            }
+            """,
+            Path("lib/pigeons.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "pigeons.dart" show Pigeon, Carrier;
             import "package:meta/meta.dart";
 
             @sealed
@@ -257,11 +396,13 @@ class SpecialInheritance : BaseTest {
     }
 
     @Test
-    fun `implement regular external class, implicit interface and mixin`() = assertCompile {
+    fun `implement Kotlin external regular class, Kotlin external implicit interface and mixin`() = assertCompile {
         kotlin(
             """
+            @DartLibrary("pigeons.dart")
             open external class Bird(isCool: Boolean)
 
+            @DartLibrary("pigeons.dart")
             open external class Pigeon {
                 constructor()
                 constructor(implement: InterfaceOrMixin)
@@ -269,9 +410,10 @@ class SpecialInheritance : BaseTest {
                 open fun fly(): Unit = definedExternally
             }
 
+            @DartLibrary("pigeons.dart")
             open external class Carrier {
                 constructor(implement: InterfaceOrMixin)
-            
+
                 open fun send(): Unit = definedExternally
             }
 
@@ -284,6 +426,25 @@ class SpecialInheritance : BaseTest {
 
         dart(
             """
+            class Bird {
+              Bird(bool isCool);
+            }
+
+            class Pigeon {
+              void fly() {}
+            }
+
+            class Carrier {
+              void send() {}
+            }
+            """,
+            Path("lib/pigeons.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "pigeons.dart" show Bird, Pigeon, Carrier;
             import "package:meta/meta.dart";
 
             @sealed
@@ -297,5 +458,4 @@ class SpecialInheritance : BaseTest {
             """
         )
     }
-
 }

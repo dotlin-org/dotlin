@@ -24,6 +24,7 @@ import assertCompile
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import kotlin.io.path.Path
 
 @DisplayName("Compile: Dialect: Collections: List")
 class List : BaseTest {
@@ -188,7 +189,7 @@ class List : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/kotlin/collections/list_factories.dt.g.dart"
+            import "package:dotlin/src/kotlin/collections/list_factories.dt.g.dart"
                 show mutableListOfNulls;
             import "package:meta/meta.dart";
 
@@ -257,13 +258,23 @@ class List : BaseTest {
                 test(listOf())
             }
 
+            @DartLibrary("test.dart")
             external fun test(list: Flex<AnyList<Int>, List<Int>>)
             """
         )
 
         dart(
             """
+            void test(List<int> list) {}
+            """,
+            Path("lib/test.dart"),
+            assert = false
+        )
+
+        dart(
+            """
             import "dart:collection" show UnmodifiableListView;
+            import "test.dart" show test;
             import "package:meta/meta.dart";
 
             void main() {
@@ -283,12 +294,22 @@ class List : BaseTest {
                 test(mutableListOf())
             }
 
+            @DartLibrary("test.dart")
             external fun test(list: Flex<AnyList<Int>, List<Int>>)
             """
         )
 
         dart(
             """
+            void test(List<int> list) {}
+            """,
+            Path("lib/test.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "test.dart" show test;
             import "package:meta/meta.dart";
 
             void main() {
@@ -309,6 +330,7 @@ class List : BaseTest {
                 val myList: MutableList<Int> = MaybeMutableList<Int>()
             }
 
+            @DartLibrary("maybe.dart")
             external class MaybeMutableList<E> : Flex<AnyList<E>, List<E>> {
                 override var size: Int = 0
                 override fun <R> cast() = MaybeMutableList<R>()
@@ -404,6 +426,17 @@ class List : BaseTest {
 
         dart(
             """
+            class MaybeMutableList<E> implements List<E> {
+              dynamic noSuchMethod(Invocation invocation) {}
+            }
+            """,
+            Path("lib/maybe.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "maybe.dart" show MaybeMutableList;
             import "package:meta/meta.dart";
 
             void main() {
@@ -423,12 +456,22 @@ class List : BaseTest {
                 val myList: ImmutableList<Int> = calculate()
             }
 
+            @DartLibrary("calc.dart")
             external fun calculate(): Flex<AnyList<Int>, List<Int>>
             """
         )
 
         dart(
             """
+            List<int> calculate() => [1, 2, 3];
+            """,
+            Path("lib/calc.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "calc.dart" show calculate;
             import "package:meta/meta.dart";
 
             void main() {
@@ -449,6 +492,7 @@ class List : BaseTest {
                 val myList: ImmutableList<Int> = MaybeMutableList<Int>()
             }
 
+            @DartLibrary("maybe.dart")
             external class MaybeMutableList<E> : Flex<AnyList<E>, List<E>> {
                 override var size: Int = 0
                 override fun <R> cast() = MaybeMutableList<R>()
@@ -544,6 +588,17 @@ class List : BaseTest {
 
         dart(
             """
+            class MaybeMutableList<E> implements List<E> {
+              dynamic noSuchMethod(Invocation invocation) {}
+            }
+            """,
+            Path("lib/maybe.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "maybe.dart" show MaybeMutableList;
             import "package:meta/meta.dart";
 
             void main() {
@@ -564,12 +619,22 @@ class List : BaseTest {
                 }
             }
 
+            @DartLibrary("calc.dart")
             external fun calculate(): Any
             """
         )
 
         dart(
             """
+            Object calculate() => 3;
+            """,
+            Path("lib/calc.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "calc.dart" show calculate;
             import "package:meta/meta.dart";
 
             void main() {
@@ -593,12 +658,22 @@ class List : BaseTest {
                 }
             }
 
+            @DartLibrary("calc.dart")
             external fun calculate(): Any
             """
         )
 
         dart(
             """
+            Object calculate() => 3;
+            """,
+            Path("lib/calc.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "calc.dart" show calculate;
             import "package:meta/meta.dart";
 
             void main() {
@@ -620,13 +695,23 @@ class List : BaseTest {
                 }
             }
 
+            @DartLibrary("calc.dart")
             external fun calculate(): Any
             """
         )
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+            Object calculate() => 3;
+            """,
+            Path("lib/calc.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "calc.dart" show calculate;
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show DotlinTypeIntrinsics;
             import "package:meta/meta.dart";
 
@@ -651,13 +736,23 @@ class List : BaseTest {
                 }
             }
 
+            @DartLibrary("calc.dart")
             external fun calculate(): Any
             """
         )
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+            Object calculate() => 3;
+            """,
+            Path("lib/calc.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "calc.dart" show calculate;
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show DotlinTypeIntrinsics;
             import "package:meta/meta.dart";
 
@@ -680,13 +775,23 @@ class List : BaseTest {
                 }
             }
 
+            @DartLibrary("calc.dart")
             external fun calculate(): Any
             """
         )
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+            Object calculate() => 3;
+            """,
+            Path("lib/calc.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "calc.dart" show calculate;
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show DotlinTypeIntrinsics;
             import "package:meta/meta.dart";
 
@@ -711,13 +816,23 @@ class List : BaseTest {
                 }
             }
 
+            @DartLibrary("calc.dart")
             external fun calculate(): Any
             """
         )
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+            Object calculate() => 3;
+            """,
+            Path("lib/calc.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "calc.dart" show calculate;
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show DotlinTypeIntrinsics;
             import "package:meta/meta.dart";
 
@@ -731,8 +846,8 @@ class List : BaseTest {
 
     @Test
     fun `is Array`() = assertCompile {
-            kotlin(
-                """
+        kotlin(
+            """
             fun main() {
                 val obj = calculate()
                 if (obj is Array<Int>) {
@@ -740,25 +855,35 @@ class List : BaseTest {
                 }
             }
 
+            @DartLibrary("calc.dart")
             external fun calculate(): Any
             """
-            )
+        )
 
-            dart(
-                """
-                import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
-                    show DotlinTypeIntrinsics;
-                import "package:meta/meta.dart";
+        dart(
+            """
+            Object calculate() => 3;
+            """,
+            Path("lib/calc.dart"),
+            assert = false
+        )
 
-                void main() {
-                  final Object obj = calculate();
-                  if (obj.isFixedSizeList<int>()) {
-                    (obj as List<int>)[0];
-                  }
-                }
-              """
-            )
-        }
+        dart(
+            """
+            import "calc.dart" show calculate;
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+                show DotlinTypeIntrinsics;
+            import "package:meta/meta.dart";
+
+            void main() {
+              final Object obj = calculate();
+              if (obj.isFixedSizeList<int>()) {
+                (obj as List<int>)[0];
+              }
+            }
+          """
+        )
+    }
 
     @Test
     fun `!is Array`() = assertCompile {
@@ -771,13 +896,23 @@ class List : BaseTest {
                 }
             }
 
+            @DartLibrary("calc.dart")
             external fun calculate(): Any
             """
         )
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+            Object calculate() => 3;
+            """,
+            Path("lib/calc.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "calc.dart" show calculate;
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show DotlinTypeIntrinsics;
             import "package:meta/meta.dart";
 
@@ -803,12 +938,22 @@ class List : BaseTest {
                 }
             }
 
+            @DartLibrary("calc.dart")
             external fun calculate(): Any
             """
         )
 
         dart(
             """
+            Object calculate() => 3;
+            """,
+            Path("lib/calc.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "calc.dart" show calculate;
             import "package:meta/meta.dart";
 
             void main() {
@@ -837,12 +982,22 @@ class List : BaseTest {
                 }
             }
 
+            @DartLibrary("calc.dart")
             external fun calculate(): Any
             """
         )
 
         dart(
             """
+            Object calculate() => 3;
+            """,
+            Path("lib/calc.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "calc.dart" show calculate;
             import "package:meta/meta.dart";
 
             void main() {
@@ -864,13 +1019,23 @@ class List : BaseTest {
                 }
             }
 
+            @DartLibrary("calc.dart")
             external fun calculate(): Any
             """
         )
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+            Object calculate() => 3;
+            """,
+            Path("lib/calc.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "calc.dart" show calculate;
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show DotlinTypeIntrinsics;
             import "package:meta/meta.dart";
 
@@ -895,13 +1060,23 @@ class List : BaseTest {
                 }
             }
 
+            @DartLibrary("calc.dart")
             external fun calculate(): Any
             """
         )
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+            Object calculate() => 3;
+            """,
+            Path("lib/calc.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "calc.dart" show calculate;
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show DotlinTypeIntrinsics;
             import "package:meta/meta.dart";
 
@@ -977,10 +1152,12 @@ class List : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_markers.dt.g.dart"
+            import "package:dotlin/src/dotlin/intrinsics/collection_markers.dt.g.dart"
                 show ImmutableListMarker;
-            import "package:dotlin/lib/src/kotlin/collections/collection.dt.g.dart"
+            import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show MutableCollection;
+            import "package:dotlin/src/kotlin/function.dt.g.dart"
+                show Function1, Function2, Function0;
             import "dart:math" show Random;
             import "package:meta/meta.dart";
 
@@ -1466,10 +1643,12 @@ class List : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_markers.dt.g.dart"
+            import "package:dotlin/src/dotlin/intrinsics/collection_markers.dt.g.dart"
                 show WriteableListMarker;
-            import "package:dotlin/lib/src/kotlin/collections/collection.dt.g.dart"
+            import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show MutableCollection;
+            import "package:dotlin/src/kotlin/function.dt.g.dart"
+                show Function1, Function2, Function0;
             import "dart:math" show Random;
             import "package:meta/meta.dart";
 
@@ -1920,10 +2099,12 @@ class List : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_markers.dt.g.dart"
+            import "package:dotlin/src/dotlin/intrinsics/collection_markers.dt.g.dart"
                 show FixedSizeListMarker;
-            import "package:dotlin/lib/src/kotlin/collections/collection.dt.g.dart"
+            import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show MutableCollection;
+            import "package:dotlin/src/kotlin/function.dt.g.dart"
+                show Function1, Function2, Function0;
             import "dart:math" show Random;
             import "package:meta/meta.dart";
 
@@ -2395,9 +2576,11 @@ class List : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_markers.dt.g.dart"
+            import "package:dotlin/src/dotlin/intrinsics/collection_markers.dt.g.dart"
                 show MutableListMarker;
-            import "package:dotlin/lib/src/kotlin/collections/iterator.dt.g.dart"
+            import "package:dotlin/src/kotlin/function.dt.g.dart"
+                show Function1, Function2, Function0;
+            import "package:dotlin/src/kotlin/collections/iterator.dt.g.dart"
                 show MutableIterator;
             import "dart:math" show Random;
             import "package:meta/meta.dart";
@@ -2815,10 +2998,12 @@ class List : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_markers.dt.g.dart"
+            import "package:dotlin/src/dotlin/intrinsics/collection_markers.dt.g.dart"
                 show FixedSizeListMarker;
-            import "package:dotlin/lib/src/kotlin/collections/collection.dt.g.dart"
+            import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show MutableCollection;
+            import "package:dotlin/src/kotlin/function.dt.g.dart"
+                show Function1, Function2, Function0;
             import "dart:math" show Random;
             import "package:meta/meta.dart";
 

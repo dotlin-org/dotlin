@@ -36,8 +36,7 @@ class Annotation : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/kotlin/native/annotation.dt.g.dart"
-                show Annotation;
+            import "package:dotlin/src/kotlin/native/annotation.dt.g.dart" show Annotation;
             import "package:meta/meta.dart";
 
             @sealed

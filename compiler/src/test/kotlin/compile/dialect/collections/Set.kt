@@ -23,6 +23,7 @@ import BaseTest
 import assertCompile
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import kotlin.io.path.Path
 
 @DisplayName("Compile: Dialect: Collections: Set")
 class Set : BaseTest {
@@ -177,7 +178,7 @@ class Set : BaseTest {
 
 
     @Test
-    fun `use Kotlin ImmutableSet as Dart Set in external function`() = assertCompile {
+    fun `use Kotlin ImmutableSet as Dart Set in Kotlin external function`() = assertCompile {
         kotlin(
             """
             import dotlin.intrinsics.*
@@ -186,13 +187,23 @@ class Set : BaseTest {
                 test(setOf())
             }
 
-            external fun test(list: Flex<AnySet<Int>, Set<Int>>)
+            @DartLibrary("test.dart")
+            external fun test(set: Flex<AnySet<Int>, Set<Int>>)
             """
         )
 
         dart(
             """
+            void test(Set<int> set) {}
+            """,
+            Path("lib/test.dart"),
+            assert = false,
+        )
+
+        dart(
+            """
             import "dart:collection" show UnmodifiableSetView;
+            import "test.dart" show test;
             import "package:meta/meta.dart";
 
             void main() {
@@ -212,12 +223,22 @@ class Set : BaseTest {
                 test(mutableSetOf())
             }
 
-            external fun test(list: Flex<AnySet<Int>, Set<Int>>)
+            @DartLibrary("test.dart")
+            external fun test(set: Flex<AnySet<Int>, Set<Int>>)
             """
         )
 
         dart(
             """
+            void test(Set<int> set) {}
+            """,
+            Path("lib/test.dart"),
+            assert = false,
+        )
+
+        dart(
+            """
+            import "test.dart" show test;
             import "package:meta/meta.dart";
 
             void main() {
@@ -237,6 +258,7 @@ class Set : BaseTest {
                 val mySet: MutableSet<Int> = MySet<Int>()
             }
 
+            @DartLibrary("my_set.dart")
             external class MySet<E> : Flex<AnySet<E>, Set<E>> {
                 override var size: Int
                 override fun iterator(): MutableIterator<E>
@@ -303,6 +325,17 @@ class Set : BaseTest {
 
         dart(
             """
+            class MySet<E> implements Set<E> {
+              dynamic noSuchMethod(Invocation invocation) {}
+            }
+            """,
+            Path("lib/my_set.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "my_set.dart" show MySet;
             import "package:meta/meta.dart";
 
             void main() {
@@ -322,12 +355,22 @@ class Set : BaseTest {
                 val myList: ImmutableSet<Int> = calculate()
             }
 
+            @DartLibrary("calc.dart")
             external fun calculate(): Flex<AnySet<Int>, Set<Int>>
             """
         )
 
         dart(
             """
+            Set<int> calculate() => {};
+            """,
+            Path("lib/calc.dart"),
+            assert = false,
+        )
+
+        dart(
+            """
+            import "calc.dart" show calculate;
             import "package:meta/meta.dart";
 
             void main() {
@@ -347,6 +390,7 @@ class Set : BaseTest {
                 val mySet: ImmutableSet<Int> = MySet<Int>()
             }
 
+            @DartLibrary("my_set.dart")
             external class MySet<E> : Flex<AnySet<E>, Set<E>> {
                 override var size: Int
                 override fun iterator(): MutableIterator<E>
@@ -413,6 +457,17 @@ class Set : BaseTest {
 
         dart(
             """
+            class MySet<E> implements Set<E> {
+              dynamic noSuchMethod(Invocation invocation) {}
+            }
+            """,
+            Path("lib/my_set.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "my_set.dart" show MySet;
             import "package:meta/meta.dart";
 
             void main() {
@@ -433,7 +488,7 @@ class Set : BaseTest {
                 }
             }
 
-            external fun calculate(): Any
+            fun calculate(): Any? = null
             """
         )
 
@@ -442,10 +497,14 @@ class Set : BaseTest {
             import "package:meta/meta.dart";
 
             void main() {
-              final Object obj = calculate();
+              final Object? obj = calculate();
               if (obj is Set<int>) {
                 (obj as Set<int>).length;
               }
+            }
+
+            Object? calculate() {
+              return null;
             }
             """
         )
@@ -462,7 +521,7 @@ class Set : BaseTest {
                 }
             }
 
-            external fun calculate(): Any
+            fun calculate(): Any? = null
             """
         )
 
@@ -471,8 +530,12 @@ class Set : BaseTest {
             import "package:meta/meta.dart";
 
             void main() {
-              final Object obj = calculate();
+              final Object? obj = calculate();
               if (obj is! Set<int>) {}
+            }
+
+            Object? calculate() {
+              return null;
             }
             """
         )
@@ -489,21 +552,25 @@ class Set : BaseTest {
                 }
             }
 
-            external fun calculate(): Any
+            fun calculate(): Any? = null
             """
         )
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show DotlinTypeIntrinsics;
             import "package:meta/meta.dart";
 
             void main() {
-              final Object obj = calculate();
+              final Object? obj = calculate();
               if (obj.isImmutableSet<int>()) {
                 (obj as Set<int>).length;
               }
+            }
+
+            Object? calculate() {
+              return null;
             }
             """
         )
@@ -520,19 +587,23 @@ class Set : BaseTest {
                 }
             }
 
-            external fun calculate(): Any
+            fun calculate(): Any? = null
             """
         )
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show DotlinTypeIntrinsics;
             import "package:meta/meta.dart";
 
             void main() {
-              final Object obj = calculate();
+              final Object? obj = calculate();
               if (!obj.isImmutableSet<int>()) {}
+            }
+
+            Object? calculate() {
+              return null;
             }
             """
         )
@@ -549,21 +620,25 @@ class Set : BaseTest {
                 }
             }
 
-            external fun calculate(): Any
+            fun calculate(): Any? = null
             """
         )
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show DotlinTypeIntrinsics;
             import "package:meta/meta.dart";
 
             void main() {
-              final Object obj = calculate();
+              final Object? obj = calculate();
               if (obj.isMutableSet<int>()) {
                 (obj as Set<int>).length;
               }
+            }
+
+            Object? calculate() {
+              return null;
             }
             """
         )
@@ -578,19 +653,23 @@ class Set : BaseTest {
                 if (obj !is MutableSet<Int>) {}
             }
 
-            external fun calculate(): Any
+            fun calculate(): Any? = null
             """
         )
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show DotlinTypeIntrinsics;
             import "package:meta/meta.dart";
 
             void main() {
-              final Object obj = calculate();
+              final Object? obj = calculate();
               if (!obj.isMutableSet<int>()) {}
+            }
+
+            Object? calculate() {
+              return null;
             }
             """
         )
@@ -660,10 +739,12 @@ class Set : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_markers.dt.g.dart"
+            import "package:dotlin/src/dotlin/intrinsics/collection_markers.dt.g.dart"
                 show ImmutableSetMarker;
-            import "package:dotlin/lib/src/kotlin/collections/collection.dt.g.dart"
+            import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show MutableCollection;
+            import "package:dotlin/src/kotlin/function.dt.g.dart"
+                show Function1, Function2, Function0;
             import "package:meta/meta.dart";
 
             @sealed
@@ -980,10 +1061,12 @@ class Set : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_markers.dt.g.dart"
+            import "package:dotlin/src/dotlin/intrinsics/collection_markers.dt.g.dart"
                 show MutableSetMarker;
-            import "package:dotlin/lib/src/kotlin/collections/iterator.dt.g.dart"
+            import "package:dotlin/src/kotlin/collections/iterator.dt.g.dart"
                 show MutableIterator;
+            import "package:dotlin/src/kotlin/function.dt.g.dart"
+                show Function1, Function2, Function0;
             import "package:meta/meta.dart";
 
             @sealed

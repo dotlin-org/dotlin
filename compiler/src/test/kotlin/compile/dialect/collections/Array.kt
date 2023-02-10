@@ -23,6 +23,7 @@ import BaseTest
 import assertCompile
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import kotlin.io.path.Path
 
 @DisplayName("Compile: Dialect: Collections: Array")
 class Array : BaseTest {
@@ -59,7 +60,7 @@ class Array : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/kotlin/collections/array_factories.dt.g.dart"
+            import "package:dotlin/src/kotlin/collections/array_factories.dt.g.dart"
                 show arrayOfNulls;
             import "package:meta/meta.dart";
 
@@ -122,12 +123,22 @@ class Array : BaseTest {
                 test(arrayOf())
             }
 
+            @DartLibrary("test.dart")
             external fun test(list: Flex<AnyList<Int>, List<Int>>)
             """
         )
 
         dart(
             """
+            void test(List<int> list) {}
+            """,
+            Path("lib/test.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "test.dart" show test;
             import "package:meta/meta.dart";
 
             void main() {
@@ -147,12 +158,22 @@ class Array : BaseTest {
                 test(numbers)
             }
 
+            @DartLibrary("test.dart")
             external fun test(list: Flex<AnyList<String>, List<String>>)
             """
         )
 
         dart(
             """
+            void test(List<String> list) {}
+            """,
+            Path("lib/test.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "test.dart" show test;
             import "package:meta/meta.dart";
 
             void process(List<String> numbers) {
@@ -172,12 +193,22 @@ class Array : BaseTest {
                 test(words)
             }
 
+            @DartLibrary("test.dart")
             external fun test(list: Flex<AnyList<String>, List<String>>)
             """
         )
 
         dart(
             """
+            void test(List<String> list) {}
+            """,
+            Path("lib/test.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "test.dart" show test;
             import "package:meta/meta.dart";
 
             void process(List<String> words) {
@@ -197,12 +228,22 @@ class Array : BaseTest {
                 val myArray: Array<Int> = calculate()
             }
 
+            @DartLibrary("calculate.dart")
             external fun calculate(): Flex<AnyList<Int>, List<Int>>
             """
         )
 
         dart(
             """
+            List<int> calculate() => [];
+            """,
+            Path("lib/calculate.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "calculate.dart" show calculate;
             import "package:meta/meta.dart";
 
             void main() {
@@ -223,6 +264,7 @@ class Array : BaseTest {
                 val myList: Array<Int> = MyList<Int>()
             }
 
+            @DartLibrary("my_list.dart")
             external class MyList<E> : Flex<AnyList<E>, List<E>> {
                 override var size: Int = 0
                 override fun <R> cast() = MyList<R>()
@@ -318,6 +360,17 @@ class Array : BaseTest {
 
         dart(
             """
+            class MyList<E> implements List<E> {
+              dynamic noSuchMethod(Invocation invocation) {}
+            }
+            """,
+            Path("lib/my_list.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "my_list.dart" show MyList;
             import "package:meta/meta.dart";
 
             void main() {

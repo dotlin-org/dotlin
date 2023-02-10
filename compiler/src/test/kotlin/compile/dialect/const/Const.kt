@@ -209,6 +209,7 @@ class Const : BaseTest {
 
         dart(
             """
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             enum Temperature {
@@ -286,6 +287,7 @@ class Const : BaseTest {
 
         dart(
             """
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function0;
             import "package:meta/meta.dart";
 
             @sealed
@@ -322,6 +324,7 @@ class Const : BaseTest {
 
         dart(
             """
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function0;
             import "package:meta/meta.dart";
 
             @sealed
@@ -361,6 +364,7 @@ class Const : BaseTest {
 
         dart(
             """
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function0;
             import "package:meta/meta.dart";
 
             @sealed
@@ -409,7 +413,8 @@ class Const : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/kotlin/library.dt.g.dart" show SafeStringPlus;
+            import "package:dotlin/src/kotlin/library.dt.g.dart" show SafeStringPlus;
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function0;
             import "package:meta/meta.dart";
 
             @sealed
@@ -464,6 +469,7 @@ class Const : BaseTest {
 
         dart(
             """
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function0;
             import "package:meta/meta.dart";
 
             void main() {

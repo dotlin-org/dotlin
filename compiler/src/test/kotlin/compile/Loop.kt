@@ -132,9 +132,9 @@ class Loop : BaseTest {
         // TODO: Remove unnecessary imports.
         dart(
             """
-            import "package:dotlin/lib/src/kotlin/ranges/ranges_ext.dt.g.dart"
+            import "package:dotlin/src/kotlin/ranges/ranges_ext.dt.g.dart"
                 show IntRangeFactoryExt;
-            import "package:dotlin/lib/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
+            import "package:dotlin/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
             import "package:meta/meta.dart";
 
             void main() {
@@ -164,8 +164,8 @@ class Loop : BaseTest {
         // TODO: Remove unnecessary imports.
         dart(
             """
-            import "package:dotlin/lib/src/kotlin/native/int.dt.g.dart" show IntRangeTo;
-            import "package:dotlin/lib/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
+            import "package:dotlin/src/kotlin/native/int.dt.g.dart" show IntRangeTo;
+            import "package:dotlin/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
             import "package:meta/meta.dart";
 
             void main() {
@@ -198,9 +198,9 @@ class Loop : BaseTest {
         // TODO: Remove unnecessary imports.
         dart(
             """
-            import "package:dotlin/lib/src/kotlin/ranges/ranges_ext.dt.g.dart"
+            import "package:dotlin/src/kotlin/ranges/ranges_ext.dt.g.dart"
                 show IntRangeFactoryExt;
-            import "package:dotlin/lib/src/kotlin/ranges/progressions.dt.g.dart"
+            import "package:dotlin/src/kotlin/ranges/progressions.dt.g.dart"
                 show IntProgression;
             import "package:meta/meta.dart";
 
@@ -233,11 +233,11 @@ class Loop : BaseTest {
         // TODO: Remove unnecessary imports.
         dart(
             """
-            import "package:dotlin/lib/src/kotlin/ranges/ranges_ext.dt.g.dart"
+            import "package:dotlin/src/kotlin/ranges/ranges_ext.dt.g.dart"
                 show IntRangeFactoryExt, IntProgressionExt;
-            import "package:dotlin/lib/src/kotlin/ranges/progressions.dt.g.dart"
+            import "package:dotlin/src/kotlin/ranges/progressions.dt.g.dart"
                 show IntProgression;
-            import "package:dotlin/lib/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
+            import "package:dotlin/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
             import "package:meta/meta.dart";
 
             void main() {
@@ -268,11 +268,11 @@ class Loop : BaseTest {
         // TODO: Remove unnecessary imports.
         dart(
             """
-            import "package:dotlin/lib/src/kotlin/ranges/ranges_ext.dt.g.dart"
+            import "package:dotlin/src/kotlin/ranges/ranges_ext.dt.g.dart"
                 show IntRangeFactoryExt, IntProgressionExt;
-            import "package:dotlin/lib/src/kotlin/ranges/progressions.dt.g.dart"
+            import "package:dotlin/src/kotlin/ranges/progressions.dt.g.dart"
                 show IntProgression;
-            import "package:dotlin/lib/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
+            import "package:dotlin/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
             import "package:meta/meta.dart";
 
             void main() {

@@ -24,6 +24,7 @@ import assertCompile
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import kotlin.io.path.Path
 
 @DisplayName("Compile: Dialect: Constructor")
 class Constructor : BaseTest {
@@ -31,6 +32,7 @@ class Constructor : BaseTest {
     fun `@DartConstructor in external companion object`() = assertCompile {
         kotlin(
             """
+            @DartLibrary("test.dart")
             external class Test {
                 external companion object {
                     @DartConstructor
@@ -46,6 +48,17 @@ class Constructor : BaseTest {
 
         dart(
             """
+            class Test {
+              Test.create();
+            }
+            """,
+            Path("lib/test.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "test.dart" show Test;
             import "package:meta/meta.dart";
 
             void main() {
@@ -59,6 +72,7 @@ class Constructor : BaseTest {
     fun `const @DartConstructor call`() = assertCompile {
         kotlin(
             """
+            @DartLibrary("test.dart")
             external class Test {
                 companion object {
                     @DartConstructor
@@ -74,6 +88,17 @@ class Constructor : BaseTest {
 
         dart(
             """
+            class Test {
+              const Test.create();
+            }
+            """,
+            Path("lib/test.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "test.dart" show Test;
             import "package:meta/meta.dart";
 
             void main() {
@@ -89,11 +114,15 @@ class Constructor : BaseTest {
         )
     }
 
+    // TODO: The external Dart code doesn't make much sense now. Would make more sense
+    // with a future Dart @nested annotation.
     @Test
     fun `const @DartConstructor call in nested class`() = assertCompile {
         kotlin(
             """
+            @DartLibrary("test.dart")
             external class TestContainer {
+                @DartLibrary("test.dart")
                 external class Test {
                     companion object {
                         @DartConstructor
@@ -101,7 +130,6 @@ class Constructor : BaseTest {
                     }
                 }
             }
-
 
             fun main() {
                 @const TestContainer.Test.create()
@@ -111,6 +139,17 @@ class Constructor : BaseTest {
 
         dart(
             """
+            class TestContainer${'$'}Test {
+              const TestContainer${'$'}Test.create();
+            }
+            """,
+            Path("lib/test.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "test.dart" show TestContainer${'$'}Test;
             import "package:meta/meta.dart";
 
             void main() {
@@ -124,6 +163,7 @@ class Constructor : BaseTest {
     fun `@DartConstructor call with value arguments`() = assertCompile {
         kotlin(
             """
+            @DartLibrary("test.dart")
             external class Test {
                 companion object {
                     @DartConstructor
@@ -139,12 +179,23 @@ class Constructor : BaseTest {
 
         dart(
             """
+            class Test {
+              const Test.create(int a, String b);
+            }
+            """,
+            Path("lib/test.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "test.dart" show Test;
             import "package:meta/meta.dart";
 
             void main() {
               Test.create(10, "abc");
             }
-            
+
             @sealed
             class Test${'$'}Companion {
               const Test${'$'}Companion._();
@@ -158,10 +209,13 @@ class Constructor : BaseTest {
     fun `@DartConstructor call with type arguments`() = assertCompile {
         kotlin(
             """
-            interface Marker
+            @DartLibrary("markers.dart")
+            abstract external class Marker
 
-            class MarkerImplementor : Marker
+            @DartLibrary("markers.dart")
+            external class MarkerImplementor : Marker()
 
+            @DartLibrary("markers.dart")
             external class Test<A, B : Marker> {
                 companion object {
                     @DartConstructor
@@ -177,12 +231,22 @@ class Constructor : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             abstract class Marker {}
 
-            @sealed
-            class MarkerImplementor implements Marker {}
+            class MarkerImplementor extends Marker {}
+
+            class Test<A, B extends Marker> {
+              Test.create(A a, B b);
+            }
+            """,
+            Path("lib/markers.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "markers.dart" show MarkerImplementor, Test;
+            import "package:meta/meta.dart";
 
             void main() {
               Test<int, MarkerImplementor>.create(10, MarkerImplementor());

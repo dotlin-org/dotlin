@@ -869,8 +869,11 @@ class Property {
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/reflect/kproperty_impl.dt.g.dart"
+            import "package:dotlin/src/kotlin/util/lateinit.dt.g.dart"
+                show ${'$'}Extensions${'$'}a70fef564787a44;
+            import "package:dotlin/src/dotlin/reflect/kproperty_impl.dt.g.dart"
                 show KMutableProperty0Impl;
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function0, Function1;
             import "package:meta/meta.dart";
 
             late bool test;
@@ -903,8 +906,11 @@ class Property {
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/reflect/kproperty_impl.dt.g.dart"
+            import "package:dotlin/src/dotlin/reflect/kproperty_impl.dt.g.dart"
                 show KMutableProperty0Impl;
+            import "package:dotlin/src/kotlin/util/lateinit.dt.g.dart"
+                show ${'$'}Extensions${'$'}a70fef564787a44;
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function0, Function1;
             import "package:meta/meta.dart";
 
             @sealed

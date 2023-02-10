@@ -48,10 +48,10 @@ class Delegation : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/reflect/kproperty_impl.dt.g.dart"
+            import "package:dotlin/src/dotlin/reflect/kproperty_impl.dt.g.dart"
                 show KProperty0Impl;
-            import "package:dotlin/lib/src/kotlin/reflect/kproperty.dt.g.dart"
-                show KProperty;
+            import "package:dotlin/src/kotlin/reflect/kproperty.dt.g.dart" show KProperty;
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function0;
             import "package:meta/meta.dart";
 
             @sealed
@@ -107,10 +107,10 @@ class Delegation : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/reflect/kproperty_impl.dt.g.dart"
+            import "package:dotlin/src/dotlin/reflect/kproperty_impl.dt.g.dart"
                 show KMutableProperty0Impl;
-            import "package:dotlin/lib/src/kotlin/reflect/kproperty.dt.g.dart"
-                show KProperty;
+            import "package:dotlin/src/kotlin/reflect/kproperty.dt.g.dart" show KProperty;
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function0, Function1;
             import "package:meta/meta.dart";
 
             @sealed
@@ -174,10 +174,10 @@ class Delegation : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/reflect/kproperty_impl.dt.g.dart"
+            import "package:dotlin/src/dotlin/reflect/kproperty_impl.dt.g.dart"
                 show KProperty1Impl;
-            import "package:dotlin/lib/src/kotlin/reflect/kproperty.dt.g.dart"
-                show KProperty;
+            import "package:dotlin/src/kotlin/reflect/kproperty.dt.g.dart" show KProperty;
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             @sealed
@@ -240,10 +240,10 @@ class Delegation : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/reflect/kproperty_impl.dt.g.dart"
+            import "package:dotlin/src/dotlin/reflect/kproperty_impl.dt.g.dart"
                 show KMutableProperty1Impl;
-            import "package:dotlin/lib/src/kotlin/reflect/kproperty.dt.g.dart"
-                show KProperty;
+            import "package:dotlin/src/kotlin/reflect/kproperty.dt.g.dart" show KProperty;
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1, Function2;
             import "package:meta/meta.dart";
 
             @sealed
@@ -320,10 +320,10 @@ class Delegation : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/reflect/kproperty_impl.dt.g.dart"
+            import "package:dotlin/src/dotlin/reflect/kproperty_impl.dt.g.dart"
                 show KProperty0Impl;
-            import "package:dotlin/lib/src/kotlin/reflect/kproperty.dt.g.dart"
-                show KProperty;
+            import "package:dotlin/src/kotlin/reflect/kproperty.dt.g.dart" show KProperty;
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function0;
             import "package:meta/meta.dart";
 
             @sealed
@@ -386,10 +386,10 @@ class Delegation : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/reflect/kproperty_impl.dt.g.dart"
+            import "package:dotlin/src/dotlin/reflect/kproperty_impl.dt.g.dart"
                 show KMutableProperty0Impl;
-            import "package:dotlin/lib/src/kotlin/reflect/kproperty.dt.g.dart"
-                show KProperty;
+            import "package:dotlin/src/kotlin/reflect/kproperty.dt.g.dart" show KProperty;
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function0, Function1;
             import "package:meta/meta.dart";
 
             @sealed
@@ -465,6 +465,7 @@ class Delegation : BaseTest {
 
         dart(
             """
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function0;
             import "package:meta/meta.dart";
 
             late final int myLazy = () {
@@ -516,6 +517,7 @@ class Delegation : BaseTest {
 
         dart(
             """
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function0;
             import "package:meta/meta.dart";
 
             void main() {

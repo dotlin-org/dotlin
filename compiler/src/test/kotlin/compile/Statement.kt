@@ -142,11 +142,11 @@ class Statement : BaseTest {
         fun `when with else`() = assertCompile {
             kotlin(
                 """
-                fun main(x: Int) {
+                fun exec(x: Int) {
                     when {
-                        1 + 1 == 3 -> main(2)
-                        3 + 3 == 7 -> main(6)
-                        else -> main(10)
+                        1 + 1 == 3 -> exec(2)
+                        3 + 3 == 7 -> exec(6)
+                        else -> exec(10)
                     }
                 }
                 """
@@ -156,13 +156,13 @@ class Statement : BaseTest {
                 """
                 import "package:meta/meta.dart";
 
-                void main(int x) {
+                void exec(int x) {
                   if (1 + 1 == 3) {
-                    main(2);
+                    exec(2);
                   } else if (3 + 3 == 7) {
-                    main(6);
+                    exec(6);
                   } else {
-                    main(10);
+                    exec(10);
                   }
                 }
                 """
@@ -175,10 +175,10 @@ class Statement : BaseTest {
                 """
                 fun test(y: Int) = y * 3
 
-                fun main(x: Int) {
+                fun exec(x: Int) {
                     when(x) {
-                        4 -> test(2)
-                        12 -> test(6)
+                        4 -> exec(2)
+                        12 -> exec(6)
                     }
                 }
                 """
@@ -192,13 +192,13 @@ class Statement : BaseTest {
                   return y * 3;
                 }
 
-                void main(int x) {
+                void exec(int x) {
                   {
                     final int tmp0_subject = x;
                     if (tmp0_subject == 4) {
-                      test(2);
+                      exec(2);
                     } else if (tmp0_subject == 12) {
-                      test(6);
+                      exec(6);
                     }
                   }
                 }
@@ -229,6 +229,7 @@ class Statement : BaseTest {
 
             dart(
                 """
+                import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
                 import "package:meta/meta.dart";
 
                 enum PowerStatus {

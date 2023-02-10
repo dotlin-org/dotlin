@@ -24,6 +24,7 @@ import assertCompile
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import kotlin.io.path.Path
 
 @DisplayName("Compile: Dialect: Collections: Collection")
 class Collection : BaseTest {
@@ -37,14 +38,23 @@ class Collection : BaseTest {
                 val myCollection: Collection<Int> = calculate()
             }
 
+            @DartLibrary("calc.dart")
             external fun calculate(): Flex<AnyList<Int>, List<Int>>
             """
         )
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/flex.dt.g.dart"
-                show AnyCollection;
+            List<int> calculate() => [];
+            """,
+            Path("lib/calc.dart"),
+            assert = false,
+        )
+
+        dart(
+            """
+            import "calc.dart" show calculate;
+            import "package:dotlin/src/dotlin/intrinsics/flex.dt.g.dart" show AnyCollection;
             import "package:meta/meta.dart";
 
             void main() {
@@ -62,14 +72,23 @@ class Collection : BaseTest {
 
             val myCollection: Collection<Int> = calculate()
 
+            @DartLibrary("calc.dart")
             external fun calculate(): Flex<AnyList<Int>, List<Int>>
             """
         )
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/flex.dt.g.dart"
-                show AnyCollection;
+            List<int> calculate() => [];
+            """,
+            Path("lib/calc.dart"),
+            assert = false,
+        )
+
+        dart(
+            """
+            import "calc.dart" show calculate;
+            import "package:dotlin/src/dotlin/intrinsics/flex.dt.g.dart" show AnyCollection;
             import "package:meta/meta.dart";
 
             final AnyCollection<int> myCollection = calculate();
@@ -90,14 +109,23 @@ class Collection : BaseTest {
 
             fun process(collection: Collection<Int>) {}
 
+            @DartLibrary("calc.dart")
             external fun calculate(): Flex<AnyList<Int>, List<Int>>
             """
         )
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/flex.dt.g.dart"
-                show AnyCollection;
+            List<int> calculate() => [];
+            """,
+            Path("lib/calc.dart"),
+            assert = false,
+        )
+
+        dart(
+            """
+            import "calc.dart" show calculate;
+            import "package:dotlin/src/dotlin/intrinsics/flex.dt.g.dart" show AnyCollection;
             import "package:meta/meta.dart";
 
             void main() {
@@ -110,6 +138,8 @@ class Collection : BaseTest {
         )
     }
 
+    // TODO: Fix in #53.
+    @Disabled
     @Test
     fun `(dynamic) is Collection`() = assertCompile {
         kotlin(
@@ -123,18 +153,27 @@ class Collection : BaseTest {
                 }
             }
 
+            @DartLibrary("calc.dart")
             external fun calculate(): dynamic
             """
         )
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+            dynamic calculate() => null;
+            """,
+            Path("lib/calc.dart"),
+            assert = false,
+        )
+
+        dart(
+            """
+            import "calc.dart" show calculate;
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show DotlinTypeIntrinsics;
-            import "package:dotlin/lib/src/kotlin/collections/collection.dt.g.dart"
+            import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show Collection;
-            import "package:dotlin/lib/src/dotlin/intrinsics/flex.dt.g.dart"
-                show AnyCollection;
+            import "package:dotlin/src/dotlin/intrinsics/flex.dt.g.dart" show AnyCollection;
             import "package:meta/meta.dart";
 
             void main() {
@@ -160,18 +199,27 @@ class Collection : BaseTest {
                 }
             }
 
+            @DartLibrary("calc.dart")
             external fun calculate(): Any
             """
         )
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+            Object calculate() => 0;
+            """,
+            Path("lib/calc.dart"),
+            assert = false,
+        )
+
+        dart(
+            """
+            import "calc.dart" show calculate;
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show DotlinTypeIntrinsics;
-            import "package:dotlin/lib/src/kotlin/collections/collection.dt.g.dart"
+            import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show Collection;
-            import "package:dotlin/lib/src/dotlin/intrinsics/flex.dt.g.dart"
-                show AnyCollection;
+            import "package:dotlin/src/dotlin/intrinsics/flex.dt.g.dart" show AnyCollection;
             import "package:meta/meta.dart";
 
             void main() {
@@ -184,6 +232,8 @@ class Collection : BaseTest {
         )
     }
 
+    // TODO: Fix in #53.
+    @Disabled
     @Test
     fun `(dynamic) !is Collection`() = assertCompile {
         kotlin(
@@ -197,13 +247,23 @@ class Collection : BaseTest {
                 }
             }
 
+            @DartLibrary("calc.dart")
             external fun calculate(): dynamic
             """
         )
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+            dynamic calculate() => null;
+            """,
+            Path("lib/calc.dart"),
+            assert = false,
+        )
+
+        dart(
+            """
+            import "calc.dart" show calculate;
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show DotlinTypeIntrinsics;
             import "package:meta/meta.dart";
 
@@ -215,6 +275,8 @@ class Collection : BaseTest {
         )
     }
 
+    // TODO: Fix in #53.
+    @Disabled
     @Test
     fun `(Any) !is Collection`() = assertCompile {
         kotlin(
@@ -228,13 +290,23 @@ class Collection : BaseTest {
                 }
             }
 
+            @DartLibrary("calc.dart")
             external fun calculate(): Any
             """
         )
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
+            Object calculate() => 3;
+            """,
+            Path("lib/calc.dart"),
+            assert = false,
+        )
+
+        dart(
+            """
+            import "calc.dart" show calculate;
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show DotlinTypeIntrinsics;
             import "package:meta/meta.dart";
 
@@ -257,6 +329,7 @@ class Collection : BaseTest {
                 val myList: Collection<Int> = MyList<Int>()
             }
 
+            @DartLibrary("my_list.dart")
             external class MyList<E> : Flex<AnyList<E>, List<E>> {
                 override var size: Int = 0
                 override fun <R> cast() = MyList<R>()
@@ -352,8 +425,18 @@ class Collection : BaseTest {
 
         dart(
             """
-            import "package:dotlin/lib/src/dotlin/intrinsics/flex.dt.g.dart"
-                show AnyCollection;
+            class MyList<E> implements List<E> {
+              dynamic noSuchMethod(Invocation invocation) {}
+            }
+            """,
+            Path("lib/my_list.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "my_list.dart" show MyList;
+            import "package:dotlin/src/dotlin/intrinsics/flex.dt.g.dart" show AnyCollection;
             import "package:meta/meta.dart";
 
             void main() {

@@ -44,6 +44,7 @@ class Lambda : BaseTest {
 
         dart(
             """
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function0;
             import "package:meta/meta.dart";
 
             void compute(void Function() action) {}
@@ -78,6 +79,7 @@ class Lambda : BaseTest {
 
         dart(
             """
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function0;
             import "package:meta/meta.dart";
 
             void compute(void Function() action) {}
@@ -111,6 +113,7 @@ class Lambda : BaseTest {
 
         dart(
             """
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             void compute(void Function(int) action) {}
@@ -143,6 +146,7 @@ class Lambda : BaseTest {
 
         dart(
             """
+            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             void compute(int Function(int) action) {}
