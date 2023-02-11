@@ -559,12 +559,12 @@ class Set : BaseTest {
         dart(
             """
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
-                show DotlinTypeIntrinsics;
+                show isImmutableSet;
             import "package:meta/meta.dart";
 
             void main() {
               final Object? obj = calculate();
-              if (obj.isImmutableSet<int>()) {
+              if (isImmutableSet<int>(obj)) {
                 (obj as Set<int>).length;
               }
             }
@@ -594,12 +594,12 @@ class Set : BaseTest {
         dart(
             """
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
-                show DotlinTypeIntrinsics;
+                show isImmutableSet;
             import "package:meta/meta.dart";
 
             void main() {
               final Object? obj = calculate();
-              if (!obj.isImmutableSet<int>()) {}
+              if (!isImmutableSet<int>(obj)) {}
             }
 
             Object? calculate() {
@@ -627,12 +627,12 @@ class Set : BaseTest {
         dart(
             """
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
-                show DotlinTypeIntrinsics;
+                show isMutableSet;
             import "package:meta/meta.dart";
 
             void main() {
               final Object? obj = calculate();
-              if (obj.isMutableSet<int>()) {
+              if (isMutableSet<int>(obj)) {
                 (obj as Set<int>).length;
               }
             }
@@ -660,12 +660,12 @@ class Set : BaseTest {
         dart(
             """
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
-                show DotlinTypeIntrinsics;
+                show isMutableSet;
             import "package:meta/meta.dart";
 
             void main() {
               final Object? obj = calculate();
-              if (!obj.isMutableSet<int>()) {}
+              if (!isMutableSet<int>(obj)) {}
             }
 
             Object? calculate() {

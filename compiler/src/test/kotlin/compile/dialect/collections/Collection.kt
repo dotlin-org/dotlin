@@ -139,13 +139,10 @@ class Collection : BaseTest {
     }
 
     // TODO: Fix in #53.
-    @Disabled
     @Test
     fun `(dynamic) is Collection`() = assertCompile {
         kotlin(
             """
-            import dotlin.intrinsics.*
-
             fun main() {
                 val obj = calculate()
                 if (obj is Collection<Int>) {
@@ -170,7 +167,7 @@ class Collection : BaseTest {
             """
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
-                show DotlinTypeIntrinsics;
+                show isCollection;
             import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show Collection;
             import "package:dotlin/src/dotlin/intrinsics/flex.dt.g.dart" show AnyCollection;
@@ -178,7 +175,7 @@ class Collection : BaseTest {
 
             void main() {
               final dynamic obj = calculate();
-              if (obj.isCollection<int>()) {
+              if (isCollection<int>(obj)) {
                 (obj as AnyCollection<int>).cast<num>();
               }
             }
@@ -190,8 +187,6 @@ class Collection : BaseTest {
     fun `(Any) is Collection`() = assertCompile {
         kotlin(
             """
-            import dotlin.intrinsics.*
-
             fun main() {
                 val obj = calculate()
                 if (obj is Collection<Int>) {
@@ -216,7 +211,7 @@ class Collection : BaseTest {
             """
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
-                show DotlinTypeIntrinsics;
+                show isCollection;
             import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show Collection;
             import "package:dotlin/src/dotlin/intrinsics/flex.dt.g.dart" show AnyCollection;
@@ -224,7 +219,7 @@ class Collection : BaseTest {
 
             void main() {
               final Object obj = calculate();
-              if (obj.isCollection<int>()) {
+              if (isCollection<int>(obj)) {
                 (obj as AnyCollection<int>).cast<num>();
               }
             }
@@ -232,14 +227,10 @@ class Collection : BaseTest {
         )
     }
 
-    // TODO: Fix in #53.
-    @Disabled
     @Test
     fun `(dynamic) !is Collection`() = assertCompile {
         kotlin(
             """
-            import dotlin.intrinsics.*
-
             fun main() {
                 val obj = calculate()
                 if (obj !is Collection<Int>) {
@@ -264,25 +255,22 @@ class Collection : BaseTest {
             """
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
-                show DotlinTypeIntrinsics;
+                show isCollection;
             import "package:meta/meta.dart";
 
             void main() {
               final dynamic obj = calculate();
-              if (!obj.isCollection<int>()) {}
+              if (!isCollection<int>(obj)) {}
             }
             """
         )
     }
 
-    // TODO: Fix in #53.
     @Disabled
     @Test
     fun `(Any) !is Collection`() = assertCompile {
         kotlin(
             """
-            import dotlin.intrinsics.*
-
             fun main() {
                 val obj = calculate()
                 if (obj !is Collection<Int>) {
@@ -307,12 +295,12 @@ class Collection : BaseTest {
             """
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
-                show DotlinTypeIntrinsics;
+                show isCollection;
             import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
-              if (!obj.isCollection<int>()) {}
+              if (!isCollection<int>(obj)) {}
             }
             """
         )

@@ -90,9 +90,9 @@ class CollectionTypeChecksLowering(override val context: DotlinLoweringContext) 
                     irMaybeNot(
                         irCall(
                             symbol.owner,
-                            receiver = expression.argument,
+                            receiver = null,
+                            expression.argument,
                             typeArguments = typeArguments.map { it.typeOrNull },
-                            isExtension = true
                         ),
                         negated
                     )

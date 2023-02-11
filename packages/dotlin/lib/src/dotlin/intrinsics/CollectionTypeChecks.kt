@@ -16,58 +16,50 @@
 
 package dotlin.intrinsics
 
-//#region Collection checks
-@DartExtensionName("DotlinTypeIntrinsics")
-inline /*internal*/ fun <T> Any?.isCollection(): Boolean =
-    this is Collection<T> || this is AnyList<T> || this is AnySet<T>
+// TODO: @DartPublic
 
-@DartExtensionName("DotlinTypeIntrinsics")
-inline /*internal*/ fun <T> Any?.isMutableCollection(): Boolean =
-    this is MutableCollection<T> || isMutableList<T>() || isMutableSet<T>()
+//#region Collection checks
+inline /*internal*/ fun <T> isCollection(obj: Any?): Boolean =
+    obj is Collection<T> || obj is AnyList<T> || obj is AnySet<T>
+
+inline /*internal*/ fun <T> isMutableCollection(obj: Any?): Boolean =
+    obj is MutableCollection<T> || isMutableList<T>(obj) || isMutableSet<T>(obj)
 //#endregion
 
 //#region List checks
-@DartExtensionName("DotlinTypeIntrinsics")
-inline /*internal*/ fun <T> Any?.isImmutableList(): Boolean = this is AnyList<T> &&
-        (this is ImmutableListMarker || (!isWriteable() && !isGrowable()))
+inline /*internal*/ fun <T> isImmutableList(obj: Any?): Boolean = obj is AnyList<T> &&
+        (obj is ImmutableListMarker || (!isWriteable(obj) && !isGrowable(obj)))
 
-@DartExtensionName("DotlinTypeIntrinsics")
-inline /*internal*/ fun <T> Any?.isWriteableList(): Boolean = this is AnyList<T> &&
-        (this is WriteableListMarker || isWriteable())
+inline /*internal*/ fun <T> isWriteableList(obj: Any?): Boolean = obj is AnyList<T> &&
+        (obj is WriteableListMarker || isWriteable(obj))
 
-@DartExtensionName("DotlinTypeIntrinsics")
-inline /*internal*/ fun <T> Any?.isFixedSizeList(): Boolean = this is AnyList<T> &&
-        (this is FixedSizeListMarker || (isWriteable() && !isGrowable()))
+inline /*internal*/ fun <T> isFixedSizeList(obj: Any?): Boolean = obj is AnyList<T> &&
+        (obj is FixedSizeListMarker || (isWriteable(obj) && !isGrowable(obj)))
 
-@DartExtensionName("DotlinTypeIntrinsics")
-inline /*internal*/ fun <T> Any?.isMutableList(): Boolean = this is AnyList<T> &&
-        (this is MutableListMarker || (isWriteable() && isGrowable()))
+inline /*internal*/ fun <T> isMutableList(obj: Any?): Boolean = obj is AnyList<T> &&
+        (obj is MutableListMarker || (isWriteable(obj) && isGrowable(obj)))
 //#endregion
 
 //#region Set checks
-@DartExtensionName("DotlinTypeIntrinsics")
-inline /*internal*/ fun <T> Any?.isImmutableSet(): Boolean = this is AnySet<T> &&
-        (this is ImmutableSetMarker || !isGrowable())
+inline /*internal*/ fun <T> isImmutableSet(obj: Any?): Boolean = obj is AnySet<T> &&
+        (obj is ImmutableSetMarker || !isGrowable(obj))
 
-@DartExtensionName("DotlinTypeIntrinsics")
-inline /*internal*/ fun <T> Any?.isMutableSet(): Boolean = this is AnySet<T> &&
-        (this is MutableSetMarker || isGrowable())
+inline /*internal*/ fun <T> isMutableSet(obj: Any?): Boolean = obj is AnySet<T> &&
+        (obj is MutableSetMarker || isGrowable(obj))
 //#region
 
 //#region Map checks
-inline /*internal*/ fun <K, V> Any?.isImmutableMap(): Boolean = this is AnyMap<K, V> &&
-        (this is ImmutableMapMarker || !isGrowable())
+inline /*internal*/ fun <K, V> isImmutableMap(obj: Any?): Boolean = obj is AnyMap<K, V> &&
+        (obj is ImmutableMapMarker || !isGrowable(obj))
 
-@DartExtensionName("DotlinTypeIntrinsics")
-inline /*internal*/ fun <K, V> Any?.isMutableMap(): Boolean = this is AnyMap<K, V> &&
-        (this is MutableMapMarker || isGrowable())
+inline /*internal*/ fun <K, V> isMutableMap(obj: Any?): Boolean = obj is AnyMap<K, V> &&
+        (obj is MutableMapMarker || isGrowable(obj))
 //#region
 
 @PublishedApi
-@DartExtensionName("ListTypes")
-inline internal fun AnyList<dynamic>.isGrowable(): Boolean {
+inline internal fun isGrowable(list: AnyList<dynamic>): Boolean {
     try {
-        add(removeLast())
+        list.add(list.removeLast())
     } catch (e: UnsupportedError) {
         return false
     } catch (e: RangeError) {
@@ -80,14 +72,13 @@ inline internal fun AnyList<dynamic>.isGrowable(): Boolean {
 }
 
 @PublishedApi
-@DartExtensionName("ListTypes")
-inline internal fun AnyList<dynamic>.isWriteable(): Boolean {
+inline internal fun isWriteable(list: AnyList<dynamic>): Boolean {
     try {
-        if (isEmpty()) {
-            sort()
+        if (list.isEmpty()) {
+            list.sort()
         } else {
-            val item = this[0]
-            this[0] = item
+            val item = list[0]
+            list[0] = item
         }
     } catch (e: UnsupportedError) {
         return false
@@ -97,10 +88,9 @@ inline internal fun AnyList<dynamic>.isWriteable(): Boolean {
 }
 
 @PublishedApi
-@DartExtensionName("SetTypes")
-inline internal fun AnySet<dynamic>.isGrowable(): Boolean {
+inline internal fun isGrowable(set: AnySet<dynamic>): Boolean {
     try {
-        retainIf { true }
+        set.retainIf { true }
     } catch (e: UnsupportedError) {
         return false
     }
@@ -109,11 +99,10 @@ inline internal fun AnySet<dynamic>.isGrowable(): Boolean {
 }
 
 @PublishedApi
-@DartExtensionName("MapTypes")
-inline internal fun AnyMap<dynamic, dynamic>.isGrowable(): Boolean {
+inline internal fun isGrowable(map: AnyMap<dynamic, dynamic>): Boolean {
     try {
         // TODO: Support `_` param name
-        removeIf { key, value -> false }
+        map.removeIf { key, value -> false }
     } catch (e: UnsupportedError) {
         return false
     }

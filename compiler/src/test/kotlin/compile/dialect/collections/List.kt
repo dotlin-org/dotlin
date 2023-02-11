@@ -712,12 +712,12 @@ class List : BaseTest {
             """
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
-                show DotlinTypeIntrinsics;
+                show isImmutableList;
             import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
-              if (obj.isImmutableList<int>()) {
+              if (isImmutableList<int>(obj)) {
                 (obj as List<int>)[0];
               }
             }
@@ -753,12 +753,12 @@ class List : BaseTest {
             """
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
-                show DotlinTypeIntrinsics;
+                show isImmutableList;
             import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
-              if (!obj.isImmutableList<int>()) {}
+              if (!isImmutableList<int>(obj)) {}
             }
             """
         )
@@ -792,12 +792,12 @@ class List : BaseTest {
             """
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
-                show DotlinTypeIntrinsics;
+                show isWriteableList;
             import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
-              if (obj.isWriteableList<int>()) {
+              if (isWriteableList<int>(obj)) {
                 (obj as List<int>)[0];
               }
             }
@@ -833,12 +833,12 @@ class List : BaseTest {
             """
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
-                show DotlinTypeIntrinsics;
+                show isWriteableList;
             import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
-              if (!obj.isWriteableList<int>()) {}
+              if (!isWriteableList<int>(obj)) {}
             }
             """
         )
@@ -872,12 +872,12 @@ class List : BaseTest {
             """
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
-                show DotlinTypeIntrinsics;
+                show isFixedSizeList;
             import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
-              if (obj.isFixedSizeList<int>()) {
+              if (isFixedSizeList<int>(obj)) {
                 (obj as List<int>)[0];
               }
             }
@@ -913,12 +913,12 @@ class List : BaseTest {
             """
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
-                show DotlinTypeIntrinsics;
+                show isFixedSizeList;
             import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
-              if (!obj.isFixedSizeList<int>()) {}
+              if (!isFixedSizeList<int>(obj)) {}
             }
             """
         )
@@ -973,8 +973,6 @@ class List : BaseTest {
     fun `!is FixedSizeList`() = assertCompile {
         kotlin(
             """
-            import dotlin.intrinsics.*
-
             fun main() {
                 val obj = calculate()
                 if (obj !is FixedSizeList<Int>) {
@@ -1036,12 +1034,12 @@ class List : BaseTest {
             """
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
-                show DotlinTypeIntrinsics;
+                show isMutableList;
             import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
-              if (obj.isMutableList<int>()) {
+              if (isMutableList<int>(obj)) {
                 (obj as List<int>)[0];
               }
             }
@@ -1077,12 +1075,12 @@ class List : BaseTest {
             """
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
-                show DotlinTypeIntrinsics;
+                show isMutableList;
             import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
-              if (!obj.isMutableList<int>()) {}
+              if (!isMutableList<int>(obj)) {}
             }
             """
         )
