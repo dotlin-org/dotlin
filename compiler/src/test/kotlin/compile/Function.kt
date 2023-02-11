@@ -206,7 +206,6 @@ class Function : BaseTest {
 
         dart(
             """
-            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             enum CharacterType {
@@ -1638,7 +1637,6 @@ class Function : BaseTest {
 
         dart(
             """
-            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             @pragma("vm:always-consider-inlining")
@@ -1676,7 +1674,6 @@ class Function : BaseTest {
 
         dart(
             """
-            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             @pragma("vm:always-consider-inlining")
@@ -1725,7 +1722,6 @@ class Function : BaseTest {
         dart(
             """
             import "package:dotlin/src/dotlin/intrinsics/internal.dt.g.dart" show ${'$'}Return;
-            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             @pragma("vm:always-consider-inlining")
@@ -1788,7 +1784,6 @@ class Function : BaseTest {
         dart(
             """
             import "package:dotlin/src/dotlin/intrinsics/internal.dt.g.dart" show ${'$'}Return;
-            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             @pragma("vm:always-consider-inlining")
@@ -1865,7 +1860,6 @@ class Function : BaseTest {
         dart(
             """
             import "package:dotlin/src/dotlin/intrinsics/internal.dt.g.dart" show ${'$'}Return;
-            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             @pragma("vm:always-consider-inlining")
@@ -1938,7 +1932,6 @@ class Function : BaseTest {
         dart(
             """
             import "package:dotlin/src/dotlin/intrinsics/internal.dt.g.dart" show ${'$'}Return;
-            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             @pragma("vm:always-consider-inlining")

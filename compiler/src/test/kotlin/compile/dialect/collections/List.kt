@@ -1156,8 +1156,6 @@ class List : BaseTest {
                 show ImmutableListMarker;
             import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show MutableCollection;
-            import "package:dotlin/src/kotlin/function.dt.g.dart"
-                show Function1, Function2, Function0;
             import "dart:math" show Random;
             import "package:meta/meta.dart";
 
@@ -1647,8 +1645,6 @@ class List : BaseTest {
                 show WriteableListMarker;
             import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show MutableCollection;
-            import "package:dotlin/src/kotlin/function.dt.g.dart"
-                show Function1, Function2, Function0;
             import "dart:math" show Random;
             import "package:meta/meta.dart";
 
@@ -2103,8 +2099,6 @@ class List : BaseTest {
                 show FixedSizeListMarker;
             import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show MutableCollection;
-            import "package:dotlin/src/kotlin/function.dt.g.dart"
-                show Function1, Function2, Function0;
             import "dart:math" show Random;
             import "package:meta/meta.dart";
 
@@ -2578,8 +2572,6 @@ class List : BaseTest {
             """
             import "package:dotlin/src/dotlin/intrinsics/collection_markers.dt.g.dart"
                 show MutableListMarker;
-            import "package:dotlin/src/kotlin/function.dt.g.dart"
-                show Function1, Function2, Function0;
             import "package:dotlin/src/kotlin/collections/iterator.dt.g.dart"
                 show MutableIterator;
             import "dart:math" show Random;
@@ -3002,8 +2994,6 @@ class List : BaseTest {
                 show FixedSizeListMarker;
             import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show MutableCollection;
-            import "package:dotlin/src/kotlin/function.dt.g.dart"
-                show Function1, Function2, Function0;
             import "dart:math" show Random;
             import "package:meta/meta.dart";
 

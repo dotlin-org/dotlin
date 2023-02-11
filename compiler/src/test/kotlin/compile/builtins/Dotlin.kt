@@ -352,7 +352,6 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             void process(bool Function(int) test) {
@@ -378,7 +377,6 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             void process({bool Function(int)? test = null}) {
@@ -422,7 +420,6 @@ class Dotlin : BaseTest {
 
         dart(
             """
-            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             class Processor {

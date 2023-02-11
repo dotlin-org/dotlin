@@ -430,4 +430,74 @@ class Import : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `import type argument of expression`() = assertCompile {
+        kotlin(
+            """
+            package pkg0
+
+            class A
+            class B<T>
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            @sealed
+            class A {}
+
+            @sealed
+            class B<T> {}
+            """
+        )
+
+        kotlin(
+            """
+            package pkg1
+
+            import pkg0.A
+            import pkg0.B
+
+            fun calc() = B<A>()
+            """
+        )
+
+        dart(
+            """
+            import "0.dt.g.dart" show B, A;
+            import "package:meta/meta.dart";
+
+            B<A> calc() {
+              return B<A>();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `import type argument of type`() = assertCompile {
+        kotlin(
+            """
+            import kotlin.reflect.KType
+
+            interface A {
+                val list: List<KType>
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:dotlin/src/kotlin/reflect/ktype.dt.g.dart" show KType;
+            import "package:meta/meta.dart";
+
+            abstract class A {
+              abstract final List<KType> list;
+            }
+            """
+        )
+    }
 }

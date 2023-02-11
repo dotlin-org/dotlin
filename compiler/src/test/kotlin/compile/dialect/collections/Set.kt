@@ -743,8 +743,6 @@ class Set : BaseTest {
                 show ImmutableSetMarker;
             import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show MutableCollection;
-            import "package:dotlin/src/kotlin/function.dt.g.dart"
-                show Function1, Function2, Function0;
             import "package:meta/meta.dart";
 
             @sealed
@@ -1065,8 +1063,6 @@ class Set : BaseTest {
                 show MutableSetMarker;
             import "package:dotlin/src/kotlin/collections/iterator.dt.g.dart"
                 show MutableIterator;
-            import "package:dotlin/src/kotlin/function.dt.g.dart"
-                show Function1, Function2, Function0;
             import "package:meta/meta.dart";
 
             @sealed

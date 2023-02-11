@@ -287,55 +287,7 @@ class SingleSymbolRenamer(private val symbol: IrSymbol, private val name: Name) 
     override fun getTypeAliasName(symbol: IrTypeAliasSymbol) = newNameIfMatch(symbol) { symbol.owner.name }
 }
 
-private fun IrFile?.remapAtRelevantParents(block: (IrElement) -> Unit) =
-    this?.module?.files?.forEach { block(it) } ?: this?.let { block(it.getPackageFragment()!!) }
 
-private fun IrDeclaration.remapAtRelevantParents(block: (IrElement) -> Unit) =
-    fileOrNull.remapAtRelevantParents(block)
-
-fun IrDeclaration.transformExpressionsEverywhere(
-    block: IrExpressionWithContextTransformer.(IrExpression, IrExpressionContext) -> IrExpression
-) = fileOrNull?.transformExpressionsEverywhere(block)
-
-fun IrFile?.transformExpressionsEverywhere(
-    block: IrExpressionWithContextTransformer.(IrExpression, IrExpressionContext) -> IrExpression
-) = remapAtRelevantParents { it.transformExpressions(block) }
-
-fun IrDeclaration.remapReferencesEverywhere(mapping: Pair<IrSymbol, IrSymbol>) =
-    remapAtRelevantParents { it.remapReferences(mapOf(mapping)) }
-
-fun IrElement.remapReferences(mapping: Pair<IrSymbol, IrSymbol>) = remapReferences(mapOf(mapping))
-
-fun IrElement.remapReferences(mapping: Map<IrSymbol, IrSymbol>) =
-    transformChildrenVoid(DeclarationReferenceRemapper(mapping))
-
-fun IrDeclaration.remapTypesEverywhere(typeRemapper: TypeRemapper) =
-    remapAtRelevantParents { it.remapTypes(typeRemapper) }
-
-fun IrDeclaration.remapTypesEverywhere(mapping: Pair<IrType, IrType>) =
-    remapAtRelevantParents { it.remapTypes(mapping) }
-
-fun IrDeclaration.remapTypesEverywhere(mapping: Map<IrType, IrType>) =
-    remapAtRelevantParents { it.remapTypes(mapping) }
-
-fun IrElement.remapTypes(block: (IrType) -> IrType) = remapTypes(
-    object : TypeRemapper {
-        override fun enterScope(irTypeParametersContainer: IrTypeParametersContainer) {}
-        override fun leaveScope() {}
-        override fun remapType(type: IrType): IrType = block(type)
-    }
-)
-
-fun IrElement.remapTypes(mapping: Pair<IrType, IrType>) = remapTypes(mapOf(mapping))
-
-fun IrElement.remapTypes(mapping: Map<IrType, IrType>) = remapTypes(
-    object : TypeRemapper {
-        override fun enterScope(irTypeParametersContainer: IrTypeParametersContainer) {}
-        override fun leaveScope() {}
-
-        override fun remapType(type: IrType) = mapping[type] ?: type
-    }
-)
 
 class DeclarationReferenceRemapper(
     private val mapping: Map<out IrSymbol, IrSymbol>

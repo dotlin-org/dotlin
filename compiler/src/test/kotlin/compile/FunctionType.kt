@@ -35,7 +35,6 @@ class FunctionType : BaseTest {
         )
         dart(
             """
-            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function0;
             import "package:meta/meta.dart";
 
             final int Function() function = () {
@@ -54,7 +53,6 @@ class FunctionType : BaseTest {
         )
         dart(
             """
-            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function0;
             import "package:meta/meta.dart";
 
             final void Function() function = () {
@@ -73,7 +71,6 @@ class FunctionType : BaseTest {
         )
         dart(
             """
-            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function2;
             import "package:meta/meta.dart";
 
             final void Function(
@@ -98,7 +95,6 @@ class FunctionType : BaseTest {
         )
         dart(
             """
-            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             void test<T>(void Function(T) block) {}
@@ -115,7 +111,6 @@ class FunctionType : BaseTest {
         )
         dart(
             """
-            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function2;
             import "package:meta/meta.dart";
 
             final void Function(

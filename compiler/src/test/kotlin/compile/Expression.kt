@@ -310,7 +310,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function0;
             import "package:meta/meta.dart";
 
             void main() {
@@ -336,7 +335,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             void main() {
@@ -1175,7 +1173,6 @@ class Expression : BaseTest {
             """
             import "package:dotlin/src/dotlin/intrinsics/errors.dt.g.dart"
                 show NoWhenBranchMatchedError;
-            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
             import "package:meta/meta.dart";
 
             enum PowerStatus {

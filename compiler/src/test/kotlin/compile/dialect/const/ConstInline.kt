@@ -315,7 +315,6 @@ class ConstInline : BaseTest {
 
         dart(
             """
-            import "package:dotlin/src/kotlin/function.dt.g.dart" show Function0;
             import "package:meta/meta.dart";
 
             @sealed

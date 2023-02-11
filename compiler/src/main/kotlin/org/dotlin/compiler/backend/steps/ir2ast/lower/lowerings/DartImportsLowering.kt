@@ -25,9 +25,11 @@ import org.dotlin.compiler.backend.annotatedDartLibrary
 import org.dotlin.compiler.backend.attributes.DartImport
 import org.dotlin.compiler.backend.descriptors.DartDescriptor
 import org.dotlin.compiler.backend.dotlin
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrTypeContext
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrTypeContext.SuperTypes
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.backend.steps.ir2ast.ir.isNonExtensionMethod
-import org.dotlin.compiler.backend.steps.ir2ast.ir.remapTypes
+import org.dotlin.compiler.backend.steps.ir2ast.ir.visitTypes
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrFileLowering
 import org.dotlin.compiler.backend.steps.src2ir.dotlinModule
@@ -65,12 +67,10 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
                 override fun visitDeclarationReference(expression: IrDeclarationReference) {
                     super.visitDeclarationReference(expression)
 
-                    val referenced = when (val owner = expression.symbol.owner) {
-                        is IrConstructor -> owner.parentClassOrNull
-                        else -> owner as? IrDeclarationWithName
-                    } ?: return
+                    val declaration = expression.symbol.owner as? IrDeclaration ?: return
 
-                    file.maybeAddDartImportsFor(referenced)
+                    // TODO: typeContext = null must be explicitely passed because of a bug in contextual receivers
+                    file.maybeAddDartImportsFor(declaration, typeContext = null)
                 }
 
                 override fun visitMemberAccess(expression: IrMemberAccessExpression<*>) =
@@ -80,31 +80,21 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
             }
         )
 
-        file.remapTypes { type ->
-            fun maybeAddImport(type: IrType) {
-                if (type is IrSimpleType) {
-                    // Add import for type alias or class.
-                    type.abbreviation?.typeAlias?.owner?.let { file.maybeAddDartImportsFor(it) }
-                        ?: type.classOrNull?.owner?.let { file.maybeAddDartImportsFor(it) }
-
-                    // Add imports for type arguments.
-                    type.arguments.forEach {
-                        it.typeOrNull?.let { t -> maybeAddImport(t) }
-                    }
-                }
+        file.visitTypes { type, context ->
+            if (type is IrSimpleType) {
+                // Add import for type alias or class.
+                type.abbreviation?.typeAlias?.owner?.let { file.maybeAddDartImportsFor(it, context) }
+                    ?: type.classOrNull?.owner?.let { file.maybeAddDartImportsFor(it, context) }
             }
-
-            maybeAddImport(type)
-
-            type
         }
     }
 
     context(DotlinLoweringContext)
     private fun IrFile.maybeAddDartImportsFor(
-        declaration: IrDeclarationWithName
+        declaration: IrDeclaration,
+        typeContext: IrTypeContext? = null
     ) {
-        if (declaration is IrConstructor) return
+        if (declaration !is IrDeclarationWithName) return
         if (declaration.fqNameWhenAvailable in ignore) return
         if (declaration is IrValueParameter) return
         // TODO: Handle Unit
@@ -117,6 +107,7 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
 
         // Import the extension container class if it's an extension.
         val relevantDeclaration = declaration.extensionContainer ?: when (declaration) {
+            is IrConstructor -> declaration.parentAsClass
             is IrSimpleFunction -> when {
                 // For `@DartConstructor`s, we want to import the parent class of the companion object it's in.
                 isDartConstructor -> declaration.parentClassOrNull?.parentClassOrNull
@@ -126,11 +117,15 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
             else -> declaration
         }
 
+        val isFunctionType = relevantDeclaration is IrClass && relevantDeclaration.defaultType.isFunction()
+
+        if (isFunctionType && typeContext != null && typeContext !is SuperTypes) return
+
         // If the file is null, it's most likely Kotlin intrinsics (ANDAND, OROR, EQEQ, etc.)
         val fileOfDeclaration = when {
             // Function1, Function2, etc. are in an "external package fragment", but are in reality located
             // in the same file as the Function interface.
-            relevantDeclaration is IrClass && relevantDeclaration.defaultType.isFunction() -> {
+            isFunctionType -> {
                 irBuiltIns.functionClass.owner.fileOrNull
             }
 

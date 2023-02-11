@@ -229,7 +229,6 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:dotlin/src/kotlin/function.dt.g.dart" show Function1;
                 import "package:meta/meta.dart";
 
                 enum PowerStatus {
