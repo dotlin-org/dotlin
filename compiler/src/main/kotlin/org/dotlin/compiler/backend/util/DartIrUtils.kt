@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Wilko Manger
+ * Copyright 2023 Wilko Manger
  *
  * This file is part of Dotlin.
  *
@@ -17,11 +17,17 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.backend.descriptors
+@file:OptIn(ObsoleteDescriptorBasedAPI::class)
 
-import org.jetbrains.kotlin.descriptors.CallableDescriptor
+package org.dotlin.compiler.backend.util
 
-interface DartCallableDescriptor : DartDescriptor, CallableDescriptor {
-    override fun hasStableParameterNames() = true
-    override fun hasSynthesizedParameterNames() = true
-}
+import org.dotlin.compiler.backend.descriptors.DartDescriptor
+import org.dotlin.compiler.dart.element.DartDeclarationElement
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
+import org.jetbrains.kotlin.ir.declarations.IrDeclaration
+
+val IrDeclaration.isDartDeclaration
+    get() = descriptor is DartDescriptor
+
+val IrDeclaration.dartElement: DartDeclarationElement?
+    get() = (descriptor as? DartDescriptor)?.element as? DartDeclarationElement

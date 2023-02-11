@@ -63,6 +63,9 @@ value class DartSimpleIdentifier(override val value: String) : DartIdentifier {
     val isGenerated: Boolean
         get() = if (!isPrivate) value.startsWith("$") else value.startsWith("_$")
 
+    val isEmpty: Boolean
+        get() = value.isEmpty()
+
     /**
      * The [value] of this identifier without private (`_`) or generation (`$`) prefixes.
      *

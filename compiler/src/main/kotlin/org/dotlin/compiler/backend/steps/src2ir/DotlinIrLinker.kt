@@ -41,12 +41,13 @@ import org.jetbrains.kotlin.ir.types.IrTypeSystemContextImpl
 import org.jetbrains.kotlin.ir.util.IdSignature
 import org.jetbrains.kotlin.ir.util.IrMessageLogger
 import org.jetbrains.kotlin.ir.util.SymbolTable
+import org.jetbrains.kotlin.ir.util.addChild
 import org.jetbrains.kotlin.library.IrLibrary
 import org.jetbrains.kotlin.library.KotlinAbiVersion
 import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.library.containsErrorCode
 import org.jetbrains.kotlin.psi2ir.generators.DeclarationStubGeneratorImpl
-import org.jetbrains.kotlin.utils.addToStdlib.cast
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 class DotlinIrLinker(
     currentModule: ModuleDescriptor?,
@@ -128,12 +129,16 @@ class DotlinIrLinker(
                 }
             }
 
-            declaration.parent = descriptor.containingDeclaration.cast<DartPackageFragmentDescriptor>().let {
+            // Generated top-level IR elements by default have an IrExternalPackageFragment parent,
+            // we want this to be an IrFile.
+            descriptor.containingDeclaration.safeAs<DartPackageFragmentDescriptor>()?.let {
                 filesByLibrary.computeIfAbsent(it.library) { library ->
                     IrFileImpl(
                         DartIrFileEntry(library),
                         packageFragmentDescriptor = it
                     )
+                }.apply {
+                    addChild(declaration)
                 }
             }
 

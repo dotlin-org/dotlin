@@ -80,7 +80,7 @@ object DotlinGenerator {
             }
         }
 
-        val protoFile = projectPath.resolve("elements.proto")
+        val protoFile = projectPath.resolve("proto/elements.proto")
         protoFile.writeText(schema)
     }
 

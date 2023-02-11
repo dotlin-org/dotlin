@@ -23,6 +23,8 @@ import org.dotlin.compiler.dart.element.DartDeclarationElement
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.storage.StorageManager
+import org.jetbrains.kotlin.storage.getValue
 
 interface DartDeclarationDescriptor : DartDescriptor, DeclarationDescriptor {
     override val element: DartDeclarationElement
@@ -38,6 +40,15 @@ interface DartDeclarationDescriptor : DartDescriptor, DeclarationDescriptor {
     @get:JvmName("_name")
     private val name: Name
         get() = Name.identifier(element.name.value)
+
+    override fun getName() = name
+}
+
+
+abstract class LazyDartDeclarationDescriptor(storageManager: StorageManager) : LazyDartDescriptor(storageManager),
+    DartDeclarationDescriptor {
+    @get:JvmName("_name")
+    private val name by storageManager.createLazyValue { super.getName() }
 
     override fun getName() = name
 }

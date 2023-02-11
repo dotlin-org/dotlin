@@ -23,17 +23,19 @@ import org.dotlin.compiler.backend.IrContext
 import org.dotlin.compiler.backend.hasDartConstAnnotation
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
+import org.dotlin.compiler.dart.element.DartConstableElement
 import org.jetbrains.kotlin.backend.jvm.ir.psiElement
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtModifierListOwner
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 context(IrContext)
-fun IrDeclaration.isDartConst(): Boolean = when (this) {
+fun IrDeclaration.isDartConst(): Boolean = dartElement?.safeAs<DartConstableElement>()?.isConst ?: when (this) {
     is IrField -> when {
         // Enum fields are always const.
         origin == IrDeclarationOrigin.FIELD_FOR_ENUM_ENTRY -> true

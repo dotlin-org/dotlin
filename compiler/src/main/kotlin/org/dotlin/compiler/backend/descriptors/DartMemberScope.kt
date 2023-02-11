@@ -91,12 +91,24 @@ class DartMemberScope(
                     element = it,
                     module,
                     container = owner,
+                    original = null,
+                    storageManager,
                 )
-                is DartFunctionElement -> DartSimpleFunctionDescriptor(element = it, module, container = owner)
+
+                is DartFunctionElement -> DartSimpleFunctionDescriptor(
+                    element = it,
+                    module,
+                    container = owner,
+                    original = null,
+                    storageManager
+                )
+
                 is DartConstructorElement -> DartConstructorDescriptor(
                     element = it,
                     module,
-                    container = owner as DartClassDescriptor
+                    container = owner as DartClassDescriptor,
+                    original = null,
+                    storageManager,
                 )
 
                 else -> throw UnsupportedOperationException("Unsupported element: $it")

@@ -21,8 +21,11 @@ package org.dotlin.compiler.backend.descriptors
 
 import org.dotlin.compiler.backend.steps.src2ir.DotlinModule
 import org.dotlin.compiler.dart.element.DartElement
+import org.jetbrains.kotlin.storage.StorageManager
 
 interface DartDescriptor {
     val element: DartElement
     val module: DotlinModule
 }
+
+abstract class LazyDartDescriptor(protected open val storageManager: StorageManager)

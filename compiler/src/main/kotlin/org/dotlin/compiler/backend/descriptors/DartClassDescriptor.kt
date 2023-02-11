@@ -26,6 +26,8 @@ import org.dotlin.compiler.dart.element.DartClassElement
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
+import org.jetbrains.kotlin.storage.StorageManager
+import org.jetbrains.kotlin.storage.getValue
 import org.jetbrains.kotlin.types.*
 
 class DartClassDescriptor(
@@ -33,7 +35,8 @@ class DartClassDescriptor(
     override val module: DotlinModule,
     override val container: DeclarationDescriptor,
     private val original: DartClassDescriptor? = null,
-) : LazyDartMemberDescriptor(), ClassDescriptor {
+    override val storageManager: StorageManager,
+) : LazyDartMemberDescriptor(storageManager), ClassDescriptor {
     override fun getOriginal() = original ?: this
 
     override fun getContainingDeclaration() = container
@@ -80,21 +83,27 @@ class DartClassDescriptor(
         TODO("Not yet implemented")
     }
 
-    override fun getUnsubstitutedMemberScope(): MemberScope {
-        TODO("Not yet implemented")
+
+    private val instanceMemberScope by storageManager.createLazyValue {
+        DartMemberScope(owner = this, module, elements = element.constructors + element.fields, storageManager)
     }
+
+    override fun getUnsubstitutedMemberScope(): MemberScope = instanceMemberScope
 
     override fun getUnsubstitutedInnerClassesScope(): MemberScope {
         TODO("Not yet implemented")
     }
 
     override fun getStaticScope(): MemberScope {
-        TODO("Not yet implemented")
+        return MemberScope.Empty // TODO
     }
 
-    override fun getConstructors(): Collection<ClassConstructorDescriptor> {
-        return emptyList() // TODO
+    @get:JvmName("_constructors")
+    private val constructors by storageManager.createLazyValue {
+        instanceMemberScope.getContributedDescriptors().filterIsInstance<DartConstructorDescriptor>()
     }
+
+    override fun getConstructors(): List<DartConstructorDescriptor> = constructors
 
     override fun getCompanionObjectDescriptor(): ClassDescriptor? = null
 
@@ -107,7 +116,7 @@ class DartClassDescriptor(
     override fun isValue() = false
 
     private val thisReceiver by lazy {
-        DartReceiverParameterDescriptor(Name.identifier("this"), type = defaultType, owner = this)
+        DartReceiverParameterDescriptor(Name.identifier("this"), type = defaultType, owner = this, module)
     }
 
     override fun getThisAsReceiverParameter(): ReceiverParameterDescriptor = thisReceiver

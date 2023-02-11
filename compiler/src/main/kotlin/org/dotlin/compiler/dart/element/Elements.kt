@@ -30,6 +30,7 @@
 package org.dotlin.compiler.dart.element
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.UseContextualSerialization
 import org.dotlin.compiler.backend.util.PathSerializer
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
@@ -126,7 +127,7 @@ sealed interface DartInterfaceOrAugmentationElement : DartDeclarationElement, Da
     override val name: DartSimpleIdentifier
 
     //val accessors: List<DartPropertyAccessorElement> TODO
-    //val constructors: List<DartConstructorElement>
+    val constructors: List<DartConstructorElement>
     val fields: List<DartFieldElement>
     //val methods: List<DartMethodElement> TODO
 
@@ -147,6 +148,7 @@ data class DartClassElement(
     override val name: DartSimpleIdentifier,
     override val typeParameters: List<DartTypeParameterElement>,
     override val isAbstract: Boolean,
+    override val constructors: List<DartConstructorElement>,
     override val fields: List<DartFieldElement> = emptyList(),
 ) : DartInterfaceElement, DartClassOrAugmentationElement
 
@@ -203,6 +205,10 @@ data class DartParameterElement(
      * this will point to the location of that parameter.
      */
     val superConstructorParameterLocation: DartElementLocation? = null,
+    /**
+     * If the parameter has a default value, this is the Dart code of the default value.
+     */
+    val defaultValueCode: String? = null,
 ) : DartVariableElement {
     val isPositional: Boolean
         get() = !isNamed
@@ -218,6 +224,9 @@ data class DartParameterElement(
 
     override val isConst: Boolean
         get() = false
+
+    val hasDefaultValue: Boolean
+        get() = defaultValueCode != null
 }
 
 @Serializable
@@ -237,11 +246,15 @@ data class DartConstructorElement(
     override val type: DartFunctionType,
     override val parameters: List<DartParameterElement> = emptyList()
 ) : DartInterfaceMemberElement, DartExecutableElement, DartConstableElement {
+    @Transient
     override val isAbstract = false
+    @Transient
     override val isStatic = false
+    @Transient
     override val isAsync = false
+    @Transient
     override val isGenerator = false
-
+    @Transient
     override val typeParameters: List<DartTypeParameterElement> = emptyList()
 }
 

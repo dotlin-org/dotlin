@@ -54,6 +54,16 @@ class DartElementSerializer {
         name: c.name,
         isAbstract: c.isAbstract,
         fields: c.fields.map((f) => serializeField(f)),
+        constructors: c.constructors.map((ctor) => serializeConstructor(ctor)),
+      );
+
+  DartConstructorElement serializeConstructor(ConstructorElement c) =>
+      DartConstructorElement(
+        location: c.encodedLocation,
+        name: c.name,
+        isConst: c.isConst,
+        type: _typeSerializer.serializeFunctionType(c.type),
+        parameters: serializeParameters(c.parameters),
       );
 
   DartFieldElement serializeField(FieldElement field) => DartFieldElement(
@@ -96,6 +106,7 @@ class DartElementSerializer {
         superConstructorParameterLocation: param is SuperFormalParameterElement
             ? param.superConstructorParameter?.encodedLocation
             : null,
+        defaultValueCode: param.defaultValueCode,
       );
 
   DartTypeParameterElement serializeTypeParameter(TypeParameterElement param) =>

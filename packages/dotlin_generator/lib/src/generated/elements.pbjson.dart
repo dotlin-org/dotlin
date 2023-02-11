@@ -62,12 +62,13 @@ const DartClassElement$json = const {
     const {'1': 'name', '3': 2, '4': 2, '5': 9, '10': 'name'},
     const {'1': 'typeParameters', '3': 3, '4': 3, '5': 11, '6': '.DartTypeParameterElement', '10': 'typeParameters'},
     const {'1': 'isAbstract', '3': 4, '4': 2, '5': 8, '10': 'isAbstract'},
-    const {'1': 'fields', '3': 5, '4': 3, '5': 11, '6': '.DartFieldElement', '10': 'fields'},
+    const {'1': 'constructors', '3': 5, '4': 3, '5': 11, '6': '.DartConstructorElement', '10': 'constructors'},
+    const {'1': 'fields', '3': 6, '4': 3, '5': 11, '6': '.DartFieldElement', '10': 'fields'},
   ],
 };
 
 /// Descriptor for `DartClassElement`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List dartClassElementDescriptor = $convert.base64Decode('ChBEYXJ0Q2xhc3NFbGVtZW50EhoKCGxvY2F0aW9uGAEgAigJUghsb2NhdGlvbhISCgRuYW1lGAIgAigJUgRuYW1lEkEKDnR5cGVQYXJhbWV0ZXJzGAMgAygLMhkuRGFydFR5cGVQYXJhbWV0ZXJFbGVtZW50Ug50eXBlUGFyYW1ldGVycxIeCgppc0Fic3RyYWN0GAQgAigIUgppc0Fic3RyYWN0EikKBmZpZWxkcxgFIAMoCzIRLkRhcnRGaWVsZEVsZW1lbnRSBmZpZWxkcw==');
+final $typed_data.Uint8List dartClassElementDescriptor = $convert.base64Decode('ChBEYXJ0Q2xhc3NFbGVtZW50EhoKCGxvY2F0aW9uGAEgAigJUghsb2NhdGlvbhISCgRuYW1lGAIgAigJUgRuYW1lEkEKDnR5cGVQYXJhbWV0ZXJzGAMgAygLMhkuRGFydFR5cGVQYXJhbWV0ZXJFbGVtZW50Ug50eXBlUGFyYW1ldGVycxIeCgppc0Fic3RyYWN0GAQgAigIUgppc0Fic3RyYWN0EjsKDGNvbnN0cnVjdG9ycxgFIAMoCzIXLkRhcnRDb25zdHJ1Y3RvckVsZW1lbnRSDGNvbnN0cnVjdG9ycxIpCgZmaWVsZHMYBiADKAsyES5EYXJ0RmllbGRFbGVtZW50UgZmaWVsZHM=');
 @$core.Deprecated('Use dartFieldElementDescriptor instead')
 const DartFieldElement$json = const {
   '1': 'DartFieldElement',
@@ -114,16 +115,11 @@ const DartConstructorElement$json = const {
     const {'1': 'isConst', '3': 3, '4': 2, '5': 8, '10': 'isConst'},
     const {'1': 'type', '3': 4, '4': 2, '5': 11, '6': '.DartFunctionType', '10': 'type'},
     const {'1': 'parameters', '3': 5, '4': 3, '5': 11, '6': '.DartParameterElement', '10': 'parameters'},
-    const {'1': 'isAbstract', '3': 6, '4': 1, '5': 8, '10': 'isAbstract'},
-    const {'1': 'isStatic', '3': 7, '4': 1, '5': 8, '10': 'isStatic'},
-    const {'1': 'isAsync', '3': 8, '4': 1, '5': 8, '10': 'isAsync'},
-    const {'1': 'isGenerator', '3': 9, '4': 1, '5': 8, '10': 'isGenerator'},
-    const {'1': 'typeParameters', '3': 10, '4': 3, '5': 11, '6': '.DartTypeParameterElement', '10': 'typeParameters'},
   ],
 };
 
 /// Descriptor for `DartConstructorElement`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List dartConstructorElementDescriptor = $convert.base64Decode('ChZEYXJ0Q29uc3RydWN0b3JFbGVtZW50EhoKCGxvY2F0aW9uGAEgAigJUghsb2NhdGlvbhISCgRuYW1lGAIgAigJUgRuYW1lEhgKB2lzQ29uc3QYAyACKAhSB2lzQ29uc3QSJQoEdHlwZRgEIAIoCzIRLkRhcnRGdW5jdGlvblR5cGVSBHR5cGUSNQoKcGFyYW1ldGVycxgFIAMoCzIVLkRhcnRQYXJhbWV0ZXJFbGVtZW50UgpwYXJhbWV0ZXJzEh4KCmlzQWJzdHJhY3QYBiABKAhSCmlzQWJzdHJhY3QSGgoIaXNTdGF0aWMYByABKAhSCGlzU3RhdGljEhgKB2lzQXN5bmMYCCABKAhSB2lzQXN5bmMSIAoLaXNHZW5lcmF0b3IYCSABKAhSC2lzR2VuZXJhdG9yEkEKDnR5cGVQYXJhbWV0ZXJzGAogAygLMhkuRGFydFR5cGVQYXJhbWV0ZXJFbGVtZW50Ug50eXBlUGFyYW1ldGVycw==');
+final $typed_data.Uint8List dartConstructorElementDescriptor = $convert.base64Decode('ChZEYXJ0Q29uc3RydWN0b3JFbGVtZW50EhoKCGxvY2F0aW9uGAEgAigJUghsb2NhdGlvbhISCgRuYW1lGAIgAigJUgRuYW1lEhgKB2lzQ29uc3QYAyACKAhSB2lzQ29uc3QSJQoEdHlwZRgEIAIoCzIRLkRhcnRGdW5jdGlvblR5cGVSBHR5cGUSNQoKcGFyYW1ldGVycxgFIAMoCzIVLkRhcnRQYXJhbWV0ZXJFbGVtZW50UgpwYXJhbWV0ZXJz');
 @$core.Deprecated('Use dartParameterElementDescriptor instead')
 const DartParameterElement$json = const {
   '1': 'DartParameterElement',
@@ -136,11 +132,12 @@ const DartParameterElement$json = const {
     const {'1': 'isRequired', '3': 6, '4': 2, '5': 8, '10': 'isRequired'},
     const {'1': 'fieldLocation', '3': 7, '4': 1, '5': 9, '10': 'fieldLocation'},
     const {'1': 'superConstructorParameterLocation', '3': 8, '4': 1, '5': 9, '10': 'superConstructorParameterLocation'},
+    const {'1': 'defaultValueCode', '3': 9, '4': 1, '5': 9, '10': 'defaultValueCode'},
   ],
 };
 
 /// Descriptor for `DartParameterElement`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List dartParameterElementDescriptor = $convert.base64Decode('ChREYXJ0UGFyYW1ldGVyRWxlbWVudBIaCghsb2NhdGlvbhgBIAIoCVIIbG9jYXRpb24SEgoEbmFtZRgCIAIoCVIEbmFtZRIdCgR0eXBlGAMgAigLMgkuRGFydFR5cGVSBHR5cGUSIAoLaXNDb3ZhcmlhbnQYBCACKAhSC2lzQ292YXJpYW50EhgKB2lzTmFtZWQYBSACKAhSB2lzTmFtZWQSHgoKaXNSZXF1aXJlZBgGIAIoCFIKaXNSZXF1aXJlZBIkCg1maWVsZExvY2F0aW9uGAcgASgJUg1maWVsZExvY2F0aW9uEkwKIXN1cGVyQ29uc3RydWN0b3JQYXJhbWV0ZXJMb2NhdGlvbhgIIAEoCVIhc3VwZXJDb25zdHJ1Y3RvclBhcmFtZXRlckxvY2F0aW9u');
+final $typed_data.Uint8List dartParameterElementDescriptor = $convert.base64Decode('ChREYXJ0UGFyYW1ldGVyRWxlbWVudBIaCghsb2NhdGlvbhgBIAIoCVIIbG9jYXRpb24SEgoEbmFtZRgCIAIoCVIEbmFtZRIdCgR0eXBlGAMgAigLMgkuRGFydFR5cGVSBHR5cGUSIAoLaXNDb3ZhcmlhbnQYBCACKAhSC2lzQ292YXJpYW50EhgKB2lzTmFtZWQYBSACKAhSB2lzTmFtZWQSHgoKaXNSZXF1aXJlZBgGIAIoCFIKaXNSZXF1aXJlZBIkCg1maWVsZExvY2F0aW9uGAcgASgJUg1maWVsZExvY2F0aW9uEkwKIXN1cGVyQ29uc3RydWN0b3JQYXJhbWV0ZXJMb2NhdGlvbhgIIAEoCVIhc3VwZXJDb25zdHJ1Y3RvclBhcmFtZXRlckxvY2F0aW9uEioKEGRlZmF1bHRWYWx1ZUNvZGUYCSABKAlSEGRlZmF1bHRWYWx1ZUNvZGU=');
 @$core.Deprecated('Use dartTypeDescriptor instead')
 const DartType$json = const {
   '1': 'DartType',

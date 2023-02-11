@@ -62,6 +62,11 @@ class DartNameGenerator {
         useKotlinAlias: Boolean = true
     ): DartIdentifier? =
         declaration.run {
+            // If this is a Dart declaration, just return the name of the element.
+            // TODO?: With Dart element deserialization, empty names are allowed. However here,
+            // we return null if it's empty. Make these two behave the same.
+            dartElement?.let { return@run it.name.let { n -> if (n.isEmpty) null else n } }
+
             // Property parameters always use the name of their property.
             // Only if the property is private is this not the case,
             // because then the parameter is separated from its property.

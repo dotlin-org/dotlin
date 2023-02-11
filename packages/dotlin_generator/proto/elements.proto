@@ -30,8 +30,9 @@ message DartClassElement {
   required string name = 2;
   repeated DartTypeParameterElement typeParameters = 3;
   required bool isAbstract = 4;
+  repeated DartConstructorElement constructors = 5;
   // WARNING: a default value decoded when value is missing
-  repeated DartFieldElement fields = 5;
+  repeated DartFieldElement fields = 6;
 }
 
 // serial name 'org.dotlin.compiler.dart.element.DartFieldElement'
@@ -71,16 +72,6 @@ message DartConstructorElement {
   required DartFunctionType type = 4;
   // WARNING: a default value decoded when value is missing
   repeated DartParameterElement parameters = 5;
-  // WARNING: a default value decoded when value is missing
-  optional bool isAbstract = 6;
-  // WARNING: a default value decoded when value is missing
-  optional bool isStatic = 7;
-  // WARNING: a default value decoded when value is missing
-  optional bool isAsync = 8;
-  // WARNING: a default value decoded when value is missing
-  optional bool isGenerator = 9;
-  // WARNING: a default value decoded when value is missing
-  repeated DartTypeParameterElement typeParameters = 10;
 }
 
 // serial name 'org.dotlin.compiler.dart.element.DartParameterElement'
@@ -95,6 +86,8 @@ message DartParameterElement {
   optional string fieldLocation = 7;
   // WARNING: a default value decoded when value is missing
   optional string superConstructorParameterLocation = 8;
+  // WARNING: a default value decoded when value is missing
+  optional string defaultValueCode = 9;
 }
 
 // serial name 'org.dotlin.compiler.dart.element.DartType'

@@ -19,6 +19,8 @@
 
 package org.dotlin.compiler.backend.descriptors
 
+import org.dotlin.compiler.backend.steps.src2ir.DotlinModule
+import org.dotlin.compiler.dart.element.DartElement
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.name.Name
@@ -31,7 +33,11 @@ class DartReceiverParameterDescriptor(
     name: Name,
     type: KotlinType,
     private val owner: DeclarationDescriptor,
+    override val module: DotlinModule,
 ) : DartParameterDescriptor, ReceiverParameterDescriptor {
+    override val element: DartElement
+        get() = throw UnsupportedOperationException("DartReceiverParameter has no element")
+
     private val _name = name
     override fun getName(): Name = _name
 
@@ -72,7 +78,6 @@ class DartReceiverParameterDescriptor(
     override fun getTypeParameters(): List<TypeParameterDescriptor> {
         return emptyList() // TODO
     }
-
 
 
     override fun getValueParameters(): List<ValueParameterDescriptor> {

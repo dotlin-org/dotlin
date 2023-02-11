@@ -23,6 +23,7 @@ package org.dotlin.compiler.backend.descriptors
 
 import org.dotlin.compiler.dart.element.*
 import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.storage.StorageManager
 
 interface DartMemberDescriptor : DartDeclarationDescriptor, MemberDescriptor {
     /**
@@ -57,10 +58,8 @@ interface DartMemberDescriptor : DartDeclarationDescriptor, MemberDescriptor {
     }
 }
 
-abstract class LazyDartMemberDescriptor : DartMemberDescriptor {
-    @get:JvmName("_name")
-    private val name by lazy { super.getName() }
-
+abstract class LazyDartMemberDescriptor(storageManager: StorageManager) : LazyDartDeclarationDescriptor(storageManager),
+    DartMemberDescriptor {
     @get:JvmName("_visibility")
     private val visibility by lazy { super.getVisibility() }
 
@@ -69,5 +68,4 @@ abstract class LazyDartMemberDescriptor : DartMemberDescriptor {
 
     override fun getVisibility() = visibility
     override fun getModality() = modality
-    override fun getName() = name
 }

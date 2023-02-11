@@ -189,7 +189,8 @@ class DartClassElement extends $pb.GeneratedMessage {
     ..aQS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
     ..pc<DartTypeParameterElement>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'typeParameters', $pb.PbFieldType.PM, protoName: 'typeParameters', subBuilder: DartTypeParameterElement.create)
     ..a<$core.bool>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isAbstract', $pb.PbFieldType.QB, protoName: 'isAbstract')
-    ..pc<DartFieldElement>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fields', $pb.PbFieldType.PM, subBuilder: DartFieldElement.create)
+    ..pc<DartConstructorElement>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'constructors', $pb.PbFieldType.PM, subBuilder: DartConstructorElement.create)
+    ..pc<DartFieldElement>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fields', $pb.PbFieldType.PM, subBuilder: DartFieldElement.create)
   ;
 
   DartClassElement._() : super();
@@ -198,6 +199,7 @@ class DartClassElement extends $pb.GeneratedMessage {
     $core.String? name,
     $core.Iterable<DartTypeParameterElement>? typeParameters,
     $core.bool? isAbstract,
+    $core.Iterable<DartConstructorElement>? constructors,
     $core.Iterable<DartFieldElement>? fields,
   }) {
     final _result = create();
@@ -212,6 +214,9 @@ class DartClassElement extends $pb.GeneratedMessage {
     }
     if (isAbstract != null) {
       _result.isAbstract = isAbstract;
+    }
+    if (constructors != null) {
+      _result.constructors.addAll(constructors);
     }
     if (fields != null) {
       _result.fields.addAll(fields);
@@ -270,7 +275,10 @@ class DartClassElement extends $pb.GeneratedMessage {
   void clearIsAbstract() => clearField(4);
 
   @$pb.TagNumber(5)
-  $core.List<DartFieldElement> get fields => $_getList(4);
+  $core.List<DartConstructorElement> get constructors => $_getList(4);
+
+  @$pb.TagNumber(6)
+  $core.List<DartFieldElement> get fields => $_getList(5);
 }
 
 class DartFieldElement extends $pb.GeneratedMessage {
@@ -602,11 +610,6 @@ class DartConstructorElement extends $pb.GeneratedMessage {
     ..a<$core.bool>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isConst', $pb.PbFieldType.QB, protoName: 'isConst')
     ..aQM<DartFunctionType>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', subBuilder: DartFunctionType.create)
     ..pc<DartParameterElement>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'parameters', $pb.PbFieldType.PM, subBuilder: DartParameterElement.create)
-    ..aOB(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isAbstract', protoName: 'isAbstract')
-    ..aOB(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isStatic', protoName: 'isStatic')
-    ..aOB(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isAsync', protoName: 'isAsync')
-    ..aOB(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isGenerator', protoName: 'isGenerator')
-    ..pc<DartTypeParameterElement>(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'typeParameters', $pb.PbFieldType.PM, protoName: 'typeParameters', subBuilder: DartTypeParameterElement.create)
   ;
 
   DartConstructorElement._() : super();
@@ -616,11 +619,6 @@ class DartConstructorElement extends $pb.GeneratedMessage {
     $core.bool? isConst,
     DartFunctionType? type,
     $core.Iterable<DartParameterElement>? parameters,
-    $core.bool? isAbstract,
-    $core.bool? isStatic,
-    $core.bool? isAsync,
-    $core.bool? isGenerator,
-    $core.Iterable<DartTypeParameterElement>? typeParameters,
   }) {
     final _result = create();
     if (location != null) {
@@ -637,21 +635,6 @@ class DartConstructorElement extends $pb.GeneratedMessage {
     }
     if (parameters != null) {
       _result.parameters.addAll(parameters);
-    }
-    if (isAbstract != null) {
-      _result.isAbstract = isAbstract;
-    }
-    if (isStatic != null) {
-      _result.isStatic = isStatic;
-    }
-    if (isAsync != null) {
-      _result.isAsync = isAsync;
-    }
-    if (isGenerator != null) {
-      _result.isGenerator = isGenerator;
-    }
-    if (typeParameters != null) {
-      _result.typeParameters.addAll(typeParameters);
     }
     return _result;
   }
@@ -716,45 +699,6 @@ class DartConstructorElement extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(5)
   $core.List<DartParameterElement> get parameters => $_getList(4);
-
-  @$pb.TagNumber(6)
-  $core.bool get isAbstract => $_getBF(5);
-  @$pb.TagNumber(6)
-  set isAbstract($core.bool v) { $_setBool(5, v); }
-  @$pb.TagNumber(6)
-  $core.bool hasIsAbstract() => $_has(5);
-  @$pb.TagNumber(6)
-  void clearIsAbstract() => clearField(6);
-
-  @$pb.TagNumber(7)
-  $core.bool get isStatic => $_getBF(6);
-  @$pb.TagNumber(7)
-  set isStatic($core.bool v) { $_setBool(6, v); }
-  @$pb.TagNumber(7)
-  $core.bool hasIsStatic() => $_has(6);
-  @$pb.TagNumber(7)
-  void clearIsStatic() => clearField(7);
-
-  @$pb.TagNumber(8)
-  $core.bool get isAsync => $_getBF(7);
-  @$pb.TagNumber(8)
-  set isAsync($core.bool v) { $_setBool(7, v); }
-  @$pb.TagNumber(8)
-  $core.bool hasIsAsync() => $_has(7);
-  @$pb.TagNumber(8)
-  void clearIsAsync() => clearField(8);
-
-  @$pb.TagNumber(9)
-  $core.bool get isGenerator => $_getBF(8);
-  @$pb.TagNumber(9)
-  set isGenerator($core.bool v) { $_setBool(8, v); }
-  @$pb.TagNumber(9)
-  $core.bool hasIsGenerator() => $_has(8);
-  @$pb.TagNumber(9)
-  void clearIsGenerator() => clearField(9);
-
-  @$pb.TagNumber(10)
-  $core.List<DartTypeParameterElement> get typeParameters => $_getList(9);
 }
 
 class DartParameterElement extends $pb.GeneratedMessage {
@@ -767,6 +711,7 @@ class DartParameterElement extends $pb.GeneratedMessage {
     ..a<$core.bool>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isRequired', $pb.PbFieldType.QB, protoName: 'isRequired')
     ..aOS(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fieldLocation', protoName: 'fieldLocation')
     ..aOS(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'superConstructorParameterLocation', protoName: 'superConstructorParameterLocation')
+    ..aOS(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'defaultValueCode', protoName: 'defaultValueCode')
   ;
 
   DartParameterElement._() : super();
@@ -779,6 +724,7 @@ class DartParameterElement extends $pb.GeneratedMessage {
     $core.bool? isRequired,
     $core.String? fieldLocation,
     $core.String? superConstructorParameterLocation,
+    $core.String? defaultValueCode,
   }) {
     final _result = create();
     if (location != null) {
@@ -804,6 +750,9 @@ class DartParameterElement extends $pb.GeneratedMessage {
     }
     if (superConstructorParameterLocation != null) {
       _result.superConstructorParameterLocation = superConstructorParameterLocation;
+    }
+    if (defaultValueCode != null) {
+      _result.defaultValueCode = defaultValueCode;
     }
     return _result;
   }
@@ -901,6 +850,15 @@ class DartParameterElement extends $pb.GeneratedMessage {
   $core.bool hasSuperConstructorParameterLocation() => $_has(7);
   @$pb.TagNumber(8)
   void clearSuperConstructorParameterLocation() => clearField(8);
+
+  @$pb.TagNumber(9)
+  $core.String get defaultValueCode => $_getSZ(8);
+  @$pb.TagNumber(9)
+  set defaultValueCode($core.String v) { $_setString(8, v); }
+  @$pb.TagNumber(9)
+  $core.bool hasDefaultValueCode() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearDefaultValueCode() => clearField(9);
 }
 
 class DartType extends $pb.GeneratedMessage {
