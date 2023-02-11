@@ -139,7 +139,7 @@ class DartProject(
                         var tries = 0
 
                         val publisher = dotlinConfig?.publisher ?: try {
-                            getPublisher()
+                            getPublisher().let { if (it == "null") "" else it }
                         } catch (e: ConnectTimeoutException) {
                             tries++
                             when (tries) {
@@ -152,7 +152,7 @@ class DartProject(
                             }
                         }
 
-                        if (publisher.isNotEmpty() && publisher != dotlinConfig?.publisher) {
+                        if (publisher != dotlinConfig?.publisher) {
                             dotlinConfigPath.apply {
                                 parent.createDirectories()
                                 writeText(
