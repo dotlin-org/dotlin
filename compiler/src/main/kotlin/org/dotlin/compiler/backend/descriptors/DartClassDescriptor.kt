@@ -21,22 +21,19 @@ package org.dotlin.compiler.backend.descriptors
 
 import org.dotlin.compiler.backend.descriptors.type.DartInterfaceTypeConstructor
 import org.dotlin.compiler.backend.descriptors.type.DartSimpleType
-import org.dotlin.compiler.backend.steps.src2ir.DotlinModule
 import org.dotlin.compiler.dart.element.DartClassElement
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
-import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.storage.getValue
 import org.jetbrains.kotlin.types.*
 
 class DartClassDescriptor(
     override val element: DartClassElement,
-    override val module: DotlinModule,
+    override val context: DartDescriptorContext,
     override val container: DeclarationDescriptor,
     private val original: DartClassDescriptor? = null,
-    override val storageManager: StorageManager,
-) : LazyDartMemberDescriptor(storageManager), ClassDescriptor {
+) : LazyDartMemberDescriptor(context.storageManager), ClassDescriptor {
     override fun getOriginal() = original ?: this
 
     override fun getContainingDeclaration() = container
@@ -50,8 +47,16 @@ class DartClassDescriptor(
 
     override fun getSource(): SourceElement = SourceElement.NO_SOURCE
 
-    override fun getTypeConstructor(): DartInterfaceTypeConstructor =
-        DartInterfaceTypeConstructor(descriptor = this, module.builtIns)
+    @get:JvmName("_typeConstructor")
+    private val typeConstructor by storageManager.createLazyValue {
+        DartInterfaceTypeConstructor(
+            descriptor = this,
+            module.builtIns
+        )
+    }
+
+    override fun getTypeConstructor(): DartInterfaceTypeConstructor = typeConstructor
+
 
     @get:JvmName("_defaultType")
     private val defaultType by lazy {
@@ -85,7 +90,11 @@ class DartClassDescriptor(
 
 
     private val instanceMemberScope by storageManager.createLazyValue {
-        DartMemberScope(owner = this, module, elements = element.constructors + element.fields, storageManager)
+        DartMemberScope(
+            owner = this,
+            context,
+            elements = element.constructors + element.fields,
+        )
     }
 
     override fun getUnsubstitutedMemberScope(): MemberScope = instanceMemberScope
@@ -115,8 +124,13 @@ class DartClassDescriptor(
     override fun isFun() = false
     override fun isValue() = false
 
-    private val thisReceiver by lazy {
-        DartReceiverParameterDescriptor(Name.identifier("this"), type = defaultType, owner = this, module)
+    private val thisReceiver by storageManager.createLazyValue {
+        DartReceiverParameterDescriptor(
+            Name.identifier("this"),
+            type = defaultType,
+            owner = this,
+            context,
+        )
     }
 
     override fun getThisAsReceiverParameter(): ReceiverParameterDescriptor = thisReceiver

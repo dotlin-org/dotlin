@@ -26,7 +26,6 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.psi.KtAnnotationEntry
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.bindingContextUtil.getAbbreviatedTypeOrType
@@ -124,8 +123,6 @@ abstract class IrContext : IrAttributes {
         get() = currentFile.module.descriptor.let {
             it == it.builtIns.builtInsModule
         }
-
-    fun KtAnnotationEntry.getFqName() = getFqName(bindingContext)
 
     fun IrExpression.hasAnnotation(fqName: FqName) = hasAnnotation(fqName, bindingContext)
 

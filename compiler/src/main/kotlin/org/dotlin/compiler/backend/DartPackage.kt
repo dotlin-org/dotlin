@@ -24,6 +24,8 @@ import org.dotlin.compiler.backend.util.URISerializer
 import java.net.URI
 import java.net.URL
 import java.nio.file.Path
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 import kotlin.io.path.*
 
 open class DartPackage(
@@ -198,4 +200,13 @@ private data class DartPackageConfig(
         @Serializable(with = PathSerializer::class)
         val packagePath: Path
     )
+}
+
+@OptIn(ExperimentalContracts::class)
+fun DartPackage.isCurrent(): Boolean {
+    contract {
+        returns(true) implies (this@isCurrent is DartProject)
+    }
+
+    return this is DartProject
 }

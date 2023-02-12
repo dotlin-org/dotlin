@@ -24,6 +24,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 import org.dotlin.compiler.backend.annotatedDartLibrary
 import org.dotlin.compiler.backend.attributes.DartImport
 import org.dotlin.compiler.backend.descriptors.DartDescriptor
+import org.dotlin.compiler.backend.descriptors.fqName
 import org.dotlin.compiler.backend.dotlin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrTypeContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrTypeContext.SuperTypes
@@ -46,6 +47,7 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
+import kotlin.io.path.relativeTo
 
 /**
  * Dart import directives are added, based on types used in files.
@@ -157,15 +159,15 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
             val pkg = module.dartPackage
 
             val filePath = when (descriptor) {
-                // Relativize to the package root, example:
+                // Make filePath relative to packageRoot, example:
                 // Package root: ${pkg.path}/lib/
                 // File Dart path: ${pkg.path}/lib/somewhere/else.dart
                 // Result: somewhere/else.dart
-                !is DartDescriptor -> pkg.packagePath.relativize(pkg.path.resolve(fileOfDeclaration.dartPath))
+                !is DartDescriptor -> pkg.path.resolve(fileOfDeclaration.dartPath).relativeTo(pkg.packagePath)
                 else -> run {
                     val fqNameWithoutPackageAndDeclaration = descriptor.fqNameSafe
                         .toString()
-                        .replace("${module.fqName}.", "")
+                        .replace("${pkg.fqName}.", "")
                         .replace(".${relevantDeclaration.name.identifier}", "")
 
                     val extension = descriptor.element.location.library.name.split(".").lastOrNull()

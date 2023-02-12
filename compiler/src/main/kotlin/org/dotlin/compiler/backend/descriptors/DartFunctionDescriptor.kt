@@ -20,7 +20,6 @@
 package org.dotlin.compiler.backend.descriptors
 
 import org.dotlin.compiler.backend.descriptors.type.toKotlinType
-import org.dotlin.compiler.backend.steps.src2ir.DotlinModule
 import org.dotlin.compiler.dart.element.DartConstructorElement
 import org.dotlin.compiler.dart.element.DartExecutableElement
 import org.dotlin.compiler.dart.element.DartFunctionElement
@@ -68,7 +67,7 @@ sealed class DartFunctionDescriptor(storageManager: StorageManager) : LazyDartMe
     }
 
     @get:JvmName("_returnType")
-    private val returnType by storageManager.createLazyValue { element.type.returnType.toKotlinType(module) }
+    private val returnType by storageManager.createLazyValue { element.type.returnType.toKotlinType() }
     override fun getReturnType(): KotlinType = returnType
 
     @get:JvmName("_valueParameters")
@@ -79,7 +78,7 @@ sealed class DartFunctionDescriptor(storageManager: StorageManager) : LazyDartMe
                 index,
                 Annotations.EMPTY, // TODO
                 element = param,
-                module,
+                context,
                 original = null,
                 storageManager,
             )
@@ -123,11 +122,10 @@ sealed class DartFunctionDescriptor(storageManager: StorageManager) : LazyDartMe
 
 class DartSimpleFunctionDescriptor(
     override val element: DartFunctionElement,
-    override val module: DotlinModule,
+    override val context: DartDescriptorContext,
     override val container: DeclarationDescriptor,
     private val original: DartSimpleFunctionDescriptor? = null,
-    storageManager: StorageManager
-) : DartFunctionDescriptor(storageManager), SimpleFunctionDescriptor {
+) : DartFunctionDescriptor(context.storageManager), SimpleFunctionDescriptor {
     override fun getOriginal() = original ?: this
 
     override fun copy(
@@ -147,11 +145,10 @@ class DartSimpleFunctionDescriptor(
 
 class DartConstructorDescriptor(
     override val element: DartConstructorElement,
-    override val module: DotlinModule,
+    override val context: DartDescriptorContext,
     override val container: DartClassDescriptor,
     private val original: DartConstructorDescriptor? = null,
-    storageManager: StorageManager,
-) : DartFunctionDescriptor(storageManager), ClassConstructorDescriptor {
+) : DartFunctionDescriptor(context.storageManager), ClassConstructorDescriptor {
     private val _name by storageManager.createLazyValue {
         when {
             element.name.isEmpty -> Name.special("<init>")
@@ -180,7 +177,7 @@ class DartConstructorDescriptor(
     }
 
     @get:JvmName("_returnType")
-    private val returnType by storageManager.createLazyValue { element.type.returnType.toKotlinType(module) }
+    private val returnType by storageManager.createLazyValue { element.type.returnType.toKotlinType() }
     override fun getReturnType(): KotlinType = returnType
 
     override fun newCopyBuilder(): FunctionDescriptor.CopyBuilder<out FunctionDescriptor> {

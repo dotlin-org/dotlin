@@ -20,7 +20,6 @@
 package org.dotlin.compiler.backend.descriptors
 
 import org.dotlin.compiler.backend.descriptors.type.toKotlinType
-import org.dotlin.compiler.backend.steps.src2ir.DotlinModule
 import org.dotlin.compiler.dart.element.DartParameterElement
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
@@ -36,10 +35,10 @@ class DartValueParameterDescriptor(
     override val index: Int,
     override val annotations: Annotations,
     override val element: DartParameterElement,
-    override val module: DotlinModule,
+    override val context: DartDescriptorContext,
     private val original: DartValueParameterDescriptor? = null,
-    override val storageManager: StorageManager,
-) : LazyDartDeclarationDescriptor(storageManager), DartParameterDescriptor, ValueParameterDescriptor {
+    storageManager: StorageManager,
+) : LazyDartDeclarationDescriptor(context.storageManager), DartParameterDescriptor, ValueParameterDescriptor {
     // TODO?
     override fun cleanCompileTimeInitializerCache() {}
 
@@ -71,7 +70,7 @@ class DartValueParameterDescriptor(
     override fun getSource(): SourceElement = SourceElement.NO_SOURCE // TODO
 
     @get:JvmName("_type")
-    private val type by storageManager.createLazyValue { element.type.toKotlinType(module) }
+    private val type by storageManager.createLazyValue { element.type.toKotlinType() }
     override fun getType(): KotlinType = type
 
     override fun getTypeParameters(): List<TypeParameterDescriptor> = emptyList()

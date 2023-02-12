@@ -19,6 +19,10 @@
 
 package org.dotlin.compiler.backend.steps.src2ir.analyze
 
+import org.dotlin.compiler.backend.DartProject
+import org.dotlin.compiler.backend.descriptors.DartDescriptorContext
+import org.dotlin.compiler.backend.descriptors.DartPackageFragmentProvider
+import org.dotlin.compiler.backend.steps.src2ir.DartElementLocator
 import org.dotlin.compiler.backend.steps.src2ir.DartPlatform
 import org.dotlin.compiler.backend.steps.src2ir.DotlinTypeTransformer
 import org.jetbrains.kotlin.analyzer.AnalysisResult
@@ -48,6 +52,8 @@ import org.jetbrains.kotlin.resolve.lazy.declarations.FileBasedDeclarationProvid
 class DotlinAnalyzer(
     private val env: KotlinCoreEnvironment,
     private val config: CompilerConfiguration,
+    private val dartProject: DartProject,
+    private val dartElementLocator: DartElementLocator,
 ) {
     fun analyze(
         files: List<KtFile>,
@@ -98,10 +104,25 @@ class DotlinAnalyzer(
         }.apply {
             thisModule.initialize(
                 CompositePackageFragmentProvider(
-                    providers = listOf(
+                    providers = listOfNotNull(
                         get<ResolveSession>().packageFragmentProvider,
-                        // TODO: Only if isBuiltIns
-                        functionInterfacePackageFragmentProvider(moduleContext.storageManager, thisModule)
+                        DartPackageFragmentProvider(
+                            dartProject,
+                            DartDescriptorContext(
+                                thisModule,
+                                dartProject,
+                                dartElementLocator,
+                                moduleContext.storageManager
+                            ),
+                        ),
+                        when {
+                            isBuiltInsModule -> functionInterfacePackageFragmentProvider(
+                                moduleContext.storageManager,
+                                thisModule
+                            )
+
+                            else -> null
+                        }
                     ),
                     debugName = "CompositeProvider: $thisModule"
                 )
@@ -117,6 +138,7 @@ class DotlinAnalyzer(
             trace.bindingContext.diagnostics.any { it.severity == Severity.ERROR } -> {
                 AnalysisResult.compilationError(trace.bindingContext)
             }
+
             else -> AnalysisResult.success(trace.bindingContext, thisModule)
         }
     }

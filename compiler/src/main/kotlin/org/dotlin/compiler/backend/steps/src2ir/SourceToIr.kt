@@ -35,6 +35,7 @@ import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDe
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.languageVersionSettings
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.descriptors.konan.kotlinLibrary
 import org.jetbrains.kotlin.ir.builders.TranslationPluginContext
@@ -101,7 +102,7 @@ private fun loadIr(
 
     val trace = BindingTraceContext()
 
-    val analysisResult = DartKotlinAnalyzerReporter(env, config).analyzeAndReport(
+    val analysisResult = DartKotlinAnalyzerReporter(env, config, dartProject, elementLocator).analyzeAndReport(
         files,
         dependencies = when {
             // We don't pass dependencies to the analyzer when compiling built-ins, because the only dependency
@@ -147,9 +148,11 @@ private fun loadIr(
         frontEndContext,
     )
 
+    val modulesByIrFragments = mutableMapOf<ModuleDescriptor, IrModuleFragment>()
+
     if (!isCompilingBuiltIns) {
         mainModule.builtIns.builtInsModule.let {
-            irLinker.deserializeIrModuleHeader(
+            modulesByIrFragments[it] = irLinker.deserializeIrModuleHeader(
                 moduleDescriptor = it,
                 kotlinLibrary = it.kotlinLibrary,
                 // For built-ins, we want everything.
@@ -158,25 +161,37 @@ private fun loadIr(
         }
     }
 
-    dependencyDartModules.forEach {
+    dependencyDartModules
+        .filter { it.impl != mainModule.builtIns.builtInsModule } // Built-ins module is already done above.
+        .associateWithTo(modulesByIrFragments) {
         irLinker.deserializeIrModuleHeader(it, it.klib, _moduleName = it.name.asString())
     }
 
-    val module = psi2Ir.generateModuleFragment(
+    val dartIrProviders = dependencyDartModules.plus(mainModule)
+        .map { DartIrProvider(it, symbolTable, psi2IrContext.irBuiltIns, modulesByIrFragments[it]) }
+    val mainModuleDartIrProvider = dartIrProviders.last()
+
+    val irModule = psi2Ir.generateModuleFragment(
         context = psi2IrContext,
         ktFiles = files,
-        irProviders = listOf(irLinker),
+        irProviders = buildList {
+            // Dart IR providers must come first.
+            addAll(dartIrProviders)
+            add(irLinker)
+        },
         linkerExtensions = emptyList(),
     )
 
+    mainModuleDartIrProvider.setModuleFiles(irModule)
+
     val extraIrAttributes = IrAttributes.Default()
 
-    IrExpressionSourceMapper.run(module.files, extraIrAttributes)
+    IrExpressionSourceMapper.run(irModule.files, extraIrAttributes)
 
     val dartNameGenerator = DartNameGenerator()
 
     DartIrAnalyzer(
-        module,
+        irModule,
         trace,
         symbolTable,
         dartNameGenerator,
@@ -189,7 +204,7 @@ private fun loadIr(
         }
 
     return IrResult(
-        module,
+        irModule,
         trace,
         symbolTable,
         extraIrAttributes,

@@ -241,4 +241,38 @@ class Interop : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `call Dart constructor`() = assertCompile {
+        dart(
+            """
+            class Point {
+              Point(int x, int y);
+            }
+            """,
+            Path("lib/point.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import dev.pub.test.point.Point
+
+            fun main() {
+                val loc = Point(1, 2)
+            }
+            """
+        )
+
+        dart(
+            """
+            import "point.dart" show Point;
+            import "package:meta/meta.dart";
+
+            void main() {
+              final Point loc = Point(1, 2);
+            }
+            """
+        )
+    }
 }

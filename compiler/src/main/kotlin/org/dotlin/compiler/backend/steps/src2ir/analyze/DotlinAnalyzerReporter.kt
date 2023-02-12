@@ -21,6 +21,8 @@ package org.dotlin.compiler.backend.steps.src2ir.analyze
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.extensions.ExtensionPointName
+import org.dotlin.compiler.backend.DartProject
+import org.dotlin.compiler.backend.steps.src2ir.DartElementLocator
 import org.dotlin.compiler.backend.steps.src2ir.analyze.suppress.DartDiagnosticSuppressor
 import org.dotlin.compiler.backend.steps.src2ir.throwIfHasErrors
 import org.jetbrains.kotlin.analyzer.AnalysisResult
@@ -36,6 +38,8 @@ import org.jetbrains.kotlin.resolve.diagnostics.DiagnosticSuppressor
 class DartKotlinAnalyzerReporter(
     private val env: KotlinCoreEnvironment,
     private val config: CompilerConfiguration,
+    private val dartProject: DartProject,
+    private val dartElementLocator: DartElementLocator,
 ) {
     fun analyzeAndReport(
         files: List<KtFile>,
@@ -51,7 +55,7 @@ class DartKotlinAnalyzerReporter(
 
         val report = AnalyzerWithCompilerReport(config).also {
             it.analyzeAndReport(files) {
-                DotlinAnalyzer(env, config).analyze(
+                DotlinAnalyzer(env, config, dartProject, dartElementLocator).analyze(
                     files,
                     dependencies,
                     isBuiltInsModule,

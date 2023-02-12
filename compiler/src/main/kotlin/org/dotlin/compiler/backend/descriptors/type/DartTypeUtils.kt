@@ -19,26 +19,28 @@
 
 package org.dotlin.compiler.backend.descriptors.type
 
-import org.dotlin.compiler.backend.steps.src2ir.DotlinModule
+import org.dotlin.compiler.backend.descriptors.DartDescriptor
 import org.dotlin.compiler.dart.element.*
 import org.dotlin.compiler.dart.element.DartNullabilitySuffix.QUESTION_MARK
 import org.jetbrains.kotlin.types.*
 
-fun DartType.toKotlinType(module: DotlinModule): KotlinType {
+context(DartDescriptor)
+fun DartType.toKotlinType(): KotlinType {
+    val builtIns = module.builtIns
     return when (this) {
         is DartInterfaceType -> {
             fun dartCore(className: String) = "dart:core;dart:core/${className.lowercase()}.dart;$className"
 
             when (elementLocation.toString()) {
-                dartCore("int") -> module.builtIns.intType
-                dartCore("double") -> module.builtIns.doubleType
-                dartCore("String") -> module.builtIns.stringType
-                dartCore("num") -> module.builtIns.numberType
-                dartCore("Object") -> module.builtIns.anyType
+                dartCore("int") -> builtIns.intType
+                dartCore("double") -> builtIns.doubleType
+                dartCore("String") -> builtIns.stringType
+                dartCore("num") -> builtIns.numberType
+                dartCore("Object") -> builtIns.anyType
                 // TODO: Comparable
                 // TODO: Handle collection types
                 else -> DartSimpleType(
-                    DartInterfaceTypeConstructor(this, module),
+                    DartInterfaceTypeConstructor(this, context),
                     arguments = emptyList(), // TODO
                     attributes = TypeAttributes.Empty, // TODO
                     isMarkedNullable = nullabilitySuffix == QUESTION_MARK
@@ -47,7 +49,7 @@ fun DartType.toKotlinType(module: DotlinModule): KotlinType {
         }
 
         DartDynamicType -> DynamicType(
-            builtIns = module.builtIns,
+            builtIns = builtIns,
             attributes = TypeAttributes.Empty
         )
 
@@ -55,11 +57,11 @@ fun DartType.toKotlinType(module: DotlinModule): KotlinType {
             .getFunction(parameters.size)
             .defaultType
             .replace(newArguments = buildList {
-                add(TypeProjectionImpl(returnType.toKotlinType(module)))
-                addAll(parameters.map { TypeProjectionImpl(it.type.toKotlinType(module)) })
+                add(TypeProjectionImpl(returnType.toKotlinType()))
+                addAll(parameters.map { TypeProjectionImpl(it.type.toKotlinType()) })
             })
 
-        DartNeverType -> module.builtIns.nothingType
-        DartVoidType -> module.builtIns.unitType // TODO
+        DartNeverType -> builtIns.nothingType
+        DartVoidType -> builtIns.unitType // TODO
     }
 }

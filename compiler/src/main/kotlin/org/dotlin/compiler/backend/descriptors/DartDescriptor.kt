@@ -19,13 +19,28 @@
 
 package org.dotlin.compiler.backend.descriptors
 
-import org.dotlin.compiler.backend.steps.src2ir.DotlinModule
+import org.dotlin.compiler.backend.DartPackage
+import org.dotlin.compiler.backend.steps.src2ir.DartElementLocator
 import org.dotlin.compiler.dart.element.DartElement
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.storage.StorageManager
 
 interface DartDescriptor {
     val element: DartElement
-    val module: DotlinModule
+    val context: DartDescriptorContext
+
+    val module: ModuleDescriptor
+        get() = context.module
+
+    val pkg: DartPackage
+        get() = context.pkg
+
+    val elementLocator: DartElementLocator
+        get() = context.elementLocator
+
+    val storageManager: StorageManager
+        get() = context.storageManager
 }
 
-abstract class LazyDartDescriptor(protected open val storageManager: StorageManager)
+// We have to pass storageManager in the constructor, otherwise `context` might not be initialized yet.
+abstract class LazyDartDescriptor(final override val storageManager: StorageManager) : DartDescriptor

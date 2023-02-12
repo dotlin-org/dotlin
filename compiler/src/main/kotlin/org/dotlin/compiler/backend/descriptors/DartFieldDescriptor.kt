@@ -19,7 +19,6 @@
 
 package org.dotlin.compiler.backend.descriptors
 
-import org.dotlin.compiler.backend.steps.src2ir.DotlinModule
 import org.dotlin.compiler.dart.element.DartFieldElement
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.resolve.constants.ConstantValue
@@ -28,7 +27,7 @@ import org.jetbrains.kotlin.types.TypeSubstitutor
 
 class DartFieldDescriptor(
     override val element: DartFieldElement,
-    override val module: DotlinModule,
+    override val context: DartDescriptorContext,
     override val container: DartDeclarationDescriptor,
     private val _original: DartFieldDescriptor? = null,
     override val getter: PropertyGetterDescriptor? = null,

@@ -45,8 +45,8 @@ interface DartDeclarationDescriptor : DartDescriptor, DeclarationDescriptor {
 }
 
 
-abstract class LazyDartDeclarationDescriptor(storageManager: StorageManager) : LazyDartDescriptor(storageManager),
-    DartDeclarationDescriptor {
+abstract class LazyDartDeclarationDescriptor(storageManager: StorageManager) :
+    LazyDartDescriptor(storageManager), DartDeclarationDescriptor {
     @get:JvmName("_name")
     private val name by storageManager.createLazyValue { super.getName() }
 

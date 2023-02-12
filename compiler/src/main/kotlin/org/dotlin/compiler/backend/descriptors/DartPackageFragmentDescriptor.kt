@@ -19,16 +19,16 @@
 
 package org.dotlin.compiler.backend.descriptors
 
-import org.dotlin.compiler.backend.steps.src2ir.DotlinModule
 import org.dotlin.compiler.dart.element.DartCompilationUnitElement
 import org.dotlin.compiler.dart.element.DartLibraryElement
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptorVisitor
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.storage.StorageManager
+import org.jetbrains.kotlin.storage.getValue
 
 /**
  * In Dart terms, a package fragment is a library file. A library file in most cases represents
@@ -37,17 +37,16 @@ import org.jetbrains.kotlin.storage.StorageManager
 class DartPackageFragmentDescriptor(
     val library: DartLibraryElement,
     override val element: DartCompilationUnitElement,
-    override val module: DotlinModule,
+    override val context: DartDescriptorContext,
     override val annotations: Annotations = Annotations.EMPTY,
     private val original: DartPackageFragmentDescriptor? = null,
-    private val storageManager: StorageManager,
-) : DartDescriptor, PackageFragmentDescriptor  {
+) : DartDescriptor, PackageFragmentDescriptor {
 
-    private val _memberScope by lazy {
-        DartMemberScope(owner = this, module, element.classes + element.functions, storageManager)
+    private val _memberScope by storageManager.createLazyValue {
+        DartMemberScope(owner = this, context, element.classes + element.functions)
     }
 
-    override val fqName: FqName = module.fqNameOf(library)
+    override val fqName: FqName = context.fqNameOf(library)
 
     override fun getMemberScope(): DartMemberScope = _memberScope
 
@@ -55,7 +54,7 @@ class DartPackageFragmentDescriptor(
 
     override fun getOriginal(): DartPackageFragmentDescriptor = original ?: this
 
-    override fun getContainingDeclaration(): DotlinModule = module
+    override fun getContainingDeclaration(): ModuleDescriptor = module
 
     override fun getSource(): SourceElement {
         return SourceElement.NO_SOURCE // TODO

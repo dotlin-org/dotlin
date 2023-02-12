@@ -16,6 +16,9 @@ Future<ResolvedPackages> resolvePackages(
   return Map.fromEntries(
     await Future.wait(
       packages.map((package) async {
+        // TODO: Use package.path instead of packagePath (in multiple places)
+        // when we want to serialize files outside of lib/. Only necessary
+        // for the current project being compiled, not dependencies.
         final contextCollections = AnalysisContextCollection(
           includedPaths: [package.packagePath],
         );

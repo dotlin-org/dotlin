@@ -20,13 +20,12 @@
 package org.dotlin.compiler.backend.descriptors.type
 
 import org.dotlin.compiler.backend.descriptors.DartClassDescriptor
-import org.dotlin.compiler.backend.steps.src2ir.DotlinModule
+import org.dotlin.compiler.backend.descriptors.DartDescriptorContext
 import org.dotlin.compiler.dart.element.DartInterfaceElement
 import org.dotlin.compiler.dart.element.DartInterfaceType
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
-import org.jetbrains.kotlin.descriptors.packageFragments
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeConstructor
@@ -37,23 +36,23 @@ class DartInterfaceTypeConstructor(
     val descriptor: DartClassDescriptor,
     private val builtIns: KotlinBuiltIns
 ) : TypeConstructor {
-    constructor(element: DartInterfaceElement, module: DotlinModule) : this(
-        descriptor = module.fqNameOf(element).let { fqName ->
-            module.impl
-                .packageFragmentProvider
-                .packageFragments(fqName.parent())
+    constructor(element: DartInterfaceElement, context: DartDescriptorContext) : this(
+        descriptor = context.fqNameOf(element).let { fqName ->
+            context.module
+                .getPackage(fqName.parent())
+                .fragments
                 .firstNotNullOf {
                     it.getMemberScope()
                         .getContributedClassifier(fqName.shortName(), NoLookupLocation.FROM_BACKEND)
                             as? DartClassDescriptor
                 }
         },
-        module.builtIns
+        context.module.builtIns
     )
 
-    constructor(type: DartInterfaceType, module: DotlinModule) : this(
-        element = module.dartElementLocator.locate(type.elementLocation),
-        module
+    constructor(type: DartInterfaceType, context: DartDescriptorContext) : this(
+        element = context.elementLocator.locate(type.elementLocation),
+        context
     )
 
     override fun getParameters(): List<TypeParameterDescriptor> {

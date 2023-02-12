@@ -19,7 +19,6 @@
 
 package org.dotlin.compiler.backend.descriptors
 
-import org.dotlin.compiler.backend.steps.src2ir.DotlinModule
 import org.dotlin.compiler.dart.element.*
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -39,16 +38,16 @@ import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter.Companion.TYPE_A
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter.Companion.VALUES
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter.Companion.VARIABLES
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
-import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.utils.Printer
 
 
 class DartMemberScope(
     private val owner: DeclarationDescriptor,
-    private val module: DotlinModule,
+    private val context: DartDescriptorContext,
     private val elements: List<DartDeclarationElement> = emptyList(),
-    private val storageManager: StorageManager
 ) : MemberScope {
+    private val storageManager = context.storageManager
+
     private data class GetDescriptorArgs(
         val kindFilter: DescriptorKindFilter,
         val nameFilter: (Name) -> Boolean,
@@ -89,26 +88,20 @@ class DartMemberScope(
                 //is DartFieldElement ->
                 is DartClassElement -> DartClassDescriptor(
                     element = it,
-                    module,
+                    context,
                     container = owner,
-                    original = null,
-                    storageManager,
                 )
 
                 is DartFunctionElement -> DartSimpleFunctionDescriptor(
                     element = it,
-                    module,
+                    context,
                     container = owner,
-                    original = null,
-                    storageManager
                 )
 
                 is DartConstructorElement -> DartConstructorDescriptor(
                     element = it,
-                    module,
+                    context,
                     container = owner as DartClassDescriptor,
-                    original = null,
-                    storageManager,
                 )
 
                 else -> throw UnsupportedOperationException("Unsupported element: $it")

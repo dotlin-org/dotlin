@@ -21,25 +21,22 @@ package org.dotlin.compiler.backend.descriptors
 
 import org.dotlin.compiler.backend.DartProject
 import org.dotlin.compiler.backend.steps.src2ir.DartPackageDeserializer
-import org.dotlin.compiler.backend.steps.src2ir.DotlinModule
 import org.dotlin.compiler.dart.element.DartLibraryElement
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentProviderOptimized
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.storage.StorageManager
 
 class DartPackageFragmentProvider(
     private val project: DartProject,
-    private val module: DotlinModule,
-    private val storageManager: StorageManager,
+    private val context: DartDescriptorContext,
 ) : PackageFragmentProviderOptimized {
     private val libraries: List<DartLibraryElement> by lazy {
         when (val pkg = DartPackageDeserializer.deserialize(
             project,
-            module.dartPackage,
-            module.dartElementLocator,
+            context.pkg,
+            context.elementLocator,
         ).single()) {
             null -> emptyList()
             else -> pkg.libraries
@@ -52,18 +49,17 @@ class DartPackageFragmentProvider(
                 DartPackageFragmentDescriptor(
                     library = it,
                     unit,
-                    module,
+                    context,
                     annotations = Annotations.EMPTY, // TODO
-                    storageManager = storageManager,
                 )
             }
         }
     }
 
     private val getFragmentsOf =
-        storageManager.createMemoizedFunction<FqName, List<DartPackageFragmentDescriptor>> { fqName ->
+        context.storageManager.createMemoizedFunction<FqName, List<DartPackageFragmentDescriptor>> { fqName ->
             when {
-                fqName.toString().startsWith(module.fqName.toString()) -> fragments.filter { it.fqName == fqName }
+                fqName.startsWithPackageFqName() -> fragments.filter { it.fqName == fqName }
                 else -> emptyList()
             }
         }
@@ -72,7 +68,7 @@ class DartPackageFragmentProvider(
     override fun getPackageFragments(fqName: FqName): List<PackageFragmentDescriptor> = getFragmentsOf(fqName)
     override fun getSubPackagesOf(fqName: FqName, nameFilter: (Name) -> Boolean): Collection<FqName> {
         // TODO: A module can contain multiple fqnames
-        if (!fqName.toString().startsWith(module.fqName.toString())) {
+        if (!fqName.startsWithPackageFqName()) {
             return emptyList()
         }
 
@@ -89,7 +85,7 @@ class DartPackageFragmentProvider(
         packageFragments.addAll(getFragmentsOf(fqName))
     }
 
-    override fun isEmpty(fqName: FqName): Boolean {
-        return false // TODO
-    }
+    override fun isEmpty(fqName: FqName): Boolean = !fqName.startsWithPackageFqName() // TODO: Can be more precise
+
+    private fun FqName.startsWithPackageFqName() = toString().startsWith(context.pkg.fqName.toString())
 }

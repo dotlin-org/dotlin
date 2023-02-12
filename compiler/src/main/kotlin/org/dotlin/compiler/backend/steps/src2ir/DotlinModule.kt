@@ -21,9 +21,8 @@ package org.dotlin.compiler.backend.steps.src2ir
 
 import org.dotlin.compiler.backend.DartPackage
 import org.dotlin.compiler.backend.DartProject
+import org.dotlin.compiler.backend.descriptors.DartDescriptorContext
 import org.dotlin.compiler.backend.descriptors.DartPackageFragmentProvider
-import org.dotlin.compiler.dart.element.DartDeclarationElement
-import org.dotlin.compiler.dart.element.DartLibraryElement
 import org.jetbrains.kotlin.backend.common.serialization.metadata.KlibMetadataModuleDescriptorFactory
 import org.jetbrains.kotlin.builtins.functions.functionInterfacePackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.ModuleCapability
@@ -36,12 +35,9 @@ import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.library.metadata.parseModuleHeader
 import org.jetbrains.kotlin.library.unresolvedDependencies
-import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.DeserializationConfiguration
 import org.jetbrains.kotlin.storage.StorageManager
-import kotlin.io.path.name
-import kotlin.io.path.nameWithoutExtension
 
 
 /**
@@ -109,7 +105,10 @@ class DotlinModule private constructor(
                             else -> null
                         }
                     },
-                    DartPackageFragmentProvider(project, this, storageManager),
+                    DartPackageFragmentProvider(
+                        project,
+                        DartDescriptorContext(this, dartPackage, dartElementLocator, storageManager),
+                    ),
                     klib?.let {
                         klibModuleFactory.createPackageFragmentProvider(
                             klib,
@@ -155,36 +154,6 @@ class DotlinModule private constructor(
     }
 
     class Capability(var dotlinModule: DotlinModule? = null)
-
-    /**
-     * FQN of the Dart package itself.
-     */
-    // TODO: There can be multiple fq names, if Kotlin code is present.
-    val fqName: FqName by lazy {
-        val group = dartPackage.run {
-            fun String.reverseDomain() = split(".").reversed().joinToString(".")
-
-            when {
-                publisher.isNotEmpty() -> publisher.reverseDomain()
-                else -> repository?.host?.reverseDomain() ?: "pkg" // TODO: Better fallback?
-            }
-        }
-
-        FqName("$group.${dartPackage.name}")
-    }
-
-    fun fqNameOf(element: DartLibraryElement): FqName {
-        val fileFqName = element.path
-            .dropWhile { it.name == "lib" }
-            .joinToString(".") { it.nameWithoutExtension }
-
-        return FqName("$fqName.$fileFqName")
-    }
-
-    fun fqNameOf(element: DartDeclarationElement): FqName {
-        val libraryFqName = fqNameOf(dartElementLocator.locate<DartLibraryElement>(element.location.library))
-        return FqName("$libraryFqName.${element.name}")
-    }
 
     override fun getOriginal(): DotlinModule = this
 

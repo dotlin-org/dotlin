@@ -289,7 +289,7 @@ class DartNameGenerator {
         val theirDartPath = dartPathOf(file)
         val currentDartPath = dartPathOf(currentFile)
 
-        return currentDartPath.parent?.relativize(theirDartPath) ?: theirDartPath
+        return currentDartPath.parent?.let { theirDartPath.relativeTo(it) } ?: theirDartPath
     }
 
     companion object {

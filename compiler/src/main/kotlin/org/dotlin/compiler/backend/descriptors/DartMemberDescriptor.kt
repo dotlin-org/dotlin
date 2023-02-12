@@ -24,6 +24,7 @@ package org.dotlin.compiler.backend.descriptors
 import org.dotlin.compiler.dart.element.*
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.storage.StorageManager
+import org.jetbrains.kotlin.storage.getValue
 
 interface DartMemberDescriptor : DartDeclarationDescriptor, MemberDescriptor {
     /**
@@ -58,13 +59,13 @@ interface DartMemberDescriptor : DartDeclarationDescriptor, MemberDescriptor {
     }
 }
 
-abstract class LazyDartMemberDescriptor(storageManager: StorageManager) : LazyDartDeclarationDescriptor(storageManager),
-    DartMemberDescriptor {
+abstract class LazyDartMemberDescriptor(storageManager: StorageManager) :
+    LazyDartDeclarationDescriptor(storageManager), DartMemberDescriptor {
     @get:JvmName("_visibility")
-    private val visibility by lazy { super.getVisibility() }
+    private val visibility by storageManager.createLazyValue { super.getVisibility() }
 
     @get:JvmName("_modality")
-    private val modality by lazy { super.getModality() }
+    private val modality by storageManager.createLazyValue { super.getModality() }
 
     override fun getVisibility() = visibility
     override fun getModality() = modality

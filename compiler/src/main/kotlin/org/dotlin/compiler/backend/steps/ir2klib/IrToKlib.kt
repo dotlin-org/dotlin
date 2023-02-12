@@ -22,6 +22,7 @@ package org.dotlin.compiler.backend.steps.ir2klib
 import org.dotlin.compiler.backend.DartProject
 import org.dotlin.compiler.backend.steps.src2ir.IrResult
 import org.dotlin.compiler.backend.steps.src2ir.klib
+import org.dotlin.compiler.backend.util.kotlinFiles
 import org.jetbrains.kotlin.backend.common.serialization.KlibIrVersion
 import org.jetbrains.kotlin.backend.common.serialization.metadata.KlibMetadataMonolithicSerializer
 import org.jetbrains.kotlin.backend.common.serialization.metadata.KlibMetadataVersion
@@ -41,6 +42,7 @@ import org.jetbrains.kotlin.library.impl.buildKotlinLibrary
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
+import kotlin.io.path.relativeTo
 
 fun writeToKlib(
     env: KotlinCoreEnvironment,
@@ -48,7 +50,7 @@ fun writeToKlib(
     irResult: IrResult,
     dartProject: DartProject
 ) {
-    irResult.module.withFilePathsRelativeTo(dartProject.path) { module ->
+    irResult.module.withRelevantFiles(dartProject.path) { module ->
         val serializedIr = DartIrModuleSerializer(
             messageLogger = config.get(IrMessageLogger.IR_MESSAGE_LOGGER) ?: IrMessageLogger.None,
             builtIns = module.irBuiltins,
@@ -91,15 +93,15 @@ fun writeToKlib(
 }
 
 @OptIn(ObsoleteDescriptorBasedAPI::class)
-private fun IrModuleFragment.withFilePathsRelativeTo(sourceRoot: Path, block: (IrModuleFragment) -> Unit) {
+private fun IrModuleFragment.withRelevantFiles(sourceRoot: Path, block: (IrModuleFragment) -> Unit) {
     // We want to serialize the file paths as relative to the source root.
     val originalFiles = files.toList()
     files.clear()
-    originalFiles.mapTo(files) {
+    originalFiles.kotlinFiles().mapTo(files) {
         IrFileImpl(
             fileEntry = it.fileEntry.let { entry ->
                 object : IrFileEntry {
-                    override val name = sourceRoot.relativize(Path(entry.name)).toString()
+                    override val name = Path(entry.name).relativeTo(sourceRoot).toString()
                     override val maxOffset = entry.maxOffset
                     override fun getColumnNumber(offset: Int) = entry.getColumnNumber(offset)
                     override fun getLineNumber(offset: Int) = entry.getLineNumber(offset)
