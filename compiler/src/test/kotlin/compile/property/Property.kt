@@ -987,4 +987,21 @@ class Property {
             """
         )
     }
+
+    @Test
+    fun `top-level val property`() = assertCompile {
+        kotlin(
+            """
+            val aNumber = 30
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            final int aNumber = 30;
+            """
+        )
+    }
 }
