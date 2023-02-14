@@ -16,19 +16,22 @@
 
 package dotlin
 
+import kotlin.annotation.AnnotationTarget.*
+import kotlin.annotation.AnnotationRetention.*
+
 /**
  * Specifies the name to use in Dart for the annotated element.
  */
 @Target(
-    AnnotationTarget.CLASS,
-    AnnotationTarget.CONSTRUCTOR,
-    AnnotationTarget.FUNCTION,
-    AnnotationTarget.PROPERTY,
-    AnnotationTarget.VALUE_PARAMETER,
-    AnnotationTarget.TYPEALIAS,
-    AnnotationTarget.FILE
+    CLASS,
+    CONSTRUCTOR,
+    FUNCTION,
+    PROPERTY,
+    VALUE_PARAMETER,
+    TYPEALIAS,
+    FILE
 )
-@Retention(AnnotationRetention.SOURCE)
+@Retention(SOURCE)
 annotation class DartName(val name: String)
 
 /**
@@ -44,8 +47,8 @@ annotation class DartName(val name: String)
  * val myExample = @const Example()
  * ```
  */
-@Target(AnnotationTarget.EXPRESSION)
-@Retention(AnnotationRetention.SOURCE)
+@Target(EXPRESSION)
+@Retention(SOURCE)
 annotation class const
 
 /**
@@ -54,8 +57,8 @@ annotation class const
  *
  * Also applies to methods that override this method.
  */
-@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR)
-@Retention(AnnotationRetention.SOURCE)
+@Target(FUNCTION, CONSTRUCTOR)
+@Retention(SOURCE)
 annotation class DartPositional
 
 /**
@@ -75,8 +78,8 @@ annotation class DartPositional
  *
  * Also applies to parameters whose overridden paramter equivalents have this annotation.
  */
-@Target(AnnotationTarget.VALUE_PARAMETER)
-@Retention(AnnotationRetention.SOURCE)
+@Target(VALUE_PARAMETER)
+@Retention(SOURCE)
 annotation class DartIndex(val index: Int)
 
 /**
@@ -103,8 +106,8 @@ annotation class DartIndex(val index: Int)
  *
  * Also applies to parameters whose overridden paramter equivalents have this annotation.
  */
-@Target(AnnotationTarget.VALUE_PARAMETER)
-@Retention(AnnotationRetention.SOURCE)
+@Target(VALUE_PARAMETER)
+@Retention(SOURCE)
 annotation class DartDifferentDefaultValue
 
 /**
@@ -123,8 +126,8 @@ annotation class DartDifferentDefaultValue
  *
  * If applied to a file, it behaves the same as if all extension methods/properties were annotated individually.
  */
-@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FUNCTION, AnnotationTarget.FILE)
-@Retention(AnnotationRetention.SOURCE)
+@Target(PROPERTY, FUNCTION, FILE)
+@Retention(SOURCE)
 annotation class DartExtensionName(val name: String)
 
 /**
@@ -132,6 +135,6 @@ annotation class DartExtensionName(val name: String)
  *
  * Can only be used on external companion object methods.
  */
-@Target(AnnotationTarget.FUNCTION,)
-@Retention(AnnotationRetention.SOURCE)
+@Target(FUNCTION,)
+@Retention(SOURCE)
 annotation class DartConstructor

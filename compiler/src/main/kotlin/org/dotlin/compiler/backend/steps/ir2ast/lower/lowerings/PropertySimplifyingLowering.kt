@@ -65,6 +65,11 @@ class PropertySimplifyingLowering(override val context: DotlinLoweringContext) :
                 parent = irProperty.parent
                 correspondingPropertySymbol = irProperty.symbol
                 initializer = irProperty.backingField?.initializer
+                annotations = buildList {
+                    addAll(irProperty.annotations)
+                    irProperty.getter?.annotations?.let { addAll(it) }
+                    irProperty.setter?.annotations?.let { addAll(it) }
+                }
             }
 
             irProperty.file.transformChildrenVoid(

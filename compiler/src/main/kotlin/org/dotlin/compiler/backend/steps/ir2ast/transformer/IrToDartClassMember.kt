@@ -21,7 +21,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
 import org.dotlin.compiler.backend.steps.ir2ast.DartAstTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartAnnotations
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.acceptAnnotations
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartFactory
 import org.dotlin.compiler.backend.util.isDartConst
 import org.dotlin.compiler.dart.ast.declaration.classlike.DartEnumDeclaration
@@ -84,8 +84,7 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember>() 
                                     val delegateIrConstructor = irDelegatingConstructorCall.symbol.owner
 
                                     val name = delegateIrConstructor.dartNameOrNull
-                                    val arguments =
-                                        irDelegatingConstructorCall.accept(IrToDartArgumentListTransformer, context)
+                                    val arguments = irDelegatingConstructorCall.acceptArguments(context)
 
                                     statements.remove(irDelegatingConstructorCall)
 
@@ -169,7 +168,7 @@ object IrToDartClassMemberTransformer : IrDartAstTransformer<DartClassMember>() 
             ),
             isStatic = irField.isStatic,
             isAbstract = isAbstract,
-            annotations = irField.dartAnnotations
+            annotations = irField.acceptAnnotations(context)
         )
     }
 

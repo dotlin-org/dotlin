@@ -80,17 +80,17 @@ class DartGenerationContext {
             is DartClassLikeDeclaration, is DartExtendsClause, is DartImplementsClause, is DartWithClause -> {
                 DartClassLikeTransformer
             }
+
             is DartDeclaration, is DartVariableDeclarationList -> DartDeclarationTransformer
             is DartCompilationUnit, is DartDirective, is DartCombinator -> DartCompilationUnitTransformer
             is DartConstructorInitializer -> DartConstructorInitializerTransformer
             is DartFormalParameter, is DartFormalParameterList -> DartFormalParameterTransformer
-           is DartLabel, is DartAnnotation -> {
-                DartMiscTransformer
-            }
+            is DartLabel, is DartAnnotation -> DartMiscTransformer
             is DartStatement, is DartCatchClause, is DartForLoopParts -> DartStatementTransformer
             is DartTypeAnnotation, is DartTypeArgumentList, is DartTypeParameter, is DartTypeParameterList -> {
                 DartTypeAnnotationTransformer
             }
+
             else -> error("No transformer for ${this::class.java.simpleName}")
         }
 

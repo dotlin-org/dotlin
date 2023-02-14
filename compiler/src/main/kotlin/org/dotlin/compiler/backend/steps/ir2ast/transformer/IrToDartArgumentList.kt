@@ -46,8 +46,12 @@ object IrToDartArgumentListTransformer : IrDartAstTransformer<DartArgumentList>(
                         label = DartLabel(dartParameter.identifier as DartSimpleIdentifier),
                         expression = irArgument.accept(context)
                     )
+
                     else -> irArgument.accept(context)
                 }
             }
     )
 }
+
+fun IrFunctionAccessExpression.acceptArguments(context: DartAstTransformContext) =
+    accept(IrToDartArgumentListTransformer, context)

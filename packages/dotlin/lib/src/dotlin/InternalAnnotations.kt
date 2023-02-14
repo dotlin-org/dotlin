@@ -16,6 +16,9 @@
 
 package dotlin
 
+import kotlin.annotation.AnnotationTarget.*
+import kotlin.annotation.AnnotationRetention.*
+
 /**
  * Specifies that the annotated method is a getter in Dart.
  *
@@ -23,8 +26,8 @@ package dotlin
  *
  * Applies to any overrides in subtypes as well.
  */
-@Target(AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.SOURCE)
+@Target(FUNCTION)
+@Retention(SOURCE)
 internal annotation class DartGetter
 
 /**
@@ -35,10 +38,10 @@ internal annotation class DartGetter
  * If used on an `abstract` member, the member must be `external`.
  */
 @Target(
-    AnnotationTarget.FUNCTION,
-    AnnotationTarget.PROPERTY
+    FUNCTION,
+    PROPERTY
 )
-@Retention(AnnotationRetention.SOURCE)
+@Retention(SOURCE)
 internal annotation class DartExtension
 
 /**
@@ -48,6 +51,6 @@ internal annotation class DartExtension
  * @param library The library the declaration should be imported from.
  *                Should be a full import string, e.g. `dart:core` or `package:transmogrify/transmogrify.dart`.
  */
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.FILE)
-@Retention(AnnotationRetention.SOURCE)
+@Target(CLASS, FUNCTION, FILE)
+@Retention(SOURCE)
 annotation class DartLibrary(val library: String)

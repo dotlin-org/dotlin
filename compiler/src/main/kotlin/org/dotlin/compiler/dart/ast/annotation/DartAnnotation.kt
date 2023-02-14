@@ -30,12 +30,13 @@ import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.toDartIdentifier
 import org.dotlin.compiler.dart.ast.expression.literal.DartSimpleStringLiteral
+import org.dotlin.compiler.dart.ast.type.DartTypeArgumentList
 
 data class DartAnnotation(
     val name: DartIdentifier,
     val constructorName: DartSimpleIdentifier? = null,
     val arguments: DartArgumentList? = null,
-    val typeArguments: DartArgumentList? = null,
+    val typeArguments: DartTypeArgumentList? = null,
 ) : DartAstNode {
     override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C) = visitor.visitAnnotation(this, data)
 

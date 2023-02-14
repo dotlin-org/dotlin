@@ -27,7 +27,12 @@ import org.dotlin.compiler.dart.ast.`typealias`.DartTypeAlias
 
 object DartDeclarationTransformer : DartAstNodeTransformer() {
     override fun DartGenerationContext.visitTopLevelVariableDeclaration(variableDeclaration: DartTopLevelVariableDeclaration) =
-        variableDeclaration.acceptChild(suffix = ";") { variables }
+        variableDeclaration.run {
+            val annotations = acceptChildAnnotations()
+            val variables = variableDeclaration.acceptChild(suffix = ";") { variables }
+
+            "$annotations$variables"
+        }
 
     override fun DartGenerationContext.visitVariableDeclaration(variableDeclaration: DartVariableDeclaration) =
         variableDeclaration.run {
@@ -48,6 +53,7 @@ object DartDeclarationTransformer : DartAstNodeTransformer() {
                     isLate -> "late final$type "
                     else -> "final$type "
                 }
+
                 isLate -> "late$type "
                 else -> "$type "
             }

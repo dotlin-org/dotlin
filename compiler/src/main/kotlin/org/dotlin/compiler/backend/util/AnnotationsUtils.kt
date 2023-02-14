@@ -20,16 +20,17 @@
 package org.dotlin.compiler.backend.util
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.getValueArgumentOrDefault
+import org.jetbrains.kotlin.backend.jvm.ir.getAnnotationRetention
+import org.jetbrains.kotlin.descriptors.annotations.KotlinRetention
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrConst
+import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
-import org.jetbrains.kotlin.ir.util.SYNTHETIC_OFFSET
-import org.jetbrains.kotlin.ir.util.defaultType
+import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.util.getAnnotation
 import org.jetbrains.kotlin.ir.util.hasAnnotation
-import org.jetbrains.kotlin.ir.util.primaryConstructor
 import org.jetbrains.kotlin.name.FqName
 
 @Suppress("UNCHECKED_CAST")
@@ -80,11 +81,14 @@ private fun <R> Any.getFromOverride(block: (IrDeclaration) -> R): R? {
             is IrSimpleFunction -> parent.overriddenSymbols.map {
                 ((it.owner as? IrSimpleFunction)?.valueParameters?.get(this.index))?.let(block)
             }.firstOrNull()
+
             else -> null
         }
+
         is IrOverridableDeclaration<*> -> overriddenSymbols.map {
             (it.owner as? IrDeclaration)?.let(block)
         }.firstOrNull()
+
         else -> null
     }
 }
@@ -103,3 +107,6 @@ fun createAnnotation(symbol: IrClassSymbol, vararg arguments: IrExpression) = Ir
 ).apply {
     arguments.forEachIndexed { index, arg -> putValueArgument(index, arg) }
 }
+
+val IrAnnotationContainer.annotationsWithRuntimeRetention: List<IrConstructorCall>
+    get() = annotations.filter { it.symbol.owner.parentAsClass.getAnnotationRetention() != KotlinRetention.SOURCE }

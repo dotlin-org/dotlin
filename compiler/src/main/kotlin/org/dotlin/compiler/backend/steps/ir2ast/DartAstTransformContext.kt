@@ -23,7 +23,7 @@ import org.dotlin.compiler.backend.IrContext
 import org.dotlin.compiler.backend.attributes.IrAttributes
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.accept
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.dartAnnotations
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.acceptAnnotations
 import org.dotlin.compiler.backend.util.isDartGetter
 import org.dotlin.compiler.backend.util.isDartSetter
 import org.dotlin.compiler.dart.ast.DartAstNode
@@ -57,7 +57,7 @@ class DartAstTransformContext(
         val returnType = returnType.accept(context)
         val typeParameters = typeParameters.accept(context)
         val parameters = valueParameters.accept(context)
-        val annotations = dartAnnotations
+        val annotations = acceptAnnotations(context)
 
         return block(
             when {

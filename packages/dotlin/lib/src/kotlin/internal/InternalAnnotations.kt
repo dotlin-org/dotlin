@@ -22,7 +22,7 @@ package kotlin.internal
  * That means it's completely safe to use generic types as argument for such parameter.
  */
 @Target(AnnotationTarget.TYPE_PARAMETER)
-@Retention(AnnotationRetention.BINARY)
+@Retention(AnnotationRetention.SOURCE)
 internal annotation class PureReifiable
 
 /**
@@ -32,5 +32,5 @@ internal annotation class PureReifiable
  * method 'java/util/Map.remove(Ljava/lang/Object;Ljava/lang/Object;)Z' is defined in JDK (i.e. for major versions >= 8)
  */
 @Target(AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.BINARY)
+@Retention(AnnotationRetention.SOURCE)
 internal annotation class PlatformDependent

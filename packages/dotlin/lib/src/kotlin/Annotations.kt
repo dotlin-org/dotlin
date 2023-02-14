@@ -17,7 +17,7 @@
 
 package kotlin
 
-import kotlin.annotation.AnnotationRetention.BINARY
+import kotlin.annotation.AnnotationRetention.RUNTIME
 import kotlin.annotation.AnnotationRetention.SOURCE
 import kotlin.annotation.AnnotationTarget.*
 
@@ -84,7 +84,7 @@ annotation class DeprecatedSinceKotlin(
  *     replacement expression to be resolved correctly.
  */
 @Target()
-@Retention(BINARY)
+@Retention(SOURCE)
 @MustBeDocumented
 annotation class ReplaceWith(val expression: String, vararg val imports: String)
 
@@ -142,7 +142,7 @@ annotation class UnsafeVariance
  * are non-negative integer numbers without leading zeros.
  */
 @Target(CLASS, PROPERTY, FIELD, CONSTRUCTOR, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER, TYPEALIAS)
-@Retention(AnnotationRetention.BINARY)
+@Retention(AnnotationRetention.SOURCE)
 @MustBeDocumented
 annotation class SinceKotlin(val version: String)
 
@@ -161,7 +161,7 @@ annotation class SinceKotlin(val version: String)
  * - or any of its superclasses/superinterfaces
  */
 @Target(ANNOTATION_CLASS)
-@Retention(BINARY)
+@Retention(RUNTIME)
 @MustBeDocumented
 @SinceKotlin("1.1")
 annotation class DslMarker
@@ -179,7 +179,7 @@ annotation class DslMarker
  * - the declaration becomes effectively public, and this should be considered with respect to binary compatibility maintaining.
  */
 @Target(AnnotationTarget.CLASS, AnnotationTarget.CONSTRUCTOR, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
-@Retention(AnnotationRetention.BINARY)
+@Retention(AnnotationRetention.SOURCE)
 @MustBeDocumented
 @SinceKotlin("1.1")
 annotation class PublishedApi

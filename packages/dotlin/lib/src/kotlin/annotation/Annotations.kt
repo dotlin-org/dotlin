@@ -59,14 +59,12 @@ enum class AnnotationTarget {
 /**
  * Contains the list of possible annotation's retentions.
  *
- * Determines how an annotation is stored in binary output.
+ * Determines how an annotation is stored in output (generated Dart code).
  */
 enum class AnnotationRetention {
-    /** Annotation isn't stored in binary output */
+    /** Annotation isn't stored in output */
     SOURCE,
-    /** Annotation is stored in binary output, but invisible for reflection */
-    BINARY,
-    /** Annotation is stored in binary output and visible for reflection (default retention) */
+    /** Annotation is stored in output and visible for reflection (default retention) */
     RUNTIME
 }
 
@@ -83,7 +81,8 @@ enum class AnnotationRetention {
 annotation class Target(vararg val allowedTargets: AnnotationTarget)
 
 /**
- * This meta-annotation determines whether an annotation is stored in binary output and visible for reflection. By default, both are true.
+ * This meta-annotation determines whether an annotation is stored in binary output and visible for reflection.
+ * By default, both are true.
  *
  * @property value necessary annotation retention (RUNTIME, BINARY or SOURCE)
  */

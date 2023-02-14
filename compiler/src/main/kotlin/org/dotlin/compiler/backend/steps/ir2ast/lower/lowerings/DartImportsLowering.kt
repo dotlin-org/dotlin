@@ -34,6 +34,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.visitTypes
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrFileLowering
 import org.dotlin.compiler.backend.steps.src2ir.dotlinModule
+import org.dotlin.compiler.backend.util.annotationsWithRuntimeRetention
 import org.dotlin.compiler.backend.util.importAliasIn
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
@@ -66,17 +67,81 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
         // Add imports through declaration references and types.
         file.acceptChildrenVoid(
             object : IrElementVisitorVoid {
+                private val visitor = this
+
                 override fun visitDeclarationReference(expression: IrDeclarationReference) {
                     super.visitDeclarationReference(expression)
 
                     val declaration = expression.symbol.owner as? IrDeclaration ?: return
 
-                    // TODO: typeContext = null must be explicitely passed because of a bug in contextual receivers
+                    // TODO: typeContext = null must be explicitly passed because of a bug in contextual receivers
                     file.maybeAddDartImportsFor(declaration, typeContext = null)
                 }
 
                 override fun visitMemberAccess(expression: IrMemberAccessExpression<*>) =
                     visitDeclarationReference(expression)
+
+                private fun IrAnnotationContainer.visitAnnotations() {
+                    annotationsWithRuntimeRetention.forEach {
+                        it.acceptChildrenVoid(visitor)
+                        file.maybeAddDartImportsFor(it.symbol.owner, typeContext = null)
+                    }
+                }
+
+                override fun visitAnonymousInitializer(declaration: IrAnonymousInitializer) {
+                    super.visitAnonymousInitializer(declaration)
+                    declaration.visitAnnotations()
+                }
+
+                override fun visitClass(declaration: IrClass) {
+                    super.visitClass(declaration)
+                    declaration.visitAnnotations()
+                }
+
+                override fun visitEnumEntry(declaration: IrEnumEntry) {
+                    super.visitEnumEntry(declaration)
+                    declaration.visitAnnotations()
+                }
+
+                override fun visitField(declaration: IrField) {
+                    super.visitField(declaration)
+                    declaration.visitAnnotations()
+                }
+
+                override fun visitFunction(declaration: IrFunction) {
+                    super.visitFunction(declaration)
+                    declaration.visitAnnotations()
+                }
+
+                override fun visitLocalDelegatedProperty(declaration: IrLocalDelegatedProperty) {
+                    super.visitLocalDelegatedProperty(declaration)
+                    declaration.visitAnnotations()
+                }
+
+                override fun visitProperty(declaration: IrProperty) {
+                    super.visitProperty(declaration)
+                    declaration.visitAnnotations()
+                }
+
+                override fun visitTypeAlias(declaration: IrTypeAlias) {
+                    super.visitTypeAlias(declaration)
+                    declaration.visitAnnotations()
+                }
+
+                override fun visitTypeParameter(declaration: IrTypeParameter) {
+                    super.visitTypeParameter(declaration)
+                    declaration.visitAnnotations()
+                }
+
+                override fun visitValueParameter(declaration: IrValueParameter) {
+                    super.visitValueParameter(declaration)
+                    declaration.visitAnnotations()
+                }
+
+                override fun visitVariable(declaration: IrVariable) {
+                    super.visitVariable(declaration)
+                    declaration.visitAnnotations()
+                }
 
                 override fun visitElement(element: IrElement) = element.acceptChildrenVoid(this)
             }

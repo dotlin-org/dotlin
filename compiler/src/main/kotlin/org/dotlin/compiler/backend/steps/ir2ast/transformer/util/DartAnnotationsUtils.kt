@@ -19,7 +19,11 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer.util
 
+import org.dotlin.compiler.backend.steps.ir2ast.DartAstTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.accept
+import org.dotlin.compiler.backend.steps.ir2ast.transformer.acceptArguments
+import org.dotlin.compiler.backend.util.annotationsWithRuntimeRetention
 import org.dotlin.compiler.dart.ast.annotation.DartAnnotation
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities.INTERNAL
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities.PROTECTED
@@ -30,60 +34,77 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.util.isAnnotationClass
 import org.jetbrains.kotlin.ir.util.isEnumClass
 import org.jetbrains.kotlin.ir.util.isLocal
+import org.jetbrains.kotlin.ir.util.parentAsClass
 
-val IrDeclaration.dartAnnotations: List<DartAnnotation>
-    get() {
-        val isExtension = isExtension
+fun IrDeclaration.acceptAnnotations(
+    context: DartAstTransformContext
+): List<DartAnnotation> {
+    val isExtension = isExtension
 
-        val isStatic = when (this) {
-            is IrField -> isStatic
-            is IrFunction -> isStatic
-            else -> false
+    val isStatic = when (this) {
+        is IrField -> isStatic
+        is IrFunction -> isStatic
+        else -> false
+    }
+
+    val override = when {
+        !isExtension && (this is IrOverridableDeclaration<*> && isOverride) || (this is IrField && isOverride) -> {
+            DartAnnotation.OVERRIDE
         }
 
-        val override = when {
-            !isExtension && (this is IrOverridableDeclaration<*> && isOverride) || (this is IrField && isOverride) -> {
-                DartAnnotation.OVERRIDE
-            }
-            else -> null
-        }
+        else -> null
+    }
 
-        val visibility = when (this) {
-            is IrDeclarationWithVisibility -> when (visibility) {
-                INTERNAL -> DartAnnotation.INTERNAL
-                else -> when {
-                    !isExtension -> when (visibility) {
-                        PROTECTED -> DartAnnotation.PROTECTED
-                        else -> null
-                    }
+    val visibility = when (this) {
+        is IrDeclarationWithVisibility -> when (visibility) {
+            INTERNAL -> DartAnnotation.INTERNAL
+            else -> when {
+                !isExtension -> when (visibility) {
+                    PROTECTED -> DartAnnotation.PROTECTED
                     else -> null
                 }
-            }
-            else -> null
-        }
 
-        val modality = when {
-            !isExtension -> when (modality) {
-                SEALED, FINAL -> when {
-                    // Sealed as well as final classes get marked @sealed.
-                    // Enum classes don't have to be marked @sealed, they are always sealed in Dart.
-                    this is IrClass && !isDartExtensionContainer && !isEnumClass -> DartAnnotation.SEALED
-                    // Non-top-level, non-static and non-local final declarations get marked @nonVirtual.
-                    parent !is IrFile && !isStatic && !isLocal -> DartAnnotation.NON_VIRTUAL
-                    else -> null
-                }
                 else -> null
             }
-            else -> null
         }
 
-        val pragmaInline = when {
-            this is IrFunction && isInline -> DartAnnotation.pragma("vm:always-consider-inlining")
-            else -> null
-        }
-
-        return listOfNotNull(visibility, modality, override, pragmaInline)
+        else -> null
     }
+
+    val modality = when {
+        !isExtension -> when (modality) {
+            SEALED, FINAL -> when {
+                // Sealed as well as final classes get marked @sealed.
+                // Enum classes don't have to be marked @sealed, they are always sealed in Dart.
+                this is IrClass && !isDartExtensionContainer && !isEnumClass -> DartAnnotation.SEALED
+                // Non-top-level, non-static and non-local final declarations get marked @nonVirtual.
+                parent !is IrFile && !isStatic && !isLocal -> DartAnnotation.NON_VIRTUAL
+                else -> null
+            }
+
+            else -> null
+        }
+
+        else -> null
+    }
+
+    val pragmaInline = when {
+        this is IrFunction && isInline -> DartAnnotation.pragma("vm:always-consider-inlining")
+        else -> null
+    }
+
+    val annotations = annotationsWithRuntimeRetention
+        .map {
+            DartAnnotation(
+                name = with(context) { it.symbol.owner.parentAsClass.dartName },
+                arguments = it.acceptArguments(context),
+                typeArguments = it.typeArguments.accept(context)
+            )
+        }
+        .toList()
+
+    return annotations + listOfNotNull(visibility, modality, override, pragmaInline)
+}
 
 private val IrDeclaration.modality: Modality?
     get() = when (this) {
@@ -95,5 +116,6 @@ private val IrDeclaration.modality: Modality?
             isAnnotationClass -> FINAL
             else -> modality
         }
+
         else -> null
     }

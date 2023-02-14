@@ -259,7 +259,7 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                     }
 
                     else -> {
-                        val arguments = irCallLike.accept(IrToDartArgumentListTransformer, context)
+                        val arguments = irCallLike.acceptArguments(context)
 
                         when {
                             irCallLike.isDartConstructorCall() -> {

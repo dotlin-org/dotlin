@@ -110,7 +110,7 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
                 // with another one. We don't want to add the constructor to the extension container in Dart.
                 !irClass.isDartExtensionContainer || it !is IrConstructor
             }
-            // We handle fake overrides only from regular interfaces and if this itself is not a
+            // We handle fake overrides only from regular interfaces and if this itself is not
             // a regular interface.
             .filter {
                 if (!it.isFakeOverride()) {
@@ -147,7 +147,7 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
             .map { it.acceptAsClassMember(context) }
             .toList()
 
-        val annotations = irClass.dartAnnotations
+        val annotations = irClass.acceptAnnotations(context)
 
         return when {
             irClass.isEnumClass -> DartEnumDeclaration(
@@ -195,7 +195,7 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
                 isLate = irField.correspondingProperty?.isLateinit == true,
                 type = irField.type.accept(context)
             ),
-            annotations = irField.dartAnnotations,
+            annotations = irField.acceptAnnotations(context),
         )
 
     override fun DartAstTransformContext.visitTypeAlias(
@@ -209,13 +209,13 @@ object IrToDartDeclarationTransformer : IrDartAstTransformer<DartCompilationUnit
             it.expandedType.isFunctionTypeOrSubtype() -> DartFunctionTypeAlias(
                 name, typeParameters,
                 aliased = it.expandedType.accept(context) as DartFunctionType,
-                annotations = irAlias.dartAnnotations
+                annotations = irAlias.acceptAnnotations(context)
             )
 
             else -> DartClassTypeAlias(
                 name, typeParameters,
                 aliased = it.expandedType.accept(context) as DartNamedType,
-                annotations = irAlias.dartAnnotations
+                annotations = irAlias.acceptAnnotations(context)
             )
         }
     }
