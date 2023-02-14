@@ -21,7 +21,6 @@ package compile
 
 import BaseTest
 import assertCompile
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import kotlin.io.path.*
@@ -197,7 +196,6 @@ class Import : BaseTest {
         )
     }
 
-    @Disabled
     @Test
     fun `import Kotlin enum entry`() = assertCompile {
         kotlin(
@@ -205,8 +203,8 @@ class Import : BaseTest {
             package pkg0
 
             enum class Temp {
-                COOL,
-                HOT
+                cool,
+                hot
             }
             """
         )
@@ -216,8 +214,8 @@ class Import : BaseTest {
             import "package:meta/meta.dart";
 
             enum Temp {
-              COOL._(),
-              HOT._();
+              cool._(),
+              hot._();
 
               const Temp._();
             }
@@ -231,10 +229,95 @@ class Import : BaseTest {
             """
             package pkg1
 
-            import pkg0.Temp
+            import pkg0.Temp.cool
 
             fun main() {
-                val x = Temp.COOL
+                val temp = cool
+            }
+            """
+        )
+
+        dart(
+            """
+            import "0.dt.g.dart" show Temp;
+            import "package:meta/meta.dart";
+
+            void main() {
+              final Temp temp = Temp.cool;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `import Kotlin enum entry if used as argument`() = assertCompile {
+        kotlin(
+            """
+            package pkg0
+
+            enum class Temp {
+                cool,
+                hot
+            }
+
+            fun isBearable(temp: Temp) = temp == Temp.cool
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            enum Temp {
+              cool._(),
+              hot._();
+
+              const Temp._();
+            }
+
+            bool isBearable(Temp temp) {
+              return temp == Temp.cool;
+            }
+
+            Temp ${'$'}Temp${'$'}valueOf(String value) =>
+                Temp.values.firstWhere((Temp v) => v.name == value);
+            """
+        )
+
+        kotlin(
+            """
+            package pkg1
+
+            import pkg0.isBearable
+            import pkg0.Temp.cool
+
+            fun main() {
+                val x = isBearable(cool)
+            }
+            """
+        )
+
+        dart(
+            """
+            import "0.dt.g.dart" show Temp, isBearable;
+            import "package:meta/meta.dart";
+
+            void main() {
+              final bool x = isBearable(Temp.cool);
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `import Kotlin enum entries`() = assertCompile {
+        kotlin(
+            """
+            package pkg0
+
+            enum class Temp {
+                cool,
+                hot
             }
             """
         )
@@ -243,8 +326,101 @@ class Import : BaseTest {
             """
             import "package:meta/meta.dart";
 
+            enum Temp {
+              cool._(),
+              hot._();
+
+              const Temp._();
+            }
+
+            Temp ${'$'}Temp${'$'}valueOf(String value) =>
+                Temp.values.firstWhere((Temp v) => v.name == value);
+            """
+        )
+
+        kotlin(
+            """
+            package pkg1
+
+            import pkg0.Temp.*
+
+            fun main() {
+                val temp = cool
+                val temp2 = hot
+            }
+            """
+        )
+
+        dart(
+            """
+            import "0.dt.g.dart" show Temp;
+            import "package:meta/meta.dart";
+
             void main() {
-              final Temp x = Temp.cool;
+              final Temp temp = Temp.cool;
+              final Temp temp2 = Temp.hot;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `import Kotlin enum entries if used as arguments`() = assertCompile {
+        kotlin(
+            """
+            package pkg0
+
+            enum class Temp {
+                cool,
+                hot
+            }
+
+            fun isBearable(temp: Temp) = temp == Temp.cool
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            enum Temp {
+              cool._(),
+              hot._();
+
+              const Temp._();
+            }
+
+            bool isBearable(Temp temp) {
+              return temp == Temp.cool;
+            }
+
+            Temp ${'$'}Temp${'$'}valueOf(String value) =>
+                Temp.values.firstWhere((Temp v) => v.name == value);
+            """
+        )
+
+        kotlin(
+            """
+            package pkg1
+
+            import pkg0.isBearable
+            import pkg0.Temp.*
+
+            fun main() {
+                val x = isBearable(cool)
+                val y = isBearable(hot)
+            }
+            """
+        )
+
+        dart(
+            """
+            import "0.dt.g.dart" show Temp, isBearable;
+            import "package:meta/meta.dart";
+
+            void main() {
+              final bool x = isBearable(Temp.cool);
+              final bool y = isBearable(Temp.hot);
             }
             """
         )

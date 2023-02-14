@@ -109,7 +109,7 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
 
         // Import the extension container class if it's an extension.
         val relevantDeclaration = declaration.extensionContainer ?: when (declaration) {
-            is IrConstructor -> declaration.parentAsClass
+            is IrConstructor, is IrEnumEntry -> declaration.parentAsClass
             is IrSimpleFunction -> when {
                 // For `@DartConstructor`s, we want to import the parent class of the companion object it's in.
                 isDartConstructor -> declaration.parentClassOrNull?.parentClassOrNull
