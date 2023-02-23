@@ -19,75 +19,31 @@
 
 package org.dotlin.compiler.backend.descriptors
 
-import org.dotlin.compiler.backend.descriptors.type.DartInterfaceTypeConstructor
-import org.dotlin.compiler.backend.descriptors.type.DartSimpleType
 import org.dotlin.compiler.dart.element.DartClassElement
-import org.jetbrains.kotlin.descriptors.*
-import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
+import org.jetbrains.kotlin.descriptors.ClassKind
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.SourceElement
+import org.jetbrains.kotlin.descriptors.impl.ClassDescriptorImpl
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.storage.getValue
-import org.jetbrains.kotlin.types.*
 
 class DartClassDescriptor(
     override val element: DartClassElement,
     override val context: DartDescriptorContext,
-    override val container: DeclarationDescriptor,
-    private val original: DartClassDescriptor? = null,
-) : LazyDartMemberDescriptor(context.storageManager), ClassDescriptor {
-    override fun getOriginal() = original ?: this
-
-    override fun getContainingDeclaration() = container
-
-    override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R =
-        visitor.visitClassDescriptor(this, data)
-
-    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>) {
-        visitor.visitClassDescriptor(this, null)
-    }
-
-    override fun getSource(): SourceElement = SourceElement.NO_SOURCE
-
-    @get:JvmName("_typeConstructor")
-    private val typeConstructor by storageManager.createLazyValue {
-        DartInterfaceTypeConstructor(
-            descriptor = this,
-            module.builtIns
-        )
-    }
-
-    override fun getTypeConstructor(): DartInterfaceTypeConstructor = typeConstructor
-
-
-    @get:JvmName("_defaultType")
-    private val defaultType by lazy {
-        DartSimpleType(
-            typeConstructor,
-            arguments = emptyList(), // TODO
-            attributes = TypeAttributes.Empty, // TODO
-            isMarkedNullable = false
-        )
-    }
-
-    override fun getDefaultType(): SimpleType = defaultType
-
-    override fun substitute(substitutor: TypeSubstitutor): ClassifierDescriptorWithTypeParameters {
-        TODO("Not yet implemented")
-    }
-
-    override fun isInner() = false
-
-    override fun getDeclaredTypeParameters(): List<TypeParameterDescriptor> {
-        return emptyList() // TODO
-    }
-
-    override fun getMemberScope(typeArguments: MutableList<out TypeProjection>): MemberScope {
-        TODO("Not yet implemented")
-    }
-
-    override fun getMemberScope(typeSubstitution: TypeSubstitution): MemberScope {
-        TODO("Not yet implemented")
-    }
-
+    val container: DeclarationDescriptor,
+) : ClassDescriptorImpl(
+    container,
+    element.kotlinName,
+    element.kotlinModality,
+    ClassKind.CLASS,
+    emptyList(), // TODO: superTypes
+    SourceElement.NO_SOURCE, // TODO: SourceElement
+    false,
+    context.storageManager,
+), DartDescriptor {
+    private val _modality = element.kotlinModality
+    override fun getModality() = _modality
 
     private val instanceMemberScope by storageManager.createLazyValue {
         DartMemberScope(
@@ -99,50 +55,17 @@ class DartClassDescriptor(
 
     override fun getUnsubstitutedMemberScope(): MemberScope = instanceMemberScope
 
-    override fun getUnsubstitutedInnerClassesScope(): MemberScope {
-        TODO("Not yet implemented")
-    }
-
     override fun getStaticScope(): MemberScope {
         return MemberScope.Empty // TODO
     }
 
-    @get:JvmName("_constructors")
-    private val constructors by storageManager.createLazyValue {
+    private val _constructors by storageManager.createLazyValue {
         instanceMemberScope.getContributedDescriptors().filterIsInstance<DartConstructorDescriptor>()
     }
 
-    override fun getConstructors(): List<DartConstructorDescriptor> = constructors
-
-    override fun getCompanionObjectDescriptor(): ClassDescriptor? = null
-
-    override fun getKind(): ClassKind = ClassKind.CLASS // TODO
-
-    override fun isCompanionObject() = false
-    override fun isData() = false
-    override fun isInline() = false
-    override fun isFun() = false
-    override fun isValue() = false
-
-    private val thisReceiver by storageManager.createLazyValue {
-        DartReceiverParameterDescriptor(
-            Name.identifier("this"),
-            type = defaultType,
-            owner = this,
-            context,
-        )
-    }
-
-    override fun getThisAsReceiverParameter(): ReceiverParameterDescriptor = thisReceiver
-
-    override fun getContextReceivers(): List<ReceiverParameterDescriptor> = emptyList()
+    override fun getConstructors(): List<DartConstructorDescriptor> = _constructors
 
     override fun getUnsubstitutedPrimaryConstructor(): ClassConstructorDescriptor? {
         TODO("Not yet implemented")
     }
-
-    override fun getSealedSubclasses(): Collection<ClassDescriptor> = emptyList()
-    override fun getValueClassRepresentation(): ValueClassRepresentation<SimpleType>? = null
-    override fun getDefaultFunctionTypeForSamInterface(): SimpleType? = null
-    override fun isDefinitelyNotSamInterface(): Boolean = true
 }

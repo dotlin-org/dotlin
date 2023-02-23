@@ -23,169 +23,87 @@ import org.dotlin.compiler.backend.descriptors.type.toKotlinType
 import org.dotlin.compiler.dart.element.DartConstructorElement
 import org.dotlin.compiler.dart.element.DartExecutableElement
 import org.dotlin.compiler.dart.element.DartFunctionElement
-import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
-import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.storage.StorageManager
+import org.jetbrains.kotlin.descriptors.impl.ClassConstructorDescriptorImpl
+import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
 import org.jetbrains.kotlin.storage.getValue
 import org.jetbrains.kotlin.types.KotlinType
-import org.jetbrains.kotlin.types.TypeSubstitutor
-
-sealed class DartFunctionDescriptor(storageManager: StorageManager) : LazyDartMemberDescriptor(storageManager),
-    DartCallableDescriptor, FunctionDescriptor {
-    abstract override val element: DartExecutableElement
-
-    override fun getContainingDeclaration() = container
-
-    override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R =
-        visitor.visitFunctionDescriptor(this, data)
-
-    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>) {
-        visitor.visitFunctionDescriptor(this, null)
-    }
-
-    override fun getSource(): SourceElement = SourceElement.NO_SOURCE
-
-    override fun substitute(substitutor: TypeSubstitutor): FunctionDescriptor? {
-        TODO("Not yet implemented")
-    }
-
-    override fun getContextReceiverParameters(): List<ReceiverParameterDescriptor> {
-        return emptyList() // TODO
-    }
-
-    override fun getExtensionReceiverParameter(): ReceiverParameterDescriptor? {
-        return null // TODO
-    }
-
-    override fun getDispatchReceiverParameter(): ReceiverParameterDescriptor? {
-        return null // TODO
-    }
-
-    override fun getTypeParameters(): List<TypeParameterDescriptor> {
-        return emptyList() // TODO
-    }
-
-    @get:JvmName("_returnType")
-    private val returnType by storageManager.createLazyValue { element.type.returnType.toKotlinType() }
-    override fun getReturnType(): KotlinType = returnType
-
-    @get:JvmName("_valueParameters")
-    private val valueParameters by storageManager.createLazyValue {
-        element.parameters.mapIndexed { index, param ->
-            DartValueParameterDescriptor(
-                container = this,
-                index,
-                Annotations.EMPTY, // TODO
-                element = param,
-                context,
-                original = null,
-                storageManager,
-            )
-        }
-    }
-
-    override fun getValueParameters(): List<ValueParameterDescriptor> = valueParameters
-
-    override fun getOverriddenDescriptors(): Collection<FunctionDescriptor> {
-        return emptyList() // TODO
-    }
-
-    override fun <V : Any?> getUserData(p0: CallableDescriptor.UserDataKey<V>?): V? {
-        return null // TODO?
-    }
-
-    override fun setOverriddenDescriptors(p0: MutableCollection<out CallableMemberDescriptor>) {
-        // TODO
-    }
-
-    override fun getKind() = CallableMemberDescriptor.Kind.DECLARATION // TODO?
-
-    override fun isOperator() = false
-
-    override fun getInitialSignatureDescriptor(): FunctionDescriptor? = this // TODO?
-
-    override fun isHiddenToOvercomeSignatureClash(): Boolean = false
-
-    override fun isInfix(): Boolean = false
-
-    override fun isInline(): Boolean {
-        return false // TODO: Read @pragma annotations for inline
-    }
-
-    override fun isTailrec(): Boolean = false
-
-    override fun isHiddenForResolutionEverywhereBesideSupercalls(): Boolean = false // TODO?
-
-    override fun isSuspend() = element.isAsync // TODO
-}
 
 class DartSimpleFunctionDescriptor(
     override val element: DartFunctionElement,
     override val context: DartDescriptorContext,
-    override val container: DeclarationDescriptor,
+    container: DeclarationDescriptor,
     private val original: DartSimpleFunctionDescriptor? = null,
-) : DartFunctionDescriptor(context.storageManager), SimpleFunctionDescriptor {
-    override fun getOriginal() = original ?: this
-
-    override fun copy(
-        p0: DeclarationDescriptor?,
-        p1: Modality?,
-        p2: DescriptorVisibility?,
-        p3: CallableMemberDescriptor.Kind?,
-        p4: Boolean
-    ): SimpleFunctionDescriptor {
-        TODO("Not yet implemented")
-    }
-
-    override fun newCopyBuilder(): FunctionDescriptor.CopyBuilder<out SimpleFunctionDescriptor> {
-        TODO("Not yet implemented")
+) : SimpleFunctionDescriptorImpl(
+    container,
+    original,
+    Annotations.EMPTY, // TODO
+    element.kotlinName,
+    CallableMemberDescriptor.Kind.DECLARATION, // TODO?
+    SourceElement.NO_SOURCE // TODO: SourceElement
+), DartDescriptor {
+    init {
+        initialize(
+            null, // TODO
+            null, // TODO
+            emptyList(), // TODO
+            emptyList(), // TODO
+            element.kotlinValueParametersOf(this),
+            element.kotlinReturnType,
+            element.kotlinModality,
+            element.kotlinVisibility,
+        )
     }
 }
 
 class DartConstructorDescriptor(
     override val element: DartConstructorElement,
     override val context: DartDescriptorContext,
-    override val container: DartClassDescriptor,
-    private val original: DartConstructorDescriptor? = null,
-) : DartFunctionDescriptor(context.storageManager), ClassConstructorDescriptor {
+    container: DartClassDescriptor,
+    original: DartConstructorDescriptor? = null,
+) : ClassConstructorDescriptorImpl(
+    container,
+    original,
+    Annotations.EMPTY, // TODO,
+    false,
+    CallableMemberDescriptor.Kind.DECLARATION, // TODO
+    SourceElement.NO_SOURCE
+), DartDescriptor {
+    init {
+        initialize(
+            element.kotlinValueParametersOf(this),
+            element.kotlinVisibility,
+        )
+    }
+
     private val _name by storageManager.createLazyValue {
         when {
-            element.name.isEmpty -> Name.special("<init>")
-            else -> super.getName()
+            element.name.isEmpty -> super.getName()
+            else -> element.kotlinName
         }
     }
 
     override fun getName() = _name
 
-    override fun getOriginal() = original ?: this
+    private val _returnType by storageManager.createLazyValue { element.type.returnType.toKotlinType() }
 
-    override fun getContainingDeclaration() = container
-
-    override fun substitute(substitutor: TypeSubstitutor): DartConstructorDescriptor? {
-        TODO("Not yet implemented")
-    }
-
-    override fun copy(
-        newOwner: DeclarationDescriptor,
-        modality: Modality,
-        visibility: DescriptorVisibility,
-        kind: CallableMemberDescriptor.Kind,
-        copyOverrides: Boolean
-    ): DartConstructorDescriptor {
-        TODO("Not yet implemented")
-    }
-
-    @get:JvmName("_returnType")
-    private val returnType by storageManager.createLazyValue { element.type.returnType.toKotlinType() }
-    override fun getReturnType(): KotlinType = returnType
-
-    override fun newCopyBuilder(): FunctionDescriptor.CopyBuilder<out FunctionDescriptor> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getConstructedClass() = container
-
-    override fun isPrimary() = false // TODO
+    override fun getReturnType(): KotlinType = _returnType
 }
+
+context(DartDescriptor)
+private fun DartExecutableElement.kotlinValueParametersOf(container: FunctionDescriptor) =
+    parameters.mapIndexed { index, param ->
+        DartValueParameterDescriptor(
+            container,
+            index,
+            Annotations.EMPTY, // TODO
+            element = param,
+            context,
+            original = null,
+        )
+    }
 

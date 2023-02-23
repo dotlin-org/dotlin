@@ -21,13 +21,8 @@ package org.dotlin.compiler.backend.descriptors
 
 import org.dotlin.compiler.dart.element.DartCompilationUnitElement
 import org.dotlin.compiler.dart.element.DartLibraryElement
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptorVisitor
-import org.jetbrains.kotlin.descriptors.ModuleDescriptor
-import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
-import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
-import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.descriptors.impl.PackageFragmentDescriptorImpl
 import org.jetbrains.kotlin.storage.getValue
 
 /**
@@ -39,31 +34,10 @@ class DartPackageFragmentDescriptor(
     override val element: DartCompilationUnitElement,
     override val context: DartDescriptorContext,
     override val annotations: Annotations = Annotations.EMPTY,
-    private val original: DartPackageFragmentDescriptor? = null,
-) : DartDescriptor, PackageFragmentDescriptor {
-
+) : PackageFragmentDescriptorImpl(context.module, context.fqNameOf(library)), DartDescriptor {
     private val _memberScope by storageManager.createLazyValue {
         DartMemberScope(owner = this, context, element.classes + element.functions)
     }
 
-    override val fqName: FqName = context.fqNameOf(library)
-
     override fun getMemberScope(): DartMemberScope = _memberScope
-
-    override fun getName(): Name = fqName.shortNameOrSpecial()
-
-    override fun getOriginal(): DartPackageFragmentDescriptor = original ?: this
-
-    override fun getContainingDeclaration(): ModuleDescriptor = module
-
-    override fun getSource(): SourceElement {
-        return SourceElement.NO_SOURCE // TODO
-    }
-
-    override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R =
-        visitor.visitPackageFragmentDescriptor(this, data)
-
-    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>) {
-        visitor.visitPackageFragmentDescriptor(this, null)
-    }
 }

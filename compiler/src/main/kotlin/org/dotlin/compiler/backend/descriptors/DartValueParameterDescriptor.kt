@@ -21,90 +21,31 @@ package org.dotlin.compiler.backend.descriptors
 
 import org.dotlin.compiler.backend.descriptors.type.toKotlinType
 import org.dotlin.compiler.dart.element.DartParameterElement
-import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
-import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.resolve.constants.ConstantValue
-import org.jetbrains.kotlin.storage.StorageManager
-import org.jetbrains.kotlin.storage.getValue
-import org.jetbrains.kotlin.types.KotlinType
-import org.jetbrains.kotlin.types.TypeSubstitutor
+import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
 
 class DartValueParameterDescriptor(
-    override val container: DartCallableDescriptor,
+    container: FunctionDescriptor,
     override val index: Int,
     override val annotations: Annotations,
     override val element: DartParameterElement,
     override val context: DartDescriptorContext,
-    private val original: DartValueParameterDescriptor? = null,
-    storageManager: StorageManager,
-) : LazyDartDeclarationDescriptor(context.storageManager), DartParameterDescriptor, ValueParameterDescriptor {
-    // TODO?
-    override fun cleanCompileTimeInitializerCache() {}
-
-    override fun copy(newOwner: CallableDescriptor, newName: Name, newIndex: Int): ValueParameterDescriptor {
-        TODO("Not yet implemented")
-    }
-
-    override fun declaresDefaultValue(): Boolean = element.hasDefaultValue
-
-    // TODO
-    override fun getCompileTimeInitializer(): ConstantValue<*>? = null
-
-    override fun getContainingDeclaration(): DartCallableDescriptor = container
-
-    override fun getContextReceiverParameters(): List<ReceiverParameterDescriptor> = emptyList()
-
-    override fun getDispatchReceiverParameter(): ReceiverParameterDescriptor? = null
-
-    override fun getExtensionReceiverParameter(): ReceiverParameterDescriptor? = null
-
-    override fun getOriginal(): DartValueParameterDescriptor = original ?: this
-
-    override fun getOverriddenDescriptors(): Collection<ValueParameterDescriptor> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getReturnType(): KotlinType = type
-
-    override fun getSource(): SourceElement = SourceElement.NO_SOURCE // TODO
-
-    @get:JvmName("_type")
-    private val type by storageManager.createLazyValue { element.type.toKotlinType() }
-    override fun getType(): KotlinType = type
-
-    override fun getTypeParameters(): List<TypeParameterDescriptor> = emptyList()
-
-    override fun <V : Any?> getUserData(key: CallableDescriptor.UserDataKey<V>?): V? {
-        TODO("Not yet implemented")
-    }
-
-    override fun getValueParameters(): List<ValueParameterDescriptor> = emptyList()
-
-    override fun getVisibility(): DescriptorVisibility {
-        TODO("Not yet implemented")
-    }
-
-    override fun isConst(): Boolean {
-        TODO("Not yet implemented")
-    }
-
+    original: DartValueParameterDescriptor? = null,
+) : ValueParameterDescriptorImpl(
+    container,
+    original,
+    index,
+    annotations,
+    element.kotlinName,
+    element.type.toKotlinType(context),
+    element.hasDefaultValue,
+    isCrossinline = false,
+    isNoinline = false,
+    varargElementType = null,
+    SourceElement.NO_SOURCE, // TODO: SourceElement
+), DartDescriptor {
     // Dart parameters are vars.
     override fun isVar(): Boolean = true
-
-    override fun substitute(substitutor: TypeSubstitutor): ValueParameterDescriptor {
-        TODO("Not yet implemented")
-    }
-
-    override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R =
-        visitor.visitValueParameterDescriptor(this, data)
-
-    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>) {
-        visitor.visitValueParameterDescriptor(this, null)
-    }
-
-    override val isCrossinline: Boolean = false
-    override val isNoinline: Boolean = false
-
-    override val varargElementType: KotlinType? = null
 }

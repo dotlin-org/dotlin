@@ -41,6 +41,3 @@ interface DartDescriptor {
     val storageManager: StorageManager
         get() = context.storageManager
 }
-
-// We have to pass storageManager in the constructor, otherwise `context` might not be initialized yet.
-abstract class LazyDartDescriptor(final override val storageManager: StorageManager) : DartDescriptor

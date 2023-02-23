@@ -59,7 +59,7 @@ class DartMemberScope(
     }
 
     private val getDescriptors =
-        storageManager.createMemoizedFunction<GetDescriptorArgs, List<DartDeclarationDescriptor>> { (kindFilter, nameFilter, lookupLocation) ->
+        storageManager.createMemoizedFunction<GetDescriptorArgs, List<DeclarationDescriptor>> { (kindFilter, nameFilter, lookupLocation) ->
             elements
                 .asSequence()
                 .filter {
@@ -83,7 +83,7 @@ class DartMemberScope(
         }
 
     private val toDescriptor =
-        storageManager.createMemoizedFunction<DartDeclarationElement, DartDeclarationDescriptor> {
+        storageManager.createMemoizedFunction<DartDeclarationElement, DeclarationDescriptor> {
             when (it) {
                 //is DartFieldElement ->
                 is DartClassElement -> DartClassDescriptor(

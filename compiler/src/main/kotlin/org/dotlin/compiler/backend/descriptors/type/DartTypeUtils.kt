@@ -20,13 +20,17 @@
 package org.dotlin.compiler.backend.descriptors.type
 
 import org.dotlin.compiler.backend.descriptors.DartDescriptor
+import org.dotlin.compiler.backend.descriptors.DartDescriptorContext
 import org.dotlin.compiler.dart.element.*
 import org.dotlin.compiler.dart.element.DartNullabilitySuffix.QUESTION_MARK
 import org.jetbrains.kotlin.types.*
 
 context(DartDescriptor)
-fun DartType.toKotlinType(): KotlinType {
-    val builtIns = module.builtIns
+fun DartType.toKotlinType(): KotlinType = toKotlinType(context)
+
+fun DartType.toKotlinType(context: DartDescriptorContext): KotlinType {
+    val module = context.module
+    val builtIns = context.module.builtIns
     return when (this) {
         is DartInterfaceType -> {
             fun dartCore(className: String) = "dart:core;dart:core/${className.lowercase()}.dart;$className"
@@ -57,8 +61,8 @@ fun DartType.toKotlinType(): KotlinType {
             .getFunction(parameters.size)
             .defaultType
             .replace(newArguments = buildList {
-                add(TypeProjectionImpl(returnType.toKotlinType()))
-                addAll(parameters.map { TypeProjectionImpl(it.type.toKotlinType()) })
+                add(TypeProjectionImpl(returnType.toKotlinType(context)))
+                addAll(parameters.map { TypeProjectionImpl(it.type.toKotlinType(context)) })
             })
 
         DartNeverType -> builtIns.nothingType
