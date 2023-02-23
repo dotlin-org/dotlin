@@ -41,6 +41,7 @@ import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
 import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.types.Variance.INVARIANT
 import org.jetbrains.kotlin.utils.addToStdlib.castAll
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstance
@@ -121,7 +122,7 @@ class EnumClassLowering(override val context: DotlinLoweringContext) : IrDeclara
                     UNDEFINED_OFFSET, UNDEFINED_OFFSET,
                     origin = IrDeclarationOrigin.ENUM_CLASS_SPECIAL_MEMBER, // TODO: Better origin
                     symbol = IrConstructorSymbolImpl(),
-                    name = Name.special("<init>"),
+                    name = SpecialNames.INIT,
                     visibility = PUBLIC,
                     returnType = defaultType,
                     isInline = false,

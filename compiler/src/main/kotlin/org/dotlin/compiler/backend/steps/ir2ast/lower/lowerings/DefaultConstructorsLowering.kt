@@ -31,7 +31,7 @@ import org.jetbrains.kotlin.ir.expressions.IrGetObjectValue
 import org.jetbrains.kotlin.ir.util.isEnumClass
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.ir.util.statements
-import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.name.SpecialNames
 
 /**
  * Default constructors (primary, no parameters, nothing passed to super, etc.) are removed.
@@ -44,7 +44,7 @@ class DefaultConstructorsLowering(override val context: DotlinLoweringContext) :
         val inEnum = declaration.parentClassOrNull?.isEnumClass == true
 
         if (!declaration.isPrimary ||
-            declaration.name != Name.special("<init>") ||
+            declaration.name != SpecialNames.INIT ||
             declaration.visibility != DescriptorVisibilities.PUBLIC ||
             declaration.annotations.isNotEmpty() ||
             declaration.valueParameters.isNotEmpty() ||
