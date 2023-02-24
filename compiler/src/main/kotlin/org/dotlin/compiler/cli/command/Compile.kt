@@ -24,7 +24,6 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
 import org.dotlin.compiler.KotlinToDartCompiler
-import org.dotlin.compiler.backend.DartProject
 import kotlin.io.path.Path
 
 class Compile : CliktCommand(name = "dotlin") {
@@ -36,12 +35,7 @@ class Compile : CliktCommand(name = "dotlin") {
         // TODO: Support compiling non-project Dart files and STDIN
 
         KotlinToDartCompiler.compile(
-            DartProject(
-                name = "TODO", // TODO
-                path = Path(""),
-                compileKlib = false, // TODO
-                dependencies = emptySet() // TODO
-            ),
+            Path(""),
             format,
         )
     }
