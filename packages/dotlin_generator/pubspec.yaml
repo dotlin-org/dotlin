@@ -1,6 +1,6 @@
 name: dotlin_generator
 description: Generates ProtoBuf Dart elements for use in the Dotlin compiler.
-version: 0.0.1
+version: 0.0.2
 homepage: https://dotlin.org
 repository: https://github.com/dotlin-org/dotlin
 
