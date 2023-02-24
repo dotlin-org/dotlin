@@ -1,3 +1,5 @@
+
+import org.gradle.api.JavaVersion.VERSION_17
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -33,6 +35,11 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+java {
+    sourceCompatibility = VERSION_17
+    targetCompatibility = VERSION_17
 }
 
 tasks.withType<KotlinCompile> {
