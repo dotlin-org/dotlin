@@ -55,7 +55,8 @@ object DotlinGenerator {
                 DartLibraryElement.serializer().descriptor,
                 DartCompilationUnitElement.serializer().descriptor,
                 DartClassElement.serializer().descriptor,
-                DartFieldElement.serializer().descriptor,
+                DartPropertyElement.serializer().descriptor,
+                DartPropertyAccessorElement.serializer().descriptor,
                 DartFunctionElement.serializer().descriptor,
                 DartConstructorElement.serializer().descriptor,
                 DartParameterElement.serializer().descriptor,
@@ -64,19 +65,22 @@ object DotlinGenerator {
         ).let {
             // We have to patch the schema: Because we're using contextual serializers, all fields which use
             // those serializers have become `bytes`. We must revert that back to their original types.
-            Regex("repeated bytes ([a-z]+)").replace(it) { match ->
-                val fieldName = match.groupValues[1]
+            Regex("(required|optional|repeated) bytes ([a-z]+)").replace(it) { match ->
+                val keyword = match.groupValues[1]
+                val fieldName = match.groupValues[2]
                 val type = matchType(
                     fieldName,
                     "librar" to DartLibraryElement::class,
                     "unit" to DartCompilationUnitElement::class,
                     "class" to DartClassElement::class,
-                    "field" to DartFieldElement::class,
+                    "propert" to DartPropertyElement::class,
+                    "getter" to DartPropertyAccessorElement::class,
+                    "setter" to DartPropertyAccessorElement::class,
                     "constructor" to DartConstructorElement::class,
                     "function" to DartFunctionElement::class,
                     "parameter" to DartParameterElement::class,
-                )
-                "repeated $type $fieldName"
+                ) ?: "bytes" // If there's no match, just keep it as "bytes"
+                "$keyword $type $fieldName"
             }
         }
 
@@ -84,8 +88,8 @@ object DotlinGenerator {
         protoFile.writeText(schema)
     }
 
-    private fun matchType(fieldName: String, vararg mapping: Pair<String, KClass<*>>): String {
-        return mapping.toMap().entries.firstNotNullOf { (term, klass) ->
+    private fun matchType(fieldName: String, vararg mapping: Pair<String, KClass<*>>): String? {
+        return mapping.toMap().entries.firstNotNullOfOrNull { (term, klass) ->
             when (fieldName.startsWith(term)) {
                 true -> klass.simpleName
                 else -> null

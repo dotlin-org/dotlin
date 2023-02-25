@@ -23,7 +23,6 @@ import org.dotlin.compiler.backend.descriptors.type.toKotlinType
 import org.dotlin.compiler.dart.element.DartConstructorElement
 import org.dotlin.compiler.dart.element.DartExecutableElement
 import org.dotlin.compiler.dart.element.DartFunctionElement
-import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
@@ -37,13 +36,13 @@ class DartSimpleFunctionDescriptor(
     override val element: DartFunctionElement,
     override val context: DartDescriptorContext,
     container: DeclarationDescriptor,
-    private val original: DartSimpleFunctionDescriptor? = null,
+    original: DartSimpleFunctionDescriptor? = null,
 ) : SimpleFunctionDescriptorImpl(
     container,
     original,
     Annotations.EMPTY, // TODO
     element.kotlinName,
-    CallableMemberDescriptor.Kind.DECLARATION, // TODO?
+    element.callableMemberDescriptorKind,
     SourceElement.NO_SOURCE // TODO: SourceElement
 ), DartDescriptor {
     init {
@@ -70,7 +69,7 @@ class DartConstructorDescriptor(
     original,
     Annotations.EMPTY, // TODO,
     false,
-    CallableMemberDescriptor.Kind.DECLARATION, // TODO
+    element.callableMemberDescriptorKind,
     SourceElement.NO_SOURCE
 ), DartDescriptor {
     init {

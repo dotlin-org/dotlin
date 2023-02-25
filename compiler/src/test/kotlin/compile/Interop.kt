@@ -275,4 +275,234 @@ class Interop : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `use Dart top-level field`() = assertCompile {
+        dart(
+            """
+            final int myField = 346;
+            """,
+            Path("lib/fields.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import dev.pub.test.fields.myField
+
+            fun main() {
+                val x = myField * 3
+            }
+            """
+        )
+
+        dart(
+            """
+            import "fields.dart" show myField;
+            import "package:meta/meta.dart";
+
+            void main() {
+              final int x = myField * 3;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `use Dart const top-level field`() = assertCompile {
+        dart(
+            """
+            const int myField = 346;
+            """,
+            Path("lib/fields.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import dev.pub.test.fields.myField
+
+            fun main() {
+                const val x = myField * 3
+            }
+            """
+        )
+
+        dart(
+            """
+            import "fields.dart" show myField;
+            import "package:meta/meta.dart";
+
+            void main() {
+              const int x = myField * 3;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `use Dart top-level getter`() = assertCompile {
+        dart(
+            """
+            int get myGetter => 345634;
+            """,
+            Path("lib/getters.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import dev.pub.test.getters.myGetter
+
+            fun main() {
+                val x = myGetter * 3
+            }
+            """
+        )
+
+        dart(
+            """
+            import "getters.dart" show myGetter;
+            import "package:meta/meta.dart";
+
+            void main() {
+              final int x = myGetter * 3;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `use Dart top-level setter`() = assertCompile {
+        dart(
+            """
+            void set mySetter(value) {}
+            """,
+            Path("lib/setters.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import dev.pub.test.setters.mySetter
+
+            fun main() {
+                mySetter = 3
+            }
+            """
+        )
+
+        dart(
+            """
+            import "setters.dart" show mySetter;
+            import "package:meta/meta.dart";
+
+            void main() {
+              mySetter = 3;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `use Dart class field`() = assertCompile {
+        dart(
+            """
+            class MyClass {
+              final field = 3;
+            }
+            """,
+            Path("lib/my_class.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import dev.pub.test.my_class.MyClass
+
+            fun main() {
+                val x = MyClass().field
+            }
+            """
+        )
+
+        dart(
+            """
+            import "my_class.dart" show MyClass;
+            import "package:meta/meta.dart";
+
+            void main() {
+              final int x = MyClass().field;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `use Dart class getter`() = assertCompile {
+        dart(
+            """
+            class MyClass {
+              int get myGetter => 345634;
+            }
+            """,
+            Path("lib/my_class.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import dev.pub.test.my_class.MyClass
+
+            fun main() {
+                val x = MyClass().myGetter * 3
+            }
+            """
+        )
+
+        dart(
+            """
+            import "my_class.dart" show MyClass;
+            import "package:meta/meta.dart";
+
+            void main() {
+              final int x = MyClass().myGetter * 3;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `use Dart class setter`() = assertCompile {
+        dart(
+            """
+            class MyClass {
+              void set mySetter(value) {}
+            }
+            """,
+            Path("lib/my_class.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import dev.pub.test.my_class.MyClass
+
+            fun main() {
+                MyClass().mySetter = 3
+            }
+            """
+        )
+
+        dart(
+            """
+            import "my_class.dart" show MyClass;
+            import "package:meta/meta.dart";
+
+            void main() {
+              MyClass().mySetter = 3;
+            }
+            """
+        )
+    }
 }

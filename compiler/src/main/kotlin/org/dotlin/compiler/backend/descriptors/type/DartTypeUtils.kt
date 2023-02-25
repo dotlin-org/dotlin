@@ -43,12 +43,7 @@ fun DartType.toKotlinType(context: DartDescriptorContext): KotlinType {
                 dartCore("Object") -> builtIns.anyType
                 // TODO: Comparable
                 // TODO: Handle collection types
-                else -> DartSimpleType(
-                    DartInterfaceTypeConstructor(this, context),
-                    arguments = emptyList(), // TODO
-                    attributes = TypeAttributes.Empty, // TODO
-                    isMarkedNullable = nullabilitySuffix == QUESTION_MARK
-                )
+                else -> DartTypeFactory.simpleType(this, context)
             }
         }
 

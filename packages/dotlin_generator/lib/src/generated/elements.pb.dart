@@ -124,19 +124,24 @@ class DartLibraryElement extends $pb.GeneratedMessage {
 class DartCompilationUnitElement extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DartCompilationUnitElement', createEmptyInstance: create)
     ..aQS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'location')
-    ..pc<DartClassElement>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'classes', $pb.PbFieldType.PM, subBuilder: DartClassElement.create)
-    ..pc<DartFunctionElement>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'functions', $pb.PbFieldType.PM, subBuilder: DartFunctionElement.create)
+    ..pc<DartPropertyElement>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'properties', $pb.PbFieldType.PM, subBuilder: DartPropertyElement.create)
+    ..pc<DartClassElement>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'classes', $pb.PbFieldType.PM, subBuilder: DartClassElement.create)
+    ..pc<DartFunctionElement>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'functions', $pb.PbFieldType.PM, subBuilder: DartFunctionElement.create)
   ;
 
   DartCompilationUnitElement._() : super();
   factory DartCompilationUnitElement({
     $core.String? location,
+    $core.Iterable<DartPropertyElement>? properties,
     $core.Iterable<DartClassElement>? classes,
     $core.Iterable<DartFunctionElement>? functions,
   }) {
     final _result = create();
     if (location != null) {
       _result.location = location;
+    }
+    if (properties != null) {
+      _result.properties.addAll(properties);
     }
     if (classes != null) {
       _result.classes.addAll(classes);
@@ -177,10 +182,13 @@ class DartCompilationUnitElement extends $pb.GeneratedMessage {
   void clearLocation() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.List<DartClassElement> get classes => $_getList(1);
+  $core.List<DartPropertyElement> get properties => $_getList(1);
 
   @$pb.TagNumber(3)
-  $core.List<DartFunctionElement> get functions => $_getList(2);
+  $core.List<DartClassElement> get classes => $_getList(2);
+
+  @$pb.TagNumber(4)
+  $core.List<DartFunctionElement> get functions => $_getList(3);
 }
 
 class DartClassElement extends $pb.GeneratedMessage {
@@ -190,7 +198,7 @@ class DartClassElement extends $pb.GeneratedMessage {
     ..pc<DartTypeParameterElement>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'typeParameters', $pb.PbFieldType.PM, protoName: 'typeParameters', subBuilder: DartTypeParameterElement.create)
     ..a<$core.bool>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isAbstract', $pb.PbFieldType.QB, protoName: 'isAbstract')
     ..pc<DartConstructorElement>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'constructors', $pb.PbFieldType.PM, subBuilder: DartConstructorElement.create)
-    ..pc<DartFieldElement>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fields', $pb.PbFieldType.PM, subBuilder: DartFieldElement.create)
+    ..pc<DartPropertyElement>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'properties', $pb.PbFieldType.PM, subBuilder: DartPropertyElement.create)
   ;
 
   DartClassElement._() : super();
@@ -200,7 +208,7 @@ class DartClassElement extends $pb.GeneratedMessage {
     $core.Iterable<DartTypeParameterElement>? typeParameters,
     $core.bool? isAbstract,
     $core.Iterable<DartConstructorElement>? constructors,
-    $core.Iterable<DartFieldElement>? fields,
+    $core.Iterable<DartPropertyElement>? properties,
   }) {
     final _result = create();
     if (location != null) {
@@ -218,8 +226,8 @@ class DartClassElement extends $pb.GeneratedMessage {
     if (constructors != null) {
       _result.constructors.addAll(constructors);
     }
-    if (fields != null) {
-      _result.fields.addAll(fields);
+    if (properties != null) {
+      _result.properties.addAll(properties);
     }
     return _result;
   }
@@ -278,11 +286,11 @@ class DartClassElement extends $pb.GeneratedMessage {
   $core.List<DartConstructorElement> get constructors => $_getList(4);
 
   @$pb.TagNumber(6)
-  $core.List<DartFieldElement> get fields => $_getList(5);
+  $core.List<DartPropertyElement> get properties => $_getList(5);
 }
 
-class DartFieldElement extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DartFieldElement', createEmptyInstance: create)
+class DartPropertyElement extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DartPropertyElement', createEmptyInstance: create)
     ..aQS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'location')
     ..aQS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
     ..a<$core.bool>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isAbstract', $pb.PbFieldType.QB, protoName: 'isAbstract')
@@ -291,11 +299,14 @@ class DartFieldElement extends $pb.GeneratedMessage {
     ..a<$core.bool>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isFinal', $pb.PbFieldType.QB, protoName: 'isFinal')
     ..a<$core.bool>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isLate', $pb.PbFieldType.QB, protoName: 'isLate')
     ..a<$core.bool>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isStatic', $pb.PbFieldType.QB, protoName: 'isStatic')
-    ..aQM<DartType>(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', subBuilder: DartType.create)
+    ..a<$core.bool>(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isSynthetic', $pb.PbFieldType.QB, protoName: 'isSynthetic')
+    ..aQM<DartType>(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', subBuilder: DartType.create)
+    ..aOM<DartPropertyAccessorElement>(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'getter', subBuilder: DartPropertyAccessorElement.create)
+    ..aOM<DartPropertyAccessorElement>(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'setter', subBuilder: DartPropertyAccessorElement.create)
   ;
 
-  DartFieldElement._() : super();
-  factory DartFieldElement({
+  DartPropertyElement._() : super();
+  factory DartPropertyElement({
     $core.String? location,
     $core.String? name,
     $core.bool? isAbstract,
@@ -304,7 +315,10 @@ class DartFieldElement extends $pb.GeneratedMessage {
     $core.bool? isFinal,
     $core.bool? isLate,
     $core.bool? isStatic,
+    $core.bool? isSynthetic,
     DartType? type,
+    DartPropertyAccessorElement? getter,
+    DartPropertyAccessorElement? setter,
   }) {
     final _result = create();
     if (location != null) {
@@ -331,31 +345,40 @@ class DartFieldElement extends $pb.GeneratedMessage {
     if (isStatic != null) {
       _result.isStatic = isStatic;
     }
+    if (isSynthetic != null) {
+      _result.isSynthetic = isSynthetic;
+    }
     if (type != null) {
       _result.type = type;
     }
+    if (getter != null) {
+      _result.getter = getter;
+    }
+    if (setter != null) {
+      _result.setter = setter;
+    }
     return _result;
   }
-  factory DartFieldElement.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DartFieldElement.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  factory DartPropertyElement.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DartPropertyElement.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  DartFieldElement clone() => DartFieldElement()..mergeFromMessage(this);
+  DartPropertyElement clone() => DartPropertyElement()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  DartFieldElement copyWith(void Function(DartFieldElement) updates) => super.copyWith((message) => updates(message as DartFieldElement)) as DartFieldElement; // ignore: deprecated_member_use
+  DartPropertyElement copyWith(void Function(DartPropertyElement) updates) => super.copyWith((message) => updates(message as DartPropertyElement)) as DartPropertyElement; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
-  static DartFieldElement create() => DartFieldElement._();
-  DartFieldElement createEmptyInstance() => create();
-  static $pb.PbList<DartFieldElement> createRepeated() => $pb.PbList<DartFieldElement>();
+  static DartPropertyElement create() => DartPropertyElement._();
+  DartPropertyElement createEmptyInstance() => create();
+  static $pb.PbList<DartPropertyElement> createRepeated() => $pb.PbList<DartPropertyElement>();
   @$core.pragma('dart2js:noInline')
-  static DartFieldElement getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DartFieldElement>(create);
-  static DartFieldElement? _defaultInstance;
+  static DartPropertyElement getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DartPropertyElement>(create);
+  static DartPropertyElement? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get location => $_getSZ(0);
@@ -430,15 +453,194 @@ class DartFieldElement extends $pb.GeneratedMessage {
   void clearIsStatic() => clearField(8);
 
   @$pb.TagNumber(9)
-  DartType get type => $_getN(8);
+  $core.bool get isSynthetic => $_getBF(8);
   @$pb.TagNumber(9)
-  set type(DartType v) { setField(9, v); }
+  set isSynthetic($core.bool v) { $_setBool(8, v); }
   @$pb.TagNumber(9)
-  $core.bool hasType() => $_has(8);
+  $core.bool hasIsSynthetic() => $_has(8);
   @$pb.TagNumber(9)
-  void clearType() => clearField(9);
+  void clearIsSynthetic() => clearField(9);
+
+  @$pb.TagNumber(10)
+  DartType get type => $_getN(9);
+  @$pb.TagNumber(10)
+  set type(DartType v) { setField(10, v); }
+  @$pb.TagNumber(10)
+  $core.bool hasType() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearType() => clearField(10);
+  @$pb.TagNumber(10)
+  DartType ensureType() => $_ensure(9);
+
+  @$pb.TagNumber(11)
+  DartPropertyAccessorElement get getter => $_getN(10);
+  @$pb.TagNumber(11)
+  set getter(DartPropertyAccessorElement v) { setField(11, v); }
+  @$pb.TagNumber(11)
+  $core.bool hasGetter() => $_has(10);
+  @$pb.TagNumber(11)
+  void clearGetter() => clearField(11);
+  @$pb.TagNumber(11)
+  DartPropertyAccessorElement ensureGetter() => $_ensure(10);
+
+  @$pb.TagNumber(12)
+  DartPropertyAccessorElement get setter => $_getN(11);
+  @$pb.TagNumber(12)
+  set setter(DartPropertyAccessorElement v) { setField(12, v); }
+  @$pb.TagNumber(12)
+  $core.bool hasSetter() => $_has(11);
+  @$pb.TagNumber(12)
+  void clearSetter() => clearField(12);
+  @$pb.TagNumber(12)
+  DartPropertyAccessorElement ensureSetter() => $_ensure(11);
+}
+
+class DartPropertyAccessorElement extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DartPropertyAccessorElement', createEmptyInstance: create)
+    ..aQS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'location')
+    ..aQS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
+    ..aQM<DartFunctionType>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', subBuilder: DartFunctionType.create)
+    ..a<$core.bool>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isAsync', $pb.PbFieldType.QB, protoName: 'isAsync')
+    ..a<$core.bool>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isGenerator', $pb.PbFieldType.QB, protoName: 'isGenerator')
+    ..a<$core.bool>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isSynthetic', $pb.PbFieldType.QB, protoName: 'isSynthetic')
+    ..pc<DartParameterElement>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'parameters', $pb.PbFieldType.PM, subBuilder: DartParameterElement.create)
+    ..pc<DartTypeParameterElement>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'typeParameters', $pb.PbFieldType.PM, protoName: 'typeParameters', subBuilder: DartTypeParameterElement.create)
+    ..aQS(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'correspondingPropertyLocation', protoName: 'correspondingPropertyLocation')
+  ;
+
+  DartPropertyAccessorElement._() : super();
+  factory DartPropertyAccessorElement({
+    $core.String? location,
+    $core.String? name,
+    DartFunctionType? type,
+    $core.bool? isAsync,
+    $core.bool? isGenerator,
+    $core.bool? isSynthetic,
+    $core.Iterable<DartParameterElement>? parameters,
+    $core.Iterable<DartTypeParameterElement>? typeParameters,
+    $core.String? correspondingPropertyLocation,
+  }) {
+    final _result = create();
+    if (location != null) {
+      _result.location = location;
+    }
+    if (name != null) {
+      _result.name = name;
+    }
+    if (type != null) {
+      _result.type = type;
+    }
+    if (isAsync != null) {
+      _result.isAsync = isAsync;
+    }
+    if (isGenerator != null) {
+      _result.isGenerator = isGenerator;
+    }
+    if (isSynthetic != null) {
+      _result.isSynthetic = isSynthetic;
+    }
+    if (parameters != null) {
+      _result.parameters.addAll(parameters);
+    }
+    if (typeParameters != null) {
+      _result.typeParameters.addAll(typeParameters);
+    }
+    if (correspondingPropertyLocation != null) {
+      _result.correspondingPropertyLocation = correspondingPropertyLocation;
+    }
+    return _result;
+  }
+  factory DartPropertyAccessorElement.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DartPropertyAccessorElement.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  DartPropertyAccessorElement clone() => DartPropertyAccessorElement()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  DartPropertyAccessorElement copyWith(void Function(DartPropertyAccessorElement) updates) => super.copyWith((message) => updates(message as DartPropertyAccessorElement)) as DartPropertyAccessorElement; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static DartPropertyAccessorElement create() => DartPropertyAccessorElement._();
+  DartPropertyAccessorElement createEmptyInstance() => create();
+  static $pb.PbList<DartPropertyAccessorElement> createRepeated() => $pb.PbList<DartPropertyAccessorElement>();
+  @$core.pragma('dart2js:noInline')
+  static DartPropertyAccessorElement getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DartPropertyAccessorElement>(create);
+  static DartPropertyAccessorElement? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get location => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set location($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasLocation() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearLocation() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get name => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set name($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasName() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearName() => clearField(2);
+
+  @$pb.TagNumber(3)
+  DartFunctionType get type => $_getN(2);
+  @$pb.TagNumber(3)
+  set type(DartFunctionType v) { setField(3, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasType() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearType() => clearField(3);
+  @$pb.TagNumber(3)
+  DartFunctionType ensureType() => $_ensure(2);
+
+  @$pb.TagNumber(4)
+  $core.bool get isAsync => $_getBF(3);
+  @$pb.TagNumber(4)
+  set isAsync($core.bool v) { $_setBool(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasIsAsync() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearIsAsync() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.bool get isGenerator => $_getBF(4);
+  @$pb.TagNumber(5)
+  set isGenerator($core.bool v) { $_setBool(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasIsGenerator() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearIsGenerator() => clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.bool get isSynthetic => $_getBF(5);
+  @$pb.TagNumber(6)
+  set isSynthetic($core.bool v) { $_setBool(5, v); }
+  @$pb.TagNumber(6)
+  $core.bool hasIsSynthetic() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearIsSynthetic() => clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.List<DartParameterElement> get parameters => $_getList(6);
+
+  @$pb.TagNumber(8)
+  $core.List<DartTypeParameterElement> get typeParameters => $_getList(7);
+
   @$pb.TagNumber(9)
-  DartType ensureType() => $_ensure(8);
+  $core.String get correspondingPropertyLocation => $_getSZ(8);
+  @$pb.TagNumber(9)
+  set correspondingPropertyLocation($core.String v) { $_setString(8, v); }
+  @$pb.TagNumber(9)
+  $core.bool hasCorrespondingPropertyLocation() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearCorrespondingPropertyLocation() => clearField(9);
 }
 
 class DartFunctionElement extends $pb.GeneratedMessage {

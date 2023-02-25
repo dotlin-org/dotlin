@@ -1,10 +1,10 @@
 package org.dotlin.compiler.backend.descriptors
 
 import org.dotlin.compiler.backend.descriptors.type.toKotlinType
-import org.dotlin.compiler.dart.element.DartAbstractableElement
-import org.dotlin.compiler.dart.element.DartDeclarationElement
-import org.dotlin.compiler.dart.element.DartFunctionElement
-import org.dotlin.compiler.dart.element.DartNamedElement
+import org.dotlin.compiler.dart.element.*
+import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
+import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor.Kind.DECLARATION
+import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor.Kind.SYNTHESIZED
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities.PRIVATE
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities.PUBLIC
 import org.jetbrains.kotlin.descriptors.DescriptorVisibility
@@ -33,3 +33,9 @@ val DartDeclarationElement.kotlinVisibility: DescriptorVisibility
 context(DartDescriptor)
 val DartFunctionElement.kotlinReturnType
     get() = type.returnType.toKotlinType()
+
+val DartElement.callableMemberDescriptorKind: CallableMemberDescriptor.Kind
+    get() = when {
+        isSynthetic -> SYNTHESIZED
+        else -> DECLARATION
+    }

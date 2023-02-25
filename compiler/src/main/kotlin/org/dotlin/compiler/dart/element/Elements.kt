@@ -21,7 +21,8 @@
     DartLibraryElement::class,
     DartCompilationUnitElement::class,
     DartClassElement::class,
-    DartFieldElement::class,
+    DartPropertyElement::class,
+    DartPropertyAccessorElement::class,
     DartConstructorElement::class,
     DartFunctionElement::class,
     DartParameterElement::class,
@@ -64,6 +65,8 @@ data class DartPackageElement(
 @Serializable
 sealed interface DartElement {
     val location: DartElementLocation
+    val isSynthetic: Boolean
+        get() = false
 }
 
 @Serializable
@@ -90,7 +93,7 @@ data class DartLibraryElement(
 @Serializable
 data class DartCompilationUnitElement(
     override val location: DartElementLocation,
-    //val accessors: List<DartPropertyAccessorElement>, TODO
+    val properties: List<DartPropertyElement> = emptyList(),
     val classes: List<DartClassElement> = emptyList(),
     val functions: List<DartFunctionElement> = emptyList(),
     //val enums: List<DartEnumElement>, TODO
@@ -123,7 +126,7 @@ sealed interface DartInterfaceElement : DartDeclarationElement, DartTypeParamete
 
     //val accessors: List<DartPropertyAccessorElement> TODO
     val constructors: List<DartConstructorElement>
-    val fields: List<DartFieldElement>
+    val properties: List<DartPropertyElement>
     //val methods: List<DartMethodElement> TODO
 
     //val interfaces: List<DartInterfaceType> TODO
@@ -138,7 +141,7 @@ data class DartClassElement(
     override val typeParameters: List<DartTypeParameterElement>,
     override val isAbstract: Boolean,
     override val constructors: List<DartConstructorElement>,
-    override val fields: List<DartFieldElement> = emptyList(),
+    override val properties: List<DartPropertyElement> = emptyList(),
 ) : DartInterfaceElement, DartAbstractableElement
 
 @Serializable
@@ -157,7 +160,7 @@ sealed interface DartVariableElement : DartDeclarationElement, DartConstableElem
 }
 
 @Serializable
-data class DartFieldElement(
+data class DartPropertyElement(
     override val location: DartElementLocation,
     override val name: DartSimpleIdentifier,
     override val isAbstract: Boolean,
@@ -166,8 +169,24 @@ data class DartFieldElement(
     override val isFinal: Boolean,
     override val isLate: Boolean,
     override val isStatic: Boolean,
-    override val type: DartType
+    override val isSynthetic: Boolean,
+    override val type: DartType,
+    val getter: DartPropertyAccessorElement?,
+    val setter: DartPropertyAccessorElement?,
 ) : DartVariableElement, DartInterfaceMemberElement
+
+@Serializable
+data class DartPropertyAccessorElement(
+    override val location: DartElementLocation,
+    override val name: DartSimpleIdentifier,
+    override val type: DartFunctionType,
+    override val isAsync: Boolean,
+    override val isGenerator: Boolean,
+    override val isSynthetic: Boolean,
+    override val parameters: List<DartParameterElement>,
+    override val typeParameters: List<DartTypeParameterElement>,
+    val correspondingPropertyLocation: DartElementLocation,
+) : DartExecutableElement
 
 @Serializable
 data class DartParameterElement(

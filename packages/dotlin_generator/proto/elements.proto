@@ -19,9 +19,11 @@ message DartLibraryElement {
 message DartCompilationUnitElement {
   required string location = 1;
   // WARNING: a default value decoded when value is missing
-  repeated DartClassElement classes = 2;
+  repeated DartPropertyElement properties = 2;
   // WARNING: a default value decoded when value is missing
-  repeated DartFunctionElement functions = 3;
+  repeated DartClassElement classes = 3;
+  // WARNING: a default value decoded when value is missing
+  repeated DartFunctionElement functions = 4;
 }
 
 // serial name 'org.dotlin.compiler.dart.element.DartClassElement'
@@ -32,11 +34,11 @@ message DartClassElement {
   required bool isAbstract = 4;
   repeated DartConstructorElement constructors = 5;
   // WARNING: a default value decoded when value is missing
-  repeated DartFieldElement fields = 6;
+  repeated DartPropertyElement properties = 6;
 }
 
-// serial name 'org.dotlin.compiler.dart.element.DartFieldElement'
-message DartFieldElement {
+// serial name 'org.dotlin.compiler.dart.element.DartPropertyElement'
+message DartPropertyElement {
   required string location = 1;
   required string name = 2;
   required bool isAbstract = 3;
@@ -45,7 +47,23 @@ message DartFieldElement {
   required bool isFinal = 6;
   required bool isLate = 7;
   required bool isStatic = 8;
-  required DartType type = 9;
+  required bool isSynthetic = 9;
+  required DartType type = 10;
+  optional DartPropertyAccessorElement getter = 11;
+  optional DartPropertyAccessorElement setter = 12;
+}
+
+// serial name 'org.dotlin.compiler.dart.element.DartPropertyAccessorElement'
+message DartPropertyAccessorElement {
+  required string location = 1;
+  required string name = 2;
+  required DartFunctionType type = 3;
+  required bool isAsync = 4;
+  required bool isGenerator = 5;
+  required bool isSynthetic = 6;
+  repeated DartParameterElement parameters = 7;
+  repeated DartTypeParameterElement typeParameters = 8;
+  required string correspondingPropertyLocation = 9;
 }
 
 // serial name 'org.dotlin.compiler.dart.element.DartFunctionElement'

@@ -31,7 +31,7 @@ import org.jetbrains.kotlin.storage.getValue
 class DartClassDescriptor(
     override val element: DartClassElement,
     override val context: DartDescriptorContext,
-    val container: DeclarationDescriptor,
+    container: DeclarationDescriptor,
 ) : ClassDescriptorImpl(
     container,
     element.kotlinName,
@@ -49,7 +49,7 @@ class DartClassDescriptor(
         DartMemberScope(
             owner = this,
             context,
-            elements = element.constructors + element.fields,
+            elements = element.constructors + element.properties,
         )
     }
 

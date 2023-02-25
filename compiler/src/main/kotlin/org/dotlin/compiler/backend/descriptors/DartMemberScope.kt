@@ -72,7 +72,7 @@ class DartMemberScope(
                         CLASSIFIERS -> false // TODO
                         PACKAGES -> false // TODO?
                         FUNCTIONS -> it is DartFunctionElement
-                        VARIABLES -> it is DartFieldElement // TODO
+                        VARIABLES -> it is DartPropertyElement
                         VALUES -> false // TODO
                         else -> false
                     }
@@ -85,7 +85,6 @@ class DartMemberScope(
     private val toDescriptor =
         storageManager.createMemoizedFunction<DartDeclarationElement, DeclarationDescriptor> {
             when (it) {
-                //is DartFieldElement ->
                 is DartClassElement -> DartClassDescriptor(
                     element = it,
                     context,
@@ -93,6 +92,12 @@ class DartMemberScope(
                 )
 
                 is DartFunctionElement -> DartSimpleFunctionDescriptor(
+                    element = it,
+                    context,
+                    container = owner,
+                )
+
+                is DartPropertyElement -> DartPropertyDescriptor(
                     element = it,
                     context,
                     container = owner,

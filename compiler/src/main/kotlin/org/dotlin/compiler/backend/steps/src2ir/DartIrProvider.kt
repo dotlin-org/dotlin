@@ -4,6 +4,7 @@ import org.dotlin.compiler.backend.DartPackage
 import org.dotlin.compiler.backend.descriptors.DartDescriptor
 import org.dotlin.compiler.backend.descriptors.DartPackageFragmentDescriptor
 import org.dotlin.compiler.backend.isCurrent
+import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.dart.element.DartLibraryElement
 import org.jetbrains.kotlin.backend.common.serialization.DescriptorByIdSignatureFinderImpl
 import org.jetbrains.kotlin.descriptors.*
@@ -15,6 +16,7 @@ import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsManglerDesc
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
 import org.jetbrains.kotlin.ir.linkage.IrProvider
 import org.jetbrains.kotlin.ir.symbols.*
@@ -74,6 +76,11 @@ class DartIrProvider(
             }.apply {
                 addChild(declaration)
                 irModuleFragment?.addFile(this)
+
+                // Corresponding properties have to be added to the file as well.
+                declaration.safeAs<IrSimpleFunction>()?.correspondingProperty?.let { property ->
+                    addChild(property)
+                }
             }
         }
 

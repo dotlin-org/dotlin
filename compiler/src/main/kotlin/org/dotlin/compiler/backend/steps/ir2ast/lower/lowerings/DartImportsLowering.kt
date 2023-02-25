@@ -192,10 +192,7 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
         val fileOfDeclaration = when {
             // Function1, Function2, etc. are in an "external package fragment", but are in reality located
             // in the same file as the Function interface.
-            isFunctionType -> {
-                irBuiltIns.functionClass.owner.fileOrNull
-            }
-
+            isFunctionType -> irBuiltIns.functionClass.owner.fileOrNull
             else -> relevantDeclaration.fileOrNull
         } ?: return
 

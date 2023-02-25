@@ -66,13 +66,19 @@ class DartElementSerializer {
         location: unit.encodedLocation,
         classes: unit.classes.map((c) => serializeClass(c)),
         functions: unit.functions.map((f) => serializeFunction(f)),
+        properties: serializePropertyInducingElements(unit.topLevelVariables)
+            .followedBy(
+          serializePropertyInducingElements(
+            unit.accessors.map((a) => a.variable),
+          ),
+        ),
       );
 
   DartClassElement serializeClass(ClassElement c) => DartClassElement(
         location: c.encodedLocation,
         name: c.name,
         isAbstract: c.isAbstract,
-        fields: c.fields.map((f) => serializeField(f)),
+        properties: serializePropertyInducingElements(c.fields),
         constructors: c.constructors.map((ctor) => serializeConstructor(ctor)),
       );
 
@@ -85,17 +91,40 @@ class DartElementSerializer {
         parameters: serializeParameters(c.parameters),
       );
 
-  DartFieldElement serializeField(FieldElement field) => DartFieldElement(
-        location: field.encodedLocation,
-        name: field.name,
-        isAbstract: field.isAbstract,
-        isCovariant: field.isCovariant,
-        isConst: field.isConst,
-        isFinal: field.isFinal,
-        isLate: field.isLate,
-        isStatic: field.isStatic,
-        type: _typeSerializer.serializeType(field.type),
+  DartPropertyElement serializePropertyInducingElement(
+    PropertyInducingElement prop,
+  ) =>
+      DartPropertyElement(
+        location: prop.encodedLocation,
+        name: prop.name,
+        isAbstract: prop is FieldElement ? prop.isAbstract : false,
+        isCovariant: prop is FieldElement ? prop.isCovariant : false,
+        isConst: prop.isConst,
+        isFinal: prop.isFinal,
+        isLate: prop.isLate,
+        isStatic: prop.isStatic,
+        isSynthetic: prop.isSynthetic,
+        type: _typeSerializer.serializeType(prop.type),
+        getter: serializePropertyAccessor(prop.getter),
+        setter: serializePropertyAccessor(prop.setter),
       );
+
+  DartPropertyAccessorElement? serializePropertyAccessor(
+    PropertyAccessorElement? accessor,
+  ) =>
+      accessor != null
+          ? DartPropertyAccessorElement(
+              location: accessor.encodedLocation,
+              name: accessor.name,
+              type: _typeSerializer.serializeFunctionType(accessor.type),
+              isAsync: accessor.isAsynchronous,
+              isGenerator: accessor.isGenerator,
+              isSynthetic: accessor.isSynthetic,
+              parameters: serializeParameters(accessor.parameters),
+              typeParameters: serializeTypeParameters(accessor.typeParameters),
+              correspondingPropertyLocation: accessor.variable.encodedLocation,
+            )
+          : null;
 
   DartFunctionElement serializeFunction(FunctionElement fun) =>
       DartFunctionElement(
@@ -148,4 +177,9 @@ extension DartMultiElementSerializer on DartElementSerializer {
     Iterable<TypeParameterElement> params,
   ) =>
       params.map((p) => serializeTypeParameter(p));
+
+  Iterable<DartPropertyElement> serializePropertyInducingElements(
+    Iterable<PropertyInducingElement> properties,
+  ) =>
+      properties.map((p) => serializePropertyInducingElement(p));
 }
