@@ -80,17 +80,12 @@ sealed interface DartAbstractableElement : DartElement {
 sealed interface DartDeclarationElement : DartNamedElement
 
 @Serializable
-sealed interface DartLibraryOrAugmentationElement : DartElement {
-    val units: List<DartCompilationUnitElement>
-}
-
-@Serializable
 data class DartLibraryElement(
     override val location: DartElementLocation,
     @Serializable(with = PathSerializer::class)
     val path: Path,
-    override val units: List<DartCompilationUnitElement> = emptyList()
-) : DartLibraryOrAugmentationElement
+    val units: List<DartCompilationUnitElement> = emptyList()
+) : DartElement
 
 @Serializable
 data class DartCompilationUnitElement(
@@ -123,7 +118,7 @@ sealed interface DartInterfaceMemberElement : DartDeclarationElement, DartAbstra
 }
 
 @Serializable
-sealed interface DartInterfaceOrAugmentationElement : DartDeclarationElement, DartTypeParameterizedElement {
+sealed interface DartInterfaceElement : DartDeclarationElement, DartTypeParameterizedElement {
     override val name: DartSimpleIdentifier
 
     //val accessors: List<DartPropertyAccessorElement> TODO
@@ -137,12 +132,6 @@ sealed interface DartInterfaceOrAugmentationElement : DartDeclarationElement, Da
 }
 
 @Serializable
-sealed interface DartInterfaceElement : DartInterfaceOrAugmentationElement
-
-@Serializable
-sealed interface DartClassOrAugmentationElement : DartInterfaceOrAugmentationElement, DartAbstractableElement
-
-@Serializable
 data class DartClassElement(
     override val location: DartElementLocation,
     override val name: DartSimpleIdentifier,
@@ -150,7 +139,7 @@ data class DartClassElement(
     override val isAbstract: Boolean,
     override val constructors: List<DartConstructorElement>,
     override val fields: List<DartFieldElement> = emptyList(),
-) : DartInterfaceElement, DartClassOrAugmentationElement
+) : DartInterfaceElement, DartAbstractableElement
 
 @Serializable
 sealed interface DartConstableElement : DartElement {
@@ -168,22 +157,17 @@ sealed interface DartVariableElement : DartDeclarationElement, DartConstableElem
 }
 
 @Serializable
-sealed interface DartFieldOrAugmentationElement : DartVariableElement, DartInterfaceMemberElement {
-    val isCovariant: Boolean
-}
-
-@Serializable
 data class DartFieldElement(
     override val location: DartElementLocation,
     override val name: DartSimpleIdentifier,
     override val isAbstract: Boolean,
-    override val isCovariant: Boolean,
+    val isCovariant: Boolean,
     override val isConst: Boolean,
     override val isFinal: Boolean,
     override val isLate: Boolean,
     override val isStatic: Boolean,
     override val type: DartType
-) : DartFieldOrAugmentationElement
+) : DartVariableElement, DartInterfaceMemberElement
 
 @Serializable
 data class DartParameterElement(
