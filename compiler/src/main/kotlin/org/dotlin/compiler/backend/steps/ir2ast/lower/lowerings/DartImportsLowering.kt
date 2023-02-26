@@ -48,6 +48,7 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
+import java.nio.file.Path
 import kotlin.io.path.relativeTo
 
 /**
@@ -212,7 +213,7 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
             // we cannot build the file path based on the fq name, because the `package`
             // and path might not match.
             if (module == currentFile.module.descriptor) {
-                return@run fileOfDeclaration.relativeDartPath.toString()
+                return@run fileOfDeclaration.relativeDartPath.toUriString()
             }
 
             // At this point, the declaration is from a dependency and thus the module must be a
@@ -225,7 +226,10 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
                 // Package root: ${pkg.path}/lib/
                 // File Dart path: ${pkg.path}/lib/somewhere/else.dart
                 // Result: somewhere/else.dart
-                !is DartDescriptor -> pkg.path.resolve(fileOfDeclaration.dartPath).relativeTo(pkg.packagePath)
+                !is DartDescriptor -> pkg.path.resolve(fileOfDeclaration.dartPath)
+                    .relativeTo(pkg.packagePath)
+                    .toUriString()
+
                 else -> run {
                     val fqNameWithoutPackageAndDeclaration = descriptor.fqNameSafe
                         .toString()
@@ -260,3 +264,5 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
         }
     }
 }
+
+private fun Path.toUriString() = joinToString("/") { it.toString() }
