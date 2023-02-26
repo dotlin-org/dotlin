@@ -254,6 +254,59 @@ class Statement : BaseTest {
                 """
             )
         }
+
+        @Test
+        fun `exhaustive when in for-loop`() = assertCompile {
+            kotlin(
+                """
+                var currentColor: Color = Color.red
+
+                fun main() {
+                    for (i in 0 until 68) {
+                        when (currentColor) {
+                            Color.red -> {}
+                            Color.green -> {}
+                            Color.blue -> {}
+                        }
+                    }
+                }
+
+                enum class Color {
+                    red, green, blue
+                }
+                """
+            )
+
+            dart(
+                """
+                import "package:dotlin/src/kotlin/ranges/ranges_ext.dt.g.dart"
+                    show IntRangeFactoryExt;
+                import "package:dotlin/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
+                import "package:meta/meta.dart";
+
+                Color currentColor = Color.red;
+                void main() {
+                  for (int i = 0; i < 68; i += 1) {
+                    final Color tmp1_subject = currentColor;
+                    if (tmp1_subject == Color.red) {
+                    } else if (tmp1_subject == Color.green) {
+                    } else if (tmp1_subject == Color.blue) {}
+                  }
+                }
+
+                enum Color {
+                  red._(),
+                  green._(),
+                  blue._();
+
+                  const Color._();
+                }
+
+                Color ${'$'}Color${'$'}valueOf(String value) =>
+                    Color.values.firstWhere((Color v) => v.name == value);
+                """
+            )
+        }
     }
 
     @Nested
