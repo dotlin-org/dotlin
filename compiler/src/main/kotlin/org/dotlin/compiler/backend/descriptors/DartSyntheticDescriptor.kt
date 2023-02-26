@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Wilko Manger
+ * Copyright 2022 Wilko Manger
  *
  * This file is part of Dotlin.
  *
@@ -17,18 +17,13 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-@file:OptIn(ObsoleteDescriptorBasedAPI::class)
+package org.dotlin.compiler.backend.descriptors
 
-package org.dotlin.compiler.backend.util
-
-import org.dotlin.compiler.backend.descriptors.DartDescriptor
-import org.dotlin.compiler.backend.descriptors.dartElementAs
-import org.dotlin.compiler.dart.element.DartDeclarationElement
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-
-val IrDeclaration.isDartDeclaration
-    get() = descriptor is DartDescriptor
-
-val IrDeclaration.dartElement: DartDeclarationElement?
-    get() = descriptor.dartElementAs()
+/**
+ * Marker interface for Dart descriptors that were not originated from loaded Dart source, but
+ * created by Dotlin for Kotlin interoperability.
+ *
+ * Not to be confused with [DartDescriptor]s whose `elements` have `isSynthetic = true`, this means
+ * the code was synthetic in Dart itself.
+ */
+interface DartSyntheticDescriptor

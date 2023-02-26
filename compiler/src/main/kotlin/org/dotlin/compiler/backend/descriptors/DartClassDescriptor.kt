@@ -42,8 +42,8 @@ class DartClassDescriptor(
     false,
     context.storageManager,
 ), DartDescriptor {
-    private val _modality = element.kotlinModality
-    override fun getModality() = _modality
+    private val _visibility = element.kotlinVisibility
+    override fun getVisibility() = _visibility
 
     private val instanceMemberScope by storageManager.createLazyValue {
         DartMemberScope(
@@ -54,10 +54,6 @@ class DartClassDescriptor(
     }
 
     override fun getUnsubstitutedMemberScope(): MemberScope = instanceMemberScope
-
-    override fun getStaticScope(): MemberScope {
-        return MemberScope.Empty // TODO
-    }
 
     private val _constructors by storageManager.createLazyValue {
         instanceMemberScope.getContributedDescriptors().filterIsInstance<DartConstructorDescriptor>()

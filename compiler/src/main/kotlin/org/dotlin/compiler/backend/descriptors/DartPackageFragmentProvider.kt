@@ -20,6 +20,7 @@
 package org.dotlin.compiler.backend.descriptors
 
 import org.dotlin.compiler.backend.DartProject
+import org.dotlin.compiler.backend.descriptors.annotation.DartSyntheticAnnotationPackageFragmentDescriptor
 import org.dotlin.compiler.backend.steps.src2ir.DartPackageDeserializer
 import org.dotlin.compiler.dart.element.DartLibraryElement
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
@@ -27,12 +28,13 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentProviderOptimized
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.storage.getValue
 
 class DartPackageFragmentProvider(
     private val project: DartProject,
     private val context: DartDescriptorContext,
 ) : PackageFragmentProviderOptimized {
-    private val libraries: List<DartLibraryElement> by lazy {
+    private val libraries: List<DartLibraryElement> by context.storageManager.createLazyValue {
         when (val pkg = DartPackageDeserializer.deserialize(
             project,
             context.pkg,
@@ -43,8 +45,8 @@ class DartPackageFragmentProvider(
         }
     }
 
-    private val fragments by lazy {
-        libraries.flatMap {
+    private val fragments: List<PackageFragmentDescriptor> by context.storageManager.createLazyValue {
+        val fragments = libraries.flatMap {
             it.units.map { unit ->
                 DartPackageFragmentDescriptor(
                     library = it,
@@ -54,10 +56,12 @@ class DartPackageFragmentProvider(
                 )
             }
         }
+
+        fragments + fragments.map { DartSyntheticAnnotationPackageFragmentDescriptor(it, context) }
     }
 
     private val getFragmentsOf =
-        context.storageManager.createMemoizedFunction<FqName, List<DartPackageFragmentDescriptor>> { fqName ->
+        context.storageManager.createMemoizedFunction<FqName, List<PackageFragmentDescriptor>> { fqName ->
             when {
                 fqName.startsWithPackageFqName() -> fragments.filter { it.fqName == fqName }
                 else -> emptyList()

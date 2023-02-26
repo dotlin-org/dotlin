@@ -235,6 +235,33 @@ To integrate better with the Dart runtime, and because Dart has better
 defintions, they are used instead of the JVM exception classes. This also means `Throwable` is not available, since it doesn't
 serve any use anymore.
 
+### Annotations
+
+In Kotlin, only `annotation class`es can be used as annotations. In Dart, any class with a `const` constructor
+and `const` top-level values can be used as annotations.
+
+To facilitate, the same is possible in Dotlin. Classes and properties that can be used as annotation, have synthetic 
+`annotation class` counter-parts generated in an `annotations` package, which can be used as annotations. 
+
+For example, if you have a Dart class in `lib/markers.dart` such as:
+
+```dart
+class Fragile {
+    const Fragile();
+}
+```
+
+It can be used in Dotlin like so:
+```kotlin
+import my.package.markers.annotations.Fragile
+
+@Fragile
+class Box
+```
+
+Normally, the `Fragile` class would be imported through `my.package.markers.Fragile`, but the annotation is in a special `annotations` sub-package.
+Note that if you want to use `Fragile` in a non-annotation context, you can stil use it as normal through `my.package.markers.Fragile`.
+
 ## Differences from Dart
 
 Aside from the obvious differences between the Kotlin language and stdlib, Dotlin adds

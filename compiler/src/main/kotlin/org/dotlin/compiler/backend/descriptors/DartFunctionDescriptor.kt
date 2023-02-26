@@ -79,12 +79,7 @@ class DartConstructorDescriptor(
         )
     }
 
-    private val _name by storageManager.createLazyValue {
-        when {
-            element.name.isEmpty -> super.getName()
-            else -> element.kotlinName
-        }
-    }
+    private val _name by storageManager.createLazyValue { element.kotlinName }
 
     override fun getName() = _name
 

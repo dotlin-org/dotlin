@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer.util
 
+import org.dotlin.compiler.backend.descriptors.annotation.isDartSyntheticPropertyAnnotation
 import org.dotlin.compiler.backend.steps.ir2ast.DartAstTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.accept
@@ -30,12 +31,14 @@ import org.jetbrains.kotlin.descriptors.DescriptorVisibilities.PROTECTED
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Modality.FINAL
 import org.jetbrains.kotlin.descriptors.Modality.SEALED
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.util.isAnnotationClass
 import org.jetbrains.kotlin.ir.util.isEnumClass
 import org.jetbrains.kotlin.ir.util.isLocal
 import org.jetbrains.kotlin.ir.util.parentAsClass
 
+@OptIn(ObsoleteDescriptorBasedAPI::class)
 fun IrDeclaration.acceptAnnotations(
     context: DartAstTransformContext
 ): List<DartAnnotation> {
@@ -95,10 +98,19 @@ fun IrDeclaration.acceptAnnotations(
 
     val annotations = annotationsWithRuntimeRetention
         .map {
+            val parentClass = it.symbol.owner.parentAsClass
+            val isPropertyAnnotation = parentClass.descriptor.isDartSyntheticPropertyAnnotation
+
             DartAnnotation(
-                name = with(context) { it.symbol.owner.parentAsClass.dartName },
-                arguments = it.acceptArguments(context),
-                typeArguments = it.typeArguments.accept(context)
+                name = with(context) { parentClass.dartName },
+                arguments = when {
+                    !isPropertyAnnotation -> it.acceptArguments(context)
+                    else -> null
+                },
+                typeArguments = when {
+                    !isPropertyAnnotation -> it.typeArguments.accept(context)
+                    else -> null
+                }
             )
         }
         .toList()

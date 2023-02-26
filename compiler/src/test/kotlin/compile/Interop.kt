@@ -505,4 +505,72 @@ class Interop : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `use Dart class as annotation`() = assertCompile {
+        dart(
+            """
+            class Fragile {
+              const Fragile();
+            }
+            """,
+            Path("lib/fragile.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import dev.pub.test.fragile.annotations.Fragile
+
+            @Fragile
+            class Box
+            """
+        )
+
+        dart(
+            """
+            import "fragile.dart" show Fragile;
+            import "package:meta/meta.dart";
+
+            @Fragile()
+            @sealed
+            class Box {}
+            """
+        )
+    }
+
+    @Test
+    fun `use Dart field as annotation`() = assertCompile {
+        dart(
+            """
+            class Fragile {
+              const Fragile._();
+            }
+
+            const fragile = Fragile._();
+            """,
+            Path("lib/fragile.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import dev.pub.test.fragile.annotations.fragile
+
+            @fragile
+            class Box
+            """
+        )
+
+        dart(
+            """
+            import "fragile.dart" show fragile;
+            import "package:meta/meta.dart";
+
+            @fragile
+            @sealed
+            class Box {}
+            """
+        )
+    }
 }

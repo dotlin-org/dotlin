@@ -100,7 +100,7 @@ class DartElementSerializer {
         isAbstract: prop is FieldElement ? prop.isAbstract : false,
         isCovariant: prop is FieldElement ? prop.isCovariant : false,
         isConst: prop.isConst,
-        isFinal: prop.isFinal,
+        isFinal: prop.isConst ? true : prop.isFinal,
         isLate: prop.isLate,
         isStatic: prop.isStatic,
         isSynthetic: prop.isSynthetic,

@@ -10,9 +10,22 @@ import org.jetbrains.kotlin.descriptors.DescriptorVisibilities.PUBLIC
 import org.jetbrains.kotlin.descriptors.DescriptorVisibility
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.name.SpecialNames
+
+private val DartNamedElement.defaultKotlinName: Name
+    get() = Name.identifier(name.value)
 
 val DartNamedElement.kotlinName: Name
-    get() = Name.identifier(name.value)
+    get() = when (this) {
+        is DartConstructorElement -> kotlinName
+        else -> defaultKotlinName
+    }
+
+val DartConstructorElement.kotlinName: Name
+    get() = when {
+        name.isEmpty -> SpecialNames.INIT
+        else -> defaultKotlinName
+    }
 
 val DartAbstractableElement.kotlinModality: Modality
     get() = when {
