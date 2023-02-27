@@ -21,7 +21,9 @@ package org.dotlin.compiler.backend.descriptors
 
 import org.dotlin.compiler.backend.DartProject
 import org.dotlin.compiler.backend.descriptors.annotation.DartSyntheticAnnotationPackageFragmentDescriptor
+import org.dotlin.compiler.backend.descriptors.export.DartExportPackageFragmentDescriptor
 import org.dotlin.compiler.backend.steps.src2ir.DartPackageDeserializer
+import org.dotlin.compiler.dart.element.DartElementLocation
 import org.dotlin.compiler.dart.element.DartLibraryElement
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentProviderOptimized
@@ -29,6 +31,7 @@ import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.storage.getValue
+import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstance
 
 class DartPackageFragmentProvider(
     private val project: DartProject,
@@ -57,7 +60,30 @@ class DartPackageFragmentProvider(
             }
         }
 
-        fragments + fragments.map { DartSyntheticAnnotationPackageFragmentDescriptor(it, context) }
+        val exportFragments = fragments.flatMap { fragment ->
+            // First look in our own fragments, to prevent recursion (and it's faster).
+            fun fragmentOf(loc: DartElementLocation) =
+                fragments.firstOrNull { it.library.location == loc }
+                    ?: context.fqNameOf(context.elementLocator.locate<DartLibraryElement>(loc))
+                        .let { fqName ->
+                            // TODO: Select based on some criteria?
+                            context.module.getPackage(fqName).fragments.firstIsInstance()
+                        }
+
+            fragment.library.exports.map { export ->
+                DartExportPackageFragmentDescriptor(
+                    export,
+                    context,
+                    fragment,
+                    exportedFragment = fragmentOf(export.exportLocation)
+                )
+            }
+        }
+
+        val syntheticAnnotationFragments = (fragments + exportFragments)
+            .map { DartSyntheticAnnotationPackageFragmentDescriptor(it, context) }
+
+        fragments + exportFragments + syntheticAnnotationFragments
     }
 
     private val getFragmentsOf =

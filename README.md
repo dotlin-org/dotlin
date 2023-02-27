@@ -237,8 +237,8 @@ serve any use anymore.
 
 ### Annotations
 
-In Kotlin, only `annotation class`es can be used as annotations. In Dart, any class with a `const` constructor
-and `const` top-level values can be used as annotations.
+In Kotlin, only `annotation class`es can be used as annotations. In Dart, classes with at least one `const` constructor
+or `const` top-level values can be used as annotations.
 
 To facilitate, the same is possible in Dotlin. Classes and properties that can be used as annotation, have synthetic 
 `annotation class` counter-parts generated in an `annotations` package, which can be used as annotations. 
@@ -261,6 +261,37 @@ class Box
 
 Normally, the `Fragile` class would be imported through `my.package.markers.Fragile`, but the annotation is in a special `annotations` sub-package.
 Note that if you want to use `Fragile` in a non-annotation context, you can stil use it as normal through `my.package.markers.Fragile`.
+
+### Importing
+
+In Kotlin, declarations are imported through their FQN (fully-qualified name), while in Dart they're imported
+through URIs. In Dotlin, FQNs are generated based on a few factors.
+
+For example, if you have a package named `species` [published](https://dart.dev/tools/pub/verified-publishers) by `example.com`,
+which has a file `lib/mammals.dart` where the class `Human` is declared, you can import `Human` as follows in Dotlin:
+```kotlin
+import com.example.species.mammals.Human
+```
+
+A lot of packages follow the convention of exporting their published API in a file with the same name of their package in `lib/`. For example,
+you'd import `package:species/species.dart` and use `Human` from there, because it's `export`ed (or declared) in `species.dart`.
+
+To import a package-level import, Dotlin removes the need of specifying the package name twice, thus you'd import it like so:
+```kotlin
+import com.example.species.Human
+```
+
+If a package does not have a verified publisher, the package host is used as a fallback (in most cases `pub.dev`):
+```kotlin
+import dev.pub.species.Human
+```
+
+If a package does not have a host (e.g. it's local or from git), it's prefixed with `pkg`:
+```kotlin
+import pkg.species.Human
+```
+
+In the future, you'll also be able to provide a `groupId` per dependency in `pubspec.yaml`, also for your own package.
 
 ## Differences from Dart
 

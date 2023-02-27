@@ -25,6 +25,7 @@ import org.dotlin.compiler.backend.descriptors.DartPackageFragmentProvider
 import org.dotlin.compiler.backend.steps.src2ir.DartElementLocator
 import org.dotlin.compiler.backend.steps.src2ir.DartPlatform
 import org.dotlin.compiler.backend.steps.src2ir.DotlinTypeTransformer
+import org.dotlin.compiler.backend.steps.src2ir.analyze.checkers.file.DartDuplicateImportChecker
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.functions.functionInterfacePackageFragmentProvider
@@ -134,12 +135,28 @@ class DotlinAnalyzer(
             files,
         )
 
+        checkSourceFiles(files, trace)
+
         return when {
             trace.bindingContext.diagnostics.any { it.severity == Severity.ERROR } -> {
                 AnalysisResult.compilationError(trace.bindingContext)
             }
 
             else -> AnalysisResult.success(trace.bindingContext, thisModule)
+        }
+    }
+
+    private val sourceFileCheckers = listOf(
+        ::DartDuplicateImportChecker
+    )
+
+    private fun checkSourceFiles(files: List<KtFile>, trace: BindingTrace) {
+        sourceFileCheckers.forEach {
+            val checker = it(trace)
+
+            files.forEach {
+                checker.check(it)
+            }
         }
     }
 }

@@ -36,12 +36,13 @@ const DartLibraryElement$json = const {
   '2': const [
     const {'1': 'location', '3': 1, '4': 2, '5': 9, '10': 'location'},
     const {'1': 'path', '3': 2, '4': 2, '5': 9, '10': 'path'},
-    const {'1': 'units', '3': 3, '4': 3, '5': 11, '6': '.DartCompilationUnitElement', '10': 'units'},
+    const {'1': 'exports', '3': 3, '4': 3, '5': 11, '6': '.DartLibraryExportElement', '10': 'exports'},
+    const {'1': 'units', '3': 4, '4': 3, '5': 11, '6': '.DartCompilationUnitElement', '10': 'units'},
   ],
 };
 
 /// Descriptor for `DartLibraryElement`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List dartLibraryElementDescriptor = $convert.base64Decode('ChJEYXJ0TGlicmFyeUVsZW1lbnQSGgoIbG9jYXRpb24YASACKAlSCGxvY2F0aW9uEhIKBHBhdGgYAiACKAlSBHBhdGgSMQoFdW5pdHMYAyADKAsyGy5EYXJ0Q29tcGlsYXRpb25Vbml0RWxlbWVudFIFdW5pdHM=');
+final $typed_data.Uint8List dartLibraryElementDescriptor = $convert.base64Decode('ChJEYXJ0TGlicmFyeUVsZW1lbnQSGgoIbG9jYXRpb24YASACKAlSCGxvY2F0aW9uEhIKBHBhdGgYAiACKAlSBHBhdGgSMwoHZXhwb3J0cxgDIAMoCzIZLkRhcnRMaWJyYXJ5RXhwb3J0RWxlbWVudFIHZXhwb3J0cxIxCgV1bml0cxgEIAMoCzIbLkRhcnRDb21waWxhdGlvblVuaXRFbGVtZW50UgV1bml0cw==');
 @$core.Deprecated('Use dartCompilationUnitElementDescriptor instead')
 const DartCompilationUnitElement$json = const {
   '1': 'DartCompilationUnitElement',
@@ -171,6 +172,19 @@ const DartType$json = const {
 
 /// Descriptor for `DartType`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List dartTypeDescriptor = $convert.base64Decode('CghEYXJ0VHlwZRISCgR0eXBlGAEgAigJUgR0eXBlEhQKBXZhbHVlGAIgAigMUgV2YWx1ZQ==');
+@$core.Deprecated('Use dartLibraryExportElementDescriptor instead')
+const DartLibraryExportElement$json = const {
+  '1': 'DartLibraryExportElement',
+  '2': const [
+    const {'1': 'location', '3': 1, '4': 2, '5': 9, '10': 'location'},
+    const {'1': 'exportLocation', '3': 2, '4': 2, '5': 9, '10': 'exportLocation'},
+    const {'1': 'show', '3': 3, '4': 3, '5': 9, '10': 'show'},
+    const {'1': 'hide', '3': 4, '4': 3, '5': 9, '10': 'hide'},
+  ],
+};
+
+/// Descriptor for `DartLibraryExportElement`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List dartLibraryExportElementDescriptor = $convert.base64Decode('ChhEYXJ0TGlicmFyeUV4cG9ydEVsZW1lbnQSGgoIbG9jYXRpb24YASACKAlSCGxvY2F0aW9uEiYKDmV4cG9ydExvY2F0aW9uGAIgAigJUg5leHBvcnRMb2NhdGlvbhISCgRzaG93GAMgAygJUgRzaG93EhIKBGhpZGUYBCADKAlSBGhpZGU=');
 @$core.Deprecated('Use dartTypeParameterElementDescriptor instead')
 const DartTypeParameterElement$json = const {
   '1': 'DartTypeParameterElement',

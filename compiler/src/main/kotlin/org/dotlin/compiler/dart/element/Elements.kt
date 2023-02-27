@@ -87,7 +87,16 @@ data class DartLibraryElement(
     override val location: DartElementLocation,
     @Serializable(with = PathSerializer::class)
     val path: Path,
+    val exports: List<DartLibraryExportElement> = emptyList(),
     val units: List<DartCompilationUnitElement> = emptyList()
+) : DartElement
+
+@Serializable
+data class DartLibraryExportElement(
+    override val location: DartElementLocation,
+    val exportLocation: DartElementLocation,
+    val show: List<String> = emptyList(),
+    val hide: List<String> = emptyList(),
 ) : DartElement
 
 @Serializable

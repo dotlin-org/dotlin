@@ -22,7 +22,6 @@ package org.dotlin.compiler.backend.descriptors.type
 import org.dotlin.compiler.backend.descriptors.DartDescriptor
 import org.dotlin.compiler.backend.descriptors.DartDescriptorContext
 import org.dotlin.compiler.dart.element.*
-import org.dotlin.compiler.dart.element.DartNullabilitySuffix.QUESTION_MARK
 import org.jetbrains.kotlin.types.*
 
 context(DartDescriptor)
@@ -36,11 +35,13 @@ fun DartType.toKotlinType(context: DartDescriptorContext): KotlinType {
             fun dartCore(className: String) = "dart:core;dart:core/${className.lowercase()}.dart;$className"
 
             when (elementLocation.toString()) {
+                dartCore("bool") -> builtIns.booleanType
                 dartCore("int") -> builtIns.intType
                 dartCore("double") -> builtIns.doubleType
                 dartCore("String") -> builtIns.stringType
                 dartCore("num") -> builtIns.numberType
                 dartCore("Object") -> builtIns.anyType
+                dartCore("Never") -> builtIns.nothingType
                 // TODO: Comparable
                 // TODO: Handle collection types
                 else -> DartTypeFactory.simpleType(this, context)

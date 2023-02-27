@@ -21,6 +21,7 @@ package analysis
 
 import BaseTest
 import assertCompilesWithError
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart.DUPLICATE_IMPORT
 import org.jetbrains.kotlin.diagnostics.Errors.UNRESOLVED_REFERENCE
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -62,6 +63,127 @@ class Interop : BaseTest {
 
             @nonAnnotation
             class Test
+            """
+        )
+    }
+
+    @Test
+    fun `error if importing Dart declaration from export and non-export`() = assertCompilesWithError(DUPLICATE_IMPORT) {
+        dart(
+            """
+            class BlackBird {}
+            """,
+            Path("lib/src/black_bird.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            export "src/black_bird.dart";
+            """,
+            Path("lib/birds.dart"),
+            assert = false
+        )
+
+        kotlin(
+            """
+            import dev.pub.test.birds.BlackBird
+            import dev.pub.test.src.black_bird.BlackBird as SrcBlackBird
+
+            fun main() {
+                val bird: SrcBlackBird = BlackBird()
+            }
+            """
+        )
+    }
+
+
+    @Test
+    fun `error if using Dart class from export that was hidden`() = assertCompilesWithError(UNRESOLVED_REFERENCE) {
+        dart(
+            """
+            class BlackBird {}
+            class BlueBird {}
+            """,
+            Path("lib/src/birds_impl.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            export "src/birds_impl.dart" hide BlackBird;
+            """,
+            Path("lib/birds.dart"),
+            assert = false
+        )
+
+        kotlin(
+            """
+            import dev.pub.test.birds.BlackBird
+
+            fun main() {
+                val myBird = BlackBird()
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `error if using Dart class from export that wasn't shown`() = assertCompilesWithError(UNRESOLVED_REFERENCE) {
+        dart(
+            """
+            class BlackBird {}
+            class BlueBird {}
+            """,
+            Path("lib/src/birds_impl.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            export "src/birds_impl.dart" show BlueBird;
+            """,
+            Path("lib/birds.dart"),
+            assert = false
+        )
+
+        kotlin(
+            """
+            import dev.pub.test.birds.BlackBird
+
+            fun main() {
+                val myBird = BlackBird()
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `error if using Dart class from export that's shown and hidden`() = assertCompilesWithError(UNRESOLVED_REFERENCE) {
+        dart(
+            """
+            class BlackBird {}
+            class BlueBird {}
+            """,
+            Path("lib/src/birds_impl.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            export "src/birds_impl.dart" show BlackBird hide BlackBird;
+            """,
+            Path("lib/birds.dart"),
+            assert = false
+        )
+
+        kotlin(
+            """
+            import dev.pub.test.birds.BlackBird
+
+            fun main() {
+                val myBird = BlackBird()
+            }
             """
         )
     }

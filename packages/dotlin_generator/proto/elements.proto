@@ -12,7 +12,9 @@ message DartLibraryElement {
   required string location = 1;
   required string path = 2;
   // WARNING: a default value decoded when value is missing
-  repeated DartCompilationUnitElement units = 3;
+  repeated DartLibraryExportElement exports = 3;
+  // WARNING: a default value decoded when value is missing
+  repeated DartCompilationUnitElement units = 4;
 }
 
 // serial name 'org.dotlin.compiler.dart.element.DartCompilationUnitElement'
@@ -118,6 +120,16 @@ message DartType {
   //   message DartNeverType, serial name 'org.dotlin.compiler.dart.element.DartNeverType'
   //   message DartVoidType, serial name 'org.dotlin.compiler.dart.element.DartVoidType'
   required bytes value = 2;
+}
+
+// serial name 'org.dotlin.compiler.dart.element.DartLibraryExportElement'
+message DartLibraryExportElement {
+  required string location = 1;
+  required string exportLocation = 2;
+  // WARNING: a default value decoded when value is missing
+  repeated string show = 3;
+  // WARNING: a default value decoded when value is missing
+  repeated string hide = 4;
 }
 
 // serial name 'org.dotlin.compiler.dart.element.DartTypeParameterElement'

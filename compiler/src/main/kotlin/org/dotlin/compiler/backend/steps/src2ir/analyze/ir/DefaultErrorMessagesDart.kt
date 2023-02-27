@@ -158,6 +158,13 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
         )
 
         put(
+            DUPLICATE_IMPORT,
+            "duplicate import: ''{0}'' is also imported at: ''{1}''",
+            Renderers.NAME,
+            Renderers.ELEMENT_TEXT
+        )
+
+        put(
             DUPLICATE_ENUM_MEMBER_NAME,
             "enum cannot contain duplicate member names"
         )

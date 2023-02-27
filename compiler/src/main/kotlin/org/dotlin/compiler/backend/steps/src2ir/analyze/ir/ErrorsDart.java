@@ -20,11 +20,9 @@
 package org.dotlin.compiler.backend.steps.src2ir.analyze.ir;
 
 import com.intellij.psi.PsiElement;
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor;
 import org.jetbrains.kotlin.diagnostics.*;
-import org.jetbrains.kotlin.psi.KtAnnotationEntry;
-import org.jetbrains.kotlin.psi.KtDeclaration;
-import org.jetbrains.kotlin.psi.KtElement;
-import org.jetbrains.kotlin.psi.KtExpression;
+import org.jetbrains.kotlin.psi.*;
 import org.jetbrains.kotlin.types.KotlinType;
 
 import static org.jetbrains.kotlin.diagnostics.PositioningStrategies.DECLARATION_SIGNATURE_OR_DEFAULT;
@@ -107,6 +105,9 @@ public interface ErrorsDart {
 
     DiagnosticFactory1<KtElement, KotlinType> DART_CONSTRUCTOR_WRONG_RETURN_TYPE =
             DiagnosticFactory1.create(Severity.ERROR, DECLARATION_SIGNATURE_OR_DEFAULT);
+
+    DiagnosticFactory2<KtImportDirective, DeclarationDescriptor, KtImportDirective> DUPLICATE_IMPORT =
+            DiagnosticFactory2.create(Severity.ERROR, DECLARATION_SIGNATURE_OR_DEFAULT);
 
     // Dart emulated errors.
     DiagnosticFactory1<KtExpression, String> CONST_WITH_NON_CONST =

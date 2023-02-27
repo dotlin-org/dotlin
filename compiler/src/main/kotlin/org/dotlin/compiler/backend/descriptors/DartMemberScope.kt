@@ -160,16 +160,6 @@ class DartMemberScope(
         // Since Dart does not support overloads, we know that we'll always have a single result.
         listOfNotNull(getDescriptor(GetDescriptorRequest(name)) as? PropertyDescriptor)
 
-    override fun printScopeStructure(p: Printer) {
-        p.println(this::class.simpleName + "{")
-        p.pushIndent()
-
-        getContributedDescriptors().forEach {
-            p.println(it)
-        }
-
-        p.popIndent()
-        p.println("}")
-    }
+    override fun printScopeStructure(p: Printer) = p.printScope()
 
 }

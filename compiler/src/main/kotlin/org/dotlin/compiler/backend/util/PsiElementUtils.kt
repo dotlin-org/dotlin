@@ -24,9 +24,7 @@ import org.jetbrains.kotlin.backend.jvm.ir.psiElement
 import org.jetbrains.kotlin.ir.declarations.IrAttributeContainer
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrField
-import org.jetbrains.kotlin.psi.KtAnnotationEntry
-import org.jetbrains.kotlin.psi.KtDeclaration
-import org.jetbrains.kotlin.psi.KtStringTemplateExpression
+import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.calls.util.getResolvedCall
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
@@ -45,3 +43,13 @@ fun KtAnnotationEntry.getFqName(bindingContext: BindingContext) = getResolvedCal
     ?.fqNameSafe
 
 fun KtStringTemplateExpression.isTripleQuoted() = text.startsWith("\"\"\"")
+
+fun KtImportDirective.descriptor(context: BindingContext) =
+    context.get(BindingContext.REFERENCE_TARGET, declarationReference)
+
+private val KtImportDirective.declarationReference: KtNameReferenceExpression
+    get() = when (val firstChild = children[0]) {
+        is KtNameReferenceExpression -> firstChild
+        is KtDotQualifiedExpression -> firstChild.lastChild as KtNameReferenceExpression
+        else -> throw UnsupportedOperationException("Unsupported child: ${firstChild::class.simpleName}")
+    }

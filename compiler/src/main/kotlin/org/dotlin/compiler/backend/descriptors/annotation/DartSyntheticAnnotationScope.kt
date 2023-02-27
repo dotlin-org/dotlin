@@ -21,7 +21,7 @@ package org.dotlin.compiler.backend.descriptors.annotation
 
 import org.dotlin.compiler.backend.descriptors.DartDescriptor
 import org.dotlin.compiler.backend.descriptors.DartDescriptorContext
-import org.dotlin.compiler.backend.descriptors.DartMemberScope
+import org.dotlin.compiler.backend.descriptors.printScope
 import org.dotlin.compiler.dart.element.DartClassElement
 import org.dotlin.compiler.dart.element.DartElement
 import org.dotlin.compiler.dart.element.DartPropertyElement
@@ -40,15 +40,17 @@ import org.jetbrains.kotlin.utils.Printer
 
 class DartSyntheticAnnotationScope(
     private val owner: DeclarationDescriptor,
-    private val scope: DartMemberScope,
+    private val scope: MemberScope,
     private val context: DartDescriptorContext,
 ) : MemberScope {
     private val storageManager = context.storageManager
 
     private val annotationNames by storageManager.createLazyValue {
-        (scope.classElementsByKotlinName + scope.variableElementsByKotlinName)
-            .filter { (_, element) -> element.canBeAnnotation }
-            .keys
+        getContributedDescriptors()
+            .filterIsInstance<DartDescriptor>()
+            .filter { it.element.canBeAnnotation }
+            .map { (it as DeclarationDescriptor).name }
+            .toSet()
     }
 
     override fun getClassifierNames(): Set<Name> = annotationNames
@@ -96,17 +98,7 @@ class DartSyntheticAnnotationScope(
             else -> false
         }
 
-    override fun printScopeStructure(p: Printer) {
-        p.println(this::class.simpleName + "{")
-        p.pushIndent()
-
-        getContributedDescriptors().forEach {
-            p.println(it)
-        }
-
-        p.popIndent()
-        p.println("}")
-    }
+    override fun printScopeStructure(p: Printer) = p.printScope()
 
     override fun getContributedFunctions(name: Name, location: LookupLocation) = emptyList<SimpleFunctionDescriptor>()
     override fun getContributedVariables(name: Name, location: LookupLocation) = emptyList<PropertyDescriptor>()

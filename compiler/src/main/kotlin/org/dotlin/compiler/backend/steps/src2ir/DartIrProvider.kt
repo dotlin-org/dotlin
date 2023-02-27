@@ -5,6 +5,7 @@ import org.dotlin.compiler.backend.descriptors.DartDescriptor
 import org.dotlin.compiler.backend.descriptors.DartPackageFragmentDescriptor
 import org.dotlin.compiler.backend.descriptors.DartSyntheticDescriptor
 import org.dotlin.compiler.backend.descriptors.annotation.DartSyntheticAnnotationPackageFragmentDescriptor
+import org.dotlin.compiler.backend.descriptors.export.DartExportPackageFragmentDescriptor
 import org.dotlin.compiler.backend.isCurrent
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.dart.element.DartLibraryElement
@@ -70,12 +71,9 @@ class DartIrProvider(
 
         // Generated top-level IR elements by default have an IrExternalPackageFragment parent,
         // we want this to be an IrFile.
-        descriptor.containingDartPackageFragment?.let {
-            filesByLibrary.computeIfAbsent(it.library) { library ->
-                IrFileImpl(
-                    DartIrFileEntry(library, it.pkg),
-                    packageFragmentDescriptor = it
-                )
+        descriptor.containingPackageFragment?.let {
+            filesByLibrary.computeIfAbsent(it.library) { _ ->
+                DartIrFile(it)
             }.apply {
                 addChild(declaration)
                 irModuleFragment?.addFile(this)
@@ -100,12 +98,26 @@ class DartIrProvider(
         files.add(irFile)
     }
 
-    private val DeclarationDescriptor.containingDartPackageFragment: DartPackageFragmentDescriptor?
-        get() = containingDeclaration?.let {
-            it.safeAs<DartPackageFragmentDescriptor>()
-                ?: it.safeAs<DartSyntheticAnnotationPackageFragmentDescriptor>()?.fragment
+    private val DeclarationDescriptor.containingPackageFragment: DartPackageFragmentDescriptor?
+        get() = when (val container = containingDeclaration) {
+            is DartPackageFragmentDescriptor -> container
+            is DartSyntheticAnnotationPackageFragmentDescriptor -> when (val fragment = container.fragment) {
+                is DartPackageFragmentDescriptor -> fragment
+                is DartExportPackageFragmentDescriptor -> fragment.fragment
+                else -> throw UnsupportedOperationException("Unexpected fragment: $fragment")
+            }
+            is DartExportPackageFragmentDescriptor -> container.fragment
+            else -> null
         }
 }
+
+// TODO: Remove when #81 is completed.
+@Suppress("FunctionName")
+fun DartIrFile(packageFragment: DartPackageFragmentDescriptor) =
+    IrFileImpl(
+        DartIrFileEntry(packageFragment.library, packageFragment.context.pkg),
+        packageFragment,
+    )
 
 private class DartIrFileEntry(library: DartLibraryElement, dartPackage: DartPackage) : IrFileEntry {
     override val maxOffset: Int = UNDEFINED_OFFSET

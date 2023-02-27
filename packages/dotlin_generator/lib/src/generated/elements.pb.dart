@@ -57,13 +57,15 @@ class DartLibraryElement extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DartLibraryElement', createEmptyInstance: create)
     ..aQS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'location')
     ..aQS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'path')
-    ..pc<DartCompilationUnitElement>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'units', $pb.PbFieldType.PM, subBuilder: DartCompilationUnitElement.create)
+    ..pc<DartLibraryExportElement>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'exports', $pb.PbFieldType.PM, subBuilder: DartLibraryExportElement.create)
+    ..pc<DartCompilationUnitElement>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'units', $pb.PbFieldType.PM, subBuilder: DartCompilationUnitElement.create)
   ;
 
   DartLibraryElement._() : super();
   factory DartLibraryElement({
     $core.String? location,
     $core.String? path,
+    $core.Iterable<DartLibraryExportElement>? exports,
     $core.Iterable<DartCompilationUnitElement>? units,
   }) {
     final _result = create();
@@ -72,6 +74,9 @@ class DartLibraryElement extends $pb.GeneratedMessage {
     }
     if (path != null) {
       _result.path = path;
+    }
+    if (exports != null) {
+      _result.exports.addAll(exports);
     }
     if (units != null) {
       _result.units.addAll(units);
@@ -118,7 +123,10 @@ class DartLibraryElement extends $pb.GeneratedMessage {
   void clearPath() => clearField(2);
 
   @$pb.TagNumber(3)
-  $core.List<DartCompilationUnitElement> get units => $_getList(2);
+  $core.List<DartLibraryExportElement> get exports => $_getList(2);
+
+  @$pb.TagNumber(4)
+  $core.List<DartCompilationUnitElement> get units => $_getList(3);
 }
 
 class DartCompilationUnitElement extends $pb.GeneratedMessage {
@@ -1121,6 +1129,82 @@ class DartType extends $pb.GeneratedMessage {
   $core.bool hasValue() => $_has(1);
   @$pb.TagNumber(2)
   void clearValue() => clearField(2);
+}
+
+class DartLibraryExportElement extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DartLibraryExportElement', createEmptyInstance: create)
+    ..aQS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'location')
+    ..aQS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'exportLocation', protoName: 'exportLocation')
+    ..pPS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'show')
+    ..pPS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'hide')
+  ;
+
+  DartLibraryExportElement._() : super();
+  factory DartLibraryExportElement({
+    $core.String? location,
+    $core.String? exportLocation,
+    $core.Iterable<$core.String>? show,
+    $core.Iterable<$core.String>? hide,
+  }) {
+    final _result = create();
+    if (location != null) {
+      _result.location = location;
+    }
+    if (exportLocation != null) {
+      _result.exportLocation = exportLocation;
+    }
+    if (show != null) {
+      _result.show.addAll(show);
+    }
+    if (hide != null) {
+      _result.hide.addAll(hide);
+    }
+    return _result;
+  }
+  factory DartLibraryExportElement.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DartLibraryExportElement.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  DartLibraryExportElement clone() => DartLibraryExportElement()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  DartLibraryExportElement copyWith(void Function(DartLibraryExportElement) updates) => super.copyWith((message) => updates(message as DartLibraryExportElement)) as DartLibraryExportElement; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static DartLibraryExportElement create() => DartLibraryExportElement._();
+  DartLibraryExportElement createEmptyInstance() => create();
+  static $pb.PbList<DartLibraryExportElement> createRepeated() => $pb.PbList<DartLibraryExportElement>();
+  @$core.pragma('dart2js:noInline')
+  static DartLibraryExportElement getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DartLibraryExportElement>(create);
+  static DartLibraryExportElement? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get location => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set location($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasLocation() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearLocation() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get exportLocation => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set exportLocation($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasExportLocation() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearExportLocation() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.String> get show => $_getList(2);
+
+  @$pb.TagNumber(4)
+  $core.List<$core.String> get hide => $_getList(3);
 }
 
 class DartTypeParameterElement extends $pb.GeneratedMessage {

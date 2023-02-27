@@ -21,7 +21,13 @@ class DartDescriptorContext(
             .dropWhile { it.name == "lib" }
             .joinToString(".") { it.nameWithoutExtension }
 
-        FqName("${pkg.fqName}.$fileFqName")
+        when (fileFqName) {
+            // package:meta/meta.dart -> dev.dart.meta
+            pkg.name -> pkg.fqName
+            // package:meta/something.dart -> dev.dart.meta.something
+            else -> FqName("${pkg.fqName}.$fileFqName")
+        }
+
     }
 
     fun fqNameOf(element: DartLibraryElement): FqName = fqNameOfLibrary(element)

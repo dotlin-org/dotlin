@@ -17,32 +17,30 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.backend.descriptors.annotation
+package org.dotlin.compiler.backend.descriptors.export
 
+import org.dotlin.compiler.backend.descriptors.DartDescriptor
 import org.dotlin.compiler.backend.descriptors.DartDescriptorContext
-import org.dotlin.compiler.backend.descriptors.DartSyntheticDescriptor
-import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
+import org.dotlin.compiler.backend.descriptors.DartPackageFragmentDescriptor
+import org.dotlin.compiler.dart.element.DartLibraryExportElement
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.PackageFragmentDescriptorImpl
-import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.storage.getValue
 
-/**
- * To use annotations from Dart classes, we create synthetic annotation classes for any class
- * that as a `const` constructor or top-level/static `const` field.
- */
-class DartSyntheticAnnotationPackageFragmentDescriptor(
-    val fragment: PackageFragmentDescriptor,
-    val context: DartDescriptorContext
+class DartExportPackageFragmentDescriptor(
+    override val element: DartLibraryExportElement,
+    override val context: DartDescriptorContext,
+    val fragment: DartPackageFragmentDescriptor,
+    private val exportedFragment: DartPackageFragmentDescriptor,
 ) : PackageFragmentDescriptorImpl(
     context.module,
-    fragment.fqName.child(Name.identifier("annotations")) // TODO: Handle conflicts
-), DartSyntheticDescriptor {
+    fragment.fqName,
+), DartDescriptor {
     override val annotations: Annotations = Annotations.EMPTY
 
     private val _memberScope by context.storageManager.createLazyValue {
-        DartSyntheticAnnotationScope(owner = this, fragment.getMemberScope(), context)
+        DartExportScope(owner = this, context, exportedFragment.getMemberScope())
     }
 
-    override fun getMemberScope(): DartSyntheticAnnotationScope = _memberScope
+    override fun getMemberScope(): DartExportScope = _memberScope
 }

@@ -18,6 +18,7 @@
  */
 
 import 'package:analyzer/dart/element/element.dart';
+import 'package:dartx/dartx_io.dart';
 import 'package:dotlin_generator/src/generated/elements.pb.dart';
 import 'package:dotlin_generator/src/serialize/type_serializer.dart';
 import 'package:dotlin_generator/src/serialize/util.dart';
@@ -55,9 +56,24 @@ class DartElementSerializer {
     return DartLibraryElement(
       location: library.encodedLocation,
       path: libPath,
+      exports: library.libraryExports.map((e) => serializeLibraryExport(e)),
       units: library.units.map((u) => serializeCompilationUnit(u)),
     );
   }
+
+  DartLibraryExportElement serializeLibraryExport(
+    LibraryExportElement export,
+  ) =>
+      DartLibraryExportElement(
+        location: export.encodedLocation,
+        exportLocation: export.exportedLibrary!.encodedLocation,
+        show: export.combinators.whereType<ShowElementCombinator>().flatMap(
+              (c) => c.shownNames,
+            ),
+        hide: export.combinators.whereType<HideElementCombinator>().flatMap(
+              (c) => c.hiddenNames,
+            ),
+      );
 
   DartCompilationUnitElement serializeCompilationUnit(
     CompilationUnitElement unit,

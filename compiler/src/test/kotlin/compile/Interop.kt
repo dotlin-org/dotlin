@@ -573,4 +573,277 @@ class Interop : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `use Dart class from export as annotation`() = assertCompile {
+        dart(
+            """
+            class Fragile {
+              const Fragile();
+            }
+            """,
+            Path("lib/src/fragile.dart"),
+            assert = false,
+        )
+
+        dart(
+            """
+            export "src/fragile.dart";
+            """,
+            Path("lib/markers.dart"),
+            assert = false
+        )
+
+        kotlin(
+            """
+            import dev.pub.test.markers.annotations.Fragile
+
+            @Fragile
+            class Box
+            """
+        )
+
+        dart(
+            """
+            import "markers.dart" show Fragile;
+            import "package:meta/meta.dart";
+
+            @Fragile()
+            @sealed
+            class Box {}
+            """
+        )
+    }
+
+    @Test
+    fun `use Dart field from export as annotation`() = assertCompile {
+        dart(
+            """
+            class Fragile {
+              const Fragile._();
+            }
+
+            const fragile = Fragile._();
+            """,
+            Path("lib/src/fragile.dart"),
+            assert = false,
+        )
+
+        dart(
+            """
+            export "src/fragile.dart";
+            """,
+            Path("lib/markers.dart"),
+            assert = false
+        )
+
+        kotlin(
+            """
+            import dev.pub.test.markers.annotations.fragile
+
+            @fragile
+            class Box
+            """
+        )
+
+        dart(
+            """
+            import "markers.dart" show fragile;
+            import "package:meta/meta.dart";
+
+            @fragile
+            @sealed
+            class Box {}
+            """
+        )
+    }
+
+    @Test
+    fun `use Dart class from export`() = assertCompile {
+        dart(
+            """
+            class BlackBird {}
+            """,
+            Path("lib/src/black_bird.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            export "src/black_bird.dart";
+            """,
+            Path("lib/birds.dart"),
+            assert = false
+        )
+
+        kotlin(
+            """
+            import dev.pub.test.birds.BlackBird
+
+            fun main() {
+                val myBird = BlackBird()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "birds.dart" show BlackBird;
+            import "package:meta/meta.dart";
+
+            void main() {
+              final BlackBird myBird = BlackBird();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `use Dart class from export (elaborate)`() = assertCompile {
+        dart(
+            """
+            class BlackBird {}
+            """,
+            Path("lib/src/black_bird.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            export "src/black_bird.dart";
+            """,
+            Path("lib/birds.dart"),
+            assert = false
+        )
+
+        kotlin(
+            """
+            import dev.pub.test.birds.BlackBird
+
+            fun getBird(): BlackBird = BlackBird()
+
+            val theBird = BlackBird()
+
+            fun main() {
+                val x = BlackBird()
+                val y = getBird()
+                val z = theBird
+            }
+            """
+        )
+
+        dart(
+            """
+            import "birds.dart" show BlackBird;
+            import "package:meta/meta.dart";
+
+            BlackBird getBird() {
+              return BlackBird();
+            }
+
+            final BlackBird theBird = BlackBird();
+            void main() {
+              final BlackBird x = BlackBird();
+              final BlackBird y = getBird();
+              final BlackBird z = theBird;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call Dart function with value parameter with exported Dart type`() = assertCompile {
+        dart(
+            """
+            class BlackBird {}
+            """,
+            Path("lib/src/black_bird.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            export "src/black_bird.dart";
+            """,
+            Path("lib/birds.dart"),
+            assert = false
+        )
+
+        dart(
+            """
+            import "birds.dart";
+
+            bool isTheWord(BlackBird bird) {
+              return true;
+            }
+            """,
+            Path("lib/word.dart"),
+            assert = false
+        )
+
+        kotlin(
+            """
+            import dev.pub.test.birds.BlackBird
+            import dev.pub.test.word.isTheWord
+
+            fun main() {
+                isTheWord(BlackBird())
+            }
+            """
+        )
+
+        dart(
+            """
+            import "birds.dart" show BlackBird;
+            import "word.dart" show isTheWord;
+            import "package:meta/meta.dart";
+
+            void main() {
+              isTheWord(BlackBird());
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `use Dart class from package export convention from dependency`() = assertCompile {
+        dependency {
+            name = "aviation"
+
+            dart(
+                """
+                class Bird {}
+                """,
+                Path("lib/src/bird.dart"),
+            )
+
+            dart(
+                """
+                export "src/bird.dart";
+                """,
+                Path("lib/aviation.dart"),
+            )
+        }
+
+        kotlin(
+            """
+            import dev.pub.aviation.Bird
+
+            fun main() {
+                val myBird = Bird()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:aviation/aviation.dart" show Bird;
+            import "package:meta/meta.dart";
+
+            void main() {
+              final Bird myBird = Bird();
+            }
+            """
+        )
+    }
 }

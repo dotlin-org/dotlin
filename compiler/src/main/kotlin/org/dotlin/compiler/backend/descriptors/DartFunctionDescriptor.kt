@@ -19,7 +19,6 @@
 
 package org.dotlin.compiler.backend.descriptors
 
-import org.dotlin.compiler.backend.descriptors.type.toKotlinType
 import org.dotlin.compiler.dart.element.DartConstructorElement
 import org.dotlin.compiler.dart.element.DartExecutableElement
 import org.dotlin.compiler.dart.element.DartFunctionElement
@@ -83,9 +82,7 @@ class DartConstructorDescriptor(
 
     override fun getName() = _name
 
-    private val _returnType by storageManager.createLazyValue { element.type.returnType.toKotlinType() }
-
-    override fun getReturnType(): KotlinType = _returnType
+    override fun getReturnType(): KotlinType = containingDeclaration.defaultType
 }
 
 context(DartDescriptor)
