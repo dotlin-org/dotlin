@@ -40,7 +40,7 @@ open class DartPackage(
      *
      * Absolute, real (resolved symlinks) path.
      */
-    val path: Path = path.toRealPath().toAbsolutePath()
+    val path: Path = path.toRealPath()
 
     /**
      * Path to where the relevant Dart files are. Most of the time `$path/lib`.
@@ -103,7 +103,19 @@ class DartProject(
                         val nodeMap = node.yamlMap
                         val name = key.content
                         val config = packages[name] ?: return@mapNotNull null
-                        val path = config.rootUri.toPath()
+                        val path = config.rootUri.let {
+                            // URI.toPath() does not support relative URIs (schemeless).
+                            when (it.scheme) {
+                                null -> Path(it.path)
+                                else -> it.toPath()
+                            }
+                        }.let {
+                            when {
+                                !it.isAbsolute -> projectPath.resolve(it)
+                                else -> it
+                            }
+                        }
+
                         val packagePath = config.packagePath
 
                         val source = nodeMap.getScalar("source")?.contentToString()

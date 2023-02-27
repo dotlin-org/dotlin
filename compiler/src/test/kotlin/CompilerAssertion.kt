@@ -252,7 +252,7 @@ abstract class DartTestProject {
     open var pubspec: String by LazyVar { defaultPubspec(name) }
 
     @Language("yaml")
-    private var pubspecLock: String =
+    var pubspecLock: String =
         """
         packages:
           _fe_analyzer_shared:
