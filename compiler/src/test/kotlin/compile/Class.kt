@@ -3206,6 +3206,65 @@ class Class : BaseTest {
     }
 
     @Test
+    fun `data class with Int property`() = assertCompile {
+        kotlin(
+            """
+            data class Something(val value: Int)
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart";
+
+            @sealed
+            class Something {
+              Something(this.value) : super();
+              @nonVirtual
+              final int value;
+              @nonVirtual
+              int component1() {
+                return this.value;
+              }
+
+              @nonVirtual
+              Something copy({int? value = null}) {
+                value = value == null ? this.value : value;
+                return Something(value);
+              }
+
+              @override
+              String toString() {
+                return "Something(value=${'$'}{this.value})";
+              }
+
+              @override
+              int get hashCode {
+                return this.value.hashCode;
+              }
+
+              bool equals(Object? other) {
+                if (identical(this, other)) {
+                  return true;
+                }
+                if (other is! Something) {
+                  return false;
+                }
+                final Something tmp0_other_with_cast = other as Something;
+                if (this.value != tmp0_other_with_cast.value) {
+                  return false;
+                }
+                return true;
+              }
+
+              @override
+              bool operator ==(Object? other) => this.equals(other);
+            }
+            """
+        )
+    }
+
+    @Test
     fun `data class overriding hashCode calling Int div`() = assertCompile {
         kotlin(
             """

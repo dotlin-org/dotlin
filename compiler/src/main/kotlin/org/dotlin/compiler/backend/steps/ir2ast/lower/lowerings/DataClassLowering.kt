@@ -35,13 +35,19 @@ class DataClassLowering(override val context: DotlinLoweringContext) : IrDeclara
             fun IrFunctionSymbol.parentIsInt() = owner.parentClassOrNull?.defaultType?.isInt() == true
 
             when {
-                expression is IrCall && expression.symbol.parentIsInt() -> expression.copy(
-                    origin = when (val name = expression.symbol.owner.name.toString()) {
+                expression is IrCall && expression.symbol.parentIsInt() -> {
+                    val origin = when (expression.symbol.owner.name.toString()) {
                         "times" -> MUL
                         "plus" -> PLUS
-                        else -> throw UnsupportedOperationException("Unexpected call: $name")
+                        else -> null
                     }
-                )
+
+                    when (origin) {
+                        // No need to fix anything.
+                        null -> expression
+                        else -> expression.copy(origin)
+                    }
+                }
                 else -> expression
             }
         }
