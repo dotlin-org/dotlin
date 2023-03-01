@@ -16,6 +16,7 @@
 
 package org.dotlin.compiler.backend.steps.ast2dart.transformer
 
+import org.dotlin.compiler.backend.runAndReportCodeGenerationError
 import org.dotlin.compiler.backend.steps.ast2dart.DartGenerationContext
 import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 import org.dotlin.compiler.dart.ast.DartLabel
@@ -59,20 +60,20 @@ import org.dotlin.compiler.dart.ast.`typealias`.DartTypeAlias
 
 abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGenerationContext> {
     final override fun visitCompilationUnit(unit: DartCompilationUnit, context: DartGenerationContext): String =
-        with(context) { visitCompilationUnit(unit) }
+        with(context) { runAndReportCodeGenerationError(unit) { visitCompilationUnit(it) } }
 
     open fun DartGenerationContext.visitCompilationUnit(unit: DartCompilationUnit) =
         super.visitCompilationUnit(unit, this)
 
     // Annotation
     final override fun visitAnnotation(annotation: DartAnnotation, context: DartGenerationContext): String =
-        with(context) { visitAnnotation(annotation) }
+        with(context) { runAndReportCodeGenerationError(annotation) { visitAnnotation(it) } }
 
     open fun DartGenerationContext.visitAnnotation(annotation: DartAnnotation) = super.visitAnnotation(annotation, this)
 
     // Type alias
     final override fun visitTypeAlias(typeAlias: DartTypeAlias, context: DartGenerationContext): String =
-        with(context) { visitTypeAlias(typeAlias) }
+        with(context) { runAndReportCodeGenerationError(typeAlias) { visitTypeAlias(it) } }
 
     open fun DartGenerationContext.visitTypeAlias(typeAlias: DartTypeAlias) = super.visitTypeAlias(typeAlias, this)
 
@@ -80,7 +81,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitNamedFunctionDeclaration(
         functionDeclaration: DartNamedFunctionDeclaration,
         context: DartGenerationContext
-    ): String = with(context) { visitNamedFunctionDeclaration(functionDeclaration) }
+    ): String = with(context) { runAndReportCodeGenerationError(functionDeclaration) { visitNamedFunctionDeclaration(it) } }
 
     open fun DartGenerationContext.visitNamedFunctionDeclaration(functionDeclaration: DartNamedFunctionDeclaration) =
         super.visitNamedFunctionDeclaration(functionDeclaration, this)
@@ -88,7 +89,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitTopLevelFunctionDeclaration(
         functionDeclaration: DartTopLevelFunctionDeclaration,
         context: DartGenerationContext
-    ): String = with(context) { visitTopLevelFunctionDeclaration(functionDeclaration) }
+    ): String = with(context) { runAndReportCodeGenerationError(functionDeclaration) { visitTopLevelFunctionDeclaration(it) } }
 
     open fun DartGenerationContext.visitTopLevelFunctionDeclaration(functionDeclaration: DartTopLevelFunctionDeclaration) =
         super.visitTopLevelFunctionDeclaration(functionDeclaration, this)
@@ -96,7 +97,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitClassLikeDeclaration(
         classLikeDeclaration: DartClassLikeDeclaration,
         context: DartGenerationContext
-    ): String = with(context) { visitClassLikeDeclaration(classLikeDeclaration) }
+    ): String = with(context) { runAndReportCodeGenerationError(classLikeDeclaration) { visitClassLikeDeclaration(it) } }
 
     open fun DartGenerationContext.visitClassLikeDeclaration(classLikeDeclaration: DartClassLikeDeclaration) =
         super.visitClassLikeDeclaration(classLikeDeclaration, this)
@@ -104,7 +105,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitClassDeclaration(
         classDeclaration: DartClassDeclaration,
         context: DartGenerationContext
-    ): String = with(context) { visitClassDeclaration(classDeclaration) }
+    ): String = with(context) { runAndReportCodeGenerationError(classDeclaration) { visitClassDeclaration(it) } }
 
     open fun DartGenerationContext.visitClassDeclaration(classDeclaration: DartClassDeclaration) =
         super.visitClassDeclaration(classDeclaration, this)
@@ -112,7 +113,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitEnumDeclaration(
         enumDeclaration: DartEnumDeclaration,
         context: DartGenerationContext
-    ): String = with(context) { visitEnumDeclaration(enumDeclaration) }
+    ): String = with(context) { runAndReportCodeGenerationError(enumDeclaration) { visitEnumDeclaration(it) } }
 
     open fun DartGenerationContext.visitEnumDeclaration(enumDeclaration: DartEnumDeclaration) =
         super.visitEnumDeclaration(enumDeclaration, this)
@@ -120,7 +121,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitEnumConstantDeclaration(
         enumConstant: DartEnumDeclaration.Constant,
         context: DartGenerationContext
-    ): String = with(context) { visitEnumConstantDeclaration(enumConstant) }
+    ): String = with(context) { runAndReportCodeGenerationError(enumConstant) { visitEnumConstantDeclaration(it) } }
 
     open fun DartGenerationContext.visitEnumConstantDeclaration(enumConstant: DartEnumDeclaration.Constant) =
         super.visitEnumConstantDeclaration(enumConstant, this)
@@ -128,7 +129,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitExtensionDeclaration(
         extensionDeclaration: DartExtensionDeclaration,
         context: DartGenerationContext
-    ): String = with(context) { visitExtensionDeclaration(extensionDeclaration) }
+    ): String = with(context) { runAndReportCodeGenerationError(extensionDeclaration) { visitExtensionDeclaration(it) } }
 
     open fun DartGenerationContext.visitExtensionDeclaration(extensionDeclaration: DartExtensionDeclaration) =
         super.visitExtensionDeclaration(extensionDeclaration, this)
@@ -136,7 +137,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitMethodDeclaration(
         methodDeclaration: DartMethodDeclaration,
         context: DartGenerationContext
-    ): String = with(context) { visitMethodDeclaration(methodDeclaration) }
+    ): String = with(context) { runAndReportCodeGenerationError(methodDeclaration) { visitMethodDeclaration(it) } }
 
     open fun DartGenerationContext.visitMethodDeclaration(methodDeclaration: DartMethodDeclaration) =
         super.visitMethodDeclaration(methodDeclaration, this)
@@ -144,7 +145,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitConstructorDeclaration(
         constructorDeclaration: DartConstructorDeclaration,
         context: DartGenerationContext
-    ): String = with(context) { visitConstructorDeclaration(constructorDeclaration) }
+    ): String = with(context) { runAndReportCodeGenerationError(constructorDeclaration) { visitConstructorDeclaration(it) } }
 
     open fun DartGenerationContext.visitConstructorDeclaration(constructorDeclaration: DartConstructorDeclaration) =
         super.visitConstructorDeclaration(constructorDeclaration, this)
@@ -152,7 +153,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitFieldDeclaration(
         fieldDeclaration: DartFieldDeclaration,
         context: DartGenerationContext
-    ): String = with(context) { visitFieldDeclaration(fieldDeclaration) }
+    ): String = with(context) { runAndReportCodeGenerationError(fieldDeclaration) { visitFieldDeclaration(it) } }
 
     open fun DartGenerationContext.visitFieldDeclaration(fieldDeclaration: DartFieldDeclaration) =
         super.visitFieldDeclaration(fieldDeclaration, this)
@@ -160,7 +161,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitTopLevelVariableDeclaration(
         variableDeclaration: DartTopLevelVariableDeclaration,
         context: DartGenerationContext
-    ): String = with(context) { visitTopLevelVariableDeclaration(variableDeclaration) }
+    ): String = with(context) { runAndReportCodeGenerationError(variableDeclaration) { visitTopLevelVariableDeclaration(it) } }
 
     open fun DartGenerationContext.visitTopLevelVariableDeclaration(variableDeclaration: DartTopLevelVariableDeclaration) =
         super.visitTopLevelVariableDeclaration(variableDeclaration, this)
@@ -168,7 +169,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitVariableDeclaration(
         variableDeclaration: DartVariableDeclaration,
         context: DartGenerationContext
-    ): String = with(context) { visitVariableDeclaration(variableDeclaration) }
+    ): String = with(context) { runAndReportCodeGenerationError(variableDeclaration) { visitVariableDeclaration(it) } }
 
     open fun DartGenerationContext.visitVariableDeclaration(variableDeclaration: DartVariableDeclaration) =
         super.visitVariableDeclaration(variableDeclaration, this)
@@ -176,14 +177,14 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitVariableDeclarationList(
         variables: DartVariableDeclarationList,
         context: DartGenerationContext
-    ): String = with(context) { visitVariableDeclarationList(variables) }
+    ): String = with(context) { runAndReportCodeGenerationError(variables) { visitVariableDeclarationList(it) } }
 
     open fun DartGenerationContext.visitVariableDeclarationList(variables: DartVariableDeclarationList) =
         super.visitVariableDeclarationList(variables, this)
 
     // Declarations: Clauses
     final override fun visitExtendsClause(extendsClause: DartExtendsClause, context: DartGenerationContext): String =
-        with(context) { visitExtendsClause(extendsClause) }
+        with(context) { runAndReportCodeGenerationError(extendsClause) { visitExtendsClause(it) } }
 
     open fun DartGenerationContext.visitExtendsClause(extendsClause: DartExtendsClause) =
         super.visitExtendsClause(extendsClause, this)
@@ -191,18 +192,18 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitImplementsClause(
         implementsClause: DartImplementsClause,
         context: DartGenerationContext
-    ): String = with(context) { visitImplementsClause(implementsClause) }
+    ): String = with(context) { runAndReportCodeGenerationError(implementsClause) { visitImplementsClause(it) } }
 
     open fun DartGenerationContext.visitImplementsClause(implementsClause: DartImplementsClause) =
         super.visitImplementsClause(implementsClause, this)
 
     final override fun visitWithClause(withClause: DartWithClause, context: DartGenerationContext): String =
-        with(context) { visitWithClause(withClause) }
+        with(context) { runAndReportCodeGenerationError(withClause) { visitWithClause(it) } }
 
     open fun DartGenerationContext.visitWithClause(withClause: DartWithClause) = super.visitWithClause(withClause, this)
 
     final override fun visitCatchClause(catchClause: DartCatchClause, context: DartGenerationContext): String =
-        with(context) { visitCatchClause(catchClause) }
+        with(context) { runAndReportCodeGenerationError(catchClause) { visitCatchClause(it) } }
 
     open fun DartGenerationContext.visitCatchClause(catchClause: DartCatchClause) =
         super.visitCatchClause(catchClause, this)
@@ -211,7 +212,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitConstructorInvocation(
         invocation: DartConstructorInvocation,
         context: DartGenerationContext
-    ): String = with(context) { visitConstructorInvocation(invocation) }
+    ): String = with(context) { runAndReportCodeGenerationError(invocation) { visitConstructorInvocation(it) } }
 
     open fun DartGenerationContext.visitConstructorInvocation(invocation: DartConstructorInvocation) =
         super.visitConstructorInvocation(invocation, this)
@@ -219,7 +220,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitConstructorFieldInitializer(
         initializer: DartConstructorFieldInitializer,
         context: DartGenerationContext
-    ): String = with(context) { visitConstructorFieldInitializer(initializer) }
+    ): String = with(context) { runAndReportCodeGenerationError(initializer) { visitConstructorFieldInitializer(it) } }
 
     open fun DartGenerationContext.visitConstructorFieldInitializer(initializer: DartConstructorFieldInitializer) =
         super.visitConstructorFieldInitializer(initializer, this)
@@ -228,19 +229,19 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitNamespaceDirective(
         directive: DartNamespaceDirective,
         context: DartGenerationContext
-    ): String = with(context) { visitNamespaceDirective(directive) }
+    ): String = with(context) { runAndReportCodeGenerationError(directive) { visitNamespaceDirective(it) } }
 
     open fun DartGenerationContext.visitNamespaceDirective(directive: DartNamespaceDirective) =
         super.visitNamespaceDirective(directive, this)
 
     final override fun visitCombinator(combinator: DartCombinator, context: DartGenerationContext): String =
-        with(context) { visitCombinator(combinator) }
+        with(context) { runAndReportCodeGenerationError(combinator) { visitCombinator(it) } }
 
     open fun DartGenerationContext.visitCombinator(combinator: DartCombinator) = super.visitCombinator(combinator, this)
 
     // Expressions
     final override fun visitArgumentList(arguments: DartArgumentList, context: DartGenerationContext): String =
-        with(context) { visitArgumentList(arguments) }
+        with(context) { runAndReportCodeGenerationError(arguments) { visitArgumentList(it) } }
 
     open fun DartGenerationContext.visitArgumentList(arguments: DartArgumentList) =
         super.visitArgumentList(arguments, this)
@@ -248,7 +249,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitFunctionExpression(
         functionExpression: DartFunctionExpression,
         context: DartGenerationContext
-    ): String = with(context) { visitFunctionExpression(functionExpression) }
+    ): String = with(context) { runAndReportCodeGenerationError(functionExpression) { visitFunctionExpression(it) } }
 
     open fun DartGenerationContext.visitFunctionExpression(functionExpression: DartFunctionExpression) =
         super.visitFunctionExpression(functionExpression, this)
@@ -256,20 +257,20 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitFunctionReference(
         functionReference: DartFunctionReference,
         context: DartGenerationContext
-    ): String = with(context) { visitFunctionReference(functionReference) }
+    ): String = with(context) { runAndReportCodeGenerationError(functionReference) { visitFunctionReference(it) } }
 
     open fun DartGenerationContext.visitFunctionReference(functionReference: DartFunctionReference) =
         super.visitFunctionReference(functionReference, this)
 
     final override fun visitIdentifier(identifier: DartIdentifier, context: DartGenerationContext): String =
-        with(context) { visitIdentifier(identifier) }
+        with(context) { runAndReportCodeGenerationError(identifier) { visitIdentifier(it) } }
 
     open fun DartGenerationContext.visitIdentifier(identifier: DartIdentifier) = super.visitIdentifier(identifier, this)
 
     final override fun visitInvocationExpression(
         invocation: DartInvocationExpression,
         context: DartGenerationContext
-    ): String = with(context) { visitInvocationExpression(invocation) }
+    ): String = with(context) { runAndReportCodeGenerationError(invocation) { visitInvocationExpression(it) } }
 
     open fun DartGenerationContext.visitInvocationExpression(invocation: DartInvocationExpression) =
         super.visitInvocationExpression(invocation, this)
@@ -277,7 +278,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitAssignmentExpression(
         assignment: DartAssignmentExpression,
         context: DartGenerationContext
-    ): String = with(context) { visitAssignmentExpression(assignment) }
+    ): String = with(context) { runAndReportCodeGenerationError(assignment) { visitAssignmentExpression(it) } }
 
     open fun DartGenerationContext.visitAssignmentExpression(assignment: DartAssignmentExpression) =
         super.visitAssignmentExpression(assignment, this)
@@ -285,7 +286,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitNamedExpression(
         namedExpression: DartNamedExpression,
         context: DartGenerationContext
-    ): String = with(context) { visitNamedExpression(namedExpression) }
+    ): String = with(context) { runAndReportCodeGenerationError(namedExpression) { visitNamedExpression(it) } }
 
     open fun DartGenerationContext.visitNamedExpression(namedExpression: DartNamedExpression) =
         super.visitNamedExpression(namedExpression, this)
@@ -293,7 +294,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitIndexExpression(
         indexExpression: DartIndexExpression,
         context: DartGenerationContext
-    ): String = with(context) { visitIndexExpression(indexExpression) }
+    ): String = with(context) { runAndReportCodeGenerationError(indexExpression) { visitIndexExpression(it) } }
 
     open fun DartGenerationContext.visitIndexExpression(indexExpression: DartIndexExpression) =
         super.visitIndexExpression(indexExpression, this)
@@ -301,7 +302,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitParenthesizedExpression(
         parenthesizedExpression: DartParenthesizedExpression,
         context: DartGenerationContext
-    ): String = with(context) { visitParenthesizedExpression(parenthesizedExpression) }
+    ): String = with(context) { runAndReportCodeGenerationError(parenthesizedExpression) { visitParenthesizedExpression(it) } }
 
     open fun DartGenerationContext.visitParenthesizedExpression(parenthesizedExpression: DartParenthesizedExpression) =
         super.visitParenthesizedExpression(parenthesizedExpression, this)
@@ -309,7 +310,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitInstanceCreationExpression(
         instanceCreation: DartInstanceCreationExpression,
         context: DartGenerationContext
-    ): String = with(context) { visitInstanceCreationExpression(instanceCreation) }
+    ): String = with(context) { runAndReportCodeGenerationError(instanceCreation) { visitInstanceCreationExpression(it) } }
 
     open fun DartGenerationContext.visitInstanceCreationExpression(instanceCreation: DartInstanceCreationExpression) =
         super.visitInstanceCreationExpression(instanceCreation, this)
@@ -317,7 +318,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitPropertyAccess(
         propertyAccess: DartPropertyAccessExpression,
         context: DartGenerationContext
-    ): String = with(context) { visitPropertyAccess(propertyAccess) }
+    ): String = with(context) { runAndReportCodeGenerationError(propertyAccess) { visitPropertyAccess(it) } }
 
     open fun DartGenerationContext.visitPropertyAccess(propertyAccess: DartPropertyAccessExpression) =
         super.visitPropertyAccess(propertyAccess, this)
@@ -325,25 +326,25 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitConditionalExpression(
         conditional: DartConditionalExpression,
         context: DartGenerationContext
-    ): String = with(context) { visitConditionalExpression(conditional) }
+    ): String = with(context) { runAndReportCodeGenerationError(conditional) { visitConditionalExpression(it) } }
 
     open fun DartGenerationContext.visitConditionalExpression(conditional: DartConditionalExpression) =
         super.visitConditionalExpression(conditional, this)
 
     final override fun visitIsExpression(isExpression: DartIsExpression, context: DartGenerationContext): String =
-        with(context) { visitIsExpression(isExpression) }
+        with(context) { runAndReportCodeGenerationError(isExpression) { visitIsExpression(it) } }
 
     open fun DartGenerationContext.visitIsExpression(isExpression: DartIsExpression) =
         super.visitIsExpression(isExpression, this)
 
     final override fun visitAsExpression(asExpression: DartAsExpression, context: DartGenerationContext): String =
-        with(context) { visitAsExpression(asExpression) }
+        with(context) { runAndReportCodeGenerationError(asExpression) { visitAsExpression(it) } }
 
     open fun DartGenerationContext.visitAsExpression(asExpression: DartAsExpression) =
         super.visitAsExpression(asExpression, this)
 
     final override fun visitThisExpression(thisExpression: DartThisExpression, context: DartGenerationContext): String =
-        with(context) { visitThisExpression(thisExpression) }
+        with(context) { runAndReportCodeGenerationError(thisExpression) { visitThisExpression(it) } }
 
     open fun DartGenerationContext.visitThisExpression(thisExpression: DartThisExpression) =
         super.visitThisExpression(thisExpression, this)
@@ -351,7 +352,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitSuperExpression(
         superExpression: DartSuperExpression,
         context: DartGenerationContext
-    ): String = with(context) { visitSuperExpression(superExpression) }
+    ): String = with(context) { runAndReportCodeGenerationError(superExpression) { visitSuperExpression(it) } }
 
     open fun DartGenerationContext.visitSuperExpression(superExpression: DartSuperExpression) =
         super.visitSuperExpression(superExpression, this)
@@ -359,7 +360,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitBinaryInfixExpression(
         binaryInfix: DartBinaryInfixExpression,
         context: DartGenerationContext
-    ): String = with(context) { visitBinaryInfixExpression(binaryInfix) }
+    ): String = with(context) { runAndReportCodeGenerationError(binaryInfix) { visitBinaryInfixExpression(it) } }
 
     open fun DartGenerationContext.visitBinaryInfixExpression(binaryInfix: DartBinaryInfixExpression) =
         super.visitBinaryInfixExpression(binaryInfix, this)
@@ -367,7 +368,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitPrefixExpression(
         prefixExpression: DartPrefixExpression,
         context: DartGenerationContext
-    ): String = with(context) { visitPrefixExpression(prefixExpression) }
+    ): String = with(context) { runAndReportCodeGenerationError(prefixExpression) { visitPrefixExpression(it) } }
 
     open fun DartGenerationContext.visitPrefixExpression(prefixExpression: DartPrefixExpression) =
         super.visitPrefixExpression(prefixExpression, this)
@@ -375,7 +376,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitPostfixExpression(
         postfixExpression: DartPostfixExpression,
         context: DartGenerationContext
-    ): String = with(context) { visitPostfixExpression(postfixExpression) }
+    ): String = with(context) { runAndReportCodeGenerationError(postfixExpression) { visitPostfixExpression(it) } }
 
     open fun DartGenerationContext.visitPostfixExpression(postfixExpression: DartPostfixExpression) =
         super.visitPostfixExpression(postfixExpression, this)
@@ -383,7 +384,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitThrowExpression(
         throwExpression: DartThrowExpression,
         context: DartGenerationContext
-    ): String = with(context) { visitThrowExpression(throwExpression) }
+    ): String = with(context) { runAndReportCodeGenerationError(throwExpression) { visitThrowExpression(it) } }
 
     open fun DartGenerationContext.visitThrowExpression(throwExpression: DartThrowExpression) =
         super.visitThrowExpression(throwExpression, this)
@@ -392,7 +393,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitSimpleStringLiteral(
         literal: DartSimpleStringLiteral,
         context: DartGenerationContext
-    ): String = with(context) { visitSimpleStringLiteral(literal) }
+    ): String = with(context) { runAndReportCodeGenerationError(literal) { visitSimpleStringLiteral(it) } }
 
     open fun DartGenerationContext.visitSimpleStringLiteral(literal: DartSimpleStringLiteral) =
         super.visitSimpleStringLiteral(literal, this)
@@ -400,7 +401,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitStringInterpolation(
         literal: DartStringInterpolation,
         context: DartGenerationContext
-    ): String = with(context) { visitStringInterpolation(literal) }
+    ): String = with(context) { runAndReportCodeGenerationError(literal) { visitStringInterpolation(it) } }
 
     open fun DartGenerationContext.visitStringInterpolation(literal: DartStringInterpolation) =
         super.visitStringInterpolation(literal, this)
@@ -408,7 +409,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitInterpolationString(
         interpolationString: DartInterpolationString,
         context: DartGenerationContext
-    ): String = with(context) { visitInterpolationString(interpolationString) }
+    ): String = with(context) { runAndReportCodeGenerationError(interpolationString) { visitInterpolationString(it) } }
 
     open fun DartGenerationContext.visitInterpolationString(interpolationString: DartInterpolationString) =
         super.visitInterpolationString(interpolationString, this)
@@ -416,41 +417,41 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitInterpolationExpression(
         element: DartInterpolationExpression,
         context: DartGenerationContext
-    ): String = with(context) { visitInterpolationExpression(element) }
+    ): String = with(context) { runAndReportCodeGenerationError(element) { visitInterpolationExpression(it) } }
 
     open fun DartGenerationContext.visitInterpolationExpression(element: DartInterpolationExpression) =
         super.visitInterpolationExpression(element, this)
 
     final override fun visitNullLiteral(literal: DartNullLiteral, context: DartGenerationContext): String =
-        with(context) { visitNullLiteral(literal) }
+        with(context) { runAndReportCodeGenerationError(literal) { visitNullLiteral(it) } }
 
     open fun DartGenerationContext.visitNullLiteral(literal: DartNullLiteral) = super.visitNullLiteral(literal, this)
 
     final override fun visitTypeLiteral(literal: DartTypeLiteral, context: DartGenerationContext): String =
-        with(context) { visitTypeLiteral(literal) }
+        with(context) { runAndReportCodeGenerationError(literal) { visitTypeLiteral(it) } }
 
     open fun DartGenerationContext.visitTypeLiteral(literal: DartTypeLiteral) = super.visitTypeLiteral(literal, this)
 
     final override fun visitBooleanLiteral(literal: DartBooleanLiteral, context: DartGenerationContext): String =
-        with(context) { visitBooleanLiteral(literal) }
+        with(context) { runAndReportCodeGenerationError(literal) { visitBooleanLiteral(it) } }
 
     open fun DartGenerationContext.visitBooleanLiteral(literal: DartBooleanLiteral) =
         super.visitBooleanLiteral(literal, this)
 
     final override fun visitIntegerLiteral(literal: DartIntegerLiteral, context: DartGenerationContext): String =
-        with(context) { visitIntegerLiteral(literal) }
+        with(context) { runAndReportCodeGenerationError(literal) { visitIntegerLiteral(it) } }
 
     open fun DartGenerationContext.visitIntegerLiteral(literal: DartIntegerLiteral) =
         super.visitIntegerLiteral(literal, this)
 
     final override fun visitDoubleLiteral(literal: DartDoubleLiteral, context: DartGenerationContext): String =
-        with(context) { visitDoubleLiteral(literal) }
+        with(context) { runAndReportCodeGenerationError(literal) { visitDoubleLiteral(it) } }
 
     open fun DartGenerationContext.visitDoubleLiteral(literal: DartDoubleLiteral) =
         super.visitDoubleLiteral(literal, this)
 
     final override fun visitCollectionLiteral(literal: DartCollectionLiteral, context: DartGenerationContext): String =
-        with(context) { visitCollectionLiteral(literal) }
+        with(context) { runAndReportCodeGenerationError(literal) { visitCollectionLiteral(it) } }
 
     open fun DartGenerationContext.visitCollectionLiteral(literal: DartCollectionLiteral) =
         super.visitCollectionLiteral(literal, this)
@@ -458,7 +459,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitCollectionElementList(
         collectionElementList: DartCollectionElementList,
         context: DartGenerationContext
-    ): String = with(context) { visitCollectionElementList(collectionElementList) }
+    ): String = with(context) { runAndReportCodeGenerationError(collectionElementList) { visitCollectionElementList(it) } }
 
     open fun DartGenerationContext.visitCollectionElementList(collectionElementList: DartCollectionElementList) =
         super.visitCollectionElementList(collectionElementList, this)
@@ -467,7 +468,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitFormalParameterList(
         parameters: DartFormalParameterList,
         context: DartGenerationContext
-    ): String = with(context) { visitFormalParameterList(parameters) }
+    ): String = with(context) { runAndReportCodeGenerationError(parameters) { visitFormalParameterList(it) } }
 
     open fun DartGenerationContext.visitFormalParameterList(parameters: DartFormalParameterList) =
         super.visitFormalParameterList(parameters, this)
@@ -475,7 +476,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitSimpleFormalParameter(
         parameter: DartSimpleFormalParameter,
         context: DartGenerationContext
-    ): String = with(context) { visitSimpleFormalParameter(parameter) }
+    ): String = with(context) { runAndReportCodeGenerationError(parameter) { visitSimpleFormalParameter(it) } }
 
     open fun DartGenerationContext.visitSimpleFormalParameter(parameter: DartSimpleFormalParameter) =
         super.visitSimpleFormalParameter(parameter, this)
@@ -483,7 +484,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitFieldFormalParameter(
         parameter: DartFieldFormalParameter,
         context: DartGenerationContext
-    ): String = with(context) { visitFieldFormalParameter(parameter) }
+    ): String = with(context) { runAndReportCodeGenerationError(parameter) { visitFieldFormalParameter(it) } }
 
     open fun DartGenerationContext.visitFieldFormalParameter(parameter: DartFieldFormalParameter) =
         super.visitFieldFormalParameter(parameter, this)
@@ -491,21 +492,21 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitDefaultFormalParameter(
         defaultParameter: DartDefaultFormalParameter,
         context: DartGenerationContext
-    ): String = with(context) { visitDefaultFormalParameter(defaultParameter) }
+    ): String = with(context) { runAndReportCodeGenerationError(defaultParameter) { visitDefaultFormalParameter(it) } }
 
     open fun DartGenerationContext.visitDefaultFormalParameter(defaultParameter: DartDefaultFormalParameter) =
         super.visitDefaultFormalParameter(defaultParameter, this)
 
     // Statements
     final override fun visitBlock(block: DartBlock, context: DartGenerationContext): String =
-        with(context) { visitBlock(block) }
+        with(context) { runAndReportCodeGenerationError(block) { visitBlock(it) } }
 
     open fun DartGenerationContext.visitBlock(block: DartBlock) = super.visitBlock(block, this)
 
     final override fun visitExpressionStatement(
         statement: DartExpressionStatement,
         context: DartGenerationContext
-    ): String = with(context) { visitExpressionStatement(statement) }
+    ): String = with(context) { runAndReportCodeGenerationError(statement) { visitExpressionStatement(it) } }
 
     open fun DartGenerationContext.visitExpressionStatement(statement: DartExpressionStatement) =
         super.visitExpressionStatement(statement, this)
@@ -513,37 +514,37 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitVariableDeclarationStatement(
         statement: DartVariableDeclarationStatement,
         context: DartGenerationContext
-    ): String = with(context) { visitVariableDeclarationStatement(statement) }
+    ): String = with(context) { runAndReportCodeGenerationError(statement) { visitVariableDeclarationStatement(it) } }
 
     open fun DartGenerationContext.visitVariableDeclarationStatement(statement: DartVariableDeclarationStatement) =
         super.visitVariableDeclarationStatement(statement, this)
 
     final override fun visitReturnStatement(statement: DartReturnStatement, context: DartGenerationContext): String =
-        with(context) { visitReturnStatement(statement) }
+        with(context) { runAndReportCodeGenerationError(statement) { visitReturnStatement(it) } }
 
     open fun DartGenerationContext.visitReturnStatement(statement: DartReturnStatement) =
         super.visitReturnStatement(statement, this)
 
     final override fun visitIfStatement(statement: DartIfStatement, context: DartGenerationContext): String =
-        with(context) { visitIfStatement(statement) }
+        with(context) { runAndReportCodeGenerationError(statement) { visitIfStatement(it) } }
 
     open fun DartGenerationContext.visitIfStatement(statement: DartIfStatement) =
         super.visitIfStatement(statement, this)
 
     final override fun visitTryStatement(statement: DartTryStatement, context: DartGenerationContext): String =
-        with(context) { visitTryStatement(statement) }
+        with(context) { runAndReportCodeGenerationError(statement) { visitTryStatement(it) } }
 
     open fun DartGenerationContext.visitTryStatement(statement: DartTryStatement) =
         super.visitTryStatement(statement, this)
 
     final override fun visitWhileStatement(statement: DartWhileStatement, context: DartGenerationContext): String =
-        with(context) { visitWhileStatement(statement) }
+        with(context) { runAndReportCodeGenerationError(statement) { visitWhileStatement(it) } }
 
     open fun DartGenerationContext.visitWhileStatement(statement: DartWhileStatement) =
         super.visitWhileStatement(statement, this)
 
     final override fun visitForStatement(statement: DartForStatement, context: DartGenerationContext): String =
-        with(context) { visitForStatement(statement) }
+        with(context) { runAndReportCodeGenerationError(statement) { visitForStatement(it) } }
 
     open fun DartGenerationContext.visitForStatement(statement: DartForStatement) =
         super.visitForStatement(statement, this)
@@ -551,7 +552,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitForPartsWithDeclarations(
         forParts: DartForPartsWithDeclarations,
         context: DartGenerationContext
-    ): String = with(context) { visitForPartsWithDeclarations(forParts) }
+    ): String = with(context) { runAndReportCodeGenerationError(forParts) { visitForPartsWithDeclarations(it) } }
 
     open fun DartGenerationContext.visitForPartsWithDeclarations(forParts: DartForPartsWithDeclarations) =
         super.visitForPartsWithDeclarations(forParts, this)
@@ -559,7 +560,7 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitForEachPartsWithDeclarations(
         forParts: DartForEachPartsWithDeclarations,
         context: DartGenerationContext
-    ): String = with(context) { visitForEachPartsWithDeclarations(forParts) }
+    ): String = with(context) { runAndReportCodeGenerationError(forParts) { visitForEachPartsWithDeclarations(it) } }
 
     open fun DartGenerationContext.visitForEachPartsWithDeclarations(forParts: DartForEachPartsWithDeclarations) =
         super.visitForEachPartsWithDeclarations(forParts, this)
@@ -568,43 +569,43 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitTypeArgumentList(
         typeArguments: DartTypeArgumentList,
         context: DartGenerationContext
-    ): String = with(context) { visitTypeArgumentList(typeArguments) }
+    ): String = with(context) { runAndReportCodeGenerationError(typeArguments) { visitTypeArgumentList(it) } }
 
     open fun DartGenerationContext.visitTypeArgumentList(typeArguments: DartTypeArgumentList) =
         super.visitTypeArgumentList(typeArguments, this)
 
     final override fun visitNamedType(type: DartNamedType, context: DartGenerationContext): String =
-        with(context) { visitNamedType(type) }
+        with(context) { runAndReportCodeGenerationError(type) { visitNamedType(it) } }
 
     open fun DartGenerationContext.visitNamedType(type: DartNamedType) = super.visitNamedType(type, this)
     final override fun visitFunctionType(type: DartFunctionType, context: DartGenerationContext): String =
-        with(context) { visitFunctionType(type) }
+        with(context) { runAndReportCodeGenerationError(type) { visitFunctionType(it) } }
 
     open fun DartGenerationContext.visitFunctionType(type: DartFunctionType) = super.visitFunctionType(type, this)
 
     final override fun visitTypeParameterList(
         typeParameters: DartTypeParameterList,
         context: DartGenerationContext
-    ): String = with(context) { visitTypeParameterList(typeParameters) }
+    ): String = with(context) { runAndReportCodeGenerationError(typeParameters) { visitTypeParameterList(it) } }
 
     open fun DartGenerationContext.visitTypeParameterList(typeParameters: DartTypeParameterList) =
         super.visitTypeParameterList(typeParameters, this)
 
     final override fun visitTypeParameter(typeParameter: DartTypeParameter, context: DartGenerationContext): String =
-        with(context) { visitTypeParameter(typeParameter) }
+        with(context) { runAndReportCodeGenerationError(typeParameter) { visitTypeParameter(it) } }
 
     open fun DartGenerationContext.visitTypeParameter(typeParameter: DartTypeParameter) =
         super.visitTypeParameter(typeParameter, this)
 
     // Function body
     final override fun visitEmptyFunctionBody(body: DartEmptyFunctionBody, context: DartGenerationContext): String =
-        with(context) { visitEmptyFunctionBody(body) }
+        with(context) { runAndReportCodeGenerationError(body) { visitEmptyFunctionBody(it) } }
 
     open fun DartGenerationContext.visitEmptyFunctionBody(body: DartEmptyFunctionBody) =
         super.visitEmptyFunctionBody(body, this)
 
     final override fun visitBlockFunctionBody(body: DartBlockFunctionBody, context: DartGenerationContext): String =
-        with(context) { visitBlockFunctionBody(body) }
+        with(context) { runAndReportCodeGenerationError(body) { visitBlockFunctionBody(it) } }
 
     open fun DartGenerationContext.visitBlockFunctionBody(body: DartBlockFunctionBody) =
         super.visitBlockFunctionBody(body, this)
@@ -612,18 +613,18 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     final override fun visitExpressionFunctionBody(
         body: DartExpressionFunctionBody,
         context: DartGenerationContext
-    ): String = with(context) { visitExpressionFunctionBody(body) }
+    ): String = with(context) { runAndReportCodeGenerationError(body) { visitExpressionFunctionBody(it) } }
 
     open fun DartGenerationContext.visitExpressionFunctionBody(body: DartExpressionFunctionBody) =
         super.visitExpressionFunctionBody(body, this)
 
     final override fun visitLabel(label: DartLabel, context: DartGenerationContext): String =
-        with(context) { visitLabel(label) }
+        with(context) { runAndReportCodeGenerationError(label) { visitLabel(it) } }
 
     open fun DartGenerationContext.visitLabel(label: DartLabel) = super.visitLabel(label, this)
 
     final override fun visitCode(code: DartCode, context: DartGenerationContext): String =
-        with(context) { visitCode(code) }
+        with(context) { runAndReportCodeGenerationError(code) { visitCode(it) } }
 
     open fun DartGenerationContext.visitCode(code: DartCode) = super.visitCode(code, this)
 

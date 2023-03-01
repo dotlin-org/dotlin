@@ -19,7 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.src2ir
 
-import org.dotlin.compiler.backend.DotlinCompilerError
+import org.dotlin.compiler.backend.DotlinCompilationException
 import org.dotlin.compiler.errors
 import org.dotlin.compiler.hasErrors
 import org.jetbrains.kotlin.analyzer.AnalysisResult
@@ -43,7 +43,7 @@ fun AnalysisResult.throwIfHasErrors() = bindingContext.diagnosticsExceptSuppress
 
 fun Iterable<Diagnostic>.throwIfHasErrors() {
     if (hasErrors) {
-        throw DotlinCompilerError(errors)
+        throw DotlinCompilationException(errors)
     }
 }
 

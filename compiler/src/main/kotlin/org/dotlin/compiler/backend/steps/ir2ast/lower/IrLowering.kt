@@ -21,6 +21,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
+import org.dotlin.compiler.backend.runAndReportLoweringError
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionWithContextTransformer
 import org.dotlin.compiler.backend.util.replace
@@ -85,13 +86,15 @@ interface IrDeclarationLowering : IrMultipleLowering<IrDeclaration> {
         })
     }
 
-    override fun lower(irFile: IrFile) = irFile.transformDeclarations { context.transform(it) }
+    override fun lower(irFile: IrFile) = irFile.transformDeclarations { declaration ->
+        runAndReportLoweringError(declaration) { context.transform(it) }
+    }
 
     override fun DotlinLoweringContext.transform(declaration: IrDeclaration): Transformations<IrDeclaration>
 }
 
 interface IrFileLowering : IrLowering {
-    override fun lower(irFile: IrFile) = context.transform(irFile)
+    override fun lower(irFile: IrFile) = runAndReportLoweringError(irFile) { context.transform(it) }
 
     fun DotlinLoweringContext.transform(file: IrFile)
 }
@@ -105,7 +108,11 @@ interface IrExpressionLowering : IrSingleLowering<IrExpression> {
                     expContext: IrExpressionContext
                 ): IrExpression {
                     expression.transformChildren(expContext)
-                    return expression.transformBy { context.transform(it, expContext) }
+                    return runAndReportLoweringError(expression) {
+                        expression.transformBy { exp ->
+                            context.transform(exp, expContext)
+                        }
+                    }
                 }
             },
             null
@@ -159,10 +166,12 @@ fun <E : IrElement> MutableList<E>.transformBy(
                     )
                     i += 1
                 }
+
                 is Transformation.Replace -> when (it.old) {
                     null -> this[i] = it.new
                     else -> replace(it.old, it.new)
                 }
+
                 is Transformation.Remove -> {
                     remove(it.element ?: childElement)
                     i -= 1
@@ -183,6 +192,7 @@ fun <E : IrExpression> E.transformBy(transform: (E) -> Transformation<E>?): E {
 
             transformation.new
         }
+
         is Transformation.Add -> throw UnsupportedOperationException("Cannot add an expression")
         is Transformation.Remove -> throw UnsupportedOperationException("Cannot remove an expression")
         else -> this

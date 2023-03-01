@@ -20,7 +20,7 @@
 import kotlinx.coroutines.runBlocking
 import org.dotlin.compiler.CompilationResult
 import org.dotlin.compiler.KotlinToDartCompiler
-import org.dotlin.compiler.backend.DotlinCompilerError
+import org.dotlin.compiler.backend.DotlinCompilationException
 import org.dotlin.compiler.backend.bin.DotlinGenerator
 import org.dotlin.compiler.backend.bin.dart
 import org.dotlin.compiler.backend.util.LazyVar
@@ -639,7 +639,7 @@ class AssertCompilesWithError : AssertCompilesWithDiagnostics() {
     override lateinit var diagnostics: List<DiagnosticFactory<*>>
 
     override fun assert() {
-        val error = assertThrows<DotlinCompilerError> { compile() }
+        val error = assertThrows<DotlinCompilationException> { compile() }
         diagnostics.forEach {
             assertContains(error.errors.factories, it)
         }
