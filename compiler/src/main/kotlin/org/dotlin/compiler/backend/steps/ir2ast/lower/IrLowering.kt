@@ -94,7 +94,7 @@ interface IrDeclarationLowering : IrMultipleLowering<IrDeclaration> {
 }
 
 interface IrFileLowering : IrLowering {
-    override fun lower(irFile: IrFile) = runAndReportLoweringError(irFile) { context.transform(it) }
+    override fun lower(irFile: IrFile) = with(context) { runAndReportLoweringError(irFile) { transform(it) } }
 
     fun DotlinLoweringContext.transform(file: IrFile)
 }
@@ -108,9 +108,11 @@ interface IrExpressionLowering : IrSingleLowering<IrExpression> {
                     expContext: IrExpressionContext
                 ): IrExpression {
                     expression.transformChildren(expContext)
-                    return runAndReportLoweringError(expression) {
-                        expression.transformBy { exp ->
-                            context.transform(exp, expContext)
+                    return with(context) {
+                        runAndReportLoweringError(expression) {
+                            expression.transformBy { exp ->
+                                transform(exp, expContext)
+                            }
                         }
                     }
                 }

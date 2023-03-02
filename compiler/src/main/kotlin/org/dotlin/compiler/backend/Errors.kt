@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
+import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.util.render
 import org.jetbrains.kotlin.load.kotlin.toSourceElement
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
@@ -45,34 +46,19 @@ abstract class DotlinStepError(
 }
 
 class DotlinLoweringError(
-    element: IrElement,
-    message: String,
-    override val cause: Throwable? = null
-) : DotlinStepError("Lowering", element.renderWithSource(), message) {
-    constructor(
-        element: IrElement,
-        cause: Throwable,
-    ) : this(element, cause.messageOrFallback(), cause)
-}
+    renderedElement: String,
+    override val cause: Throwable
+) : DotlinStepError("Lowering", renderedElement, cause.messageOrFallback())
 
-class DotlinTransformerError(element: IrElement, message: String, override val cause: Throwable? = null) :
-    DotlinStepError("Transformer", element.renderWithSource(), message) {
-    constructor(
-        element: IrElement,
-        cause: Throwable,
-    ) : this(element, cause.messageOrFallback(), cause)
-}
+class DotlinTransformerError(renderedElement: String, override val cause: Throwable)
+    : DotlinStepError("Transformer", renderedElement, cause.messageOrFallback())
 
-class DotlinCodeGeneratorError(node: DartAstNode, message: String, override val cause: Throwable? = null) :
-    DotlinStepError("Code generation", node.toString(), message) {
-    constructor(
-        node: DartAstNode,
-        cause: Throwable,
-    ) : this(node, cause.messageOrFallback(), cause)
-}
+class DotlinCodeGeneratorError(node: DartAstNode, override val cause: Throwable)
+    : DotlinStepError("Code generation", node.toString(), cause.messageOrFallback())
 
 private fun Throwable.messageOrFallback() = message ?: "Unknown"
 
+context(IrContext)
 private fun IrElement.renderWithSource(): String {
     val descriptor = safeAs<IrDeclaration>()
         ?.descriptor
@@ -81,7 +67,8 @@ private fun IrElement.renderWithSource(): String {
         ?.let { DescriptorRenderer.FQ_NAMES_IN_TYPES_WITH_ANNOTATIONS.render(it) }
         ?: render()
 
-    val renderedSource = descriptor?.toSourceElement?.getPsi()?.run {
+    val sourceElement = descriptor?.toSourceElement?.getPsi() ?: (this as? IrExpression)?.ktExpression
+    val renderedSource = sourceElement?.run {
         val file = containingFile?.name?.let {  " (file: $it)" } ?: ""
         "\nSource$file:\n$text"
     } ?: ""
@@ -102,11 +89,13 @@ private fun <E, R> runAndReport(
     }
 }
 
+context(IrContext)
 fun <E : IrElement, R> runAndReportTransformerError(element: E, block: (E) -> R): R =
-    runAndReport(element, block, ::DotlinTransformerError)
+    runAndReport(element, block) { e, cause -> DotlinTransformerError(e.renderWithSource(), cause) }
 
+context(IrContext)
 fun <E : IrElement, R> runAndReportLoweringError(element: E, block: (E) -> R): R =
-    runAndReport(element, block, ::DotlinLoweringError)
+    runAndReport(element, block) { e, cause -> DotlinLoweringError(e.renderWithSource(), cause) }
 
 fun <N : DartAstNode, R> runAndReportCodeGenerationError(element: N, block: (N) -> R): R =
     runAndReport(element, block, ::DotlinCodeGeneratorError)
