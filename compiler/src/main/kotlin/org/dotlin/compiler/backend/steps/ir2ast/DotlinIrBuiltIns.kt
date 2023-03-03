@@ -20,6 +20,7 @@
 package org.dotlin.compiler.backend.steps.ir2ast
 
 import org.dotlin.compiler.backend.dart
+import org.dotlin.compiler.backend.dev
 import org.dotlin.compiler.backend.dotlin
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -49,6 +50,7 @@ class DotlinIrBuiltIns(private val context: DotlinLoweringContext) {
     private val symbolTable = context.symbolTable
 
     val dart = Dart(this)
+    val meta = Meta(this)
 
     private val operatorsPackage = context.irBuiltIns.operatorsPackageFragment
 
@@ -138,13 +140,21 @@ class DotlinIrBuiltIns(private val context: DotlinLoweringContext) {
         val immutableSetView = builtIns.classSymbolAt(dart.collection.ImmutableSetView)
     }
 
+    class Meta(builtIns: DotlinIrBuiltIns) {
+        val internal = builtIns.classSymbolAt(dev.dart.meta.annotations.internal)
+        val protected = builtIns.classSymbolAt(dev.dart.meta.annotations.protected)
+        val nonVirtual = builtIns.classSymbolAt(dev.dart.meta.annotations.nonVirtual)
+        val sealed = builtIns.classSymbolAt(dev.dart.meta.annotations.sealed)
+    }
+
     private inline fun <reified S : IrSymbol> symbolAt(name: FqName): S =
         symbolsAt<S>(name).firstOrNull() ?: error("Symbol not found: $name")
 
     private inline fun <reified S : IrSymbol> symbolsAt(name: FqName): List<S> {
         val packageFqName = name.parent()
         val memberIdentifier = name.shortName()
-        val descriptors = builtInsModule.getPackage(packageFqName)
+        val descriptors = builtInsModule
+            .getPackage(packageFqName)
             .memberScope
             .getContributedDescriptors(
                 kindFilter = when (S::class) {

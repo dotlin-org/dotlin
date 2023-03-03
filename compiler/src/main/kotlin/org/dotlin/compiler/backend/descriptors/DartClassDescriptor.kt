@@ -49,14 +49,20 @@ class DartClassDescriptor(
         DartMemberScope(
             owner = this,
             context,
-            elements = element.constructors + element.properties,
+            elements = element.properties,
         )
     }
 
     override fun getUnsubstitutedMemberScope(): MemberScope = instanceMemberScope
 
     private val _constructors by storageManager.createLazyValue {
-        instanceMemberScope.getContributedDescriptors().filterIsInstance<DartConstructorDescriptor>()
+        element.constructors.map {
+            DartConstructorDescriptor(
+                element = it,
+                context,
+                container = this,
+            )
+        }
     }
 
     override fun getConstructors(): List<DartConstructorDescriptor> = _constructors

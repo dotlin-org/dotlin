@@ -38,8 +38,6 @@ class NameMangling : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void test() {}
             final int test${'$'}property = 3;
             """
@@ -60,7 +58,7 @@ class NameMangling : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Example {
@@ -87,7 +85,7 @@ class NameMangling : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             final int test = 3;
 
@@ -116,7 +114,7 @@ class NameMangling : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Example {
@@ -145,7 +143,7 @@ class NameMangling : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             class ExampleBase {
               ExampleBase(int number) : super();
@@ -177,7 +175,7 @@ class NameMangling : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test<T> {

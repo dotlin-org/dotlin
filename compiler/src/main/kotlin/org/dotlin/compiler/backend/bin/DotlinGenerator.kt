@@ -21,6 +21,7 @@ package org.dotlin.compiler.backend.bin
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.protobuf.schema.ProtoBufSchemaGenerator
+import org.dotlin.compiler.backend.DotlinGeneratorException
 import org.dotlin.compiler.dart.element.*
 import java.nio.file.Path
 import kotlin.io.path.Path
@@ -44,8 +45,11 @@ object DotlinGenerator {
             result.toTypedArray()
         }
 
-        // TODO: Check result
-        dart.run("dotlin_generator:generate", *flattenedPaths, workingDirectory = workingDirectory)
+        val exitCode = dart.run("dotlin_generator:generate", *flattenedPaths, workingDirectory = workingDirectory)
+
+        if (exitCode != 0) {
+            throw DotlinGeneratorException("Failed to generate Dart elements")
+        }
     }
 
     fun generateSchema() {

@@ -36,7 +36,7 @@ class Object : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test {
@@ -61,7 +61,7 @@ class Object : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -97,7 +97,7 @@ class Object : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test {
@@ -131,7 +131,7 @@ class Object : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed, nonVirtual;
 
             @sealed
             class Test {
@@ -169,7 +169,7 @@ class Object : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -196,7 +196,7 @@ class Object : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -227,7 +227,7 @@ class Object : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -261,7 +261,7 @@ class Object : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -300,7 +300,7 @@ class Object : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -339,7 +339,7 @@ class Object : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -373,7 +373,7 @@ class Object : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -405,7 +405,7 @@ class Object : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test${'$'}Companion {
@@ -428,7 +428,7 @@ class Object : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test {

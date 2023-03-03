@@ -45,8 +45,6 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 void main() {
                   if (0 == 1) {
                     main();
@@ -74,8 +72,6 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 void main() {
                   if (1 + 1 == 3) {
                     main();
@@ -101,8 +97,6 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 void main() {
                   if (0 == 1) {}
                 }
@@ -125,8 +119,6 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 void main() {
                   if (1 + 1 == 3) {
                     main();
@@ -154,8 +146,6 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 void exec(int x) {
                   if (1 + 1 == 3) {
                     exec(2);
@@ -186,8 +176,6 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 int test(int y) {
                   return y * 3;
                 }
@@ -229,8 +217,6 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 enum PowerStatus {
                   OFF._(),
                   ON._(),
@@ -282,7 +268,6 @@ class Statement : BaseTest {
                 import "package:dotlin/src/kotlin/ranges/ranges_ext.dt.g.dart"
                     show IntRangeFactoryExt;
                 import "package:dotlin/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
-                import "package:meta/meta.dart";
 
                 Color currentColor = Color.red;
                 void main() {
@@ -332,8 +317,6 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 void main() {
                   try {
                     thisThrows();
@@ -371,8 +354,6 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 void main() {
                   try {
                     thisThrows();
@@ -405,8 +386,6 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 void main() {
                   return;
                 }
@@ -428,8 +407,6 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 String doIt(int? x) {
                   if (x == null) {
                     return "null";
@@ -456,8 +433,6 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 void main() {
                   int x = 0;
                   x = 3;
@@ -479,8 +454,6 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 void main() {
                   int x = 0;
                   x += 3;
@@ -502,8 +475,6 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 void main() {
                   int x = 0;
                   x -= 3;
@@ -525,8 +496,6 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 void main() {
                   int x = 0;
                   x *= 3;
@@ -548,8 +517,6 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 void main() {
                   int x = 0;
                   x ~/= 3;
@@ -571,8 +538,6 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 void main() {
                   double x = 0.0;
                   x /= 3;
@@ -597,7 +562,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
+                import "package:meta/meta.dart" show nonVirtual, sealed;
 
                 @sealed
                 class Test {
@@ -628,7 +593,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
+                import "package:meta/meta.dart" show nonVirtual, sealed;
 
                 @sealed
                 class Test {
@@ -659,7 +624,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
+                import "package:meta/meta.dart" show nonVirtual, sealed;
 
                 @sealed
                 class Test {
@@ -690,7 +655,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
+                import "package:meta/meta.dart" show nonVirtual, sealed;
 
                 @sealed
                 class Test {
@@ -721,7 +686,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
+                import "package:meta/meta.dart" show nonVirtual, sealed;
 
                 @sealed
                 class Test {
@@ -752,7 +717,7 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
+                import "package:meta/meta.dart" show nonVirtual, sealed;
 
                 @sealed
                 class Test {
@@ -781,8 +746,6 @@ class Statement : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 void main() {
                   late int test;
                   test = 3;

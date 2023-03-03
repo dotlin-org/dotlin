@@ -77,11 +77,13 @@ class DartProject(
         }
 
         suspend fun from(projectPath: Path, compileKlib: Boolean): DartProject {
+            suspend fun pubGet() = dart.pub.get(workingDirectory = projectPath)
+
             val pubspecFile = projectPath.resolve("pubspec.yaml")
             val pubspecLockFile = projectPath.resolve("pubspec.lock")
 
             if (pubspecLockFile.notExists()) {
-                dart.pub.get(workingDirectory = projectPath)
+                pubGet()
             }
 
             fun parseYaml(path: Path) = Yaml.default.parseToYamlNode(path.readText()).yamlMap
@@ -89,9 +91,13 @@ class DartProject(
             val pubspec = parseYaml(pubspecFile)
             val pubspecLock = parseYaml(pubspecLockFile)
 
-            val packageConfig: DartPackageConfig = json.decodeFromString(
-                projectPath.resolve(".dart_tool/package_config.json").readText()
-            )
+            val packageConfigFile = projectPath.resolve(".dart_tool/package_config.json")
+
+            if (packageConfigFile.notExists()) {
+                pubGet()
+            }
+
+            val packageConfig: DartPackageConfig = json.decodeFromString(packageConfigFile.readText())
 
             val packages = packageConfig.packages.associateBy { it.name }
 
@@ -111,7 +117,8 @@ class DartProject(
                             }
                         }.let {
                             when {
-                                !it.isAbsolute -> projectPath.resolve(it)
+                                // URI is relative to the .dart_tool directory.
+                                !it.isAbsolute -> packageConfigFile.parent.resolve(it)
                                 else -> it
                             }
                         }

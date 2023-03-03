@@ -35,6 +35,8 @@ import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 class DotlinCompilationException(val errors: Collection<Diagnostic>) : Exception()
 
+class DotlinGeneratorException(override val message: String) : Exception()
+
 abstract class DotlinStepError(
     val type: String,
     val element: String,

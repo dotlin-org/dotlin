@@ -42,7 +42,6 @@ class Interop : BaseTest {
         dart(
             """
             import "dart:typed_data" show ByteData;
-            import "package:meta/meta.dart";
 
             void main() {
               final ByteData buffer = ByteData(8);
@@ -79,7 +78,6 @@ class Interop : BaseTest {
         dart(
             """
             import "package:yad/test.dart" show yetAnotherFunction;
-            import "package:meta/meta.dart";
 
             void main() {
               final int result = yetAnotherFunction();
@@ -116,7 +114,6 @@ class Interop : BaseTest {
         dart(
             """
             import "package:yad/yet_another_class.dart" show YetAnotherClass;
-            import "package:meta/meta.dart";
 
             void main() {
               late YetAnotherClass x;
@@ -158,7 +155,6 @@ class Interop : BaseTest {
         dart(
             """
             import "package:yad/test.dart" show yetAnotherFunction1, yetAnotherFunction2;
-            import "package:meta/meta.dart";
 
             void main() {
               final int result1 = yetAnotherFunction1();
@@ -196,7 +192,6 @@ class Interop : BaseTest {
         dart(
             """
             import "package:mathz/point.dart" show Point;
-            import "package:meta/meta.dart";
 
             void main() {
               final Point loc = Point(1, 2);
@@ -233,7 +228,6 @@ class Interop : BaseTest {
         dart(
             """
             import "package:mathz/point.dart" show Point;
-            import "package:meta/meta.dart";
 
             void main() {
               const Point loc = Point(1, 2);
@@ -267,7 +261,6 @@ class Interop : BaseTest {
         dart(
             """
             import "point.dart" show Point;
-            import "package:meta/meta.dart";
 
             void main() {
               final Point loc = Point(1, 2);
@@ -299,7 +292,6 @@ class Interop : BaseTest {
         dart(
             """
             import "fields.dart" show myField;
-            import "package:meta/meta.dart";
 
             void main() {
               final int x = myField * 3;
@@ -331,7 +323,6 @@ class Interop : BaseTest {
         dart(
             """
             import "fields.dart" show myField;
-            import "package:meta/meta.dart";
 
             void main() {
               const int x = myField * 3;
@@ -363,7 +354,6 @@ class Interop : BaseTest {
         dart(
             """
             import "getters.dart" show myGetter;
-            import "package:meta/meta.dart";
 
             void main() {
               final int x = myGetter * 3;
@@ -395,7 +385,6 @@ class Interop : BaseTest {
         dart(
             """
             import "setters.dart" show mySetter;
-            import "package:meta/meta.dart";
 
             void main() {
               mySetter = 3;
@@ -429,7 +418,6 @@ class Interop : BaseTest {
         dart(
             """
             import "my_class.dart" show MyClass;
-            import "package:meta/meta.dart";
 
             void main() {
               final int x = MyClass().field;
@@ -463,7 +451,6 @@ class Interop : BaseTest {
         dart(
             """
             import "my_class.dart" show MyClass;
-            import "package:meta/meta.dart";
 
             void main() {
               final int x = MyClass().myGetter * 3;
@@ -497,7 +484,6 @@ class Interop : BaseTest {
         dart(
             """
             import "my_class.dart" show MyClass;
-            import "package:meta/meta.dart";
 
             void main() {
               MyClass().mySetter = 3;
@@ -530,7 +516,7 @@ class Interop : BaseTest {
         dart(
             """
             import "fragile.dart" show Fragile;
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @Fragile()
             @sealed
@@ -565,7 +551,7 @@ class Interop : BaseTest {
         dart(
             """
             import "fragile.dart" show fragile;
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @fragile
             @sealed
@@ -606,7 +592,7 @@ class Interop : BaseTest {
         dart(
             """
             import "markers.dart" show Fragile;
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @Fragile()
             @sealed
@@ -649,7 +635,7 @@ class Interop : BaseTest {
         dart(
             """
             import "markers.dart" show fragile;
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @fragile
             @sealed
@@ -689,7 +675,6 @@ class Interop : BaseTest {
         dart(
             """
             import "birds.dart" show BlackBird;
-            import "package:meta/meta.dart";
 
             void main() {
               final BlackBird myBird = BlackBird();
@@ -735,7 +720,6 @@ class Interop : BaseTest {
         dart(
             """
             import "birds.dart" show BlackBird;
-            import "package:meta/meta.dart";
 
             BlackBird getBird() {
               return BlackBird();
@@ -796,7 +780,6 @@ class Interop : BaseTest {
             """
             import "birds.dart" show BlackBird;
             import "word.dart" show isTheWord;
-            import "package:meta/meta.dart";
 
             void main() {
               isTheWord(BlackBird());
@@ -838,7 +821,6 @@ class Interop : BaseTest {
         dart(
             """
             import "package:aviation/aviation.dart" show Bird;
-            import "package:meta/meta.dart";
 
             void main() {
               final Bird myBird = Bird();

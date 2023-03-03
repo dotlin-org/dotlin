@@ -1,14 +1,3 @@
-import 'dart:collection';
-
-import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/dart/element/nullability_suffix.dart';
-import 'package:analyzer/dart/element/type.dart' as og;
-import 'package:analyzer/dart/element/type.dart' hide DartType;
-import 'package:dartx/dartx_io.dart';
-import 'package:dotlin_generator/src/serialize/element_serializer.dart';
-import 'package:dotlin_generator/src/serialize/util.dart';
-import 'package:protobuf/protobuf.dart';
-
 /*
  * Copyright 2023 Wilko Manger
  *
@@ -27,6 +16,17 @@ import 'package:protobuf/protobuf.dart';
  * You should have received a copy of the GNU Affero General Public License
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+import 'dart:collection';
+
+import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/nullability_suffix.dart';
+import 'package:analyzer/dart/element/type.dart' as og;
+import 'package:analyzer/dart/element/type.dart' hide DartType;
+import 'package:dartx/dartx_io.dart';
+import 'package:dotlin_generator/src/serialize/element_serializer.dart';
+import 'package:dotlin_generator/src/serialize/util.dart';
+import 'package:protobuf/protobuf.dart';
 
 import '../generated/elements.pb.dart';
 

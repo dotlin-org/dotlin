@@ -43,7 +43,6 @@ class Import : BaseTest {
             """
             import "dart:core" as Int64 show int;
             import "dart:core" hide int;
-            import "package:meta/meta.dart";
 
             void main() {
               final Int64.int x = 3;
@@ -91,7 +90,6 @@ class Import : BaseTest {
             """
             import "package:yad/test1.dt.g.dart" show yetAnotherFunction1;
             import "package:yad/test2.dt.g.dart" show yetAnotherFunction2;
-            import "package:meta/meta.dart";
 
             void main() {
               final int result1 = yetAnotherFunction1();
@@ -114,8 +112,6 @@ class Import : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             int yetAnotherFunction1() {
               return 3;
             }
@@ -142,7 +138,6 @@ class Import : BaseTest {
         dart(
             """
             import "0.dt.g.dart" show yetAnotherFunction1, yetAnotherFunction2;
-            import "package:meta/meta.dart";
 
             void main() {
               final int result1 = yetAnotherFunction1();
@@ -164,8 +159,6 @@ class Import : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             int calculate() {
               return 30;
             }
@@ -187,7 +180,6 @@ class Import : BaseTest {
         dart(
             """
             import "0.dt.g.dart" show calculate;
-            import "package:meta/meta.dart";
 
             void main() {
               final int x = calculate();
@@ -211,8 +203,6 @@ class Import : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             enum Temp {
               cool._(),
               hot._();
@@ -240,7 +230,6 @@ class Import : BaseTest {
         dart(
             """
             import "0.dt.g.dart" show Temp;
-            import "package:meta/meta.dart";
 
             void main() {
               final Temp temp = Temp.cool;
@@ -266,8 +255,6 @@ class Import : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             enum Temp {
               cool._(),
               hot._();
@@ -300,7 +287,6 @@ class Import : BaseTest {
         dart(
             """
             import "0.dt.g.dart" show Temp, isBearable;
-            import "package:meta/meta.dart";
 
             void main() {
               final bool x = isBearable(Temp.cool);
@@ -324,8 +310,6 @@ class Import : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             enum Temp {
               cool._(),
               hot._();
@@ -354,7 +338,6 @@ class Import : BaseTest {
         dart(
             """
             import "0.dt.g.dart" show Temp;
-            import "package:meta/meta.dart";
 
             void main() {
               final Temp temp = Temp.cool;
@@ -381,8 +364,6 @@ class Import : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             enum Temp {
               cool._(),
               hot._();
@@ -416,7 +397,6 @@ class Import : BaseTest {
         dart(
             """
             import "0.dt.g.dart" show Temp, isBearable;
-            import "package:meta/meta.dart";
 
             void main() {
               final bool x = isBearable(Temp.cool);
@@ -438,8 +418,6 @@ class Import : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             typedef MyInt = int;
             """
         )
@@ -457,7 +435,6 @@ class Import : BaseTest {
         dart(
             """
             import "0.dt.g.dart" show MyInt;
-            import "package:meta/meta.dart";
 
             MyInt calc() {
               return 3;
@@ -479,7 +456,7 @@ class Import : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class A {}
@@ -503,7 +480,6 @@ class Import : BaseTest {
         dart(
             """
             import "0.dt.g.dart" show B, A;
-            import "package:meta/meta.dart";
 
             B<A> calc() {
               return B<A>();
@@ -527,7 +503,6 @@ class Import : BaseTest {
         dart(
             """
             import "package:dotlin/src/kotlin/reflect/ktype.dt.g.dart" show KType;
-            import "package:meta/meta.dart";
 
             abstract class A {
               abstract final List<KType> list;

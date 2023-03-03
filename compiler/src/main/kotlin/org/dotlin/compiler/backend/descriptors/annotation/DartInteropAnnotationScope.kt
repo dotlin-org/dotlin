@@ -38,7 +38,7 @@ import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.storage.getValue
 import org.jetbrains.kotlin.utils.Printer
 
-class DartSyntheticAnnotationScope(
+class DartInteropAnnotationScope(
     private val owner: DeclarationDescriptor,
     private val scope: MemberScope,
     private val context: DartDescriptorContext,
@@ -46,7 +46,7 @@ class DartSyntheticAnnotationScope(
     private val storageManager = context.storageManager
 
     private val annotationNames by storageManager.createLazyValue {
-        getContributedDescriptors()
+        scope.getContributedDescriptors()
             .filterIsInstance<DartDescriptor>()
             .filter { it.element.canBeAnnotation }
             .map { (it as DeclarationDescriptor).name }
@@ -65,7 +65,7 @@ class DartSyntheticAnnotationScope(
     private val getAnnotations =
         storageManager.createMemoizedFunction<(Name) -> Boolean, List<DeclarationDescriptor>> { nameFilter ->
             scope.getContributedDescriptors(
-                DescriptorKindFilter(CLASSIFIERS_MASK and VARIABLES_MASK),
+                DescriptorKindFilter(CLASSIFIERS_MASK or VARIABLES_MASK),
                 nameFilter
             ).mapNotNull { toAnnotationDescriptor(it) }
         }
@@ -79,9 +79,9 @@ class DartSyntheticAnnotationScope(
     }
 
     private val toAnnotationDescriptor =
-        storageManager.createMemoizedFunctionWithNullableValues<DeclarationDescriptor, DartSyntheticAnnotationClassDescriptor> {
+        storageManager.createMemoizedFunctionWithNullableValues<DeclarationDescriptor, DartInteropAnnotationClassDescriptor<*>> {
             when {
-                it is DartDescriptor && it.element.canBeAnnotation -> DartSyntheticAnnotationClassDescriptor(
+                it is DartDescriptor && it.element.canBeAnnotation -> DartInteropAnnotationClassDescriptor(
                     from = it,
                     owner,
                     context.storageManager

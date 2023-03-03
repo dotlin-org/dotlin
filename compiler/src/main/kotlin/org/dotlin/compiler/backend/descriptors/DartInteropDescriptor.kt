@@ -22,8 +22,5 @@ package org.dotlin.compiler.backend.descriptors
 /**
  * Marker interface for Dart descriptors that were not originated from loaded Dart source, but
  * created by Dotlin for Kotlin interoperability.
- *
- * Not to be confused with [DartDescriptor]s whose `elements` have `isSynthetic = true`, this means
- * the code was synthetic in Dart itself.
  */
-interface DartSyntheticDescriptor
+interface DartInteropDescriptor

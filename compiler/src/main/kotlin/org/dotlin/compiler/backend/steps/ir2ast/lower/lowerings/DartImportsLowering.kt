@@ -25,9 +25,7 @@ import org.dotlin.compiler.backend.DartPathGenerator.dartPath
 import org.dotlin.compiler.backend.DartPathGenerator.relativeDartPath
 import org.dotlin.compiler.backend.annotatedDartLibrary
 import org.dotlin.compiler.backend.attributes.DartImport
-import org.dotlin.compiler.backend.descriptors.DartDescriptor
-import org.dotlin.compiler.backend.descriptors.DartPackageFragmentDescriptor
-import org.dotlin.compiler.backend.descriptors.dartPackageFragment
+import org.dotlin.compiler.backend.descriptors.*
 import org.dotlin.compiler.backend.descriptors.export.DartExportPackageFragmentDescriptor
 import org.dotlin.compiler.backend.dotlin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrTypeContext
@@ -234,7 +232,7 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
             val pkg = module.dartPackage
 
             val filePath = when (descriptor) {
-                is DartDescriptor -> {
+                is DartDescriptor, is DartInteropDescriptor -> {
                     val fragment = exportedPackageFragmentOf(descriptor) ?: descriptor.dartPackageFragment
                     fragment.library.path.toUriString()
                 }

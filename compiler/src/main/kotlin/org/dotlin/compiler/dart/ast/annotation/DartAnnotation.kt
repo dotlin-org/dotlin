@@ -45,13 +45,6 @@ data class DartAnnotation(
 
     companion object {
         val OVERRIDE = DartAnnotation("override".toDartIdentifier())
-        val DEPRECATED = DartAnnotation("deprecated".toDartIdentifier())
-
-        // package:meta annotations
-        val INTERNAL = DartAnnotation("internal".toDartIdentifier())
-        val PROTECTED = DartAnnotation("protected".toDartIdentifier())
-        val NON_VIRTUAL = DartAnnotation("nonVirtual".toDartIdentifier())
-        val SEALED = DartAnnotation("sealed".toDartIdentifier())
 
         fun pragma(name: String) =
             DartAnnotation(

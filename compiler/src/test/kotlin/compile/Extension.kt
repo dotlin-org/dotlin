@@ -38,7 +38,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test {}
@@ -62,7 +62,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test {}
@@ -90,7 +90,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test {}
@@ -118,7 +118,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test<T> {}
@@ -145,7 +145,7 @@ class Extension : BaseTest {
         // TODO?: These could be in a single container, but technically they are different types.
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test<T> {}
@@ -175,7 +175,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test<T> {}
@@ -203,7 +203,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test<T> {}
@@ -225,8 +225,6 @@ class Extension : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             extension ${'$'}Extensions${'$'}m4003f16a123cbc3c on String {
               void titleCase() {}
             }
@@ -244,8 +242,6 @@ class Extension : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             extension ${'$'}Extensions${'$'}1ebfd8e5fb05c28e<T> on T {
               void doIt() {}
             }
@@ -265,7 +261,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test<T> {}
@@ -289,7 +285,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test<T> {}
@@ -334,7 +330,7 @@ class Extension : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             abstract class Buildable {
               void build();
@@ -379,8 +375,6 @@ class Extension : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             extension ${'$'}Extensions${'$'}69eeea92bbe1f1f1 on int {
               int shift() {
                 return 0;
@@ -406,7 +400,6 @@ class Extension : BaseTest {
             """
             import "package:dotlin/src/kotlin/math.dt.g.dart"
                 show ${'$'}Extensions${'$'}69eeea92bbe1f1f1;
-            import "package:meta/meta.dart";
 
             void main() {
               0.absoluteValue;
@@ -425,8 +418,6 @@ class Extension : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             extension ${'$'}Extensions${'$'}23387b3b44ac6b48<T> on T {
               T? execute() {
                 return null;

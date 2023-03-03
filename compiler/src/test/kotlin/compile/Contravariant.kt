@@ -43,7 +43,7 @@ class Contravariant : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class HasContravariant<T> {}
@@ -75,7 +75,7 @@ class Contravariant : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class HasContravariant<T> {}
@@ -105,7 +105,7 @@ class Contravariant : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class HasContravariant<T> {}
@@ -138,7 +138,7 @@ class Contravariant : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class HasContravariant<T> {}
@@ -173,7 +173,7 @@ class Contravariant : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
+                import "package:meta/meta.dart" show sealed;
 
                 @sealed
                 class HasContravariant<T> {}
@@ -204,7 +204,7 @@ class Contravariant : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class HasContravariant<T> {}

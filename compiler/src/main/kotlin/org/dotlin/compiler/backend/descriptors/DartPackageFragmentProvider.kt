@@ -20,7 +20,7 @@
 package org.dotlin.compiler.backend.descriptors
 
 import org.dotlin.compiler.backend.DartProject
-import org.dotlin.compiler.backend.descriptors.annotation.DartSyntheticAnnotationPackageFragmentDescriptor
+import org.dotlin.compiler.backend.descriptors.annotation.DartInteropAnnotationPackageFragmentDescriptor
 import org.dotlin.compiler.backend.descriptors.export.DartExportPackageFragmentDescriptor
 import org.dotlin.compiler.backend.steps.src2ir.DartPackageDeserializer
 import org.dotlin.compiler.dart.element.DartElementLocation
@@ -81,7 +81,7 @@ class DartPackageFragmentProvider(
         }
 
         val syntheticAnnotationFragments = (fragments + exportFragments)
-            .map { DartSyntheticAnnotationPackageFragmentDescriptor(it, context) }
+            .map { DartInteropAnnotationPackageFragmentDescriptor(it, context) }
 
         fragments + exportFragments + syntheticAnnotationFragments
     }

@@ -20,7 +20,7 @@
 package org.dotlin.compiler.backend.descriptors.annotation
 
 import org.dotlin.compiler.backend.descriptors.DartDescriptorContext
-import org.dotlin.compiler.backend.descriptors.DartSyntheticDescriptor
+import org.dotlin.compiler.backend.descriptors.DartInteropDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.PackageFragmentDescriptorImpl
@@ -31,18 +31,18 @@ import org.jetbrains.kotlin.storage.getValue
  * To use annotations from Dart classes, we create synthetic annotation classes for any class
  * that as a `const` constructor or top-level/static `const` field.
  */
-class DartSyntheticAnnotationPackageFragmentDescriptor(
+class DartInteropAnnotationPackageFragmentDescriptor(
     val fragment: PackageFragmentDescriptor,
     val context: DartDescriptorContext
 ) : PackageFragmentDescriptorImpl(
     context.module,
     fragment.fqName.child(Name.identifier("annotations")) // TODO: Handle conflicts
-), DartSyntheticDescriptor {
+), DartInteropDescriptor {
     override val annotations: Annotations = Annotations.EMPTY
 
     private val _memberScope by context.storageManager.createLazyValue {
-        DartSyntheticAnnotationScope(owner = this, fragment.getMemberScope(), context)
+        DartInteropAnnotationScope(owner = this, fragment.getMemberScope(), context)
     }
 
-    override fun getMemberScope(): DartSyntheticAnnotationScope = _memberScope
+    override fun getMemberScope(): DartInteropAnnotationScope = _memberScope
 }

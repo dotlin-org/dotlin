@@ -41,7 +41,6 @@ class List : BaseTest {
         dart(
             """
             import "dart:collection" show UnmodifiableListView;
-            import "package:meta/meta.dart";
 
             void main() {
               final List<int> list = UnmodifiableListView<int>(<int>[0, 1, 2]);
@@ -62,8 +61,6 @@ class List : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final List<int> list = const <int>[0, 1, 2];
             }
@@ -83,8 +80,6 @@ class List : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               const List<int> list = <int>[0, 1, 2];
             }
@@ -105,7 +100,6 @@ class List : BaseTest {
         dart(
             """
             import "dart:collection" show UnmodifiableListView;
-            import "package:meta/meta.dart";
 
             void main() {
               final List<String> list = UnmodifiableListView<String>(<String>[]);
@@ -126,8 +120,6 @@ class List : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final List<String> list = const <String>[];
             }
@@ -147,8 +139,6 @@ class List : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               const List<String> list = <String>[];
             }
@@ -168,8 +158,6 @@ class List : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final List<int> list = <int>[0, 1, 2];
             }
@@ -191,7 +179,6 @@ class List : BaseTest {
             """
             import "package:dotlin/src/kotlin/collections/list_factories.dt.g.dart"
                 show mutableListOfNulls;
-            import "package:meta/meta.dart";
 
             void main() {
               final List<int?> list = mutableListOfNulls<int>(40);
@@ -213,8 +200,6 @@ class List : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final List<int> list = kotlin.List<int>(30, (int it) {
                 return it * 2;
@@ -237,8 +222,6 @@ class List : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final List<int> list = MutableList<int>(30, (int it) {
                 return it * 2;
@@ -275,7 +258,6 @@ class List : BaseTest {
             """
             import "dart:collection" show UnmodifiableListView;
             import "test.dart" show test;
-            import "package:meta/meta.dart";
 
             void main() {
               test(UnmodifiableListView<int>(<int>[]));
@@ -310,7 +292,6 @@ class List : BaseTest {
         dart(
             """
             import "test.dart" show test;
-            import "package:meta/meta.dart";
 
             void main() {
               test(<int>[]);
@@ -437,7 +418,6 @@ class List : BaseTest {
         dart(
             """
             import "maybe.dart" show MaybeMutableList;
-            import "package:meta/meta.dart";
 
             void main() {
               final List<int> myList = MaybeMutableList<int>();
@@ -472,7 +452,6 @@ class List : BaseTest {
         dart(
             """
             import "calc.dart" show calculate;
-            import "package:meta/meta.dart";
 
             void main() {
               final List<int> myList = calculate();
@@ -599,7 +578,6 @@ class List : BaseTest {
         dart(
             """
             import "maybe.dart" show MaybeMutableList;
-            import "package:meta/meta.dart";
 
             void main() {
               final List<int> myList = MaybeMutableList<int>();
@@ -635,7 +613,6 @@ class List : BaseTest {
         dart(
             """
             import "calc.dart" show calculate;
-            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -674,7 +651,6 @@ class List : BaseTest {
         dart(
             """
             import "calc.dart" show calculate;
-            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -713,7 +689,6 @@ class List : BaseTest {
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show isImmutableList;
-            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -754,7 +729,6 @@ class List : BaseTest {
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show isImmutableList;
-            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -793,7 +767,6 @@ class List : BaseTest {
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show isWriteableList;
-            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -834,7 +807,6 @@ class List : BaseTest {
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show isWriteableList;
-            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -873,7 +845,6 @@ class List : BaseTest {
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show isFixedSizeList;
-            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -914,7 +885,6 @@ class List : BaseTest {
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show isFixedSizeList;
-            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -954,8 +924,6 @@ class List : BaseTest {
         dart(
             """
             import "calc.dart" show calculate;
-            import "package:meta/meta.dart";
-
             void main() {
               final Object obj = calculate();
               if (obj.isFixedSizeList<int>()) {
@@ -996,8 +964,6 @@ class List : BaseTest {
         dart(
             """
             import "calc.dart" show calculate;
-            import "package:meta/meta.dart";
-
             void main() {
               final Object obj = calculate();
               if (!obj.isFixedSizeList<int>()) {}
@@ -1035,7 +1001,6 @@ class List : BaseTest {
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show isMutableList;
-            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -1076,7 +1041,6 @@ class List : BaseTest {
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show isMutableList;
-            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -1150,12 +1114,12 @@ class List : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show nonVirtual, sealed;
             import "package:dotlin/src/dotlin/intrinsics/collection_markers.dt.g.dart"
                 show ImmutableListMarker;
             import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show MutableCollection;
             import "dart:math" show Random;
-            import "package:meta/meta.dart";
 
             @sealed
             class EmptyImmutableList<E> implements List<E>, ImmutableListMarker {
@@ -1639,12 +1603,12 @@ class List : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show nonVirtual, sealed;
             import "package:dotlin/src/dotlin/intrinsics/collection_markers.dt.g.dart"
                 show WriteableListMarker;
             import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show MutableCollection;
             import "dart:math" show Random;
-            import "package:meta/meta.dart";
 
             @sealed
             class EmptyWriteableList<E> implements List<E>, WriteableListMarker {
@@ -2093,12 +2057,12 @@ class List : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show nonVirtual, sealed;
             import "package:dotlin/src/dotlin/intrinsics/collection_markers.dt.g.dart"
                 show FixedSizeListMarker;
             import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show MutableCollection;
             import "dart:math" show Random;
-            import "package:meta/meta.dart";
 
             @sealed
             class EmptyArray<E> implements List<E>, FixedSizeListMarker {
@@ -2568,12 +2532,12 @@ class List : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "package:dotlin/src/dotlin/intrinsics/collection_markers.dt.g.dart"
                 show MutableListMarker;
             import "package:dotlin/src/kotlin/collections/iterator.dt.g.dart"
                 show MutableIterator;
             import "dart:math" show Random;
-            import "package:meta/meta.dart";
 
             @sealed
             class EmptyMutableList<E> implements List<E>, MutableListMarker {
@@ -2988,12 +2952,12 @@ class List : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show nonVirtual, sealed;
             import "package:dotlin/src/dotlin/intrinsics/collection_markers.dt.g.dart"
                 show FixedSizeListMarker;
             import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show MutableCollection;
             import "dart:math" show Random;
-            import "package:meta/meta.dart";
 
             @sealed
             class EmptyArray<E> implements List<E>, FixedSizeListMarker {

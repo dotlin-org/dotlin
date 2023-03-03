@@ -40,7 +40,6 @@ class Set : BaseTest {
         dart(
             """
             import "dart:collection" show UnmodifiableSetView;
-            import "package:meta/meta.dart";
 
             void main() {
               final Set<int> set = UnmodifiableSetView<int>(<int>{0, 1, 2});
@@ -61,8 +60,6 @@ class Set : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final Set<int> set = const <int>{0, 1, 2};
             }
@@ -82,8 +79,6 @@ class Set : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               const Set<int> set = <int>{0, 1, 2};
             }
@@ -104,7 +99,6 @@ class Set : BaseTest {
         dart(
             """
             import "dart:collection" show UnmodifiableSetView;
-            import "package:meta/meta.dart";
 
             void main() {
               final Set<String> set = UnmodifiableSetView<String>(<String>{});
@@ -125,8 +119,6 @@ class Set : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final Set<String> set = const <String>{};
             }
@@ -146,8 +138,6 @@ class Set : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               const Set<String> set = <String>{};
             }
@@ -167,8 +157,6 @@ class Set : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final Set<int> set = <int>{0, 1, 2};
             }
@@ -204,7 +192,6 @@ class Set : BaseTest {
             """
             import "dart:collection" show UnmodifiableSetView;
             import "test.dart" show test;
-            import "package:meta/meta.dart";
 
             void main() {
               test(UnmodifiableSetView<int>(<int>{}));
@@ -239,7 +226,6 @@ class Set : BaseTest {
         dart(
             """
             import "test.dart" show test;
-            import "package:meta/meta.dart";
 
             void main() {
               test(<int>{});
@@ -336,7 +322,6 @@ class Set : BaseTest {
         dart(
             """
             import "my_set.dart" show MySet;
-            import "package:meta/meta.dart";
 
             void main() {
               final Set<int> mySet = MySet<int>();
@@ -371,7 +356,6 @@ class Set : BaseTest {
         dart(
             """
             import "calc.dart" show calculate;
-            import "package:meta/meta.dart";
 
             void main() {
               final Set<int> myList = calculate();
@@ -468,7 +452,6 @@ class Set : BaseTest {
         dart(
             """
             import "my_set.dart" show MySet;
-            import "package:meta/meta.dart";
 
             void main() {
               final Set<int> mySet = MySet<int>();
@@ -494,8 +477,6 @@ class Set : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final Object? obj = calculate();
               if (obj is Set<int>) {
@@ -527,8 +508,6 @@ class Set : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final Object? obj = calculate();
               if (obj is! Set<int>) {}
@@ -560,7 +539,6 @@ class Set : BaseTest {
             """
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show isImmutableSet;
-            import "package:meta/meta.dart";
 
             void main() {
               final Object? obj = calculate();
@@ -595,7 +573,6 @@ class Set : BaseTest {
             """
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show isImmutableSet;
-            import "package:meta/meta.dart";
 
             void main() {
               final Object? obj = calculate();
@@ -628,7 +605,6 @@ class Set : BaseTest {
             """
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show isMutableSet;
-            import "package:meta/meta.dart";
 
             void main() {
               final Object? obj = calculate();
@@ -661,7 +637,6 @@ class Set : BaseTest {
             """
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show isMutableSet;
-            import "package:meta/meta.dart";
 
             void main() {
               final Object? obj = calculate();
@@ -739,11 +714,11 @@ class Set : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show nonVirtual, sealed;
             import "package:dotlin/src/dotlin/intrinsics/collection_markers.dt.g.dart"
                 show ImmutableSetMarker;
             import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show MutableCollection;
-            import "package:meta/meta.dart";
 
             @sealed
             class EmptyImmutableSet<E> implements Set<E>, ImmutableSetMarker {
@@ -1059,11 +1034,11 @@ class Set : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "package:dotlin/src/dotlin/intrinsics/collection_markers.dt.g.dart"
                 show MutableSetMarker;
             import "package:dotlin/src/kotlin/collections/iterator.dt.g.dart"
                 show MutableIterator;
-            import "package:meta/meta.dart";
 
             @sealed
             class EmptyMutableSet<E> implements Set<E>, MutableSetMarker {

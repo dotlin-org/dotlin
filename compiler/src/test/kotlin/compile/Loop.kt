@@ -44,8 +44,6 @@ class Loop : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               int i = 0;
               while (i <= 10) {
@@ -72,8 +70,6 @@ class Loop : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               int i = 0;
               while (i <= 10) i++;
@@ -100,8 +96,6 @@ class Loop : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               int i = 0;
               do {
@@ -135,7 +129,6 @@ class Loop : BaseTest {
             import "package:dotlin/src/kotlin/ranges/ranges_ext.dt.g.dart"
                 show IntRangeFactoryExt;
             import "package:dotlin/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
-            import "package:meta/meta.dart";
 
             void main() {
               for (int i = 0; i < 10; i += 1) process(i);
@@ -166,7 +159,6 @@ class Loop : BaseTest {
             """
             import "package:dotlin/src/kotlin/native/int.dt.g.dart" show IntRangeTo;
             import "package:dotlin/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
-            import "package:meta/meta.dart";
 
             void main() {
               for (int i = 0; i <= 10; i += 1) {
@@ -202,7 +194,6 @@ class Loop : BaseTest {
                 show IntRangeFactoryExt;
             import "package:dotlin/src/kotlin/ranges/progressions.dt.g.dart"
                 show IntProgression;
-            import "package:meta/meta.dart";
 
             void main() {
               for (int i = 10; i >= 0; i -= 1) {
@@ -238,7 +229,6 @@ class Loop : BaseTest {
             import "package:dotlin/src/kotlin/ranges/progressions.dt.g.dart"
                 show IntProgression;
             import "package:dotlin/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
-            import "package:meta/meta.dart";
 
             void main() {
               for (int i = 0; i < 14; i += 2) process(i);
@@ -273,7 +263,6 @@ class Loop : BaseTest {
             import "package:dotlin/src/kotlin/ranges/progressions.dt.g.dart"
                 show IntProgression;
             import "package:dotlin/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
-            import "package:meta/meta.dart";
 
             void main() {
               for (int i = 0; i < 14; i += 3) process(i);
@@ -301,8 +290,6 @@ class Loop : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final List<int> elements =
                   List<int>.of(<int>[1, 2, 3, 4, 5], growable: false);

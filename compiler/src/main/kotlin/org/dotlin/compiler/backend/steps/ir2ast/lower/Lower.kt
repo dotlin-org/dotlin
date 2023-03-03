@@ -88,6 +88,7 @@ private val lowerings: List<Lowering> = listOf(
     ::CollectionFactoryCallsLowering,
     RuntimeCollectionTypeLowering::Declarations,
     RuntimeCollectionTypeLowering::Casts,
+    ::DartMetaAnnotationsLowering,
     ::DartImportsLowering
 )
 

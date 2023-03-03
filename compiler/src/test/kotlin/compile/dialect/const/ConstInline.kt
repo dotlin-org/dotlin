@@ -38,7 +38,7 @@ class ConstInline : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test {
@@ -69,7 +69,7 @@ class ConstInline : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test {
@@ -104,7 +104,7 @@ class ConstInline : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test {
@@ -144,8 +144,8 @@ class ConstInline : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "package:dotlin/src/kotlin/library.dt.g.dart" show SafeStringPlus;
-            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -187,8 +187,8 @@ class ConstInline : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "package:dotlin/src/kotlin/library.dt.g.dart" show SafeStringPlus;
-            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -230,8 +230,8 @@ class ConstInline : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "package:dotlin/src/kotlin/library.dt.g.dart" show SafeStringPlus;
-            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -273,8 +273,8 @@ class ConstInline : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "package:dotlin/src/kotlin/library.dt.g.dart" show SafeStringPlus;
-            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -315,7 +315,7 @@ class ConstInline : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Zen {

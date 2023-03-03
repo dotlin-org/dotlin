@@ -2,8 +2,8 @@ package org.dotlin.compiler.backend.steps.src2ir
 
 import org.dotlin.compiler.backend.DartPackage
 import org.dotlin.compiler.backend.descriptors.DartDescriptor
+import org.dotlin.compiler.backend.descriptors.DartInteropDescriptor
 import org.dotlin.compiler.backend.descriptors.DartPackageFragmentDescriptor
-import org.dotlin.compiler.backend.descriptors.DartSyntheticDescriptor
 import org.dotlin.compiler.backend.isCurrent
 import org.dotlin.compiler.dart.element.DartLibraryElement
 import org.jetbrains.kotlin.backend.common.serialization.DescriptorByIdSignatureFinderImpl
@@ -44,7 +44,7 @@ class DartIrProvider(
 
         if (descriptor.module != module) return null
 
-        if (descriptor !is DartDescriptor && descriptor !is DartSyntheticDescriptor) return null
+        if (descriptor !is DartDescriptor && descriptor !is DartInteropDescriptor) return null
 
         val declaration = stubGenerator.run {
             when (symbol) {

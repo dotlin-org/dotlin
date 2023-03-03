@@ -19,7 +19,6 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast
 
-import org.dotlin.compiler.backend.DartPathGenerator
 import org.dotlin.compiler.backend.DartPathGenerator.dartPath
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lower
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.IrToDartCompilationUnitTransformer
@@ -28,18 +27,10 @@ import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.DartIrAnalyzer
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.post.DartNameChecker
 import org.dotlin.compiler.backend.steps.src2ir.throwIfHasErrors
 import org.dotlin.compiler.backend.util.kotlinFiles
-import org.dotlin.compiler.dart.ast.annotation.isInternal
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
-import org.dotlin.compiler.dart.ast.compilationunit.DartNamedCompilationUnitMember
-import org.dotlin.compiler.dart.ast.compilationunit.isPrivate
-import org.dotlin.compiler.dart.ast.directive.DartExportDirective
-import org.dotlin.compiler.dart.ast.directive.DartHideCombinator
-import org.dotlin.compiler.dart.ast.expression.literal.DartSimpleStringLiteral
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.diagnostics.Diagnostic
-import org.jetbrains.kotlin.util.collectionUtils.filterIsInstanceAnd
 import java.nio.file.Path
-import kotlin.io.path.Path
 
 fun irToDartAst(
     config: CompilerConfiguration,
@@ -75,9 +66,10 @@ fun irToDartAst(
 
     // TODO: Only do this if we're not mixing public Dart/Kotlin code.
     // TODO: Make separate option in pubspec
+    // TODO: Move to lowering/IR level?
     if (/*dartProject.compileKlib*/false) {
         // Add exports file.
-        units[Path("lib/${dartProject.name}.${DartPathGenerator.FILE_EXTENSION}")] = DartCompilationUnit(
+        /*units[Path("lib/${dartProject.name}.${DartPathGenerator.FILE_EXTENSION}")] = DartCompilationUnit(
             directives = units.mapNotNull { (path, unit) ->
                 when {
                     // If all declarations in the unit are private or internal, we don't need to export it.
@@ -98,7 +90,7 @@ fun irToDartAst(
                     )
                 }
             }
-        )
+        )*/
     }
 
     return IrToDartAstResult(units, ir.bindingTrace.bindingContext.diagnostics.all())

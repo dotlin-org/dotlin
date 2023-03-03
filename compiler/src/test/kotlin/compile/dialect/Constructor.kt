@@ -59,7 +59,6 @@ class Constructor : BaseTest {
         dart(
             """
             import "test.dart" show Test;
-            import "package:meta/meta.dart";
 
             void main() {
               Test.create();
@@ -99,7 +98,7 @@ class Constructor : BaseTest {
         dart(
             """
             import "test.dart" show Test;
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             void main() {
               const Test.create();
@@ -150,7 +149,6 @@ class Constructor : BaseTest {
         dart(
             """
             import "test.dart" show TestContainer${'$'}Test;
-            import "package:meta/meta.dart";
 
             void main() {
               const TestContainer${'$'}Test.create();
@@ -190,7 +188,7 @@ class Constructor : BaseTest {
         dart(
             """
             import "test.dart" show Test;
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             void main() {
               Test.create(10, "abc");
@@ -246,7 +244,7 @@ class Constructor : BaseTest {
         dart(
             """
             import "markers.dart" show MarkerImplementor, Test;
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             void main() {
               Test<int, MarkerImplementor>.create(10, MarkerImplementor());
@@ -280,8 +278,6 @@ class Constructor : BaseTest {
             import "dart:typed_data";
             import "dart:core" as core;
             import "dart:core" hide List;
-            import "package:meta/meta.dart";
-
             void main() {
               Float32List.fromList(<double>[0.1, 0.2, 0.3]);
             }
@@ -307,8 +303,6 @@ class Constructor : BaseTest {
             """
             import "dart:core" as core;
             import "dart:core" hide List;
-            import "package:meta/meta.dart";
-
             void main() {
               final core.List<int> array = core.List<int>.generate(10, (int it) {
                 return it;
@@ -332,8 +326,6 @@ class Constructor : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final bool logging = const bool.fromEnvironment("logging");
             }

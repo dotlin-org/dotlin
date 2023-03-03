@@ -41,8 +41,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             final int topLevelProperty = 0;
             void main() {
               topLevelProperty;
@@ -65,8 +63,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             final int _topLevelProperty = 0;
             void main() {
               _topLevelProperty;
@@ -89,7 +85,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test {}
@@ -115,7 +111,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -146,7 +142,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -173,8 +169,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final int x = 0 == 1 ? 0 : 1;
             }
@@ -202,8 +196,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             int test() {
               return 3;
             }
@@ -238,8 +230,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             int test() {
               return 3;
             }
@@ -275,8 +265,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             int test(int x) {
               return x;
             }
@@ -310,8 +298,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final int x = () {
                 return 68;
@@ -335,8 +321,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final int x = (int y) {
                 return 68 * y;
@@ -363,7 +347,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Gondor {
@@ -398,7 +382,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Gondor {
@@ -432,8 +416,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final String amount = "Three";
               "${'$'}{amount} were given to the Elves, immortal, wisest and fairest of all beings.";
@@ -455,8 +437,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final bool areDwarves = true;
               "${'$'}{areDwarves ? "Seven" : "Three"} to the Dwarf-Lords, great miners and craftsmen of ...";
@@ -477,8 +457,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               true && 2 == 0;
             }
@@ -498,8 +476,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               true || 2 == 0;
             }
@@ -519,8 +495,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               3 == 0 && 2 == 0 && 1 == 0;
             }
@@ -540,8 +514,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               3 == 0 || 2 == 0 || 1 == 0;
             }
@@ -564,7 +536,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Hobbit {
@@ -594,8 +566,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               9 is int;
             }
@@ -615,8 +585,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               9 is! int;
             }
@@ -638,7 +606,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test {}
@@ -664,7 +632,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test {}
@@ -688,8 +656,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               !(1 == 0);
             }
@@ -713,7 +679,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -742,8 +708,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               null ?? "";
             }
@@ -767,7 +731,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             class Base {
               String sayHello() {
@@ -806,8 +770,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final int x = () {
                 try {
@@ -846,7 +808,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -882,7 +844,6 @@ class Expression : BaseTest {
         dart(
             """
             import "package:dotlin/src/dotlin/intrinsics/internal.dt.g.dart" show ${'$'}Return;
-            import "package:meta/meta.dart";
 
             void main() {
               try {
@@ -917,7 +878,6 @@ class Expression : BaseTest {
         dart(
             """
             import "package:dotlin/src/dotlin/intrinsics/internal.dt.g.dart" show ${'$'}Return;
-            import "package:meta/meta.dart";
 
             void main() {
               test(null);
@@ -957,7 +917,6 @@ class Expression : BaseTest {
         dart(
             """
             import "package:dotlin/src/dotlin/intrinsics/internal.dt.g.dart" show ${'$'}Return;
-            import "package:meta/meta.dart";
 
             void main() {
               test(null, 3);
@@ -1007,7 +966,6 @@ class Expression : BaseTest {
         dart(
             """
             import "package:dotlin/src/dotlin/intrinsics/internal.dt.g.dart" show ${'$'}Return;
-            import "package:meta/meta.dart";
 
             void main() {
               test(null, 3);
@@ -1062,8 +1020,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void test(int? y) {
               final int? x = () {
                 final int? tmp0_subject = y;
@@ -1097,8 +1053,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void test(Object y) {
               final int x = () {
                 final Object tmp0_subject = y;
@@ -1132,8 +1086,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void test(Object y) {
               final int x = () {
                 final Object tmp0_subject = y;
@@ -1173,7 +1125,6 @@ class Expression : BaseTest {
             """
             import "package:dotlin/src/dotlin/intrinsics/errors.dt.g.dart"
                 show NoWhenBranchMatchedError;
-            import "package:meta/meta.dart";
 
             enum PowerStatus {
               OFF._(),
@@ -1215,8 +1166,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               null!;
             }
@@ -1236,8 +1185,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               -1;
             }
@@ -1258,8 +1205,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final int x = 3;
               -x;
@@ -1280,8 +1225,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               0 != 1;
             }
@@ -1301,8 +1244,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               0 << 1;
             }
@@ -1322,8 +1263,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               0 >> 1;
             }
@@ -1343,8 +1282,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               0 >>> 1;
             }
@@ -1364,8 +1301,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               0 & 1;
             }
@@ -1385,8 +1320,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               0 | 1;
             }
@@ -1406,8 +1339,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               0 ^ 1;
             }
@@ -1427,8 +1358,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               ~1;
             }
@@ -1446,8 +1375,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             const double x = 1.0 / 0.0;
             """
         )
@@ -1463,8 +1390,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             const double x = -(1.0 / 0.0);
             """
         )
@@ -1480,8 +1405,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             const double x = -(0.0 / 0.0);
             """
         )
@@ -1503,8 +1426,6 @@ class Expression : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 void main() {
                   int x = 1;
                   ++x;
@@ -1526,8 +1447,6 @@ class Expression : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 void main() {
                   int x = 1;
                   --x;
@@ -1549,8 +1468,6 @@ class Expression : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 void main() {
                   int x = 1;
                   x++;
@@ -1572,8 +1489,6 @@ class Expression : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
-
                 void main() {
                   int x = 1;
                   x--;
@@ -1599,7 +1514,7 @@ class Expression : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
+                import "package:meta/meta.dart" show nonVirtual, sealed;
 
                 @sealed
                 class Test {
@@ -1634,7 +1549,7 @@ class Expression : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
+                import "package:meta/meta.dart" show nonVirtual, sealed;
 
                 @sealed
                 class Test {
@@ -1669,7 +1584,7 @@ class Expression : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
+                import "package:meta/meta.dart" show nonVirtual, sealed;
 
                 @sealed
                 class Test {
@@ -1708,7 +1623,7 @@ class Expression : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
+                import "package:meta/meta.dart" show nonVirtual, sealed;
 
                 @sealed
                 class Test {
@@ -1753,7 +1668,7 @@ class Expression : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
+                import "package:meta/meta.dart" show nonVirtual, sealed;
 
                 @sealed
                 class Test {
@@ -1792,7 +1707,7 @@ class Expression : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
+                import "package:meta/meta.dart" show nonVirtual, sealed;
 
                 @sealed
                 class Test {
@@ -1828,7 +1743,7 @@ class Expression : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
+                import "package:meta/meta.dart" show nonVirtual, sealed;
 
                 @sealed
                 class Test {
@@ -1871,7 +1786,7 @@ class Expression : BaseTest {
 
             dart(
                 """
-                import "package:meta/meta.dart";
+                import "package:meta/meta.dart" show nonVirtual, sealed;
 
                 @sealed
                 class Test {
@@ -1907,7 +1822,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -1940,7 +1855,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test {}
@@ -1972,8 +1887,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               1.add(2);
             }
@@ -2007,7 +1920,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             abstract class WritingSurface {}
 
@@ -2044,8 +1957,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             bool get x {
               return false;
             }
@@ -2072,8 +1983,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void generic<T>(T obj) {}
             void main() {
               generic<String>("asd");
@@ -2098,7 +2007,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -2125,8 +2034,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final String x = "Line0\nLine1";
             }
@@ -2149,8 +2056,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final String x = r${"\"\"\""}Line 0
                 Line 1
@@ -2179,8 +2084,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final String a = "A";
               final String b = "BEE";
@@ -2212,8 +2115,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final String x = r${"\"\"\""}Line\n0
                 Line\n1
@@ -2242,8 +2143,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final String a = "A";
               final String b = "BEE";
@@ -2272,8 +2171,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final bool x = 0 < 1;
             }
@@ -2293,8 +2190,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final bool x = 0 <= 1;
             }
@@ -2314,8 +2209,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final bool x = 0 > 1;
             }
@@ -2335,8 +2228,6 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final bool x = 0 >= 1;
             }
@@ -2362,7 +2253,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class MyComp implements Comparable<MyComp> {
@@ -2399,7 +2290,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class MyComp implements Comparable<MyComp> {
@@ -2436,7 +2327,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class MyComp implements Comparable<MyComp> {
@@ -2473,7 +2364,7 @@ class Expression : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class MyComp implements Comparable<MyComp> {
@@ -2506,7 +2397,6 @@ class Expression : BaseTest {
             """
             import "package:dotlin/src/kotlin/native/int.dt.g.dart" show IntRangeTo;
             import "package:dotlin/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
-            import "package:meta/meta.dart";
 
             void main() {
               final IntRange range = 0.rangeTo(10);
@@ -2530,7 +2420,6 @@ class Expression : BaseTest {
             import "package:dotlin/src/kotlin/ranges/ranges_ext.dt.g.dart"
                 show IntRangeFactoryExt;
             import "package:dotlin/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
-            import "package:meta/meta.dart";
 
             void main() {
               final IntRange range = 0.until(10);

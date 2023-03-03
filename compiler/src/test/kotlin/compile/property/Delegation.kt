@@ -48,10 +48,10 @@ class Delegation : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show nonVirtual, sealed;
             import "package:dotlin/src/dotlin/reflect/kproperty_impl.dt.g.dart"
                 show KProperty0Impl;
             import "package:dotlin/src/kotlin/reflect/kproperty.dt.g.dart" show KProperty;
-            import "package:meta/meta.dart";
 
             @sealed
             class Delegate {
@@ -106,10 +106,10 @@ class Delegation : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show nonVirtual, sealed;
             import "package:dotlin/src/dotlin/reflect/kproperty_impl.dt.g.dart"
                 show KMutableProperty0Impl;
             import "package:dotlin/src/kotlin/reflect/kproperty.dt.g.dart" show KProperty;
-            import "package:meta/meta.dart";
 
             @sealed
             class Delegate {
@@ -172,10 +172,10 @@ class Delegation : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show nonVirtual, sealed;
             import "package:dotlin/src/dotlin/reflect/kproperty_impl.dt.g.dart"
                 show KProperty1Impl;
             import "package:dotlin/src/kotlin/reflect/kproperty.dt.g.dart" show KProperty;
-            import "package:meta/meta.dart";
 
             @sealed
             class Delegate {
@@ -237,10 +237,10 @@ class Delegation : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show nonVirtual, sealed;
             import "package:dotlin/src/dotlin/reflect/kproperty_impl.dt.g.dart"
                 show KMutableProperty1Impl;
             import "package:dotlin/src/kotlin/reflect/kproperty.dt.g.dart" show KProperty;
-            import "package:meta/meta.dart";
 
             @sealed
             class Delegate {
@@ -316,10 +316,10 @@ class Delegation : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show nonVirtual, sealed;
             import "package:dotlin/src/dotlin/reflect/kproperty_impl.dt.g.dart"
                 show KProperty0Impl;
             import "package:dotlin/src/kotlin/reflect/kproperty.dt.g.dart" show KProperty;
-            import "package:meta/meta.dart";
 
             @sealed
             class Delegate {
@@ -381,10 +381,10 @@ class Delegation : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show nonVirtual, sealed;
             import "package:dotlin/src/dotlin/reflect/kproperty_impl.dt.g.dart"
                 show KMutableProperty0Impl;
             import "package:dotlin/src/kotlin/reflect/kproperty.dt.g.dart" show KProperty;
-            import "package:meta/meta.dart";
 
             @sealed
             class Delegate {
@@ -439,8 +439,6 @@ class Delegation : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             late final int myLazy = 100;
             """
         )
@@ -459,8 +457,6 @@ class Delegation : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             late final int myLazy = () {
               final int x = 340;
               return x + x * 8;
@@ -483,8 +479,6 @@ class Delegation : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               late final int myLazy = 100;
               myLazy;
@@ -510,8 +504,6 @@ class Delegation : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               late final int myLazy = () {
                 final int x = 340;

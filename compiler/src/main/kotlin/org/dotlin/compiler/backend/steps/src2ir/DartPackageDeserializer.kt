@@ -67,11 +67,11 @@ object DartPackageDeserializer {
     }
 
     private fun generateElements(project: DartProject, packages: Iterable<DartPackage>) {
-        val paths = packages.map {
+        val paths = packages.mapNotNull {
             // TODO: Only skip if Dotlin compiler version matches
             when (it.dlibPath.exists()) {
-                //true -> null // TODO: Uncomment
-                else -> it.path to it.packagePath
+                true -> null
+                false -> it.path to it.packagePath
             }
         }
 

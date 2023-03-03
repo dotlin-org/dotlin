@@ -146,6 +146,12 @@ class DotlinModule private constructor(
             modules.first { it.name.asStringStripSpecialMarkers() == klibDep.path }.impl
         }
 
+        // Add the 'meta' dependency to the stdlib.
+        // TODO: Set all dependencies of dependencies
+        if (impl == impl.builtIns.builtInsModule) {
+            dependencies.add(modules.first { it.name == Name.special("<meta>") }.impl)
+        }
+
         impl.setDependencies(dependencies.toList())
     }
 

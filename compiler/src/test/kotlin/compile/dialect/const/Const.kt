@@ -40,7 +40,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test {
@@ -68,7 +68,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test {
@@ -94,7 +94,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -122,7 +122,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -154,7 +154,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed, nonVirtual;
 
             @sealed
             class Testable {
@@ -185,8 +185,6 @@ class Const : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             const int x = 9223372036854775780;
             """
         )
@@ -209,8 +207,6 @@ class Const : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             enum Temperature {
               cold._(),
               chilly._(),
@@ -240,7 +236,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class Test {
@@ -264,8 +260,6 @@ class Const : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             const int x = -92233720368;
             const int y = x - 1;
             """
@@ -286,7 +280,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Zen {
@@ -322,7 +316,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Zen {
@@ -361,7 +355,7 @@ class Const : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Zen {
@@ -409,8 +403,8 @@ class Const : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show nonVirtual, sealed;
             import "package:dotlin/src/kotlin/library.dt.g.dart" show SafeStringPlus;
-            import "package:meta/meta.dart";
 
             @sealed
             class Zen {
@@ -443,8 +437,6 @@ class Const : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               const Duration d = Duration(seconds: 2);
             }
@@ -464,8 +456,6 @@ class Const : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               const int Function() d = _${'$'}7aa;
             }
@@ -489,8 +479,6 @@ class Const : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               const bool nope = true == false;
             }

@@ -38,8 +38,6 @@ class Type : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final Type myType = String;
             }

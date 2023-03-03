@@ -55,10 +55,6 @@ class DartMemberScope(
         elements.filterIsInstance<DartVariableElement>().associateBy { it.kotlinName }
     }
 
-    private val elementsByKotlinName by storageManager.createLazyValue {
-        classElementsByKotlinName + functionElementsByKotlinName + variableElementsByKotlinName
-    }
-
     override fun getClassifierNames(): Set<Name> = classElementsByKotlinName.keys
     override fun getFunctionNames(): Set<Name> = functionElementsByKotlinName.keys
     override fun getVariableNames(): Set<Name> = variableElementsByKotlinName.keys
@@ -79,7 +75,10 @@ class DartMemberScope(
                 maps.add(variableElementsByKotlinName)
             }
 
-            maps.reduce { acc, map -> acc + map }
+            when {
+                maps.isNotEmpty() -> maps.reduce { acc, map -> acc + map }
+                else -> emptyMap()
+            }
         }
 
     private data class GetDescriptorsRequest(
@@ -133,12 +132,6 @@ class DartMemberScope(
                 element = it,
                 context,
                 container = owner,
-            )
-
-            is DartConstructorElement -> DartConstructorDescriptor(
-                element = it,
-                context,
-                container = owner as DartClassDescriptor,
             )
 
             else -> throw UnsupportedOperationException("Unsupported element: $it")

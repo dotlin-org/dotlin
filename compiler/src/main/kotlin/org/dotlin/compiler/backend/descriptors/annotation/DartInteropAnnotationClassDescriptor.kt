@@ -19,26 +19,23 @@
 
 package org.dotlin.compiler.backend.descriptors.annotation
 
-import org.dotlin.compiler.backend.descriptors.DartSyntheticDescriptor
+import org.dotlin.compiler.backend.descriptors.DartDescriptor
+import org.dotlin.compiler.backend.descriptors.DartInteropDescriptor
 import org.dotlin.compiler.backend.descriptors.dartElementAs
 import org.dotlin.compiler.dart.element.DartConstructorElement
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ClassConstructorDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.ClassDescriptorImpl
-import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
-import org.jetbrains.kotlin.resolve.scopes.MemberScopeImpl
 import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.storage.getValue
-import org.jetbrains.kotlin.utils.Printer
 
-class DartSyntheticAnnotationClassDescriptor(
-    val from: DeclarationDescriptor,
+class DartInteropAnnotationClassDescriptor<D>(
+    val from: D,
     val container: DeclarationDescriptor,
     val storageManager: StorageManager,
-) : ClassDescriptorImpl(
+)  : ClassDescriptorImpl(
     container,
     from.name,
     Modality.FINAL,
@@ -47,23 +44,23 @@ class DartSyntheticAnnotationClassDescriptor(
     SourceElement.NO_SOURCE,
     false,
     storageManager,
-), DartSyntheticDescriptor {
+), DartInteropDescriptor where D : DartDescriptor, D : DeclarationDescriptor {
     init {
         require(from is ClassDescriptor || from is PropertyDescriptor)
     }
 
     private inner class Constructor(from: ClassConstructorDescriptor?) : ClassConstructorDescriptorImpl(
-        this@DartSyntheticAnnotationClassDescriptor,
+        this@DartInteropAnnotationClassDescriptor,
         null,
         Annotations.EMPTY,
         true,
         CallableMemberDescriptor.Kind.SYNTHESIZED,
         SourceElement.NO_SOURCE,
-    ), DartSyntheticDescriptor {
+    ), DartInteropDescriptor {
         init {
             initialize(
                 from?.valueParameters?.map { it.copy(this, it.name, it.index) } ?: emptyList(),
-                from?.visibility ?: this@DartSyntheticAnnotationClassDescriptor.visibility,
+                from?.visibility ?: this@DartInteropAnnotationClassDescriptor.visibility,
             )
 
             returnType = getDefaultType()
@@ -85,38 +82,14 @@ class DartSyntheticAnnotationClassDescriptor(
 
     private val constructorAsList by storageManager.createLazyValue { listOf(constructor) }
 
-    // TODO?: Make static scope available from original? To prevent needing to import both synthetic annotation class
-    // and original.
+    override fun getUnsubstitutedMemberScope(): MemberScope = MemberScope.Empty
 
-    inner class Scope : MemberScopeImpl() {
-        override fun getContributedDescriptors(
-            kindFilter: DescriptorKindFilter,
-            nameFilter: (Name) -> Boolean
-        ): Collection<DeclarationDescriptor> {
-            if (!nameFilter(constructor.name) || !kindFilter.accepts(constructor)) {
-                return emptyList()
-            }
-
-            return constructorAsList
-        }
-
-        override fun printScopeStructure(p: Printer) {
-            p.println(constructor)
-        }
-    }
-
-    private val scope = Scope()
-
-    override fun getUnsubstitutedMemberScope(): MemberScope = scope
-
-    override fun getConstructors(): List<ClassConstructorDescriptor> = listOf(constructor)
+    override fun getConstructors(): List<ClassConstructorDescriptor> = constructorAsList
 
     override fun getUnsubstitutedPrimaryConstructor(): ClassConstructorDescriptor = constructor
 
-    override fun getStaticScope(): MemberScope {
-        return MemberScope.Empty // TODO
-    }
+    override fun getStaticScope(): MemberScope = MemberScope.Empty
 }
 
 val DeclarationDescriptor.isDartSyntheticPropertyAnnotation: Boolean
-    get() = this is DartSyntheticAnnotationClassDescriptor && from is PropertyDescriptor
+    get() = this is DartInteropAnnotationClassDescriptor<*> && from is PropertyDescriptor

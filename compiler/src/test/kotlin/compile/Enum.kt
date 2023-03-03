@@ -39,8 +39,6 @@ class Enum : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             enum Test {
               alpha._(),
               beta._();
@@ -67,7 +65,7 @@ class Enum : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual;
 
             enum Test {
               alpha._("α"),
@@ -97,7 +95,7 @@ class Enum : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual;
 
             enum Test {
               alpha._("α", "Α"),
@@ -136,8 +134,6 @@ class Enum : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             enum Test {
               alpha._(),
               beta._();
@@ -172,8 +168,6 @@ class Enum : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             enum Test {
               alpha._(),
               beta._();
@@ -208,8 +202,6 @@ class Enum : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             enum Test {
               alpha._(),
               beta._();
@@ -244,8 +236,6 @@ class Enum : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             enum Test {
               alpha._(),
               beta._();
@@ -280,8 +270,6 @@ class Enum : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             enum Test {
               alpha._(),
               beta._();
@@ -314,7 +302,7 @@ class Enum : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual;
 
             enum Test {
               alpha._("α", "Α"),
@@ -393,7 +381,7 @@ class Enum : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed, nonVirtual;
 
             @sealed
             class Person {}
@@ -530,7 +518,7 @@ class Enum : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             enum Test {
               alpha._(30, const _${'$'}Test${'$'}alpha()),

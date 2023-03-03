@@ -54,12 +54,6 @@ object IrToDartCompilationUnitTransformer : IrDartAstTransformer<DartCompilation
                         alias = import.alias?.toDartIdentifier()
                     )
                 }
-                // Always import the meta package for extra annotations.
-                .plus(
-                    DartImportDirective(
-                        uri = DartSimpleStringLiteral("package:meta/meta.dart")
-                    )
-                )
                 .optimizeImports()
                 .toList()
         )

@@ -176,4 +176,25 @@ object kotlin : PackageFqNameWrapper {
     }
 }
 
+object dev : PackageFqNameWrapper {
+    override val self = FqName("dev")
+
+    object dart : PackageFqNameWrapper {
+        override val self = dev.self.child("dart")
+
+        object meta : PackageFqNameWrapper {
+            override val self = dart.self.child("meta")
+
+            object annotations : PackageFqNameWrapper {
+                override val self = meta.self.child("annotations")
+
+                val internal = self.child("internal")
+                val protected = self.child("protected")
+                val nonVirtual = self.child("nonVirtual")
+                val sealed = self.child("sealed")
+            }
+        }
+    }
+}
+
 private fun FqName.child(name: String) = child(Name.identifier(name))

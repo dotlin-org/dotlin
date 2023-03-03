@@ -45,8 +45,6 @@ class Static : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               DateTime.now();
             }
@@ -72,8 +70,6 @@ class Static : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               DateTime.now;
             }
@@ -101,8 +97,6 @@ class Static : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               DateTime.now();
             }
@@ -131,8 +125,6 @@ class Static : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final int x = Int16List.bytesPerElement;
             }

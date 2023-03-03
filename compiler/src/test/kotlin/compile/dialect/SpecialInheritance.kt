@@ -54,7 +54,6 @@ class SpecialInheritance : BaseTest {
         dart(
             """
             import "pigeon.dart" show Pigeon;
-            import "package:meta/meta.dart";
 
             abstract class CarrierPigeon implements Pigeon {}
             """
@@ -106,8 +105,8 @@ class SpecialInheritance : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "pigeons.dart" show Pigeon, Carrier;
-            import "package:meta/meta.dart";
 
             @sealed
             class CarrierPigeon implements Pigeon, Carrier {
@@ -161,8 +160,8 @@ class SpecialInheritance : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "pigeons.dart" show Pigeon, Carrier;
-            import "package:meta/meta.dart";
 
             @sealed
             class CarrierPigeon implements Pigeon, Carrier {
@@ -213,8 +212,8 @@ class SpecialInheritance : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "pigeons.dart" show Pigeon, Carrier;
-            import "package:meta/meta.dart";
 
             @sealed
             class CarrierPigeon with Pigeon, Carrier {}
@@ -269,8 +268,8 @@ class SpecialInheritance : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "pigeons.dart" show Pigeon, Carrier;
-            import "package:meta/meta.dart";
 
             @sealed
             class CarrierPigeon extends Pigeon implements Carrier {
@@ -325,8 +324,8 @@ class SpecialInheritance : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "pigeons.dart" show Pigeon, Carrier;
-            import "package:meta/meta.dart";
 
             @sealed
             class CarrierPigeon extends Pigeon with Carrier {
@@ -381,8 +380,8 @@ class SpecialInheritance : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "pigeons.dart" show Pigeon, Carrier;
-            import "package:meta/meta.dart";
 
             @sealed
             class CarrierPigeon with Carrier implements Pigeon {
@@ -445,7 +444,7 @@ class SpecialInheritance : BaseTest {
         dart(
             """
             import "pigeons.dart" show Bird, Pigeon, Carrier;
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class CarrierPigeon extends Bird with Carrier implements Pigeon {

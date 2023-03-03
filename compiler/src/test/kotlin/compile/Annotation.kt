@@ -36,8 +36,8 @@ class Annotation : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "package:dotlin/src/kotlin/native/annotation.dt.g.dart" show Annotation;
-            import "package:meta/meta.dart";
 
             @sealed
             class Test implements Annotation {
@@ -60,8 +60,8 @@ class Annotation : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "package:dotlin/src/kotlin/native/annotation.dt.g.dart" show Annotation;
-            import "package:meta/meta.dart";
 
             @sealed
             class Sensitive implements Annotation {
@@ -88,8 +88,8 @@ class Annotation : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show nonVirtual, sealed;
             import "package:dotlin/src/kotlin/native/annotation.dt.g.dart" show Annotation;
-            import "package:meta/meta.dart";
 
             @sealed
             class Sensitive implements Annotation {
@@ -123,8 +123,8 @@ class Annotation : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "package:dotlin/src/kotlin/native/annotation.dt.g.dart" show Annotation;
-            import "package:meta/meta.dart";
 
             @sealed
             class Sensitive implements Annotation {
@@ -150,8 +150,8 @@ class Annotation : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show nonVirtual, sealed;
             import "package:dotlin/src/kotlin/native/annotation.dt.g.dart" show Annotation;
-            import "package:meta/meta.dart";
 
             @sealed
             class Sensitive implements Annotation {
@@ -184,8 +184,8 @@ class Annotation : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "package:dotlin/src/kotlin/native/annotation.dt.g.dart" show Annotation;
-            import "package:meta/meta.dart";
 
             @sealed
             class Sensitive implements Annotation {
@@ -211,8 +211,8 @@ class Annotation : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show nonVirtual, sealed;
             import "package:dotlin/src/kotlin/native/annotation.dt.g.dart" show Annotation;
-            import "package:meta/meta.dart";
 
             @sealed
             class Sensitive implements Annotation {
@@ -245,8 +245,8 @@ class Annotation : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "package:dotlin/src/kotlin/native/annotation.dt.g.dart" show Annotation;
-            import "package:meta/meta.dart";
 
             @sealed
             class Sensitive implements Annotation {
@@ -272,8 +272,8 @@ class Annotation : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "package:dotlin/src/kotlin/native/annotation.dt.g.dart" show Annotation;
-            import "package:meta/meta.dart";
 
             @sealed
             class Sensitive implements Annotation {
@@ -300,8 +300,8 @@ class Annotation : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "package:dotlin/src/kotlin/native/annotation.dt.g.dart" show Annotation;
-            import "package:meta/meta.dart";
 
             @sealed
             class Sensitive implements Annotation {
@@ -331,8 +331,8 @@ class Annotation : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "package:dotlin/src/kotlin/native/annotation.dt.g.dart" show Annotation;
-            import "package:meta/meta.dart";
 
             @sealed
             class Sensitive implements Annotation {
@@ -368,8 +368,8 @@ class Annotation : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "package:dotlin/src/kotlin/native/annotation.dt.g.dart" show Annotation;
-            import "package:meta/meta.dart";
 
             @sealed
             class Sensitive implements Annotation {
@@ -410,8 +410,8 @@ class Annotation : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "package:dotlin/src/kotlin/native/annotation.dt.g.dart" show Annotation;
-            import "package:meta/meta.dart";
 
             @sealed
             class Sensitive implements Annotation {
@@ -457,8 +457,8 @@ class Annotation : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed;
             import "package:dotlin/src/kotlin/native/annotation.dt.g.dart" show Annotation;
-            import "package:meta/meta.dart";
 
             @sealed
             class Sensitive implements Annotation {
@@ -496,8 +496,8 @@ class Annotation : BaseTest {
 
         dart(
             """
+            import "package:meta/meta.dart" show sealed, nonVirtual;
             import "package:dotlin/src/kotlin/native/annotation.dt.g.dart" show Annotation;
-            import "package:meta/meta.dart";
 
             @sealed
             class Sensitive implements Annotation {
@@ -532,8 +532,8 @@ class Annotation : BaseTest {
             """
             import "package:dotlin/src/kotlin/annotation/annotations.dt.g.dart"
                 show AnnotationRetention, Retention;
+            import "package:meta/meta.dart" show sealed, nonVirtual;
             import "package:dotlin/src/kotlin/native/annotation.dt.g.dart" show Annotation;
-            import "package:meta/meta.dart";
 
             @Retention(value: AnnotationRetention.SOURCE)
             @sealed
@@ -568,8 +568,8 @@ class Annotation : BaseTest {
             """
             import "package:dotlin/src/kotlin/annotation/annotations.dt.g.dart"
                 show AnnotationRetention, Retention;
+            import "package:meta/meta.dart" show sealed, nonVirtual;
             import "package:dotlin/src/kotlin/native/annotation.dt.g.dart" show Annotation;
-            import "package:meta/meta.dart";
 
             @Retention(value: AnnotationRetention.RUNTIME)
             @sealed
@@ -600,8 +600,8 @@ class Annotation : BaseTest {
             """
             import "package:dotlin/src/kotlin/annotation/annotations.dt.g.dart"
                 show AnnotationRetention, Retention;
+            import "package:meta/meta.dart" show sealed;
             import "package:dotlin/src/kotlin/native/annotation.dt.g.dart" show Annotation;
-            import "package:meta/meta.dart";
 
             @Retention(value: AnnotationRetention.RUNTIME)
             @sealed
@@ -623,7 +623,7 @@ class Annotation : BaseTest {
         dart(
             """
             import "0.dt.g.dart" show Sensitive;
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Bird {

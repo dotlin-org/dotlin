@@ -39,8 +39,6 @@ class Array : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final List<int> array = List<int>.of(<int>[0, 1, 2], growable: false);
             }
@@ -62,7 +60,6 @@ class Array : BaseTest {
             """
             import "package:dotlin/src/kotlin/collections/array_factories.dt.g.dart"
                 show arrayOfNulls;
-            import "package:meta/meta.dart";
 
             void main() {
               final List<int?> array = arrayOfNulls<int>(10);
@@ -83,8 +80,6 @@ class Array : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final List<String> array = List<String>.empty(growable: false);
             }
@@ -104,8 +99,6 @@ class Array : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final List<int> array = List<int>.empty(growable: false);
             }
@@ -139,7 +132,6 @@ class Array : BaseTest {
         dart(
             """
             import "test.dart" show test;
-            import "package:meta/meta.dart";
 
             void main() {
               test(List<int>.empty(growable: false));
@@ -174,7 +166,6 @@ class Array : BaseTest {
         dart(
             """
             import "test.dart" show test;
-            import "package:meta/meta.dart";
 
             void process(List<String> numbers) {
               test(numbers);
@@ -209,7 +200,6 @@ class Array : BaseTest {
         dart(
             """
             import "test.dart" show test;
-            import "package:meta/meta.dart";
 
             void process(List<String> words) {
               test(words);
@@ -244,7 +234,6 @@ class Array : BaseTest {
         dart(
             """
             import "calculate.dart" show calculate;
-            import "package:meta/meta.dart";
 
             void main() {
               final List<int> myArray = calculate();
@@ -371,7 +360,6 @@ class Array : BaseTest {
         dart(
             """
             import "my_list.dart" show MyList;
-            import "package:meta/meta.dart";
 
             void main() {
               final List<int> myList = MyList<int>();

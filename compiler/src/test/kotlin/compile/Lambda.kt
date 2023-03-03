@@ -44,8 +44,6 @@ class Lambda : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void compute(void Function() action) {}
             void main() {
               compute(() {
@@ -78,8 +76,6 @@ class Lambda : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void compute(void Function() action) {}
             void main() {
               final int answer = 42;
@@ -111,8 +107,6 @@ class Lambda : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void compute(void Function(int) action) {}
             void main() {
               compute((int x) {
@@ -143,8 +137,6 @@ class Lambda : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void compute(int Function(int) action) {}
             void main() {
               compute((int x) {

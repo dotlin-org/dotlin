@@ -44,7 +44,7 @@ class TypeErasure : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class MyClass<T> {}
@@ -75,8 +75,6 @@ class TypeErasure : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void exec() {}
             void test<T>(Object arg) {
               if (arg is T) {
@@ -105,7 +103,7 @@ class TypeErasure : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show sealed;
 
             @sealed
             class MyClass<T> {}

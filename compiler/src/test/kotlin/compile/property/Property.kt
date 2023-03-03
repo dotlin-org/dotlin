@@ -19,7 +19,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -46,7 +46,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -77,7 +77,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -113,7 +113,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -162,7 +162,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -203,7 +203,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -229,7 +229,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             int returnsInt() {
               return 343;
@@ -262,7 +262,7 @@ class Property {
 
             dart(
                 """
-                import "package:meta/meta.dart";
+                import "package:meta/meta.dart" show nonVirtual, sealed;
 
                 int returnsInt() {
                   return 343;
@@ -302,7 +302,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -325,7 +325,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -356,7 +356,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             int returnsInt() {
               return 343;
@@ -394,37 +394,37 @@ class Property {
 
             dart(
                 """
-                    import "package:meta/meta.dart";
+                import "package:meta/meta.dart" show nonVirtual, sealed;
 
-                    int returnsInt() {
-                      return 343;
-                    }
-                    
-                    @sealed
-                    class Test {
-                      Test({
-                        dynamic property1 = const _$DefaultValue(),
-                        dynamic property2 = const _$DefaultValue(),
-                      })  : property1 = property1 == const _$DefaultValue()
-                                ? returnsInt()
-                                : property1 as int?,
-                            property2 = property2 == const _$DefaultValue()
-                                ? returnsInt()
-                                : property2 as int?,
-                            super();
-                      @nonVirtual
-                      final int? property1;
-                      @nonVirtual
-                      final int? property2;
-                    }
-                    
-                    @sealed
-                    class _$DefaultValue {
-                      const _$DefaultValue();
-                      @nonVirtual
-                      dynamic noSuchMethod(Invocation invocation) {}
-                    }
-                    """
+                int returnsInt() {
+                  return 343;
+                }
+
+                @sealed
+                class Test {
+                  Test({
+                    dynamic property1 = const _$DefaultValue(),
+                    dynamic property2 = const _$DefaultValue(),
+                  })  : property1 = property1 == const _$DefaultValue()
+                            ? returnsInt()
+                            : property1 as int?,
+                        property2 = property2 == const _$DefaultValue()
+                            ? returnsInt()
+                            : property2 as int?,
+                        super();
+                  @nonVirtual
+                  final int? property1;
+                  @nonVirtual
+                  final int? property2;
+                }
+
+                @sealed
+                class _$DefaultValue {
+                  const _$DefaultValue();
+                  @nonVirtual
+                  dynamic noSuchMethod(Invocation invocation) {}
+                }
+                """
             )
         }
 
@@ -443,7 +443,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -476,7 +476,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -518,7 +518,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -554,7 +554,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -581,7 +581,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -615,7 +615,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -656,7 +656,7 @@ class Property {
 
             dart(
                 """
-                import "package:meta/meta.dart";
+                import "package:meta/meta.dart" show nonVirtual, sealed;
 
                 @sealed
                 class Test {
@@ -688,7 +688,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             int returnsInt() {
               return 343;
@@ -719,7 +719,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -749,7 +749,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Vector {
@@ -775,7 +775,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Vector {
@@ -799,7 +799,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Vector {
@@ -821,7 +821,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Vector {
@@ -846,8 +846,6 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             bool get x {
               return false;
             }
@@ -873,7 +871,6 @@ class Property {
                 show ${'$'}Extensions${'$'}a70fef564787a44;
             import "package:dotlin/src/dotlin/reflect/kproperty_impl.dt.g.dart"
                 show KMutableProperty0Impl;
-            import "package:meta/meta.dart";
 
             late bool test;
             void main() {
@@ -905,11 +902,11 @@ class Property {
 
         dart(
             """
+            import "package:meta/meta.dart" show nonVirtual, sealed;
             import "package:dotlin/src/dotlin/reflect/kproperty_impl.dt.g.dart"
                 show KMutableProperty0Impl;
             import "package:dotlin/src/kotlin/util/lateinit.dt.g.dart"
                 show ${'$'}Extensions${'$'}a70fef564787a44;
-            import "package:meta/meta.dart";
 
             @sealed
             class Test {
@@ -942,7 +939,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -970,7 +967,7 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
+            import "package:meta/meta.dart" show nonVirtual, sealed;
 
             @sealed
             class Test {
@@ -998,8 +995,6 @@ class Property {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             final int aNumber = 30;
             """
         )

@@ -1,7 +1,7 @@
 package org.dotlin.compiler.backend.descriptors
 
 import org.dotlin.compiler.backend.DartPackage
-import org.dotlin.compiler.backend.descriptors.annotation.DartSyntheticAnnotationPackageFragmentDescriptor
+import org.dotlin.compiler.backend.descriptors.annotation.DartInteropAnnotationPackageFragmentDescriptor
 import org.dotlin.compiler.backend.descriptors.export.DartExportPackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
@@ -29,7 +29,7 @@ val DartPackage.fqName: FqName
 val DeclarationDescriptor.dartPackageFragment: DartPackageFragmentDescriptor
     get() = when (val container = containingPackageFragment) {
         is DartPackageFragmentDescriptor -> container
-        is DartSyntheticAnnotationPackageFragmentDescriptor -> when (val fragment = container.fragment) {
+        is DartInteropAnnotationPackageFragmentDescriptor -> when (val fragment = container.fragment) {
             is DartPackageFragmentDescriptor -> fragment
             is DartExportPackageFragmentDescriptor -> fragment.fragment
             else -> throw UnsupportedOperationException("Unexpected fragment: $fragment")

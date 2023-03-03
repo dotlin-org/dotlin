@@ -55,7 +55,6 @@ class Collection : BaseTest {
             """
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/flex.dt.g.dart" show AnyCollection;
-            import "package:meta/meta.dart";
 
             void main() {
               final AnyCollection<int> myCollection = calculate();
@@ -89,7 +88,6 @@ class Collection : BaseTest {
             """
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/flex.dt.g.dart" show AnyCollection;
-            import "package:meta/meta.dart";
 
             final AnyCollection<int> myCollection = calculate();
             """
@@ -126,7 +124,6 @@ class Collection : BaseTest {
             """
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/flex.dt.g.dart" show AnyCollection;
-            import "package:meta/meta.dart";
 
             void main() {
               final List<int> myList = calculate();
@@ -171,7 +168,6 @@ class Collection : BaseTest {
             import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show Collection;
             import "package:dotlin/src/dotlin/intrinsics/flex.dt.g.dart" show AnyCollection;
-            import "package:meta/meta.dart";
 
             void main() {
               final dynamic obj = calculate();
@@ -215,7 +211,6 @@ class Collection : BaseTest {
             import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show Collection;
             import "package:dotlin/src/dotlin/intrinsics/flex.dt.g.dart" show AnyCollection;
-            import "package:meta/meta.dart";
 
             void main() {
               final Object obj = calculate();
@@ -256,7 +251,6 @@ class Collection : BaseTest {
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show isCollection;
-            import "package:meta/meta.dart";
 
             void main() {
               final dynamic obj = calculate();
@@ -296,8 +290,6 @@ class Collection : BaseTest {
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show isCollection;
-            import "package:meta/meta.dart";
-
             void main() {
               final Object obj = calculate();
               if (!isCollection<int>(obj)) {}
@@ -425,7 +417,6 @@ class Collection : BaseTest {
             """
             import "my_list.dart" show MyList;
             import "package:dotlin/src/dotlin/intrinsics/flex.dt.g.dart" show AnyCollection;
-            import "package:meta/meta.dart";
 
             void main() {
               final AnyCollection<int> myList = MyList<int>();
@@ -456,8 +447,6 @@ class Collection : BaseTest {
 
         dart(
             """
-            import "package:meta/meta.dart";
-
             void main() {
               final dynamic obj = calculate();
               if (!obj.isCollection<int>()) {}

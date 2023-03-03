@@ -3,8 +3,14 @@ description: The Dotlin standard library.
 version: 0.0.1
 homepage: dotlin.org
 
+publish_to: none # TODO
+
 environment:
   sdk: '>=2.18.2 <3.0.0'
 
 dependencies:
   meta: ^1.9.0
+
+dev_dependencies:
+  dotlin_generator:
+    path: ../dotlin_generator
