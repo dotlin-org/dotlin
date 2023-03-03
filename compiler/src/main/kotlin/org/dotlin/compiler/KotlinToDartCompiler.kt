@@ -22,8 +22,8 @@ package org.dotlin.compiler
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.util.Disposer
 import kotlinx.coroutines.runBlocking
-import org.dotlin.compiler.backend.DartNameGenerator
 import org.dotlin.compiler.backend.DartPackage
+import org.dotlin.compiler.backend.DartPathGenerator
 import org.dotlin.compiler.backend.DartProject
 import org.dotlin.compiler.backend.steps.ast2dart.dartAstToDartSource
 import org.dotlin.compiler.backend.steps.ir2ast.irToDartAst
@@ -105,7 +105,7 @@ object KotlinToDartCompiler {
             // Delete all old files first.
             // TODO: Only delete changed files, but still delete related deleted .kt files.
             project.path.toFile().walk()
-                .filter { !it.isDirectory && it.path.endsWith(".${DartNameGenerator.FILE_EXTENSION}") }
+                .filter { !it.isDirectory && it.path.endsWith(".${DartPathGenerator.FILE_EXTENSION}") }
                 .forEach { it.delete() }
 
             for ((path, source) in result.sources) {

@@ -10,6 +10,7 @@ import org.dotlin.compiler.dart.ast.expression.identifier.DartIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartPrefixedIdentifier
 import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.jetbrains.kotlin.backend.jvm.ir.psiElement
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.ir.IrBuiltIns
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
@@ -30,7 +31,6 @@ import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.bindingContextUtil.getAbbreviatedTypeOrType
 import org.jetbrains.kotlin.types.Variance
-import java.nio.file.Path
 
 abstract class IrContext : IrAttributes {
     abstract val bindingContext: BindingContext
@@ -95,26 +95,11 @@ abstract class IrContext : IrAttributes {
     fun IrTypeParameter.dartNameValueWith(superTypes: Boolean) =
         dartNameGenerator.run { dartNameValueWith(superTypes) }
 
-    /**
-     * The path for the (eventually) generated Dart file. The path is relative to its source root.
-     *
-     * The original Kotlin file name is transformed to snake case, and the `.kt` extension is replaced
-     * with `.dt.g.dart`.
-     */
-    val IrFile.dartPath: Path
-        get() = dartNameGenerator.runWith(this) { dartPathOf(it) }
-
-    /**
-     * The path for the (eventually) generated Dart file. The path is relative to the [currentFile]. Will be empty
-     * if this file is the [currentFile].
-     *
-     * The original Kotlin file name is transformed to snake case, and the `.kt` extension is replaced with `.g.dart`.
-     */
-    val IrFile.relativeDartPath: Path
-        get() = dartNameGenerator.runWith(this) { relativeDartPathOf(it) }
+    val ModuleDescriptor.isCurrent: Boolean
+        get() = this == currentFile.module.descriptor
 
     val IrFile.isInCurrentModule: Boolean
-        get() = module == currentFile.module
+        get() = module.descriptor.isCurrent
 
     val IrDeclaration.isInCurrentModule: Boolean
         get() = fileOrNull?.isInCurrentModule == true

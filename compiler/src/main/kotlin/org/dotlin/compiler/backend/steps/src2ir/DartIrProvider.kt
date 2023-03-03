@@ -4,27 +4,19 @@ import org.dotlin.compiler.backend.DartPackage
 import org.dotlin.compiler.backend.descriptors.DartDescriptor
 import org.dotlin.compiler.backend.descriptors.DartPackageFragmentDescriptor
 import org.dotlin.compiler.backend.descriptors.DartSyntheticDescriptor
-import org.dotlin.compiler.backend.descriptors.annotation.DartSyntheticAnnotationPackageFragmentDescriptor
-import org.dotlin.compiler.backend.descriptors.export.DartExportPackageFragmentDescriptor
 import org.dotlin.compiler.backend.isCurrent
-import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.dart.element.DartLibraryElement
 import org.jetbrains.kotlin.backend.common.serialization.DescriptorByIdSignatureFinderImpl
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.*
-import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsManglerDesc
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrFile
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
 import org.jetbrains.kotlin.ir.linkage.IrProvider
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.util.SymbolTable
-import org.jetbrains.kotlin.ir.util.addChild
 import org.jetbrains.kotlin.psi2ir.generators.DeclarationStubGeneratorImpl
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
-import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 /**
  * Providers IR elements from Dart descriptors.
@@ -33,13 +25,10 @@ class DartIrProvider(
     private val module: ModuleDescriptor,
     symbolTable: SymbolTable,
     irBuiltIns: IrBuiltIns,
-    private val irModuleFragment: IrModuleFragment?,
 ) : IrProvider {
-    private val filesByLibrary = mutableMapOf<DartLibraryElement, IrFileImpl>()
-
     private val descriptorFinder = DescriptorByIdSignatureFinderImpl(
         module,
-        JsManglerDesc, // TODO: JS reference
+        DotlinDescriptorBasedMangler,
     )
 
     private val stubGenerator = DeclarationStubGeneratorImpl(
@@ -69,46 +58,8 @@ class DartIrProvider(
             }
         }
 
-        // Generated top-level IR elements by default have an IrExternalPackageFragment parent,
-        // we want this to be an IrFile.
-        descriptor.containingPackageFragment?.let {
-            filesByLibrary.computeIfAbsent(it.library) { _ ->
-                DartIrFile(it)
-            }.apply {
-                addChild(declaration)
-                irModuleFragment?.addFile(this)
-
-                // Corresponding properties have to be added to the file as well.
-                declaration.safeAs<IrSimpleFunction>()?.correspondingProperty?.let { property ->
-                    addChild(property)
-                }
-            }
-        }
-
         return declaration
     }
-
-    fun setModuleFiles(irModuleFragment: IrModuleFragment) {
-        require(this.irModuleFragment == null) { "Modules are already set" }
-        filesByLibrary.values.forEach { irModuleFragment.addFile(it) }
-    }
-
-    private fun IrModuleFragment.addFile(irFile: IrFileImpl) {
-        irFile.module = this
-        files.add(irFile)
-    }
-
-    private val DeclarationDescriptor.containingPackageFragment: DartPackageFragmentDescriptor?
-        get() = when (val container = containingDeclaration) {
-            is DartPackageFragmentDescriptor -> container
-            is DartSyntheticAnnotationPackageFragmentDescriptor -> when (val fragment = container.fragment) {
-                is DartPackageFragmentDescriptor -> fragment
-                is DartExportPackageFragmentDescriptor -> fragment.fragment
-                else -> throw UnsupportedOperationException("Unexpected fragment: $fragment")
-            }
-            is DartExportPackageFragmentDescriptor -> container.fragment
-            else -> null
-        }
 }
 
 // TODO: Remove when #81 is completed.

@@ -35,7 +35,6 @@ import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDe
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.languageVersionSettings
-import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.descriptors.konan.kotlinLibrary
 import org.jetbrains.kotlin.ir.builders.TranslationPluginContext
@@ -148,11 +147,9 @@ private fun loadIr(
         frontEndContext,
     )
 
-    val modulesByIrFragments = mutableMapOf<ModuleDescriptor, IrModuleFragment>()
-
     if (!isCompilingBuiltIns) {
         mainModule.builtIns.builtInsModule.let {
-            modulesByIrFragments[it] = irLinker.deserializeIrModuleHeader(
+            irLinker.deserializeIrModuleHeader(
                 moduleDescriptor = it,
                 kotlinLibrary = it.kotlinLibrary,
                 // For built-ins, we want everything.
@@ -163,13 +160,12 @@ private fun loadIr(
 
     dependencyDartModules
         .filter { it.impl != mainModule.builtIns.builtInsModule } // Built-ins module is already done above.
-        .associateWithTo(modulesByIrFragments) {
-        irLinker.deserializeIrModuleHeader(it, it.klib, _moduleName = it.name.asString())
-    }
+        .forEach {
+            irLinker.deserializeIrModuleHeader(it, it.klib, _moduleName = it.name.asString())
+        }
 
     val dartIrProviders = dependencyDartModules.plus(mainModule)
-        .map { DartIrProvider(it, symbolTable, psi2IrContext.irBuiltIns, modulesByIrFragments[it]) }
-    val mainModuleDartIrProvider = dartIrProviders.last()
+        .map { DartIrProvider(it, symbolTable, psi2IrContext.irBuiltIns) }
 
     val irModule = psi2Ir.generateModuleFragment(
         context = psi2IrContext,
@@ -181,8 +177,6 @@ private fun loadIr(
         },
         linkerExtensions = emptyList(),
     )
-
-    mainModuleDartIrProvider.setModuleFiles(irModule)
 
     val extraIrAttributes = IrAttributes.Default()
 

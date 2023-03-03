@@ -28,7 +28,6 @@ import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.builders.declarations.buildFun
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
-import org.jetbrains.kotlin.ir.declarations.impl.IrExternalPackageFragmentImpl
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
@@ -37,6 +36,7 @@ import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.makeNullable
 import org.jetbrains.kotlin.ir.util.SYNTHETIC_OFFSET
+import org.jetbrains.kotlin.ir.util.addChild
 import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -50,10 +50,7 @@ class DotlinIrBuiltIns(private val context: DotlinLoweringContext) {
 
     val dart = Dart(this)
 
-    private val operatorsPackage = IrExternalPackageFragmentImpl.createEmptyExternalPackageFragment(
-        builtInsModule,
-        org.dotlin.compiler.backend.dotlin.intrinsics.operators.self
-    )
+    private val operatorsPackage = context.irBuiltIns.operatorsPackageFragment
 
     // Fake functions for certain operators.
     fun ifNull(type: IrType) = context.irFactory.buildFun {
@@ -81,7 +78,7 @@ class DotlinIrBuiltIns(private val context: DotlinLoweringContext) {
             }
         )
 
-        parent = operatorsPackage
+        operatorsPackage.addChild(ifNull)
     }
 
     val const = classSymbolAt(dotlin.const)

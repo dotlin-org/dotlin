@@ -21,12 +21,14 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
+import org.dotlin.compiler.backend.DartPathGenerator.dartPath
+import org.dotlin.compiler.backend.DartPathGenerator.relativeDartPath
 import org.dotlin.compiler.backend.annotatedDartLibrary
 import org.dotlin.compiler.backend.attributes.DartImport
 import org.dotlin.compiler.backend.descriptors.DartDescriptor
 import org.dotlin.compiler.backend.descriptors.DartPackageFragmentDescriptor
+import org.dotlin.compiler.backend.descriptors.dartPackageFragment
 import org.dotlin.compiler.backend.descriptors.export.DartExportPackageFragmentDescriptor
-import org.dotlin.compiler.backend.descriptors.fqName
 import org.dotlin.compiler.backend.dotlin
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrTypeContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrTypeContext.SuperTypes
@@ -35,7 +37,6 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.isNonExtensionMethod
 import org.dotlin.compiler.backend.steps.ir2ast.ir.visitTypes
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrFileLowering
-import org.dotlin.compiler.backend.steps.src2ir.DartIrFile
 import org.dotlin.compiler.backend.steps.src2ir.dotlinModule
 import org.dotlin.compiler.backend.util.annotationsWithRuntimeRetention
 import org.dotlin.compiler.backend.util.descriptor
@@ -45,6 +46,7 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.descriptors.IrBuiltinsPackageFragmentDescriptorImpl
 import org.jetbrains.kotlin.ir.expressions.IrDeclarationReference
 import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin.*
@@ -53,7 +55,6 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameOrNull
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
 import java.nio.file.Path
@@ -197,40 +198,34 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
 
         if (isFunctionType && typeContext != null && typeContext !is SuperTypes) return
 
-        // If the file is null, it's most likely Kotlin intrinsics (ANDAND, OROR, EQEQ, etc.)
-        val fileOfDeclaration = when {
+        val irFragmentOfDeclaration = when {
             // Function1, Function2, etc. are in an "external package fragment", but are in reality located
             // in the same file as the Function interface.
-            isFunctionType -> irBuiltIns.functionClass.owner.fileOrNull
-            else -> relevantDeclaration.fileOrNull
-        } ?: return
+            isFunctionType -> irBuiltIns.functionClass.owner.getPackageFragment()
+            else -> relevantDeclaration.getPackageFragment()
+        }
+
+        // We don't need to import Kotlin intrinsics such as ANDAND, OROR, EQEQ, etc.
+        if (irFragmentOfDeclaration.packageFragmentDescriptor is IrBuiltinsPackageFragmentDescriptorImpl) return
 
         if (relevantDeclaration.name.isSpecial) return
 
         val annotatedLibraryUri = relevantDeclaration.annotatedDartLibrary
 
         // We don't need to import declarations defined in the same file, unless there's an `@DartLibrary` annotation.
-        if (this == fileOfDeclaration && annotatedLibraryUri == null) return
+        if (this == irFragmentOfDeclaration && annotatedLibraryUri == null) return
 
         val descriptor = relevantDeclaration.descriptor
 
         val libraryUri = annotatedLibraryUri ?: run {
             var module = descriptor.module
 
-            // If the imported declaration is from our module, or if we know it's written in Kotlin
-            // we cannot build the file path based on the fq name, because the `package`
-            // and path might not match.
+            // If the imported declaration is from our module, the library URI is just a relative path.
             if (module == currentFile.module.descriptor) {
-                val relevantFileOfDeclaration = when (descriptor) {
-                    is DartDescriptor -> exportedPackageFragmentOf(descriptor)?.let { fragment ->
-                        DartIrFile(fragment).also { it.module = currentFile.module }
-                    } ?: fileOfDeclaration
-
-                    else -> fileOfDeclaration
-                }
+                exportedPackageFragmentOf(descriptor)?.let { return@run it.relativeDartPath.toUriString() }
 
                 // TODO: Make relativeDartPath work without IrFiles (#81)
-                return@run relevantFileOfDeclaration.relativeDartPath.toUriString()
+                return@run irFragmentOfDeclaration.relativeDartPath.toUriString()
             }
 
             // At this point, the declaration is from a dependency and thus the module must be a
@@ -239,42 +234,19 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
             val pkg = module.dartPackage
 
             val filePath = when (descriptor) {
+                is DartDescriptor -> {
+                    val fragment = exportedPackageFragmentOf(descriptor) ?: descriptor.dartPackageFragment
+                    fragment.library.path.toUriString()
+                }
                 // Make filePath relative to packageRoot, example:
                 // Package root: ${pkg.path}/lib/
                 // File Dart path: ${pkg.path}/lib/somewhere/else.dart
                 // Result: somewhere/else.dart
-                !is DartDescriptor -> pkg.path.resolve(fileOfDeclaration.dartPath)
+                else -> pkg.path.resolve(irFragmentOfDeclaration.dartPath)
                     .relativeTo(pkg.packagePath)
                     .toUriString()
-
-                else -> {
-                    val exportedFragment = exportedPackageFragmentOf(descriptor)
-                    val fqNameWithoutPackageAndDeclaration = run {
-                        val fqName = exportedFragment?.fqName ?: descriptor.fqNameSafe
-
-                        if (fqName == pkg.fqName) {
-
-                        }
-
-                        when (fqName) {
-                            pkg.fqName -> pkg.name
-                            else -> fqName
-                                .toString()
-                                .replace("${pkg.fqName}.", "") // Remove package name.
-                                .replaceAfterLast(".", "", "") // Remove declaration name.
-                                .dropLast(1) // Drop last dot.
-                        }
-                    }
-
-                    val relevantLibraryPath =  exportedFragment?.library?.path?.toUriString()
-                        ?: descriptor.element.location.library.name
-                    val extension = relevantLibraryPath.split(".").lastOrNull()
-
-                    fqNameWithoutPackageAndDeclaration
-                        .split(".")
-                        .joinToString("/", postfix = ".$extension")
-                }
             }
+
 
             val packageName = module.dartPackage.name
 
@@ -295,29 +267,29 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
             }
         }
     }
-
-    context(DotlinLoweringContext)
-    private fun IrFile.exportedPackageFragmentOf(descriptor: DeclarationDescriptor): DartPackageFragmentDescriptor? {
-        val ktFile = getKtFile() ?: return null
-        val import = ktFile.importDirectives
-            .associateWith { it.descriptor(bindingContext) }
-            .entries
-            .firstOrNull { (_, d) -> d == descriptor }
-            ?.key
-            ?: return null
-
-        val importedFqName = import.importedFqName ?: return null
-
-        // Not an export if the imported fqName is the same as that of the descriptor.
-        if (importedFqName == descriptor.fqNameOrNull()) return null
-
-        val packageFragment = module.descriptor.getPackage(importedFqName.parent())
-            .fragments
-            .firstIsInstanceOrNull<DartExportPackageFragmentDescriptor>()
-            ?: return null
-
-        return packageFragment.fragment
-    }
-
-    private fun Path.toUriString() = joinToString("/") { it.toString() }
 }
+
+context(DotlinLoweringContext)
+private fun IrFile.exportedPackageFragmentOf(descriptor: DeclarationDescriptor): DartPackageFragmentDescriptor? {
+    val ktFile = getKtFile() ?: return null
+    val import = ktFile.importDirectives
+        .associateWith { it.descriptor(bindingContext) }
+        .entries
+        .firstOrNull { (_, d) -> d == descriptor }
+        ?.key
+        ?: return null
+
+    val importedFqName = import.importedFqName ?: return null
+
+    // Not an export if the imported fqName is the same as that of the descriptor.
+    if (importedFqName == descriptor.fqNameOrNull()) return null
+
+    val packageFragment = module.descriptor.getPackage(importedFqName.parent())
+        .fragments
+        .firstIsInstanceOrNull<DartExportPackageFragmentDescriptor>()
+        ?: return null
+
+    return packageFragment.fragment
+}
+
+private fun Path.toUriString() = joinToString("/") { it.toString() }

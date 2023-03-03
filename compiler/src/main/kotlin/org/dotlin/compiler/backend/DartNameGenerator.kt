@@ -32,9 +32,6 @@ import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.isSetter
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.util.collectionUtils.filterIsInstanceAnd
-import java.nio.file.Path
-import kotlin.io.path.Path
-import kotlin.io.path.relativeTo
 
 class DartNameGenerator {
     private val builtInIdentifiers = listOf(
@@ -263,39 +260,4 @@ class DartNameGenerator {
         }
 
     private fun List<*>.isLastIndexAndNotSingle(index: Int) = index == size - 1 && size != 1
-
-    private fun dartNameOf(file: IrFile): String {
-        return file.name.foldIndexed(initial = "") { index, acc, char ->
-            acc + when {
-                index != 0 && char.isUpperCase() && !acc.last().isUpperCase() -> "_$char"
-                else -> char.toString()
-            }
-        }.lowercase().replace(Regex("\\.kt$"), ".$FILE_EXTENSION")
-    }
-
-    fun IrContext.dartPathOf(file: IrFile): Path {
-        val fileName = dartNameOf(file)
-        val filePath = Path(file.path)
-
-        val relativeParentPath = when {
-            file.isInCurrentModule -> filePath.relativeTo(dartProject.path).parent
-            else -> filePath.parent // File paths are always serialized as relative to their project root.
-        } ?: Path("")
-
-        return relativeParentPath.resolve(fileName)
-    }
-
-    fun IrContext.relativeDartPathOf(file: IrFile): Path {
-        val theirDartPath = dartPathOf(file)
-        val currentDartPath = dartPathOf(currentFile)
-
-        return currentDartPath.parent?.let { theirDartPath.relativeTo(it) } ?: theirDartPath
-    }
-
-    companion object {
-        /**
-         * Dotlin-generated Dart file extension, without dot.
-         */
-        const val FILE_EXTENSION = "dt.g.dart"
-    }
 }

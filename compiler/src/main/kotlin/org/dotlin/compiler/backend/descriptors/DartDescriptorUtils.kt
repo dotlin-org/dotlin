@@ -1,6 +1,10 @@
 package org.dotlin.compiler.backend.descriptors
 
 import org.dotlin.compiler.backend.DartPackage
+import org.dotlin.compiler.backend.descriptors.annotation.DartSyntheticAnnotationPackageFragmentDescriptor
+import org.dotlin.compiler.backend.descriptors.export.DartExportPackageFragmentDescriptor
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.name.FqName
 
 /**
@@ -20,4 +24,24 @@ val DartPackage.fqName: FqName
         }
 
         return FqName("$group.${name}")
+    }
+
+val DeclarationDescriptor.dartPackageFragment: DartPackageFragmentDescriptor
+    get() = when (val container = containingPackageFragment) {
+        is DartPackageFragmentDescriptor -> container
+        is DartSyntheticAnnotationPackageFragmentDescriptor -> when (val fragment = container.fragment) {
+            is DartPackageFragmentDescriptor -> fragment
+            is DartExportPackageFragmentDescriptor -> fragment.fragment
+            else -> throw UnsupportedOperationException("Unexpected fragment: $fragment")
+        }
+
+        is DartExportPackageFragmentDescriptor -> container.fragment
+        else -> throw UnsupportedOperationException("Unexpected package fragment: $container")
+    }
+
+private val DeclarationDescriptor.containingPackageFragment: PackageFragmentDescriptor
+    get() = when (this) {
+        is PackageFragmentDescriptor -> this
+        else -> containingDeclaration?.containingPackageFragment
+            ?: throw UnsupportedOperationException("No package fragment found")
     }

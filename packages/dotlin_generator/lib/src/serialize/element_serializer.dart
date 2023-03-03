@@ -131,7 +131,9 @@ class DartElementSerializer {
       accessor != null
           ? DartPropertyAccessorElement(
               location: accessor.encodedLocation,
-              name: accessor.name,
+              name: accessor.isSetter
+                  ? accessor.name.reversed.replaceFirst('=', '').reversed
+                  : accessor.name,
               type: _typeSerializer.serializeFunctionType(accessor.type),
               isAsync: accessor.isAsynchronous,
               isGenerator: accessor.isGenerator,

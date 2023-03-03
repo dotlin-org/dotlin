@@ -19,7 +19,8 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast
 
-import org.dotlin.compiler.backend.DartNameGenerator
+import org.dotlin.compiler.backend.DartPathGenerator
+import org.dotlin.compiler.backend.DartPathGenerator.dartPath
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lower
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.IrToDartCompilationUnitTransformer
 import org.dotlin.compiler.backend.steps.src2ir.IrResult
@@ -76,7 +77,7 @@ fun irToDartAst(
     // TODO: Make separate option in pubspec
     if (/*dartProject.compileKlib*/false) {
         // Add exports file.
-        units[Path("lib/${dartProject.name}.${DartNameGenerator.FILE_EXTENSION}")] = DartCompilationUnit(
+        units[Path("lib/${dartProject.name}.${DartPathGenerator.FILE_EXTENSION}")] = DartCompilationUnit(
             directives = units.mapNotNull { (path, unit) ->
                 when {
                     // If all declarations in the unit are private or internal, we don't need to export it.
