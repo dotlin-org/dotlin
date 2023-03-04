@@ -250,7 +250,7 @@ class Interop : BaseTest {
 
         kotlin(
             """
-            import dev.pub.test.point.Point
+            import pkg.test.point.Point
 
             fun main() {
                 val loc = Point(1, 2)
@@ -281,7 +281,7 @@ class Interop : BaseTest {
 
         kotlin(
             """
-            import dev.pub.test.fields.myField
+            import pkg.test.fields.myField
 
             fun main() {
                 val x = myField * 3
@@ -312,7 +312,7 @@ class Interop : BaseTest {
 
         kotlin(
             """
-            import dev.pub.test.fields.myField
+            import pkg.test.fields.myField
 
             fun main() {
                 const val x = myField * 3
@@ -343,7 +343,7 @@ class Interop : BaseTest {
 
         kotlin(
             """
-            import dev.pub.test.getters.myGetter
+            import pkg.test.getters.myGetter
 
             fun main() {
                 val x = myGetter * 3
@@ -374,7 +374,7 @@ class Interop : BaseTest {
 
         kotlin(
             """
-            import dev.pub.test.setters.mySetter
+            import pkg.test.setters.mySetter
 
             fun main() {
                 mySetter = 3
@@ -407,7 +407,7 @@ class Interop : BaseTest {
 
         kotlin(
             """
-            import dev.pub.test.my_class.MyClass
+            import pkg.test.my_class.MyClass
 
             fun main() {
                 val x = MyClass().field
@@ -440,7 +440,7 @@ class Interop : BaseTest {
 
         kotlin(
             """
-            import dev.pub.test.my_class.MyClass
+            import pkg.test.my_class.MyClass
 
             fun main() {
                 val x = MyClass().myGetter * 3
@@ -473,7 +473,7 @@ class Interop : BaseTest {
 
         kotlin(
             """
-            import dev.pub.test.my_class.MyClass
+            import pkg.test.my_class.MyClass
 
             fun main() {
                 MyClass().mySetter = 3
@@ -506,7 +506,7 @@ class Interop : BaseTest {
 
         kotlin(
             """
-            import dev.pub.test.fragile.annotations.Fragile
+            import pkg.test.fragile.annotations.Fragile
 
             @Fragile
             class Box
@@ -541,7 +541,7 @@ class Interop : BaseTest {
 
         kotlin(
             """
-            import dev.pub.test.fragile.annotations.fragile
+            import pkg.test.fragile.annotations.fragile
 
             @fragile
             class Box
@@ -582,7 +582,7 @@ class Interop : BaseTest {
 
         kotlin(
             """
-            import dev.pub.test.markers.annotations.Fragile
+            import pkg.test.markers.annotations.Fragile
 
             @Fragile
             class Box
@@ -625,7 +625,7 @@ class Interop : BaseTest {
 
         kotlin(
             """
-            import dev.pub.test.markers.annotations.fragile
+            import pkg.test.markers.annotations.fragile
 
             @fragile
             class Box
@@ -664,7 +664,7 @@ class Interop : BaseTest {
 
         kotlin(
             """
-            import dev.pub.test.birds.BlackBird
+            import pkg.test.birds.BlackBird
 
             fun main() {
                 val myBird = BlackBird()
@@ -703,7 +703,7 @@ class Interop : BaseTest {
 
         kotlin(
             """
-            import dev.pub.test.birds.BlackBird
+            import pkg.test.birds.BlackBird
 
             fun getBird(): BlackBird = BlackBird()
 
@@ -767,8 +767,8 @@ class Interop : BaseTest {
 
         kotlin(
             """
-            import dev.pub.test.birds.BlackBird
-            import dev.pub.test.word.isTheWord
+            import pkg.test.birds.BlackBird
+            import pkg.test.word.isTheWord
 
             fun main() {
                 isTheWord(BlackBird())
@@ -824,6 +824,39 @@ class Interop : BaseTest {
 
             void main() {
               final Bird myBird = Bird();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `use Dart top-level getter with publish_to set`() = assertCompile {
+        publishTo = "https://pub.dev"
+
+        dart(
+            """
+            int get myGetter => 345634;
+            """,
+            Path("lib/getters.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import dev.pub.test.getters.myGetter
+
+            fun main() {
+                val x = myGetter * 3
+            }
+            """
+        )
+
+        dart(
+            """
+            import "getters.dart" show myGetter;
+
+            void main() {
+              final int x = myGetter * 3;
             }
             """
         )

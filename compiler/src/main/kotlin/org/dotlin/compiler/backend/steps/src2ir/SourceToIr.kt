@@ -72,7 +72,7 @@ fun sourceToIr(
 
     // If the Dart package is a library, we must specify const declarations
     // that are not normally const in Kotlin. Otherwise, this information is lost in the output IR.
-    if (dartProject.compileKlib) {
+    if (dartProject.isPublishable) {
         ir = ir.copy(
             loweringContext = ir.lower(
                 config,

@@ -22,21 +22,28 @@ package analysis
 import BaseTest
 import assertCompilesWithError
 import assertCompilesWithWarning
+import assertCompilesWithoutWarnings
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 @DisplayName("Analysis: Dotlin")
 class Dotlin : BaseTest {
-
-    // TODO: Only raise this warning if publish_to in pubspec.yaml is not 'none' (?)
-    @Disabled
     @Test
     fun `warning if declaring extension without @DartExtensionName in public package`() =
         assertCompilesWithWarning(ErrorsDart.EXTENSION_WITHOUT_EXPLICIT_DART_EXTENSION_NAME_IN_PUBLIC_PACKAGE) {
-            //isLibrary = true TODO
+            publishTo = "https://pub.dev"
 
+            kotlin(
+                """
+                fun Int.negate() = -this
+                """
+            )
+        }
+
+    @Test
+    fun `no warning if declaring extension without @DartExtensionName in private package`() =
+        assertCompilesWithoutWarnings {
             kotlin(
                 """
                 fun Int.negate() = -this

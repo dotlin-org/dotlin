@@ -37,6 +37,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.io.path.*
 import kotlin.test.assertContains
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.text.RegexOption.MULTILINE
 
@@ -46,7 +47,7 @@ abstract class DartTestProject {
             ?: Path(System.getProperty("user.home")).resolve(".pub-cache")
 
         @Language("yaml")
-        private fun defaultPubspec(name: String): String =
+        private fun defaultPubspec(name: String, publishTo: String): String =
             """
             name: $name
             version: 1.0.0
@@ -54,7 +55,7 @@ abstract class DartTestProject {
             environment:
               sdk: '>=2.18.0 <3.0.0'
 
-            publish_to: none
+            publish_to: $publishTo
     
             dependencies:
               dotlin:
@@ -247,9 +248,10 @@ abstract class DartTestProject {
     }
 
     open val name: String = "test"
+    open var publishTo: String = "none"
     open val path = createTempDirectory()
 
-    open var pubspec: String by LazyVar { defaultPubspec(name) }
+    open var pubspec: String by LazyVar { defaultPubspec(name, publishTo) }
 
     @Language("yaml")
     var pubspecLock: String =
@@ -453,6 +455,8 @@ abstract class DartTestProject {
             strict-raw-types: true
           errors:
             unnecessary_non_null_assertion: info
+            # Otherwise it will complain about publishable packages having 'path' dependencies.
+            invalid_dependency: info
         """.trimIndent()
 
     fun writeConfigFiles(writeLockFiles: Boolean = true) {
@@ -657,6 +661,19 @@ class AssertCompilesWithWarning : AssertCompilesWithDiagnostics() {
     }
 }
 
+class AssertCompilesWithoutWarnings : AssertCompilesWithDiagnostics() {
+    override var diagnostics = emptyList<DiagnosticFactory<*>>()
+
+    override fun assert() {
+        val (_, diagnostics) = assertDoesNotThrow { compile() }
+        assertContentEquals(
+            actual = diagnostics.warnings.factories,
+            expected = emptyList(),
+            message = "Warnings found: ${diagnostics.warnings.factories}"
+        )
+    }
+}
+
 class AssertCanCompile : CompilerAssertion() {
     override fun assert() {
         assertDoesNotThrow { compile() }
@@ -700,6 +717,12 @@ inline fun assertCompilesWithWarnings(
     AssertCompilesWithWarning().let {
         require(factories.isNotEmpty())
         it.diagnostics = factories.toList()
+        block(it)
+        it.assert()
+    }
+
+inline fun assertCompilesWithoutWarnings(block: AssertCompilesWithoutWarnings.() -> Unit) =
+    AssertCompilesWithoutWarnings().let {
         block(it)
         it.assert()
     }

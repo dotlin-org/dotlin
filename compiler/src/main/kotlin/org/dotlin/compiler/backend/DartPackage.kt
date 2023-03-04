@@ -60,14 +60,20 @@ class DartProject(
     name: String,
     val dependencies: Set<DartPackage>,
     path: Path,
-    val compileKlib: Boolean,
+    publishTo: URL?,
 ) : DartPackage(
     name,
     publisher = "" /* TODO */,
-    repository = URL("https://pub.dev") /* TODO */,
+    repository = publishTo,
     path,
     packagePath = Path("lib") /* TODO */
 ) {
+    /**
+     * Whether this project has a repository to publish to (`publish_to` in `pubspec.yaml`).
+     */
+    val isPublishable: Boolean
+        get() = repository != null
+
     companion object {
         private val http = HttpClient(CIO)
 
@@ -76,7 +82,7 @@ class DartProject(
             prettyPrint = true
         }
 
-        suspend fun from(projectPath: Path, compileKlib: Boolean): DartProject {
+        suspend fun from(projectPath: Path): DartProject {
             suspend fun pubGet() = dart.pub.get(workingDirectory = projectPath)
 
             val pubspecFile = projectPath.resolve("pubspec.yaml")
@@ -125,11 +131,9 @@ class DartProject(
 
                         val packagePath = config.packagePath
 
-                        val source = nodeMap.getScalar("source")?.contentToString()
-
                         // TODO: Read PUB_HOSTED_URL
                         val fallbackRepositoryUrl = URL("https://pub.dev")
-                        val repositoryUrl = when (source) {
+                        val repositoryUrl = when (nodeMap.getScalar("source")?.contentToString()) {
                             "hosted" -> {
                                 val url = nodeMap
                                     .get<YamlMap>("description")?.yamlMap
@@ -193,7 +197,9 @@ class DartProject(
                     ?.toSet()
                     .orEmpty(),
                 path = projectPath,
-                compileKlib,
+                publishTo = pubspec.get<YamlScalar>("publish_to")?.content
+                    ?.let { if (it != "none") it else null }
+                    ?.let { URL(it) }
             )
         }
     }

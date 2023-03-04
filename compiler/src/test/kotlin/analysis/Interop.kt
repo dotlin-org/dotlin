@@ -87,8 +87,8 @@ class Interop : BaseTest {
 
         kotlin(
             """
-            import dev.pub.test.birds.BlackBird
-            import dev.pub.test.src.black_bird.BlackBird as SrcBlackBird
+            import pkg.test.birds.BlackBird
+            import pkg.test.src.black_bird.BlackBird as SrcBlackBird
 
             fun main() {
                 val bird: SrcBlackBird = BlackBird()

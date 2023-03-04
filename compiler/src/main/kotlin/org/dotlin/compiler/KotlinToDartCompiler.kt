@@ -22,7 +22,6 @@ package org.dotlin.compiler
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.util.Disposer
 import kotlinx.coroutines.runBlocking
-import org.dotlin.compiler.backend.DartPackage
 import org.dotlin.compiler.backend.DartPathGenerator
 import org.dotlin.compiler.backend.DartProject
 import org.dotlin.compiler.backend.steps.ast2dart.dartAstToDartSource
@@ -44,39 +43,14 @@ import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import java.nio.file.Path
-import kotlin.io.path.*
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.createDirectories
+import kotlin.io.path.isDirectory
+import kotlin.io.path.writeText
 
 object KotlinToDartCompiler {
-    /**
-     * Compiles the given Kotlin code and returns the output path.
-     */
-    fun compile(
-        kotlin: String,
-        format: Boolean = false,
-        isLibrary: Boolean = true, // TODO: Read from pubspec
-        dependencies: Set<DartPackage>,
-    ): CompilationResult {
-        val tmpDir = createTempDirectory().also {
-            it.resolve("main.kt")
-                .createFile()
-                .toFile()
-                .writeText(kotlin)
-        }
-
-        return compile(
-            DartProject(
-                name = "main",
-                dependencies,
-                path = tmpDir,
-                isLibrary,
-            ),
-            format,
-            showPathsInDiagnostics = false
-        )
-    }
-
     fun compile(path: Path, format: Boolean = false): CompilationResult = compile(
-        runBlocking { DartProject.from(path, compileKlib = true) },
+        runBlocking { DartProject.from(path) },
         format
     )
 
@@ -96,7 +70,7 @@ object KotlinToDartCompiler {
                 project
             )
 
-            if (project.compileKlib) {
+            if (project.isPublishable) {
                 writeToKlib(env, config, ir, project)
             }
 
