@@ -516,6 +516,8 @@ abstract class DartTestProject {
                 pubspec = nameRegex.replace(pubspec, "name: $value")
             }
 
+        override var publishTo: String = "https://pub.dev"
+
         var needsCompile: Boolean = false
             private set
 

@@ -107,6 +107,9 @@ class DartProject(
 
             val packages = packageConfig.packages.associateBy { it.name }
 
+            // TODO: Read PUB_HOSTED_URL
+            val fallbackRepositoryUrl = URL("https://pub.dev")
+
             return DartProject(
                 name = pubspec.get<YamlScalar>("name")!!.content,
                 dependencies = pubspecLock.get<YamlMap>("packages")
@@ -131,8 +134,6 @@ class DartProject(
 
                         val packagePath = config.packagePath
 
-                        // TODO: Read PUB_HOSTED_URL
-                        val fallbackRepositoryUrl = URL("https://pub.dev")
                         val repositoryUrl = when (nodeMap.getScalar("source")?.contentToString()) {
                             "hosted" -> {
                                 val url = nodeMap
@@ -197,9 +198,16 @@ class DartProject(
                     ?.toSet()
                     .orEmpty(),
                 path = projectPath,
-                publishTo = pubspec.get<YamlScalar>("publish_to")?.content
-                    ?.let { if (it != "none") it else null }
-                    ?.let { URL(it) }
+                publishTo = pubspec.get<YamlScalar>("publish_to").let {
+                    // If the key is missing from the pubspec, use the fallback repo.
+                    when (it) {
+                        null -> fallbackRepositoryUrl
+                        else -> when (val value = it.content) {
+                            "none" -> null
+                            else -> URL(value)
+                        }
+                    }
+                }
             )
         }
     }
