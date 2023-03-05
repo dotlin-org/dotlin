@@ -426,4 +426,98 @@ class Extension : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `extension calling extension with receiver type parameter`() = assertCompile {
+        kotlin(
+            """
+            class Test<T>
+
+            fun <T> Test<T>.doIt() {}
+            fun <T> Test<T>.doItAgain() = doIt()
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart" show sealed;
+
+            @sealed
+            class Test<T> {}
+
+            extension ${'$'}Extensions${'$'}m16c83f0fbfe989b5<T> on Test<T> {
+              void doIt() {}
+            }
+
+            extension ${'$'}Extensions${'$'}37f52dfc25a24d30<T> on Test<T> {
+              void doItAgain() {
+                return this.doIt();
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `extension calling extension with receiver and regular type parameter`() = assertCompile {
+        kotlin(
+            """
+            class Test<T>
+
+            fun <T, A> Test<T>.doIt() {}
+            fun <T, A> Test<T>.doItAgain() = doIt<T, A>()
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart" show sealed;
+
+            @sealed
+            class Test<T> {}
+
+            extension ${'$'}Extensions${'$'}1969ba987fc0610b<T> on Test<T> {
+              void doIt<A>() {}
+            }
+
+            extension ${'$'}Extensions${'$'}186b8b16690e3d60<T> on Test<T> {
+              void doItAgain<A>() {
+                return this.doIt<A>();
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `calling extension with receiver and regular type parameter`() = assertCompile {
+        kotlin(
+            """
+            class Test<T>
+
+            fun <T, A> Test<T>.doIt() {}
+
+            fun main() {
+                Test<Int>().doIt<Int, Double>()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart" show sealed;
+
+            @sealed
+            class Test<T> {}
+
+            void main() {
+              Test<int>().doIt<double>();
+            }
+
+            extension ${'$'}Extensions${'$'}1969ba987fc0610b<T> on Test<T> {
+              void doIt<A>() {}
+            }
+            """
+        )
+    }
 }

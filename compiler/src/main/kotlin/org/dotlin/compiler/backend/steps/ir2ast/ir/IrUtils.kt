@@ -19,7 +19,6 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.ir
 
-import org.dotlin.compiler.backend.IrContext
 import org.dotlin.compiler.backend.hasDartExtensionAnnotation
 import org.dotlin.compiler.backend.kotlin
 import org.dotlin.compiler.backend.util.falseIfNull

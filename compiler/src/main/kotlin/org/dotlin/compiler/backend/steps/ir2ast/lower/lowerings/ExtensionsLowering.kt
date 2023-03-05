@@ -19,13 +19,11 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
-import org.dotlin.compiler.backend.steps.ir2ast.ir.extensionReceiverParameterOrNull
-import org.dotlin.compiler.backend.steps.ir2ast.ir.typeArguments
-import org.dotlin.compiler.backend.steps.ir2ast.ir.typeParameterOrNull
-import org.dotlin.compiler.backend.steps.ir2ast.ir.typeParametersOrSelf
+import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.declarations.IrTypeParametersContainer
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -50,7 +48,7 @@ class ExtensionsLowering(override val context: DotlinLoweringContext) : IrDeclar
             addChild(declaration)
         }
 
-        val oldReceiverTypeParameters = declaration.extensionReceiverParameterOrNull!!.type.typeParametersOrSelf
+        val oldReceiverTypeParameters = declaration.receiverTypeParameters
         if (oldReceiverTypeParameters.isNotEmpty()) {
             if (declaration is IrFunction) {
                 declaration.typeParameters -= oldReceiverTypeParameters
@@ -88,30 +86,35 @@ class ExtensionsLowering(override val context: DotlinLoweringContext) : IrDeclar
         override fun DotlinLoweringContext.transform(expression: IrExpression): Transformation<IrExpression>? {
             if (expression !is IrCall) return noChange()
 
-            val receiverParameter = expression.symbol.owner.extensionReceiverParameterOrNull ?: return noChange()
-            val receiverTypeParameter = receiverParameter.type.typeParameterOrNull ?: return noChange()
+            val function = expression.symbol.owner
+
+            if (!function.isExtension) return noChange()
+
+            val receiverTypeParameters = function.receiverTypeParameters
+            val newTypeArguments = expression.typeArguments.mapIndexedNotNull { index, arg ->
+                when {
+                    function.typeParameters[index] in receiverTypeParameters -> null
+                    else -> arg
+                }
+            }
 
             return replaceWith(
                 IrCallImpl(
                     expression.startOffset, expression.endOffset,
                     expression.type,
                     expression.symbol,
-                    typeArgumentsCount = expression.typeArgumentsCount - 1,
+                    typeArgumentsCount = newTypeArguments.size,
                     expression.valueArgumentsCount,
                     expression.origin,
                     expression.superQualifierSymbol,
                 ).apply {
                     copyValueArgumentsFrom(expression, destFunction = symbol.owner)
-
-                    var newIndex = 0
-                    expression.typeArguments.forEachIndexed { originalIndex, arg ->
-                        if (originalIndex != receiverTypeParameter.index) {
-                            putTypeArgument(newIndex, arg)
-                        }
-                        newIndex++
-                    }
+                    newTypeArguments.forEachIndexed { i, arg -> putTypeArgument(i, arg) }
                 }
             )
         }
     }
 }
+
+private val IrDeclaration.receiverTypeParameters: List<IrTypeParameter>
+    get() = extensionReceiverParameterOrNull!!.type.typeParametersOrSelf
