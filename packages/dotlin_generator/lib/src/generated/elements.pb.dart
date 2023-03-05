@@ -1207,82 +1207,6 @@ class DartLibraryExportElement extends $pb.GeneratedMessage {
   $core.List<$core.String> get hide => $_getList(3);
 }
 
-class DartTypeParameterElement extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DartTypeParameterElement', createEmptyInstance: create)
-    ..aQS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
-    ..aQS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'location')
-    ..aOM<DartType>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'bound', subBuilder: DartType.create)
-  ;
-
-  DartTypeParameterElement._() : super();
-  factory DartTypeParameterElement({
-    $core.String? name,
-    $core.String? location,
-    DartType? bound,
-  }) {
-    final _result = create();
-    if (name != null) {
-      _result.name = name;
-    }
-    if (location != null) {
-      _result.location = location;
-    }
-    if (bound != null) {
-      _result.bound = bound;
-    }
-    return _result;
-  }
-  factory DartTypeParameterElement.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DartTypeParameterElement.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  DartTypeParameterElement clone() => DartTypeParameterElement()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  DartTypeParameterElement copyWith(void Function(DartTypeParameterElement) updates) => super.copyWith((message) => updates(message as DartTypeParameterElement)) as DartTypeParameterElement; // ignore: deprecated_member_use
-  $pb.BuilderInfo get info_ => _i;
-  @$core.pragma('dart2js:noInline')
-  static DartTypeParameterElement create() => DartTypeParameterElement._();
-  DartTypeParameterElement createEmptyInstance() => create();
-  static $pb.PbList<DartTypeParameterElement> createRepeated() => $pb.PbList<DartTypeParameterElement>();
-  @$core.pragma('dart2js:noInline')
-  static DartTypeParameterElement getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DartTypeParameterElement>(create);
-  static DartTypeParameterElement? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.String get name => $_getSZ(0);
-  @$pb.TagNumber(1)
-  set name($core.String v) { $_setString(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasName() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearName() => clearField(1);
-
-  @$pb.TagNumber(2)
-  $core.String get location => $_getSZ(1);
-  @$pb.TagNumber(2)
-  set location($core.String v) { $_setString(1, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasLocation() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearLocation() => clearField(2);
-
-  @$pb.TagNumber(3)
-  DartType get bound => $_getN(2);
-  @$pb.TagNumber(3)
-  set bound(DartType v) { setField(3, v); }
-  @$pb.TagNumber(3)
-  $core.bool hasBound() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearBound() => clearField(3);
-  @$pb.TagNumber(3)
-  DartType ensureBound() => $_ensure(2);
-}
-
 class DartFunctionType extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DartFunctionType', createEmptyInstance: create)
     ..pc<DartParameterElement>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'parameters', $pb.PbFieldType.PM, subBuilder: DartParameterElement.create)
@@ -1622,5 +1546,81 @@ class DartVoidType extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static DartVoidType getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DartVoidType>(create);
   static DartVoidType? _defaultInstance;
+}
+
+class DartTypeParameterElement extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DartTypeParameterElement', createEmptyInstance: create)
+    ..aQS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
+    ..aQS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'location')
+    ..aOM<DartType>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'bound', subBuilder: DartType.create)
+  ;
+
+  DartTypeParameterElement._() : super();
+  factory DartTypeParameterElement({
+    $core.String? name,
+    $core.String? location,
+    DartType? bound,
+  }) {
+    final _result = create();
+    if (name != null) {
+      _result.name = name;
+    }
+    if (location != null) {
+      _result.location = location;
+    }
+    if (bound != null) {
+      _result.bound = bound;
+    }
+    return _result;
+  }
+  factory DartTypeParameterElement.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DartTypeParameterElement.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  DartTypeParameterElement clone() => DartTypeParameterElement()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  DartTypeParameterElement copyWith(void Function(DartTypeParameterElement) updates) => super.copyWith((message) => updates(message as DartTypeParameterElement)) as DartTypeParameterElement; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static DartTypeParameterElement create() => DartTypeParameterElement._();
+  DartTypeParameterElement createEmptyInstance() => create();
+  static $pb.PbList<DartTypeParameterElement> createRepeated() => $pb.PbList<DartTypeParameterElement>();
+  @$core.pragma('dart2js:noInline')
+  static DartTypeParameterElement getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DartTypeParameterElement>(create);
+  static DartTypeParameterElement? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get name => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set name($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasName() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearName() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get location => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set location($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasLocation() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearLocation() => clearField(2);
+
+  @$pb.TagNumber(3)
+  DartType get bound => $_getN(2);
+  @$pb.TagNumber(3)
+  set bound(DartType v) { setField(3, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasBound() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearBound() => clearField(3);
+  @$pb.TagNumber(3)
+  DartType ensureBound() => $_ensure(2);
 }
 

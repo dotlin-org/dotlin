@@ -69,7 +69,7 @@ object DotlinGenerator {
         ).let {
             // We have to patch the schema: Because we're using contextual serializers, all fields which use
             // those serializers have become `bytes`. We must revert that back to their original types.
-            Regex("(required|optional|repeated) bytes ([a-z]+)").replace(it) { match ->
+            Regex("(required|optional|repeated) bytes ([a-zA-Z]+)").replace(it) { match ->
                 val keyword = match.groupValues[1]
                 val fieldName = match.groupValues[2]
                 val type = matchType(
@@ -83,6 +83,7 @@ object DotlinGenerator {
                     "constructor" to DartConstructorElement::class,
                     "function" to DartFunctionElement::class,
                     "parameter" to DartParameterElement::class,
+                    "typeParameter" to DartTypeParameterElement::class,
                 ) ?: "bytes" // If there's no match, just keep it as "bytes"
                 "$keyword $type $fieldName"
             }

@@ -133,14 +133,6 @@ message DartLibraryExportElement {
   repeated string hide = 4;
 }
 
-// serial name 'org.dotlin.compiler.dart.element.DartTypeParameterElement'
-message DartTypeParameterElement {
-  required string name = 1;
-  required string location = 2;
-  // WARNING: a default value decoded when value is missing
-  optional DartType bound = 3;
-}
-
 // serial name 'org.dotlin.compiler.dart.element.DartFunctionType'
 message DartFunctionType {
   // WARNING: a default value decoded when value is missing
@@ -181,6 +173,14 @@ message DartTypeParameterType {
 
 // serial name 'org.dotlin.compiler.dart.element.DartVoidType'
 message DartVoidType {
+}
+
+// serial name 'org.dotlin.compiler.dart.element.DartTypeParameterElement'
+message DartTypeParameterElement {
+  required string name = 1;
+  required string location = 2;
+  // WARNING: a default value decoded when value is missing
+  optional DartType bound = 3;
 }
 
 // serial name 'org.dotlin.compiler.dart.element.DartNullabilitySuffix'
