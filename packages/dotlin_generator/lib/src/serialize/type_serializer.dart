@@ -64,8 +64,7 @@ class DartTypeSerializer {
       // TODO
       proto = DartNeverType();
     } else if (type is TypeParameterType) {
-      // TODO
-      proto = DartNeverType();
+      proto = serializeTypeParameterType(type);
     } else if (type is VoidType) {
       proto = serializeVoidType(type);
     } else {
@@ -87,6 +86,13 @@ class DartTypeSerializer {
           ),
           returnType: serializeType(type.returnType),
           nullabilitySuffix: serializeNullabilitySuffix(type.nullabilitySuffix),
+      );
+
+  DartTypeParameterType serializeTypeParameterType(TypeParameterType type) =>
+      DartTypeParameterType(
+        elementLocation: type.element.encodedLocation,
+        bound: serializeType(type.bound),
+        nullabilitySuffix: serializeNullabilitySuffix(type.nullabilitySuffix)
       );
 
   late final _neverType = DartNeverType();

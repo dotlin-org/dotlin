@@ -217,6 +217,13 @@ const DartDynamicType$json = const {
 
 /// Descriptor for `DartDynamicType`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List dartDynamicTypeDescriptor = $convert.base64Decode('Cg9EYXJ0RHluYW1pY1R5cGU=');
+@$core.Deprecated('Use dartNeverTypeDescriptor instead')
+const DartNeverType$json = const {
+  '1': 'DartNeverType',
+};
+
+/// Descriptor for `DartNeverType`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List dartNeverTypeDescriptor = $convert.base64Decode('Cg1EYXJ0TmV2ZXJUeXBl');
 @$core.Deprecated('Use dartInterfaceTypeDescriptor instead')
 const DartInterfaceType$json = const {
   '1': 'DartInterfaceType',
@@ -232,13 +239,18 @@ const DartInterfaceType$json = const {
 
 /// Descriptor for `DartInterfaceType`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List dartInterfaceTypeDescriptor = $convert.base64Decode('ChFEYXJ0SW50ZXJmYWNlVHlwZRIoCg9lbGVtZW50TG9jYXRpb24YASACKAlSD2VsZW1lbnRMb2NhdGlvbhIvCg10eXBlQXJndW1lbnRzGAIgAygLMgkuRGFydFR5cGVSDXR5cGVBcmd1bWVudHMSMgoKc3VwZXJDbGFzcxgDIAEoCzISLkRhcnRJbnRlcmZhY2VUeXBlUgpzdXBlckNsYXNzEkQKE3N1cGVySW50ZXJmYWNlVHlwZXMYBCADKAsyEi5EYXJ0SW50ZXJmYWNlVHlwZVITc3VwZXJJbnRlcmZhY2VUeXBlcxI8Cg9zdXBlck1peGluVHlwZXMYBSADKAsyEi5EYXJ0SW50ZXJmYWNlVHlwZVIPc3VwZXJNaXhpblR5cGVzEkQKEW51bGxhYmlsaXR5U3VmZml4GAYgAigOMhYuRGFydE51bGxhYmlsaXR5U3VmZml4UhFudWxsYWJpbGl0eVN1ZmZpeA==');
-@$core.Deprecated('Use dartNeverTypeDescriptor instead')
-const DartNeverType$json = const {
-  '1': 'DartNeverType',
+@$core.Deprecated('Use dartTypeParameterTypeDescriptor instead')
+const DartTypeParameterType$json = const {
+  '1': 'DartTypeParameterType',
+  '2': const [
+    const {'1': 'elementLocation', '3': 1, '4': 2, '5': 9, '10': 'elementLocation'},
+    const {'1': 'bound', '3': 2, '4': 2, '5': 11, '6': '.DartType', '10': 'bound'},
+    const {'1': 'nullabilitySuffix', '3': 3, '4': 2, '5': 14, '6': '.DartNullabilitySuffix', '10': 'nullabilitySuffix'},
+  ],
 };
 
-/// Descriptor for `DartNeverType`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List dartNeverTypeDescriptor = $convert.base64Decode('Cg1EYXJ0TmV2ZXJUeXBl');
+/// Descriptor for `DartTypeParameterType`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List dartTypeParameterTypeDescriptor = $convert.base64Decode('ChVEYXJ0VHlwZVBhcmFtZXRlclR5cGUSKAoPZWxlbWVudExvY2F0aW9uGAEgAigJUg9lbGVtZW50TG9jYXRpb24SHwoFYm91bmQYAiACKAsyCS5EYXJ0VHlwZVIFYm91bmQSRAoRbnVsbGFiaWxpdHlTdWZmaXgYAyACKA4yFi5EYXJ0TnVsbGFiaWxpdHlTdWZmaXhSEW51bGxhYmlsaXR5U3VmZml4');
 @$core.Deprecated('Use dartVoidTypeDescriptor instead')
 const DartVoidType$json = const {
   '1': 'DartVoidType',

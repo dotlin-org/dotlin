@@ -1390,6 +1390,35 @@ class DartDynamicType extends $pb.GeneratedMessage {
   static DartDynamicType? _defaultInstance;
 }
 
+class DartNeverType extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DartNeverType', createEmptyInstance: create)
+    ..hasRequiredFields = false
+  ;
+
+  DartNeverType._() : super();
+  factory DartNeverType() => create();
+  factory DartNeverType.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DartNeverType.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  DartNeverType clone() => DartNeverType()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  DartNeverType copyWith(void Function(DartNeverType) updates) => super.copyWith((message) => updates(message as DartNeverType)) as DartNeverType; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static DartNeverType create() => DartNeverType._();
+  DartNeverType createEmptyInstance() => create();
+  static $pb.PbList<DartNeverType> createRepeated() => $pb.PbList<DartNeverType>();
+  @$core.pragma('dart2js:noInline')
+  static DartNeverType getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DartNeverType>(create);
+  static DartNeverType? _defaultInstance;
+}
+
 class DartInterfaceType extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DartInterfaceType', createEmptyInstance: create)
     ..aQS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'elementLocation', protoName: 'elementLocation')
@@ -1490,33 +1519,80 @@ class DartInterfaceType extends $pb.GeneratedMessage {
   void clearNullabilitySuffix() => clearField(6);
 }
 
-class DartNeverType extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DartNeverType', createEmptyInstance: create)
-    ..hasRequiredFields = false
+class DartTypeParameterType extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DartTypeParameterType', createEmptyInstance: create)
+    ..aQS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'elementLocation', protoName: 'elementLocation')
+    ..aQM<DartType>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'bound', subBuilder: DartType.create)
+    ..e<DartNullabilitySuffix>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'nullabilitySuffix', $pb.PbFieldType.QE, protoName: 'nullabilitySuffix', defaultOrMaker: DartNullabilitySuffix.QUESTION_MARK, valueOf: DartNullabilitySuffix.valueOf, enumValues: DartNullabilitySuffix.values)
   ;
 
-  DartNeverType._() : super();
-  factory DartNeverType() => create();
-  factory DartNeverType.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DartNeverType.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  DartTypeParameterType._() : super();
+  factory DartTypeParameterType({
+    $core.String? elementLocation,
+    DartType? bound,
+    DartNullabilitySuffix? nullabilitySuffix,
+  }) {
+    final _result = create();
+    if (elementLocation != null) {
+      _result.elementLocation = elementLocation;
+    }
+    if (bound != null) {
+      _result.bound = bound;
+    }
+    if (nullabilitySuffix != null) {
+      _result.nullabilitySuffix = nullabilitySuffix;
+    }
+    return _result;
+  }
+  factory DartTypeParameterType.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DartTypeParameterType.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  DartNeverType clone() => DartNeverType()..mergeFromMessage(this);
+  DartTypeParameterType clone() => DartTypeParameterType()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  DartNeverType copyWith(void Function(DartNeverType) updates) => super.copyWith((message) => updates(message as DartNeverType)) as DartNeverType; // ignore: deprecated_member_use
+  DartTypeParameterType copyWith(void Function(DartTypeParameterType) updates) => super.copyWith((message) => updates(message as DartTypeParameterType)) as DartTypeParameterType; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
-  static DartNeverType create() => DartNeverType._();
-  DartNeverType createEmptyInstance() => create();
-  static $pb.PbList<DartNeverType> createRepeated() => $pb.PbList<DartNeverType>();
+  static DartTypeParameterType create() => DartTypeParameterType._();
+  DartTypeParameterType createEmptyInstance() => create();
+  static $pb.PbList<DartTypeParameterType> createRepeated() => $pb.PbList<DartTypeParameterType>();
   @$core.pragma('dart2js:noInline')
-  static DartNeverType getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DartNeverType>(create);
-  static DartNeverType? _defaultInstance;
+  static DartTypeParameterType getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DartTypeParameterType>(create);
+  static DartTypeParameterType? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get elementLocation => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set elementLocation($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasElementLocation() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearElementLocation() => clearField(1);
+
+  @$pb.TagNumber(2)
+  DartType get bound => $_getN(1);
+  @$pb.TagNumber(2)
+  set bound(DartType v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasBound() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearBound() => clearField(2);
+  @$pb.TagNumber(2)
+  DartType ensureBound() => $_ensure(1);
+
+  @$pb.TagNumber(3)
+  DartNullabilitySuffix get nullabilitySuffix => $_getN(2);
+  @$pb.TagNumber(3)
+  set nullabilitySuffix(DartNullabilitySuffix v) { setField(3, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasNullabilitySuffix() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearNullabilitySuffix() => clearField(3);
 }
 
 class DartVoidType extends $pb.GeneratedMessage {

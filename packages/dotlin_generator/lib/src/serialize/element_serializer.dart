@@ -96,6 +96,7 @@ class DartElementSerializer {
         isAbstract: c.isAbstract,
         properties: serializePropertyInducingElements(c.fields),
         constructors: c.constructors.map((ctor) => serializeConstructor(ctor)),
+        typeParameters: serializeTypeParameters(c.typeParameters),
       );
 
   DartConstructorElement serializeConstructor(ConstructorElement c) =>

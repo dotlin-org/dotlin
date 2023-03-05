@@ -21,6 +21,7 @@
     DartLibraryElement::class,
     DartCompilationUnitElement::class,
     DartClassElement::class,
+    DartTypeParameterElement::class,
     DartPropertyElement::class,
     DartPropertyAccessorElement::class,
     DartConstructorElement::class,
@@ -48,6 +49,9 @@ value class DartElementLocation(private val parts: List<String>) {
 
     val name: String
         get() = parts.last()
+
+    val parent: DartElementLocation
+        get() = DartElementLocation(parts.dropLast(1))
 
     val library: DartElementLocation
         get() = DartElementLocation(parts.subList(0, 1))
@@ -116,7 +120,7 @@ data class DartTypeParameterElement(
     override val name: DartSimpleIdentifier,
     override val location: DartElementLocation,
     val bound: DartType? = null
-) : DartNamedElement
+) : DartDeclarationElement
 
 @Serializable
 sealed interface DartTypeParameterizedElement : DartElement {

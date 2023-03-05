@@ -27,6 +27,9 @@ import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.impl.ClassDescriptorImpl
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.storage.getValue
+import org.jetbrains.kotlin.types.ClassTypeConstructorImpl
+import org.jetbrains.kotlin.types.TypeConstructor
+import org.jetbrains.kotlin.types.checker.KotlinTypeRefiner
 
 class DartClassDescriptor(
     override val element: DartClassElement,
@@ -42,6 +45,17 @@ class DartClassDescriptor(
     false,
     context.storageManager,
 ), DartDescriptor {
+    private val _typeConstructor by storageManager.createLazyValue {
+        ClassTypeConstructorImpl(
+            this,
+            declaredTypeParameters,
+            listOf(context.module.builtIns.anyType), // TODO
+            context.storageManager,
+        )
+    }
+
+    override fun getTypeConstructor(): TypeConstructor = _typeConstructor
+
     private val _visibility = element.kotlinVisibility
     override fun getVisibility() = _visibility
 
@@ -54,6 +68,13 @@ class DartClassDescriptor(
     }
 
     override fun getUnsubstitutedMemberScope(): MemberScope = instanceMemberScope
+    override fun getUnsubstitutedMemberScope(kotlinTypeRefiner: KotlinTypeRefiner): MemberScope = instanceMemberScope
+
+    private val typeParameters by storageManager.createLazyValue {
+        element.typeParameters.kotlinTypeParametersOf(this)
+    }
+
+    override fun getDeclaredTypeParameters() = typeParameters
 
     private val _constructors by storageManager.createLazyValue {
         element.constructors.map {

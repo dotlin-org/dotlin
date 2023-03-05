@@ -19,48 +19,63 @@
 
 package org.dotlin.compiler.backend.descriptors.type
 
-import org.dotlin.compiler.backend.descriptors.DartClassDescriptor
 import org.dotlin.compiler.backend.descriptors.DartDescriptorContext
-import org.dotlin.compiler.dart.element.DartInterfaceElement
-import org.dotlin.compiler.dart.element.DartInterfaceType
-import org.dotlin.compiler.dart.element.DartNullabilitySuffix
-import org.jetbrains.kotlin.incremental.components.NoLookupLocation
-import org.jetbrains.kotlin.types.ClassTypeConstructorImpl
+import org.dotlin.compiler.backend.descriptors.dartElement
+import org.dotlin.compiler.dart.element.*
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.types.KotlinTypeFactory
 import org.jetbrains.kotlin.types.SimpleType
 import org.jetbrains.kotlin.types.TypeAttributes
+import org.jetbrains.kotlin.types.TypeProjectionImpl
 
 object DartTypeFactory {
-    fun simpleType(element: DartInterfaceElement, nullable: Boolean, context: DartDescriptorContext): SimpleType {
-        val descriptor = context.fqNameOf(element).let { fqName ->
-            context.module
-                .getPackage(fqName.parent())
-                .fragments
-                .firstNotNullOf {
-                    it.getMemberScope()
-                        .getContributedClassifier(fqName.shortName(), NoLookupLocation.FROM_BACKEND)
-                            as? DartClassDescriptor
+    fun simpleType(
+        type: DartTypeWithElement,
+        context: DartDescriptorContext
+    ): SimpleType {
+        val descriptor: ClassifierDescriptor = run {
+            // For type parameter types, we get the parent element, to then find the type parameter in the descriptor.
+            val element = context.elementLocator.locate<DartDeclarationElement>(
+                location = when (type) {
+                    is DartInterfaceType -> type.elementLocation
+                    is DartTypeParameterType -> type.elementLocation.parent
                 }
+            )
+
+            val (packageName, descriptorName) =  context.fqNameOf(element).let { it.parent() to it.shortName() }
+            val descriptor = context.module
+                .getPackage(packageName)
+                .memberScope
+                .getContributedDescriptors { it == descriptorName }
+                .first()
+
+            when (type) {
+                is DartInterfaceType -> descriptor as ClassDescriptor
+                is DartTypeParameterType -> {
+                    val typeParameterElement = context.elementLocator
+                        .locate<DartTypeParameterElement>(type.elementLocation)
+
+                    val typeParameters = when (descriptor) {
+                        is ClassDescriptor -> descriptor.declaredTypeParameters
+                        is FunctionDescriptor -> descriptor.typeParameters
+                        else -> throw UnsupportedOperationException("Unexpected descriptor: $descriptor")
+                    }
+
+                    typeParameters.first { it.dartElement == typeParameterElement }
+                }
+            }
         }
 
         return KotlinTypeFactory.simpleType(
             attributes = TypeAttributes.Empty, // TODO
-            ClassTypeConstructorImpl(
-                descriptor,
-                emptyList(), // TODO
-                listOf(context.module.builtIns.anyType), // TODO
-                context.storageManager,
-            ),
-            arguments = emptyList(), // TODO
-            nullable,
+            descriptor.typeConstructor,
+            when (type) {
+                is DartInterfaceType -> type.typeArguments.map { TypeProjectionImpl(it.toKotlinType(context)) }
+                is DartTypeParameterType -> emptyList()
+            },
+            type.nullabilitySuffix == DartNullabilitySuffix.QUESTION_MARK,
         )
     }
-
-    fun simpleType(type: DartInterfaceType, context: DartDescriptorContext) =
-        simpleType(
-            context.elementLocator.locate(type.elementLocation),
-            type.nullabilitySuffix == DartNullabilitySuffix.QUESTION_MARK,
-            context
-        )
-
 }

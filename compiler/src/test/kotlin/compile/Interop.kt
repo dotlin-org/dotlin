@@ -861,4 +861,120 @@ class Interop : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `use Dart type with type parameters`() = assertCompile {
+        dart(
+            """
+            class MyClass<A, B> {
+              MyClass(this.a, this.b);
+              final A a;
+              final B b;
+            }
+            """,
+            Path("lib/my_class.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.my_class.MyClass
+
+            fun main() {
+                var leftA = 0
+                var leftB = 0.0
+                val x = MyClass(leftA, leftB)
+                leftA = x.a
+                leftB = x.b
+            }
+            """
+        )
+
+        dart(
+            """
+            import "my_class.dart" show MyClass;
+
+            void main() {
+              int leftA = 0;
+              double leftB = 0.0;
+              final MyClass<int, double> x = MyClass<int, double>(leftA, leftB);
+              leftA = x.a;
+              leftB = x.b;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `use Dart return type with type parameters`() = assertCompile {
+        dart(
+            """
+            class MyClass<A, B> {
+              MyClass(this.a, this.b);
+              final A a;
+              final B b;
+            }
+
+            MyClass<int, bool> calculate() => MyClass(0, false);
+            """,
+            Path("lib/my_class.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.my_class.MyClass
+            import pkg.test.my_class.calculate
+
+            fun main() {
+                val x = calculate()
+                val i: Int = x.a
+                val b: Boolean = x.b
+            }
+            """
+        )
+
+        dart(
+            """
+            import "my_class.dart" show calculate, MyClass;
+
+            void main() {
+              final MyClass<int, bool> x = calculate();
+              final int i = x.a;
+              final bool b = x.b;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `use Dart return type with type parameters defined in function`() = assertCompile {
+        dart(
+            """
+            T calculate<T>() => throw "Nope";
+            """,
+            Path("lib/calc.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            fun main() {
+                val x = calculate<Int>()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "calc.dart" show calculate;
+
+            void main() {
+              final int x = calculate<int>();
+            }
+            """
+        )
+    }
 }

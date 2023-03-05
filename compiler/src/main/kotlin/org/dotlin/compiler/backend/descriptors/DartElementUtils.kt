@@ -1,15 +1,12 @@
 package org.dotlin.compiler.backend.descriptors
 
 import org.dotlin.compiler.backend.descriptors.type.toKotlinType
-import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 import org.dotlin.compiler.dart.element.*
-import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor.Kind.DECLARATION
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor.Kind.SYNTHESIZED
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities.PRIVATE
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities.PUBLIC
-import org.jetbrains.kotlin.descriptors.DescriptorVisibility
-import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
 
@@ -53,3 +50,15 @@ val DartElement.callableMemberDescriptorKind: CallableMemberDescriptor.Kind
         isSynthetic -> SYNTHESIZED
         else -> DECLARATION
     }
+
+context(DartDescriptor)
+fun List<DartTypeParameterElement>.kotlinTypeParametersOf(
+    container: DeclarationDescriptor
+): List<TypeParameterDescriptor> = mapIndexed { index, element ->
+    DartTypeParameterDescriptor(
+        element,
+        context,
+        container,
+        index
+    )
+}

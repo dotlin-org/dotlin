@@ -116,8 +116,9 @@ message DartType {
   // decoded as message with one of these types:
   //   message DartDynamicType, serial name 'org.dotlin.compiler.dart.element.DartDynamicType'
   //   message DartFunctionType, serial name 'org.dotlin.compiler.dart.element.DartFunctionType'
-  //   message DartInterfaceType, serial name 'org.dotlin.compiler.dart.element.DartInterfaceType'
   //   message DartNeverType, serial name 'org.dotlin.compiler.dart.element.DartNeverType'
+  //   message DartInterfaceType, serial name 'org.dotlin.compiler.dart.element.DartInterfaceType'
+  //   message DartTypeParameterType, serial name 'org.dotlin.compiler.dart.element.DartTypeParameterType'
   //   message DartVoidType, serial name 'org.dotlin.compiler.dart.element.DartVoidType'
   required bytes value = 2;
 }
@@ -154,6 +155,10 @@ message DartFunctionType {
 message DartDynamicType {
 }
 
+// serial name 'org.dotlin.compiler.dart.element.DartNeverType'
+message DartNeverType {
+}
+
 // serial name 'org.dotlin.compiler.dart.element.DartInterfaceType'
 message DartInterfaceType {
   required string elementLocation = 1;
@@ -167,8 +172,11 @@ message DartInterfaceType {
   required DartNullabilitySuffix nullabilitySuffix = 6;
 }
 
-// serial name 'org.dotlin.compiler.dart.element.DartNeverType'
-message DartNeverType {
+// serial name 'org.dotlin.compiler.dart.element.DartTypeParameterType'
+message DartTypeParameterType {
+  required string elementLocation = 1;
+  required DartType bound = 2;
+  required DartNullabilitySuffix nullabilitySuffix = 3;
 }
 
 // serial name 'org.dotlin.compiler.dart.element.DartVoidType'

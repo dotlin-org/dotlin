@@ -53,14 +53,27 @@ object DartNeverType : DartType {
 }
 
 @Serializable
+sealed interface DartTypeWithElement : DartType {
+    val elementLocation: DartElementLocation
+}
+
+@Serializable
 data class DartInterfaceType(
-    val elementLocation: DartElementLocation,
+    override val elementLocation: DartElementLocation,
     val typeArguments: List<DartType> = emptyList(),
     val superClass: DartInterfaceType?,
     val superInterfaceTypes: List<DartInterfaceType> = emptyList(),
     val superMixinTypes: List<DartInterfaceType> = emptyList(),
     override val nullabilitySuffix: DartNullabilitySuffix,
-) : DartType
+) : DartTypeWithElement
+
+@Serializable
+data class DartTypeParameterType(
+    override val elementLocation: DartElementLocation,
+    val bound: DartType,
+    override val nullabilitySuffix: DartNullabilitySuffix,
+) : DartTypeWithElement
+
 
 @Serializable
 object DartVoidType : DartType {

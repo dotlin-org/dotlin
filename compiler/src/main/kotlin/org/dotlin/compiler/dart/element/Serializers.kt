@@ -28,7 +28,7 @@ import org.dotlin.compiler.dart.ast.expression.identifier.DartSimpleIdentifier
 
 object DartElementLocationSerializer : KSerializer<DartElementLocation> {
     override val descriptor = PrimitiveSerialDescriptor(
-        serialName = "org.dotlin.compiler.dart.element.DartElementReferenceSerializer",
+        serialName = "org.dotlin.compiler.dart.element.DartElementLocationSerializer",
         PrimitiveKind.STRING
     )
 

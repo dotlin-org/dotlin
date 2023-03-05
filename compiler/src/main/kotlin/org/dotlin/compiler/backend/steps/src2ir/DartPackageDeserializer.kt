@@ -48,6 +48,7 @@ object DartPackageDeserializer {
                 DartLibraryElement.serializer().registerOnSerialize(locator)
                 DartCompilationUnitElement.serializer().registerOnSerialize(locator)
                 DartClassElement.serializer().registerOnSerialize(locator)
+                DartTypeParameterElement.serializer().registerOnSerialize(locator)
                 DartPropertyElement.serializer().registerOnSerialize(locator)
                 DartPropertyAccessorElement.serializer().registerOnSerialize(locator)
                 DartFunctionElement.serializer().registerOnSerialize(locator)

@@ -48,14 +48,20 @@ class DartSimpleFunctionDescriptor(
         initialize(
             null, // TODO
             null, // TODO
-            emptyList(), // TODO
-            emptyList(), // TODO
+            emptyList(),
+            element.typeParameters.kotlinTypeParametersOf(this),
             element.kotlinValueParametersOf(this),
-            element.kotlinReturnType,
+            // Return type is lazily evaluated, because if it contains a type parameter defined in this function
+            // we'll get recursion.
+            null,
             element.kotlinModality,
             element.kotlinVisibility,
         )
     }
+
+    private val _returnType by storageManager.createLazyValue { element.kotlinReturnType }
+
+    override fun getReturnType(): KotlinType = _returnType
 }
 
 class DartConstructorDescriptor(

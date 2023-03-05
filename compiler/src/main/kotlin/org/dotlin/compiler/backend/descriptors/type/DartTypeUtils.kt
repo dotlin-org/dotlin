@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.types.*
 context(DartDescriptor)
 fun DartType.toKotlinType(): KotlinType = toKotlinType(context)
 
+// TODO?: Cache
 fun DartType.toKotlinType(context: DartDescriptorContext): KotlinType {
     val module = context.module
     val builtIns = context.module.builtIns
@@ -61,6 +62,7 @@ fun DartType.toKotlinType(context: DartDescriptorContext): KotlinType {
                 addAll(parameters.map { TypeProjectionImpl(it.type.toKotlinType(context)) })
             })
 
+        is DartTypeParameterType -> DartTypeFactory.simpleType(this, context)
         DartNeverType -> builtIns.nothingType
         DartVoidType -> builtIns.unitType // TODO
     }
