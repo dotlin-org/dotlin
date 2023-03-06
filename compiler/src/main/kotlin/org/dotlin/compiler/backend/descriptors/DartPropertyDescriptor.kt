@@ -25,7 +25,6 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.PropertyDescriptorImpl
-import org.jetbrains.kotlin.resolve.DescriptorUtils
 
 class DartPropertyDescriptor(
     override val element: DartPropertyElement,
@@ -53,7 +52,7 @@ class DartPropertyDescriptor(
         setType(
             element.type.toKotlinType(),
             emptyList(),
-            DescriptorUtils.getDispatchReceiverParameterIfNeeded(container),
+            element.kotlinReceiver,
             null, // TODO: Extension receiver parameter
             emptyList(),
         )

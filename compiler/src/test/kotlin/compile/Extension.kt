@@ -520,4 +520,48 @@ class Extension : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `extension on companion`() = assertCompile {
+        kotlin(
+            """
+            class Test {
+                companion object
+            }
+
+            fun Test.Companion.doSomething(): Int = 3
+
+            fun main() {
+                Test.doSomething()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart" show sealed;
+
+            @sealed
+            class Test {
+              static const Test${'$'}Companion ${'$'}companion = Test${'$'}Companion.${'$'}instance;
+            }
+
+            void main() {
+              Test${'$'}Companion.${'$'}instance.doSomething();
+            }
+
+            extension ${'$'}Extensions${'$'}5e33dc1589283692 on Test${'$'}Companion {
+              int doSomething() {
+                return 3;
+              }
+            }
+
+            @sealed
+            class Test${'$'}Companion {
+              const Test${'$'}Companion._() : super();
+              static const Test${'$'}Companion ${'$'}instance = const Test${'$'}Companion._();
+            }
+            """
+        )
+    }
 }

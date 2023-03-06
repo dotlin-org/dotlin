@@ -28,11 +28,8 @@ import org.dotlin.compiler.backend.attributes.DartImport
 import org.dotlin.compiler.backend.descriptors.*
 import org.dotlin.compiler.backend.descriptors.export.DartExportPackageFragmentDescriptor
 import org.dotlin.compiler.backend.dotlin
-import org.dotlin.compiler.backend.steps.ir2ast.ir.IrTypeContext
+import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrTypeContext.SuperTypes
-import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
-import org.dotlin.compiler.backend.steps.ir2ast.ir.isNonExtensionMethod
-import org.dotlin.compiler.backend.steps.ir2ast.ir.visitTypes
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.IrFileLowering
 import org.dotlin.compiler.backend.steps.src2ir.dotlinModule
@@ -50,6 +47,7 @@ import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin.*
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
+import org.jetbrains.kotlin.ir.util.isStatic
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameOrNull
@@ -177,17 +175,33 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
 
         val isDartConstructor by lazy { declaration.hasAnnotation(dotlin.DartConstructor) }
 
-        // Don't import methods (except if it's annotated with @DartConstructor).
-        if (declaration is IrSimpleFunction && !isDartConstructor && declaration.isNonExtensionMethod) return
+        // Don't import methods/property accessors, except if they're static or annotated with @DartConstructor, then
+        // we will import the relevant class. This won't happen naturally because there's no IrDeclarationReference
+        // whose type would be imported.
+        if (declaration is IrSimpleFunction &&
+            !declaration.isStatic &&
+            !isDartConstructor &&
+            declaration.isNonExtensionMethod
+        ) {
+            return
+        }
 
         // Import the extension container class if it's an extension.
         val relevantDeclaration = declaration.extensionContainer ?: when (declaration) {
             is IrConstructor, is IrEnumEntry -> declaration.parentAsClass
             is IrSimpleFunction -> when {
                 // For `@DartConstructor`s, we want to import the parent class of the companion object it's in.
-                isDartConstructor -> declaration.parentClassOrNull?.parentClassOrNull
-                else -> null
-            } ?: declaration.correspondingProperty ?: declaration
+                isDartConstructor -> declaration.parentAsClass.parentAsClass
+                declaration.isStatic -> declaration.parentAsClass
+                else -> {
+                    val prop = declaration.correspondingProperty
+
+                    when (prop?.isStatic) {
+                        true -> declaration.parentAsClass
+                        else -> prop ?: declaration
+                    }
+                }
+            }
 
             else -> declaration
         }

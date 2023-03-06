@@ -22,6 +22,7 @@ package org.dotlin.compiler.backend.steps.ir2ast.ir
 import org.dotlin.compiler.backend.hasDartExtensionAnnotation
 import org.dotlin.compiler.backend.kotlin
 import org.dotlin.compiler.backend.util.falseIfNull
+import org.dotlin.compiler.backend.util.isDotlinExternal
 import org.jetbrains.kotlin.backend.common.ir.*
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.descriptors.Modality
@@ -38,7 +39,6 @@ import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
-import org.jetbrains.kotlin.ir.util.isStatic
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
@@ -47,6 +47,7 @@ import org.jetbrains.kotlin.util.collectionUtils.filterIsInstanceAnd
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+import org.jetbrains.kotlin.ir.util.isStatic as isActuallyStatic
 
 val IrSimpleFunction.correspondingProperty: IrProperty?
     get() = correspondingPropertySymbol?.owner
@@ -390,7 +391,25 @@ val IrProperty.hasImplicitSetter: Boolean
  * Also keeps in account that extensions are lowered into classes.
  */
 val IrFunction.isStatic: Boolean
-    get() = isStatic && !(parent as IrClass).isDartExtensionContainer
+    get() = isActuallyStatic && (parent as? IrClass)?.isDartExtensionContainer != true
+
+/**
+ * Also keeps in account that extensions are lowered into classes.
+ */
+val IrProperty.isStatic: Boolean
+    get() = getter?.isStatic == true && (setter == null || setter!!.isStatic)
+
+// TODO: Rename to isStatic
+val IrDeclaration.isDartStatic: Boolean
+    // TODO: Remove everything after `||`, when stdlib companion object static containers and collection factories
+    // are gone.
+    get() = when (this) {
+        is IrFunction -> isStatic
+        is IrProperty -> isStatic
+        is IrField -> isStatic
+        else -> false
+    } || parentClassOrNull?.isCompanion == true &&
+            (isDotlinExternal || (this is IrSimpleFunction && correspondingProperty?.isDotlinExternal == true))
 
 val IrFunction.isImplicitGetter: Boolean
     get() = isGetter && origin == IrDeclarationOrigin.DEFAULT_PROPERTY_ACCESSOR &&

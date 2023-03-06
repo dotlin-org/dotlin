@@ -22,7 +22,6 @@ package org.dotlin.compiler.backend.steps.ir2ast.transformer
 import org.dotlin.compiler.backend.attributes.CollectionLiteralKind.*
 import org.dotlin.compiler.backend.dotlin
 import org.dotlin.compiler.backend.hasDartGetterAnnotation
-import org.dotlin.compiler.backend.isDartStatic
 import org.dotlin.compiler.backend.steps.ir2ast.DartAstTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.*
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDotlinStatementOrigin.IF_NULL

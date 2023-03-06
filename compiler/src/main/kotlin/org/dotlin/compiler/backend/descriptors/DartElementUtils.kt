@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.descriptors.DescriptorVisibilities.PRIVATE
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities.PUBLIC
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
+import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.utils.addIfNotNull
 
 val DartClassElement.superTypes: List<DartInterfaceType>
@@ -82,3 +83,10 @@ val DartElement.parent: DartElement
 context(DartDescriptorContext)
 val DartElement.parent: DartElement
     get() = elementLocator.locate(location.parent)
+
+context(DeclarationDescriptorNonRoot)
+val DartInterfaceMemberElement.kotlinReceiver: ReceiverParameterDescriptor?
+    get() = when {
+        !isStatic -> DescriptorUtils.getDispatchReceiverParameterIfNeeded(containingDeclaration)
+        else -> null
+    }

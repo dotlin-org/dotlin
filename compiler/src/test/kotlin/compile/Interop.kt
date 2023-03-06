@@ -1178,4 +1178,103 @@ class Interop : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `call Dart static method`() = assertCompile {
+        dart(
+            """
+            class SomeClass {
+              static double ourMethod(double x, double y) => 0.0;
+            }
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.SomeClass
+
+            fun main() {
+                val z: Double = SomeClass.ourMethod(1.0, 2.0)
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show SomeClass;
+
+            void main() {
+              final double z = SomeClass.ourMethod(1.0, 2.0);
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `use Dart static property`() = assertCompile {
+        dart(
+            """
+            class SomeClass {
+              static double ourProperty = 0.0;
+            }
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.SomeClass
+
+            fun main() {
+                val z: Double = SomeClass.ourProperty
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show SomeClass;
+
+            void main() {
+              final double z = SomeClass.ourProperty;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `use Dart static const value`() = assertCompile {
+        dart(
+            """
+            class SomeClass {
+              static const ourConst = 0.0;
+            }
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.SomeClass
+
+            fun main() {
+                const val z: Double = SomeClass.ourConst
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show SomeClass;
+
+            void main() {
+              const double z = SomeClass.ourConst;
+            }
+            """
+        )
+    }
 }

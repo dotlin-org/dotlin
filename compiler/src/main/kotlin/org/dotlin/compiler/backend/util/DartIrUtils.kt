@@ -24,6 +24,7 @@ package org.dotlin.compiler.backend.util
 import org.dotlin.compiler.backend.descriptors.DartDescriptor
 import org.dotlin.compiler.backend.descriptors.dartElementAs
 import org.dotlin.compiler.dart.element.DartDeclarationElement
+import org.dotlin.compiler.dart.element.DartElement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 
@@ -32,3 +33,5 @@ val IrDeclaration.isDartDeclaration
 
 val IrDeclaration.dartElement: DartDeclarationElement?
     get() = descriptor.dartElementAs()
+
+fun <E : DartElement> IrDeclaration.dartElementAs(): E? = descriptor.dartElementAs()

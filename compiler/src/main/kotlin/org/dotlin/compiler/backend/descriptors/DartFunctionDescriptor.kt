@@ -28,7 +28,6 @@ import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ClassConstructorDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
-import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.storage.getValue
 import org.jetbrains.kotlin.types.KotlinType
 
@@ -48,7 +47,7 @@ class DartSimpleFunctionDescriptor(
     init {
         initialize(
             null, // TODO
-            DescriptorUtils.getDispatchReceiverParameterIfNeeded(container),
+            element.kotlinReceiver,
             emptyList(),
             element.typeParameters.kotlinTypeParametersOf(this),
             element.kotlinValueParametersOf(this),

@@ -60,16 +60,20 @@ class DartClassDescriptor(
     private val _visibility = element.kotlinVisibility
     override fun getVisibility() = _visibility
 
-    private val instanceMemberScope by storageManager.createLazyValue {
-        DartMemberScope(
-            owner = this,
-            context,
-            elements = element.properties + element.methods,
-        )
-    }
+    private fun memberScope(static: Boolean) = DartMemberScope(
+        owner = this,
+        context,
+        elements = (element.properties + element.methods).filter { it.isStatic == static },
+    )
+
+    private val instanceMemberScope by storageManager.createLazyValue { memberScope(static = false) }
 
     override fun getUnsubstitutedMemberScope(): MemberScope = instanceMemberScope
     override fun getUnsubstitutedMemberScope(kotlinTypeRefiner: KotlinTypeRefiner): MemberScope = instanceMemberScope
+
+    private val staticMemberScope by storageManager.createLazyValue { memberScope(static = true) }
+
+    override fun getStaticScope(): MemberScope = staticMemberScope
 
     private val typeParameters by storageManager.createLazyValue {
         element.typeParameters.kotlinTypeParametersOf(this)
