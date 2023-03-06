@@ -207,6 +207,9 @@ class DartClassElement extends $pb.GeneratedMessage {
     ..a<$core.bool>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isAbstract', $pb.PbFieldType.QB, protoName: 'isAbstract')
     ..pc<DartConstructorElement>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'constructors', $pb.PbFieldType.PM, subBuilder: DartConstructorElement.create)
     ..pc<DartPropertyElement>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'properties', $pb.PbFieldType.PM, subBuilder: DartPropertyElement.create)
+    ..aOM<DartInterfaceType>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'superType', protoName: 'superType', subBuilder: DartInterfaceType.create)
+    ..pc<DartInterfaceType>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'superInterfaceTypes', $pb.PbFieldType.PM, protoName: 'superInterfaceTypes', subBuilder: DartInterfaceType.create)
+    ..pc<DartInterfaceType>(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'superMixinTypes', $pb.PbFieldType.PM, protoName: 'superMixinTypes', subBuilder: DartInterfaceType.create)
   ;
 
   DartClassElement._() : super();
@@ -217,6 +220,9 @@ class DartClassElement extends $pb.GeneratedMessage {
     $core.bool? isAbstract,
     $core.Iterable<DartConstructorElement>? constructors,
     $core.Iterable<DartPropertyElement>? properties,
+    DartInterfaceType? superType,
+    $core.Iterable<DartInterfaceType>? superInterfaceTypes,
+    $core.Iterable<DartInterfaceType>? superMixinTypes,
   }) {
     final _result = create();
     if (location != null) {
@@ -236,6 +242,15 @@ class DartClassElement extends $pb.GeneratedMessage {
     }
     if (properties != null) {
       _result.properties.addAll(properties);
+    }
+    if (superType != null) {
+      _result.superType = superType;
+    }
+    if (superInterfaceTypes != null) {
+      _result.superInterfaceTypes.addAll(superInterfaceTypes);
+    }
+    if (superMixinTypes != null) {
+      _result.superMixinTypes.addAll(superMixinTypes);
     }
     return _result;
   }
@@ -295,6 +310,23 @@ class DartClassElement extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(6)
   $core.List<DartPropertyElement> get properties => $_getList(5);
+
+  @$pb.TagNumber(7)
+  DartInterfaceType get superType => $_getN(6);
+  @$pb.TagNumber(7)
+  set superType(DartInterfaceType v) { setField(7, v); }
+  @$pb.TagNumber(7)
+  $core.bool hasSuperType() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearSuperType() => clearField(7);
+  @$pb.TagNumber(7)
+  DartInterfaceType ensureSuperType() => $_ensure(6);
+
+  @$pb.TagNumber(8)
+  $core.List<DartInterfaceType> get superInterfaceTypes => $_getList(7);
+
+  @$pb.TagNumber(9)
+  $core.List<DartInterfaceType> get superMixinTypes => $_getList(8);
 }
 
 class DartPropertyElement extends $pb.GeneratedMessage {
@@ -1207,6 +1239,106 @@ class DartLibraryExportElement extends $pb.GeneratedMessage {
   $core.List<$core.String> get hide => $_getList(3);
 }
 
+class DartInterfaceType extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DartInterfaceType', createEmptyInstance: create)
+    ..aQS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'elementLocation', protoName: 'elementLocation')
+    ..pc<DartType>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'typeArguments', $pb.PbFieldType.PM, protoName: 'typeArguments', subBuilder: DartType.create)
+    ..aOM<DartInterfaceType>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'superClass', protoName: 'superClass', subBuilder: DartInterfaceType.create)
+    ..pc<DartInterfaceType>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'superInterfaceTypes', $pb.PbFieldType.PM, protoName: 'superInterfaceTypes', subBuilder: DartInterfaceType.create)
+    ..pc<DartInterfaceType>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'superMixinTypes', $pb.PbFieldType.PM, protoName: 'superMixinTypes', subBuilder: DartInterfaceType.create)
+    ..e<DartNullabilitySuffix>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'nullabilitySuffix', $pb.PbFieldType.QE, protoName: 'nullabilitySuffix', defaultOrMaker: DartNullabilitySuffix.QUESTION_MARK, valueOf: DartNullabilitySuffix.valueOf, enumValues: DartNullabilitySuffix.values)
+  ;
+
+  DartInterfaceType._() : super();
+  factory DartInterfaceType({
+    $core.String? elementLocation,
+    $core.Iterable<DartType>? typeArguments,
+    DartInterfaceType? superClass,
+    $core.Iterable<DartInterfaceType>? superInterfaceTypes,
+    $core.Iterable<DartInterfaceType>? superMixinTypes,
+    DartNullabilitySuffix? nullabilitySuffix,
+  }) {
+    final _result = create();
+    if (elementLocation != null) {
+      _result.elementLocation = elementLocation;
+    }
+    if (typeArguments != null) {
+      _result.typeArguments.addAll(typeArguments);
+    }
+    if (superClass != null) {
+      _result.superClass = superClass;
+    }
+    if (superInterfaceTypes != null) {
+      _result.superInterfaceTypes.addAll(superInterfaceTypes);
+    }
+    if (superMixinTypes != null) {
+      _result.superMixinTypes.addAll(superMixinTypes);
+    }
+    if (nullabilitySuffix != null) {
+      _result.nullabilitySuffix = nullabilitySuffix;
+    }
+    return _result;
+  }
+  factory DartInterfaceType.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DartInterfaceType.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  DartInterfaceType clone() => DartInterfaceType()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  DartInterfaceType copyWith(void Function(DartInterfaceType) updates) => super.copyWith((message) => updates(message as DartInterfaceType)) as DartInterfaceType; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static DartInterfaceType create() => DartInterfaceType._();
+  DartInterfaceType createEmptyInstance() => create();
+  static $pb.PbList<DartInterfaceType> createRepeated() => $pb.PbList<DartInterfaceType>();
+  @$core.pragma('dart2js:noInline')
+  static DartInterfaceType getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DartInterfaceType>(create);
+  static DartInterfaceType? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get elementLocation => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set elementLocation($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasElementLocation() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearElementLocation() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.List<DartType> get typeArguments => $_getList(1);
+
+  @$pb.TagNumber(3)
+  DartInterfaceType get superClass => $_getN(2);
+  @$pb.TagNumber(3)
+  set superClass(DartInterfaceType v) { setField(3, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasSuperClass() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearSuperClass() => clearField(3);
+  @$pb.TagNumber(3)
+  DartInterfaceType ensureSuperClass() => $_ensure(2);
+
+  @$pb.TagNumber(4)
+  $core.List<DartInterfaceType> get superInterfaceTypes => $_getList(3);
+
+  @$pb.TagNumber(5)
+  $core.List<DartInterfaceType> get superMixinTypes => $_getList(4);
+
+  @$pb.TagNumber(6)
+  DartNullabilitySuffix get nullabilitySuffix => $_getN(5);
+  @$pb.TagNumber(6)
+  set nullabilitySuffix(DartNullabilitySuffix v) { setField(6, v); }
+  @$pb.TagNumber(6)
+  $core.bool hasNullabilitySuffix() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearNullabilitySuffix() => clearField(6);
+}
+
 class DartFunctionType extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DartFunctionType', createEmptyInstance: create)
     ..pc<DartParameterElement>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'parameters', $pb.PbFieldType.PM, subBuilder: DartParameterElement.create)
@@ -1341,106 +1473,6 @@ class DartNeverType extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static DartNeverType getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DartNeverType>(create);
   static DartNeverType? _defaultInstance;
-}
-
-class DartInterfaceType extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DartInterfaceType', createEmptyInstance: create)
-    ..aQS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'elementLocation', protoName: 'elementLocation')
-    ..pc<DartType>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'typeArguments', $pb.PbFieldType.PM, protoName: 'typeArguments', subBuilder: DartType.create)
-    ..aOM<DartInterfaceType>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'superClass', protoName: 'superClass', subBuilder: DartInterfaceType.create)
-    ..pc<DartInterfaceType>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'superInterfaceTypes', $pb.PbFieldType.PM, protoName: 'superInterfaceTypes', subBuilder: DartInterfaceType.create)
-    ..pc<DartInterfaceType>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'superMixinTypes', $pb.PbFieldType.PM, protoName: 'superMixinTypes', subBuilder: DartInterfaceType.create)
-    ..e<DartNullabilitySuffix>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'nullabilitySuffix', $pb.PbFieldType.QE, protoName: 'nullabilitySuffix', defaultOrMaker: DartNullabilitySuffix.QUESTION_MARK, valueOf: DartNullabilitySuffix.valueOf, enumValues: DartNullabilitySuffix.values)
-  ;
-
-  DartInterfaceType._() : super();
-  factory DartInterfaceType({
-    $core.String? elementLocation,
-    $core.Iterable<DartType>? typeArguments,
-    DartInterfaceType? superClass,
-    $core.Iterable<DartInterfaceType>? superInterfaceTypes,
-    $core.Iterable<DartInterfaceType>? superMixinTypes,
-    DartNullabilitySuffix? nullabilitySuffix,
-  }) {
-    final _result = create();
-    if (elementLocation != null) {
-      _result.elementLocation = elementLocation;
-    }
-    if (typeArguments != null) {
-      _result.typeArguments.addAll(typeArguments);
-    }
-    if (superClass != null) {
-      _result.superClass = superClass;
-    }
-    if (superInterfaceTypes != null) {
-      _result.superInterfaceTypes.addAll(superInterfaceTypes);
-    }
-    if (superMixinTypes != null) {
-      _result.superMixinTypes.addAll(superMixinTypes);
-    }
-    if (nullabilitySuffix != null) {
-      _result.nullabilitySuffix = nullabilitySuffix;
-    }
-    return _result;
-  }
-  factory DartInterfaceType.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DartInterfaceType.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  DartInterfaceType clone() => DartInterfaceType()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  DartInterfaceType copyWith(void Function(DartInterfaceType) updates) => super.copyWith((message) => updates(message as DartInterfaceType)) as DartInterfaceType; // ignore: deprecated_member_use
-  $pb.BuilderInfo get info_ => _i;
-  @$core.pragma('dart2js:noInline')
-  static DartInterfaceType create() => DartInterfaceType._();
-  DartInterfaceType createEmptyInstance() => create();
-  static $pb.PbList<DartInterfaceType> createRepeated() => $pb.PbList<DartInterfaceType>();
-  @$core.pragma('dart2js:noInline')
-  static DartInterfaceType getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DartInterfaceType>(create);
-  static DartInterfaceType? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.String get elementLocation => $_getSZ(0);
-  @$pb.TagNumber(1)
-  set elementLocation($core.String v) { $_setString(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasElementLocation() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearElementLocation() => clearField(1);
-
-  @$pb.TagNumber(2)
-  $core.List<DartType> get typeArguments => $_getList(1);
-
-  @$pb.TagNumber(3)
-  DartInterfaceType get superClass => $_getN(2);
-  @$pb.TagNumber(3)
-  set superClass(DartInterfaceType v) { setField(3, v); }
-  @$pb.TagNumber(3)
-  $core.bool hasSuperClass() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearSuperClass() => clearField(3);
-  @$pb.TagNumber(3)
-  DartInterfaceType ensureSuperClass() => $_ensure(2);
-
-  @$pb.TagNumber(4)
-  $core.List<DartInterfaceType> get superInterfaceTypes => $_getList(3);
-
-  @$pb.TagNumber(5)
-  $core.List<DartInterfaceType> get superMixinTypes => $_getList(4);
-
-  @$pb.TagNumber(6)
-  DartNullabilitySuffix get nullabilitySuffix => $_getN(5);
-  @$pb.TagNumber(6)
-  set nullabilitySuffix(DartNullabilitySuffix v) { setField(6, v); }
-  @$pb.TagNumber(6)
-  $core.bool hasNullabilitySuffix() => $_has(5);
-  @$pb.TagNumber(6)
-  void clearNullabilitySuffix() => clearField(6);
 }
 
 class DartTypeParameterType extends $pb.GeneratedMessage {

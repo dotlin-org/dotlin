@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.descriptors
 
+import org.dotlin.compiler.backend.descriptors.type.toKotlinType
 import org.dotlin.compiler.dart.element.DartClassElement
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
@@ -49,7 +50,7 @@ class DartClassDescriptor(
         ClassTypeConstructorImpl(
             this,
             declaredTypeParameters,
-            listOf(context.module.builtIns.anyType), // TODO
+            element.superTypes.map { it.toKotlinType() },
             context.storageManager,
         )
     }

@@ -155,6 +155,9 @@ data class DartClassElement(
     override val isAbstract: Boolean,
     override val constructors: List<DartConstructorElement>,
     override val properties: List<DartPropertyElement> = emptyList(),
+    val superType: DartInterfaceType?,
+    val superInterfaceTypes: List<DartInterfaceType> = emptyList(),
+    val superMixinTypes: List<DartInterfaceType> = emptyList(),
 ) : DartInterfaceElement, DartAbstractableElement
 
 @Serializable

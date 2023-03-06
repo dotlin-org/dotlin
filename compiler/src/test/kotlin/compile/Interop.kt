@@ -21,6 +21,7 @@ package compile
 
 import BaseTest
 import assertCompile
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import kotlin.io.path.*
@@ -973,6 +974,107 @@ class Interop : BaseTest {
 
             void main() {
               final int x = calculate<int>();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `assign Dart base type to subtype`() = assertCompile {
+        dart(
+            """
+            class A {}
+
+            class B extends A {}
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.*
+
+            fun main() {
+                val a: A = B()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show B, A;
+
+            void main() {
+              final A a = B();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `assign Dart base type to interface subtype`() = assertCompile {
+        dart(
+            """
+            class A {}
+
+            class B implements A {}
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.*
+
+            fun main() {
+                val a: A = B()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show B, A;
+
+            void main() {
+              final A a = B();
+            }
+            """
+        )
+    }
+
+    // TODO: Enable when support for loading mixins is supported
+    @Disabled
+    @Test
+    fun `assign Dart base type to mixin subtype`() = assertCompile {
+        dart(
+            """
+            mixin A {}
+
+            class B with A {}
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.*
+
+            fun main() {
+                val a: A = B()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show B, A;
+
+            void main() {
+              final A a = B();
             }
             """
         )

@@ -9,6 +9,14 @@ import org.jetbrains.kotlin.descriptors.DescriptorVisibilities.PRIVATE
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities.PUBLIC
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
+import org.jetbrains.kotlin.utils.addIfNotNull
+
+val DartClassElement.superTypes: List<DartInterfaceType>
+    get() = buildList {
+        addIfNotNull(superType)
+        addAll(superInterfaceTypes)
+        addAll(superMixinTypes)
+    }
 
 private val DartNamedElement.defaultKotlinName: Name
     get() = Name.identifier(name.value)

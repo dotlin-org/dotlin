@@ -37,6 +37,11 @@ message DartClassElement {
   repeated DartConstructorElement constructors = 5;
   // WARNING: a default value decoded when value is missing
   repeated DartPropertyElement properties = 6;
+  optional DartInterfaceType superType = 7;
+  // WARNING: a default value decoded when value is missing
+  repeated DartInterfaceType superInterfaceTypes = 8;
+  // WARNING: a default value decoded when value is missing
+  repeated DartInterfaceType superMixinTypes = 9;
 }
 
 // serial name 'org.dotlin.compiler.dart.element.DartPropertyElement'
@@ -133,6 +138,19 @@ message DartLibraryExportElement {
   repeated string hide = 4;
 }
 
+// serial name 'org.dotlin.compiler.dart.element.DartInterfaceType?'
+message DartInterfaceType {
+  required string elementLocation = 1;
+  // WARNING: a default value decoded when value is missing
+  repeated DartType typeArguments = 2;
+  optional DartInterfaceType superClass = 3;
+  // WARNING: a default value decoded when value is missing
+  repeated DartInterfaceType superInterfaceTypes = 4;
+  // WARNING: a default value decoded when value is missing
+  repeated DartInterfaceType superMixinTypes = 5;
+  required DartNullabilitySuffix nullabilitySuffix = 6;
+}
+
 // serial name 'org.dotlin.compiler.dart.element.DartFunctionType'
 message DartFunctionType {
   // WARNING: a default value decoded when value is missing
@@ -151,19 +169,6 @@ message DartDynamicType {
 message DartNeverType {
 }
 
-// serial name 'org.dotlin.compiler.dart.element.DartInterfaceType'
-message DartInterfaceType {
-  required string elementLocation = 1;
-  // WARNING: a default value decoded when value is missing
-  repeated DartType typeArguments = 2;
-  optional DartInterfaceType superClass = 3;
-  // WARNING: a default value decoded when value is missing
-  repeated DartInterfaceType superInterfaceTypes = 4;
-  // WARNING: a default value decoded when value is missing
-  repeated DartInterfaceType superMixinTypes = 5;
-  required DartNullabilitySuffix nullabilitySuffix = 6;
-}
-
 // serial name 'org.dotlin.compiler.dart.element.DartTypeParameterType'
 message DartTypeParameterType {
   required string elementLocation = 1;
@@ -175,17 +180,17 @@ message DartTypeParameterType {
 message DartVoidType {
 }
 
+// serial name 'org.dotlin.compiler.dart.element.DartNullabilitySuffix'
+enum DartNullabilitySuffix {
+  QUESTION_MARK = 0;
+  STAR = 1;
+  NONE = 2;
+}
+
 // serial name 'org.dotlin.compiler.dart.element.DartTypeParameterElement'
 message DartTypeParameterElement {
   required string name = 1;
   required string location = 2;
   // WARNING: a default value decoded when value is missing
   optional DartType bound = 3;
-}
-
-// serial name 'org.dotlin.compiler.dart.element.DartNullabilitySuffix'
-enum DartNullabilitySuffix {
-  QUESTION_MARK = 0;
-  STAR = 1;
-  NONE = 2;
 }

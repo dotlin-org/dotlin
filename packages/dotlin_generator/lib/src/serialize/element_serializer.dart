@@ -91,13 +91,19 @@ class DartElementSerializer {
       );
 
   DartClassElement serializeClass(ClassElement c) => DartClassElement(
-        location: c.encodedLocation,
-        name: c.name,
-        isAbstract: c.isAbstract,
-        properties: serializePropertyInducingElements(c.fields),
-        constructors: c.constructors.map((ctor) => serializeConstructor(ctor)),
-        typeParameters: serializeTypeParameters(c.typeParameters),
-      );
+      location: c.encodedLocation,
+      name: c.name,
+      isAbstract: c.isAbstract,
+      properties: serializePropertyInducingElements(c.fields),
+      constructors: c.constructors.map((ctor) => serializeConstructor(ctor)),
+      typeParameters: serializeTypeParameters(c.typeParameters),
+      superType: c.supertype != null
+          ? _typeSerializer.serializeInterfaceType(c.supertype!)
+          : null,
+      superInterfaceTypes: _typeSerializer.serializeInterfaceTypes(
+        c.interfaces,
+      ),
+      superMixinTypes: _typeSerializer.serializeInterfaceTypes(c.mixins));
 
   DartConstructorElement serializeConstructor(ConstructorElement c) =>
       DartConstructorElement(

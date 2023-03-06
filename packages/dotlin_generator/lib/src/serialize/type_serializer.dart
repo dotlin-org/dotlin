@@ -140,7 +140,7 @@ class DartTypeSerializer {
   }
 }
 
-extension on DartTypeSerializer {
+extension DartMultiTypeSerializer on DartTypeSerializer {
   Iterable<DartType> serializeTypes(Iterable<og.DartType> types) =>
       types.map((t) => serializeType(t));
 

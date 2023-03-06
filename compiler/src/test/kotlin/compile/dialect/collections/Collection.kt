@@ -135,7 +135,6 @@ class Collection : BaseTest {
         )
     }
 
-    // TODO: Fix in #53.
     @Test
     fun `(dynamic) is Collection`() = assertCompile {
         kotlin(
