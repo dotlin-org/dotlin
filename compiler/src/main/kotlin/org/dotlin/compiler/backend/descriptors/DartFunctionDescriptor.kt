@@ -28,6 +28,7 @@ import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ClassConstructorDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
+import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.storage.getValue
 import org.jetbrains.kotlin.types.KotlinType
 
@@ -47,7 +48,7 @@ class DartSimpleFunctionDescriptor(
     init {
         initialize(
             null, // TODO
-            null, // TODO
+            DescriptorUtils.getDispatchReceiverParameterIfNeeded(container),
             emptyList(),
             element.typeParameters.kotlinTypeParametersOf(this),
             element.kotlinValueParametersOf(this),
@@ -59,7 +60,7 @@ class DartSimpleFunctionDescriptor(
         )
     }
 
-    private val _returnType by storageManager.createLazyValue { element.kotlinReturnType }
+    private val _returnType by lazy { element.kotlinReturnType }
 
     override fun getReturnType(): KotlinType = _returnType
 }

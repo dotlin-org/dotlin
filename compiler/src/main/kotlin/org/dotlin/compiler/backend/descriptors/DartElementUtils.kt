@@ -74,3 +74,11 @@ fun List<DartTypeParameterElement>.kotlinTypeParametersOf(
 
 val DartNullabilitySuffix.isNullable: Boolean
     get() = this == QUESTION_MARK
+
+context(DartDescriptor)
+val DartElement.parent: DartElement
+    get() = elementLocator.locate(location.parent)
+
+context(DartDescriptorContext)
+val DartElement.parent: DartElement
+    get() = elementLocator.locate(location.parent)

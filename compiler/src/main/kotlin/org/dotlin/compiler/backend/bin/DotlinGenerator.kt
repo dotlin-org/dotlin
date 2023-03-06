@@ -82,6 +82,7 @@ object DotlinGenerator {
                     "setter" to DartPropertyAccessorElement::class,
                     "constructor" to DartConstructorElement::class,
                     "function" to DartFunctionElement::class,
+                    "method" to DartFunctionElement::class,
                     "parameter" to DartParameterElement::class,
                     "typeParameter" to DartTypeParameterElement::class,
                 ) ?: "bytes" // If there's no match, just keep it as "bytes"

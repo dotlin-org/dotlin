@@ -64,7 +64,7 @@ class DartClassDescriptor(
         DartMemberScope(
             owner = this,
             context,
-            elements = element.properties,
+            elements = element.properties + element.methods,
         )
     }
 

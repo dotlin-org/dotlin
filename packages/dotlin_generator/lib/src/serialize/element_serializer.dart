@@ -36,7 +36,6 @@ class DartElementSerializer {
 
   DartLibraryElement serializeLibrary(LibraryElement library) {
     final libUri = Uri.parse(library.identifier);
-    // ignore: unnecessary_string_escapes
     var libPath = libUri.path;
 
     switch (libUri.scheme) {
@@ -47,6 +46,7 @@ class DartElementSerializer {
         break;
       // Otherwise, it's a package URI.
       case "package":
+        // ignore: unnecessary_string_escapes
         libPath = libPath.replaceFirst(RegExp("^[A-Za-z_]+\/"), "");
         break;
       default:
@@ -81,7 +81,7 @@ class DartElementSerializer {
       DartCompilationUnitElement(
         location: unit.encodedLocation,
         classes: unit.classes.map((c) => serializeClass(c)),
-        functions: unit.functions.map((f) => serializeFunction(f)),
+        functions: serializeFunctions(unit.functions),
         properties: serializePropertyInducingElements(unit.topLevelVariables)
             .followedBy(
           serializePropertyInducingElements(
@@ -96,6 +96,7 @@ class DartElementSerializer {
       isAbstract: c.isAbstract,
       properties: serializePropertyInducingElements(c.fields),
       constructors: c.constructors.map((ctor) => serializeConstructor(ctor)),
+      methods: serializeFunctions(c.methods),
       typeParameters: serializeTypeParameters(c.typeParameters),
       superType: c.supertype != null
           ? _typeSerializer.serializeInterfaceType(c.supertype!)
@@ -151,7 +152,7 @@ class DartElementSerializer {
             )
           : null;
 
-  DartFunctionElement serializeFunction(FunctionElement fun) =>
+  DartFunctionElement serializeFunction(ExecutableElement fun) =>
       DartFunctionElement(
         location: fun.encodedLocation,
         name: fun.name,
@@ -207,4 +208,9 @@ extension DartMultiElementSerializer on DartElementSerializer {
     Iterable<PropertyInducingElement> properties,
   ) =>
       properties.map((p) => serializePropertyInducingElement(p));
+
+  Iterable<DartFunctionElement> serializeFunctions(
+    Iterable<ExecutableElement> funs,
+  ) =>
+      funs.map((p) => serializeFunction(p));
 }

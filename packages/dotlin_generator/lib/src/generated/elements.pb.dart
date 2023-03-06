@@ -207,9 +207,10 @@ class DartClassElement extends $pb.GeneratedMessage {
     ..a<$core.bool>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isAbstract', $pb.PbFieldType.QB, protoName: 'isAbstract')
     ..pc<DartConstructorElement>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'constructors', $pb.PbFieldType.PM, subBuilder: DartConstructorElement.create)
     ..pc<DartPropertyElement>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'properties', $pb.PbFieldType.PM, subBuilder: DartPropertyElement.create)
-    ..aOM<DartInterfaceType>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'superType', protoName: 'superType', subBuilder: DartInterfaceType.create)
-    ..pc<DartInterfaceType>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'superInterfaceTypes', $pb.PbFieldType.PM, protoName: 'superInterfaceTypes', subBuilder: DartInterfaceType.create)
-    ..pc<DartInterfaceType>(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'superMixinTypes', $pb.PbFieldType.PM, protoName: 'superMixinTypes', subBuilder: DartInterfaceType.create)
+    ..pc<DartFunctionElement>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'methods', $pb.PbFieldType.PM, subBuilder: DartFunctionElement.create)
+    ..aOM<DartInterfaceType>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'superType', protoName: 'superType', subBuilder: DartInterfaceType.create)
+    ..pc<DartInterfaceType>(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'superInterfaceTypes', $pb.PbFieldType.PM, protoName: 'superInterfaceTypes', subBuilder: DartInterfaceType.create)
+    ..pc<DartInterfaceType>(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'superMixinTypes', $pb.PbFieldType.PM, protoName: 'superMixinTypes', subBuilder: DartInterfaceType.create)
   ;
 
   DartClassElement._() : super();
@@ -220,6 +221,7 @@ class DartClassElement extends $pb.GeneratedMessage {
     $core.bool? isAbstract,
     $core.Iterable<DartConstructorElement>? constructors,
     $core.Iterable<DartPropertyElement>? properties,
+    $core.Iterable<DartFunctionElement>? methods,
     DartInterfaceType? superType,
     $core.Iterable<DartInterfaceType>? superInterfaceTypes,
     $core.Iterable<DartInterfaceType>? superMixinTypes,
@@ -242,6 +244,9 @@ class DartClassElement extends $pb.GeneratedMessage {
     }
     if (properties != null) {
       _result.properties.addAll(properties);
+    }
+    if (methods != null) {
+      _result.methods.addAll(methods);
     }
     if (superType != null) {
       _result.superType = superType;
@@ -312,21 +317,24 @@ class DartClassElement extends $pb.GeneratedMessage {
   $core.List<DartPropertyElement> get properties => $_getList(5);
 
   @$pb.TagNumber(7)
-  DartInterfaceType get superType => $_getN(6);
-  @$pb.TagNumber(7)
-  set superType(DartInterfaceType v) { setField(7, v); }
-  @$pb.TagNumber(7)
-  $core.bool hasSuperType() => $_has(6);
-  @$pb.TagNumber(7)
-  void clearSuperType() => clearField(7);
-  @$pb.TagNumber(7)
-  DartInterfaceType ensureSuperType() => $_ensure(6);
+  $core.List<DartFunctionElement> get methods => $_getList(6);
 
   @$pb.TagNumber(8)
-  $core.List<DartInterfaceType> get superInterfaceTypes => $_getList(7);
+  DartInterfaceType get superType => $_getN(7);
+  @$pb.TagNumber(8)
+  set superType(DartInterfaceType v) { setField(8, v); }
+  @$pb.TagNumber(8)
+  $core.bool hasSuperType() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearSuperType() => clearField(8);
+  @$pb.TagNumber(8)
+  DartInterfaceType ensureSuperType() => $_ensure(7);
 
   @$pb.TagNumber(9)
-  $core.List<DartInterfaceType> get superMixinTypes => $_getList(8);
+  $core.List<DartInterfaceType> get superInterfaceTypes => $_getList(8);
+
+  @$pb.TagNumber(10)
+  $core.List<DartInterfaceType> get superMixinTypes => $_getList(9);
 }
 
 class DartPropertyElement extends $pb.GeneratedMessage {

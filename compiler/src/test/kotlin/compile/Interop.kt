@@ -1079,4 +1079,103 @@ class Interop : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `call Dart method`() = assertCompile {
+        dart(
+            """
+            class SomeClass {
+              int myMethod(int x, int y) => x * y;
+            }
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.SomeClass
+
+            fun main() {
+                val z: Int = SomeClass().myMethod(2, 3)
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show SomeClass;
+
+            void main() {
+              final int z = SomeClass().myMethod(2, 3);
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call Dart method with class type parameters`() = assertCompile {
+        dart(
+            """
+            class SomeClass<X, Y> {
+              int myMethod(X x, Y y) => 3;
+            }
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.SomeClass
+
+            fun main() {
+                val z: Int = SomeClass<Int, Double>().myMethod(2, 3.0)
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show SomeClass;
+
+            void main() {
+              final int z = SomeClass<int, double>().myMethod(2, 3.0);
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call Dart method with class type parameters and type parameter return type`() = assertCompile {
+        dart(
+            """
+            class SomeClass<X, Y> {
+              Z myMethod<Z>(X x, Y y) => throw "Nope";
+            }
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.SomeClass
+
+            fun main() {
+                val z: Int = SomeClass<Int, Double>().myMethod(2, 3.0)
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show SomeClass;
+
+            void main() {
+              final int z = SomeClass<int, double>().myMethod<int>(2, 3.0);
+            }
+            """
+        )
+    }
 }

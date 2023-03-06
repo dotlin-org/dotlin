@@ -19,15 +19,14 @@
 
 package org.dotlin.compiler.backend.descriptors.type
 
-import org.dotlin.compiler.backend.descriptors.DartDescriptorContext
-import org.dotlin.compiler.backend.descriptors.DotlinFlexibleType
-import org.dotlin.compiler.backend.descriptors.dartElement
-import org.dotlin.compiler.backend.descriptors.isNullable
+import org.dotlin.compiler.backend.descriptors.*
 import org.dotlin.compiler.dart.element.*
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 object DartTypeFactory {
     fun simpleType(
@@ -43,12 +42,27 @@ object DartTypeFactory {
                 }
             )
 
-            val (packageName, descriptorName) = context.fqNameOf(element).let { it.parent() to it.shortName() }
-            val descriptor = context.module
-                .getPackage(packageName)
-                .memberScope
-                .getContributedDescriptors { it == descriptorName }
-                .first()
+            val (parentFqName, descriptorName) = context.fqNameOf(element).let { it.parent() to it.shortName() }
+            val descriptor = run {
+                val isClassMember = with(context) { element.parent is DartInterfaceElement }
+
+                val memberScope = when {
+                    isClassMember -> context.module
+                        .getPackage(parentFqName.parent())
+                        .memberScope
+                        .getContributedClassifier(parentFqName.shortName(), NoLookupLocation.FROM_BACKEND)
+                        .cast<ClassDescriptor>()
+                        .unsubstitutedMemberScope
+
+                    else -> context.module
+                        .getPackage(parentFqName)
+                        .memberScope
+                }
+
+                memberScope
+                    .getContributedDescriptors { it == descriptorName }
+                    .first()
+            }
 
             when (type) {
                 is DartInterfaceType -> descriptor as ClassDescriptor

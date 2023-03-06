@@ -32,16 +32,20 @@ message DartCompilationUnitElement {
 message DartClassElement {
   required string location = 1;
   required string name = 2;
+  // WARNING: a default value decoded when value is missing
   repeated DartTypeParameterElement typeParameters = 3;
   required bool isAbstract = 4;
+  // WARNING: a default value decoded when value is missing
   repeated DartConstructorElement constructors = 5;
   // WARNING: a default value decoded when value is missing
   repeated DartPropertyElement properties = 6;
-  optional DartInterfaceType superType = 7;
   // WARNING: a default value decoded when value is missing
-  repeated DartInterfaceType superInterfaceTypes = 8;
+  repeated DartFunctionElement methods = 7;
+  optional DartInterfaceType superType = 8;
   // WARNING: a default value decoded when value is missing
-  repeated DartInterfaceType superMixinTypes = 9;
+  repeated DartInterfaceType superInterfaceTypes = 9;
+  // WARNING: a default value decoded when value is missing
+  repeated DartInterfaceType superMixinTypes = 10;
 }
 
 // serial name 'org.dotlin.compiler.dart.element.DartPropertyElement'

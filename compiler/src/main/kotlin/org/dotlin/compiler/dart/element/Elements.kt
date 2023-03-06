@@ -137,27 +137,27 @@ sealed interface DartInterfaceMemberElement : DartDeclarationElement, DartAbstra
 sealed interface DartInterfaceElement : DartDeclarationElement, DartTypeParameterizedElement {
     override val name: DartSimpleIdentifier
 
-    //val accessors: List<DartPropertyAccessorElement> TODO
+    val superType: DartInterfaceType?
+    val superInterfaceTypes: List<DartInterfaceType>
+    val superMixinTypes: List<DartInterfaceType>
+
     val constructors: List<DartConstructorElement>
     val properties: List<DartPropertyElement>
-    //val methods: List<DartMethodElement> TODO
-
-    //val interfaces: List<DartInterfaceType> TODO
-    //val mixins: List<DartMixinType>  TODO
-
+    val methods: List<DartFunctionElement>
 }
 
 @Serializable
 data class DartClassElement(
     override val location: DartElementLocation,
     override val name: DartSimpleIdentifier,
-    override val typeParameters: List<DartTypeParameterElement>,
+    override val typeParameters: List<DartTypeParameterElement> = emptyList(),
     override val isAbstract: Boolean,
-    override val constructors: List<DartConstructorElement>,
+    override val constructors: List<DartConstructorElement> = emptyList(),
     override val properties: List<DartPropertyElement> = emptyList(),
-    val superType: DartInterfaceType?,
-    val superInterfaceTypes: List<DartInterfaceType> = emptyList(),
-    val superMixinTypes: List<DartInterfaceType> = emptyList(),
+    override val methods: List<DartFunctionElement> = emptyList(),
+    override val superType: DartInterfaceType?,
+    override val superInterfaceTypes: List<DartInterfaceType> = emptyList(),
+    override val superMixinTypes: List<DartInterfaceType> = emptyList(),
 ) : DartInterfaceElement, DartAbstractableElement
 
 @Serializable
@@ -267,12 +267,16 @@ data class DartConstructorElement(
 ) : DartInterfaceMemberElement, DartExecutableElement, DartConstableElement {
     @Transient
     override val isAbstract = false
+
     @Transient
     override val isStatic = false
+
     @Transient
     override val isAsync = false
+
     @Transient
     override val isGenerator = false
+
     @Transient
     override val typeParameters: List<DartTypeParameterElement> = emptyList()
 }
