@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings
 
+import org.dotlin.compiler.backend.dotlin
 import org.dotlin.compiler.backend.kotlin.Array
 import org.dotlin.compiler.backend.kotlin.collections.Collection
 import org.dotlin.compiler.backend.kotlin.collections.ImmutableList
@@ -34,6 +35,7 @@ import org.dotlin.compiler.backend.steps.ir2ast.ir.irCall
 import org.dotlin.compiler.backend.steps.ir2ast.lower.*
 import org.jetbrains.kotlin.backend.common.lower.irNot
 import org.jetbrains.kotlin.ir.builders.IrSingleStatementBuilder
+import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrTypeOperator.INSTANCEOF
 import org.jetbrains.kotlin.ir.expressions.IrTypeOperator.NOT_INSTANCEOF
@@ -41,6 +43,7 @@ import org.jetbrains.kotlin.ir.expressions.IrTypeOperatorCall
 import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.types.typeOrNull
+import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
 
 /**
  * Transforms any use of [Collection] (or [MutableCollection]) that's not a supertype to
@@ -53,6 +56,11 @@ import org.jetbrains.kotlin.ir.types.typeOrNull
 // TODO: Assert in functions that the type is correct
 @Suppress("UnnecessaryVariable")
 class CollectionTypeChecksLowering(override val context: DotlinLoweringContext) : IrExpressionLowering {
+    private val skip = listOf(
+        dotlin.intrinsics.isCollection,
+        dotlin.intrinsics.isMutableCollection
+    )
+
     override fun DotlinLoweringContext.transform(
         expression: IrExpression,
         context: IrExpressionContext
@@ -64,11 +72,15 @@ class CollectionTypeChecksLowering(override val context: DotlinLoweringContext) 
             return noChange()
         }
 
+        val container = context.container
+        // We don't want to transform the `is Collection` calls in the intrinsic functions themselves.
+        if (container is IrSimpleFunction && container.fqNameWhenAvailable in skip) {
+            return noChange()
+        }
+
         val negated = expression.operator == NOT_INSTANCEOF
 
         val typeArguments = (expression.typeOperand as IrSimpleType).arguments
-
-        // TODO: Optimize call to intrinsic functions: Inline them directly ourselves.
 
         return replaceWith(
             with(dotlinIrBuiltIns) {
