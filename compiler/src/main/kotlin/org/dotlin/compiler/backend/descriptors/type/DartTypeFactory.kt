@@ -20,15 +20,14 @@
 package org.dotlin.compiler.backend.descriptors.type
 
 import org.dotlin.compiler.backend.descriptors.DartDescriptorContext
+import org.dotlin.compiler.backend.descriptors.DotlinFlexibleType
 import org.dotlin.compiler.backend.descriptors.dartElement
+import org.dotlin.compiler.backend.descriptors.isNullable
 import org.dotlin.compiler.dart.element.*
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.types.KotlinTypeFactory
-import org.jetbrains.kotlin.types.SimpleType
-import org.jetbrains.kotlin.types.TypeAttributes
-import org.jetbrains.kotlin.types.TypeProjectionImpl
+import org.jetbrains.kotlin.types.*
 
 object DartTypeFactory {
     fun simpleType(
@@ -44,7 +43,7 @@ object DartTypeFactory {
                 }
             )
 
-            val (packageName, descriptorName) =  context.fqNameOf(element).let { it.parent() to it.shortName() }
+            val (packageName, descriptorName) = context.fqNameOf(element).let { it.parent() to it.shortName() }
             val descriptor = context.module
                 .getPackage(packageName)
                 .memberScope
@@ -72,10 +71,18 @@ object DartTypeFactory {
             attributes = TypeAttributes.Empty, // TODO
             descriptor.typeConstructor,
             when (type) {
-                is DartInterfaceType -> type.typeArguments.map { TypeProjectionImpl(it.toKotlinType(context)) }
+                is DartInterfaceType -> type.typeArguments.toKotlinTypeProjections(context)
                 is DartTypeParameterType -> emptyList()
             },
-            type.nullabilitySuffix == DartNullabilitySuffix.QUESTION_MARK,
+            type.nullabilitySuffix.isNullable,
         )
     }
+
+    fun flexibleType(lower: SimpleType, upper: SimpleType): FlexibleType {
+        require(lower != upper)
+        return DotlinFlexibleType(KotlinTypeFactory.flexibleType(lower, upper) as FlexibleType)
+    }
+
+    fun List<DartType>.toKotlinTypeProjections(context: DartDescriptorContext) =
+        map { TypeProjectionImpl(it.toKotlinType(context)) }
 }

@@ -2,6 +2,7 @@ package org.dotlin.compiler.backend.descriptors
 
 import org.dotlin.compiler.backend.descriptors.type.toKotlinType
 import org.dotlin.compiler.dart.element.*
+import org.dotlin.compiler.dart.element.DartNullabilitySuffix.QUESTION_MARK
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor.Kind.DECLARATION
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor.Kind.SYNTHESIZED
@@ -70,3 +71,6 @@ fun List<DartTypeParameterElement>.kotlinTypeParametersOf(
         index
     )
 }
+
+val DartNullabilitySuffix.isNullable: Boolean
+    get() = this == QUESTION_MARK

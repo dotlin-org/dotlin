@@ -34,7 +34,6 @@ object dotlin : PackageFqNameWrapper {
     object intrinsics : PackageFqNameWrapper {
         override val self = dotlin.self.child("intrinsics")
 
-        val Flex = self.child("Flex")
         val AnyList = self.child("AnyList")
         val AnySet = self.child("AnySet")
         val AnyMap = self.child("AnyMap")

@@ -1,39 +1,17 @@
-package org.dotlin.compiler.backend.steps.src2ir
+package org.dotlin.compiler.backend.descriptors
 
 import org.dotlin.compiler.backend.dotlin
 import org.dotlin.compiler.backend.kotlin
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
 import org.jetbrains.kotlin.renderer.DescriptorRendererOptions
-import org.jetbrains.kotlin.resolve.TypeResolver
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameOrNull
-import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.types.FlexibleType
+import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.TypeAttributes
+import org.jetbrains.kotlin.types.TypeRefinement
 import org.jetbrains.kotlin.types.checker.KotlinTypeRefiner
 
-/**
- * Ideally this would've inherit [TypeResolver] and transform types through there. But the class
- * is closed, so we use [DotlinTypeTransformer] as a [TypeResolver.TypeTransformerForTests].
- */
-class DotlinTypeTransformer : TypeResolver.TypeTransformerForTests() {
-    private fun KotlinType.toDotlinTypeOrNull(): KotlinType? {
-        if (fqNameOrNull() == dotlin.intrinsics.Flex) {
-            return DotlinFlexibleType(
-                KotlinTypeFactory.flexibleType(
-                    lowerBound = arguments.first().type as SimpleType,
-                    upperBound = arguments.last().type as SimpleType
-                ) as FlexibleType
-            )
-        }
-
-        return null
-    }
-
-    override fun transformType(kotlinType: KotlinType) = kotlinType.toDotlinTypeOrNull()
-}
-
-/**
- * Types representing `dotlin.intrinsics.Flex`.
- */
 class DotlinFlexibleType(private val original: FlexibleType) : FlexibleType(original.lowerBound, original.upperBound) {
     override val delegate = original.delegate
 

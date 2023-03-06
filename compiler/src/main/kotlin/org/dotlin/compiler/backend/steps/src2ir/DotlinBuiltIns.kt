@@ -1,17 +1,31 @@
 package org.dotlin.compiler.backend.steps.src2ir
 
+import org.dotlin.compiler.backend.dotlin
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.PrimitiveType
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
+import org.jetbrains.kotlin.storage.getValue
 import org.jetbrains.kotlin.types.*
 
 /**
  * Primitive arrays are mapped to the typed array, e.g. `IntArray` to `Array<Int>`.
+ *
+ * Also includes some other Dotlin intrinsic types.
  */
 // TODO: Map all other number primitives to Int and Double
 class DotlinBuiltIns : KotlinBuiltIns(LockBasedStorageManager("DotlinBuiltIns")) {
-    private val primitiveTypes by lazy {
+    private val getBuiltInClass = storageManager.createMemoizedFunction<FqName, ClassDescriptor> {
+        getBuiltInClassByFqName(it)
+    }
+
+    val anyList by storageManager.createLazyValue { getBuiltInClass(dotlin.intrinsics.AnyList) }
+    val anySet by storageManager.createLazyValue { getBuiltInClass(dotlin.intrinsics.AnySet) }
+    val anyMap by storageManager.createLazyValue { getBuiltInClass(dotlin.intrinsics.AnyMap) }
+
+    private val primitiveTypes by storageManager.createLazyValue {
         setOf(
             booleanType,
             charType,
@@ -24,7 +38,7 @@ class DotlinBuiltIns : KotlinBuiltIns(LockBasedStorageManager("DotlinBuiltIns"))
         )
     }
 
-    private val primitiveToSimpleTypes by lazy {
+    private val primitiveToSimpleTypes by storageManager.createLazyValue {
         mapOf(
             PrimitiveType.BOOLEAN to booleanType,
             PrimitiveType.CHAR to charType,

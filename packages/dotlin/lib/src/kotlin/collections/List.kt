@@ -18,7 +18,6 @@
 package kotlin.collections
 
 import dart.math.Random
-import dotlin.intrinsics.Flex
 
 /**
  * A generic indexable ordered collection of elements. Methods in this interface support

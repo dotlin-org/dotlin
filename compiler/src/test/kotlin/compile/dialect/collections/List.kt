@@ -232,69 +232,63 @@ class List : BaseTest {
     }
 
     @Test
-    fun `use Kotlin ImmutableList as Dart List in external function`() = assertCompile {
-        kotlin(
-            """
-            import dotlin.intrinsics.*
-
-            fun main() {
-                test(listOf())
-            }
-
-            @DartLibrary("test.dart")
-            external fun test(list: Flex<AnyList<Int>, List<Int>>)
-            """
-        )
-
+    fun `use Kotlin ImmutableList as Dart List in Dart function`() = assertCompile {
         dart(
             """
-            void test(List<int> list) {}
+            void execute(List<int> list) {}
             """,
-            Path("lib/test.dart"),
+            Path("lib/exec.dart"),
             assert = false
+        )
+
+        kotlin(
+            """
+            import pkg.test.exec.execute
+
+            fun main() {
+                execute(listOf())
+            }
+            """
         )
 
         dart(
             """
             import "dart:collection" show UnmodifiableListView;
-            import "test.dart" show test;
+            import "exec.dart" show execute;
 
             void main() {
-              test(UnmodifiableListView<int>(<int>[]));
+              execute(UnmodifiableListView<int>(<int>[]));
             }
             """
         )
     }
 
     @Test
-    fun `use Kotlin MutableList as Dart List in external function`() = assertCompile {
-        kotlin(
-            """
-            import dotlin.intrinsics.*
-
-            fun main() {
-                test(mutableListOf())
-            }
-
-            @DartLibrary("test.dart")
-            external fun test(list: Flex<AnyList<Int>, List<Int>>)
-            """
-        )
-
+    fun `use Kotlin MutableList as Dart List in Dart function`() = assertCompile {
         dart(
             """
-            void test(List<int> list) {}
+            void execute(List<int> list) {}
             """,
-            Path("lib/test.dart"),
+            Path("lib/exec.dart"),
             assert = false
         )
 
+        kotlin(
+            """
+            import pkg.test.exec.execute
+
+            fun main() {
+                execute(mutableListOf())
+            }
+            """
+        )
+
         dart(
             """
-            import "test.dart" show test;
+            import "exec.dart" show execute;
 
             void main() {
-              test(<int>[]);
+              execute(<int>[]);
             }
             """
         )
@@ -302,109 +296,6 @@ class List : BaseTest {
 
     @Test
     fun `assign Dart List subtype to Kotlin MutableList`() = assertCompile {
-        kotlin(
-            """
-            import dotlin.intrinsics.*
-            import dart.math.Random
-
-            fun main() {
-                val myList: MutableList<Int> = MaybeMutableList<Int>()
-            }
-
-            @DartLibrary("maybe.dart")
-            external class MaybeMutableList<E> : Flex<AnyList<E>, List<E>> {
-                override var size: Int = 0
-                override fun <R> cast() = MaybeMutableList<R>()
-                override operator fun get(index: Int): E = throw UnsupportedError("Empty")
-                override fun reversed() = this
-                override fun indexOf(element: @UnsafeVariance E, start: Int): Int = -1
-                override fun indexOfFirst(start: Int, predicate: (element: E) -> Boolean): Int = -1
-                override fun indexOfLast(start: Int?, predicate: (element: E) -> Boolean): Int = -1
-                override fun lastIndexOf(element: @UnsafeVariance E, start: Int?): Int = -1
-                override operator fun plus(other: List<@UnsafeVariance E>) = other
-                override fun subList(start: Int, end: Int?) = MaybeMutableList<E>()
-                override fun slice(start: Int, end: Int) = MaybeMutableList<E>()
-                override fun asMap(): Map<Int, E> = throw UnsupportedError("Empty")
-                override fun equals(other: Any?) = other is List<E> && other.isEmpty()
-                override fun iterator(): MutableIterator<E> = throw UnsupportedError("Empty")
-                override fun plus(elements: Iterable<@UnsafeVariance E>): Iterable<E> = elements
-                override fun <T> map(transform: (element: E) -> T) = MaybeMutableList<T>()
-                override fun filter(predicate: (element: E) -> Boolean) = this
-                override fun <T> filterIsInstance() = MaybeMutableList<T>()
-                override fun <T> flatMap(transform: (element: E) -> Iterable<T>) = MaybeMutableList<T>()
-                override fun contains(element: Any?): Boolean = false
-                override fun forEach(action: (element: E) -> Unit) {}
-                override fun reduce(operator: (acc: E, element: E) -> @UnsafeVariance E): E = throw UnsupportedError("Empty")
-                override fun <T> fold(
-                    initial: T,
-                    operation: (acc: T, element: E) -> T
-                ): T = throw UnsupportedError("Empty")
-                override fun all(predicate: (element: E) -> Boolean): Boolean = false
-                override fun joinToString(separator: String): String = ""
-                override fun any(predicate: (element: E) -> Boolean): Boolean = false
-                override fun toList(growable: Boolean) = this
-                override fun isEmpty(): Boolean = true
-                override fun isNotEmpty(): Boolean = false
-                override fun take(n: Int) = this
-                override fun takeWhile(predicate: (value: E) -> Boolean) = this
-                override fun drop(n: Int) = this
-                override fun dropWhile(predicate: (value: E) -> Boolean) = this
-                override var first: E = throw UnsupportedError("Empty")
-                override var last: E = throw UnsupportedError("Empty")
-                override fun single(): E = throw UnsupportedError("Empty")
-                override fun first(
-                    orElse: (() -> @UnsafeVariance E)?,
-                    predicate: (element: E) -> Boolean
-                ): E = throw UnsupportedError("Empty")
-                override fun last(
-                    orElse: (() -> @UnsafeVariance E)?,
-                    predicate: (element: E) -> Boolean
-                ): E = throw UnsupportedError("Empty")
-                override fun single(
-                    orElse: (() -> @UnsafeVariance E)?,
-                    predicate: (element: E) -> Boolean
-                ): E = throw UnsupportedError("Empty")
-                override fun elementAt(index: Int): E = throw UnsupportedError("Empty")
-                override fun toSet(): Set<E> = throw UnsupportedError("Empty")
-
-                override operator fun set(index: Int, value: E): E = throw UnsupportedError("")
-                override fun setAll(index: Int, @DartName("iterable") elements: Iterable<E>) {}
-
-                override fun setSlice(
-                    start: Int,
-                    end: Int,
-                    elements: Iterable<E>,
-                    dropCount: Int
-                ) {}
-
-                override fun fillSlice(start: Int, end: Int, fill: E?) {}
-                override fun sort(selector: ((a: E, b: E) -> Int)?) {}
-                override fun shuffle(random: Random?) {}
- 
-                override fun add(value: E): Unit {}
-            
-                override fun addAll(elements: Iterable<E>): Unit {}
-            
-                override fun clear(): Unit {}
-            
-                override fun remove(value: Any?): Boolean = false
-                override fun removeIf(predicate: (element: E) -> Boolean): Unit {}
-                override fun retainIf(predicate: (element: E) -> Boolean): Unit {}
-
-                override fun add(index: Int, element: E): Unit {}
-                
-                override fun addAll(index: Int, elements: Iterable<E>): Unit {}
-                
-                override fun removeAt(index: Int): E = throw "no"
-            
-                override fun removeLast(): E = throw "no"
-                
-                override fun removeSlice(start: Int, end: Int): Unit {}
-                override fun replaceSlice(start: Int, end: Int, @DartName("replacements") elements: Iterable<E>): Unit {}
-            }
-            """
-        )
-
         dart(
             """
             class MaybeMutableList<E> implements List<E> {
@@ -413,6 +304,16 @@ class List : BaseTest {
             """,
             Path("lib/maybe.dart"),
             assert = false
+        )
+
+        kotlin(
+            """
+            import pkg.test.maybe.MaybeMutableList
+
+            fun main() {
+                val myList: MutableList<Int> = MaybeMutableList<Int>()
+            }
+            """
         )
 
         dart(
@@ -428,25 +329,22 @@ class List : BaseTest {
 
     @Test
     fun `assign Dart List to Kotlin ImmutableList`() = assertCompile {
-        kotlin(
-            """
-            import dotlin.intrinsics.*
-
-            fun main() {
-                val myList: ImmutableList<Int> = calculate()
-            }
-
-            @DartLibrary("calc.dart")
-            external fun calculate(): Flex<AnyList<Int>, List<Int>>
-            """
-        )
-
         dart(
             """
             List<int> calculate() => [1, 2, 3];
             """,
             Path("lib/calc.dart"),
             assert = false
+        )
+
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            fun main() {
+                val myList: ImmutableList<Int> = calculate()
+            }
+            """
         )
 
         dart(
@@ -462,109 +360,6 @@ class List : BaseTest {
 
     @Test
     fun `assign Dart List subtype to Kotlin ImmutableList`() = assertCompile {
-        kotlin(
-            """
-            import dotlin.intrinsics.*
-            import dart.math.Random
-
-            fun main() {
-                val myList: ImmutableList<Int> = MaybeMutableList<Int>()
-            }
-
-            @DartLibrary("maybe.dart")
-            external class MaybeMutableList<E> : Flex<AnyList<E>, List<E>> {
-                override var size: Int = 0
-                override fun <R> cast() = MaybeMutableList<R>()
-                override operator fun get(index: Int): E = throw UnsupportedError("Empty")
-                override fun reversed() = this
-                override fun indexOf(element: @UnsafeVariance E, start: Int): Int = -1
-                override fun indexOfFirst(start: Int, predicate: (element: E) -> Boolean): Int = -1
-                override fun indexOfLast(start: Int?, predicate: (element: E) -> Boolean): Int = -1
-                override fun lastIndexOf(element: @UnsafeVariance E, start: Int?): Int = -1
-                override operator fun plus(other: List<@UnsafeVariance E>) = other
-                override fun subList(start: Int, end: Int?) = MaybeMutableList<E>()
-                override fun slice(start: Int, end: Int) = MaybeMutableList<E>()
-                override fun asMap(): Map<Int, E> = throw UnsupportedError("Empty")
-                override fun equals(other: Any?) = other is List<E> && other.isEmpty()
-                override fun iterator(): MutableIterator<E> = throw UnsupportedError("Empty")
-                override fun plus(elements: Iterable<@UnsafeVariance E>): Iterable<E> = elements
-                override fun <T> map(transform: (element: E) -> T) = MaybeMutableList<T>()
-                override fun filter(predicate: (element: E) -> Boolean) = this
-                override fun <T> filterIsInstance() = MaybeMutableList<T>()
-                override fun <T> flatMap(transform: (element: E) -> Iterable<T>) = MaybeMutableList<T>()
-                override fun contains(element: Any?): Boolean = false
-                override fun forEach(action: (element: E) -> Unit) {}
-                override fun reduce(operator: (acc: E, element: E) -> @UnsafeVariance E): E = throw UnsupportedError("Empty")
-                override fun <T> fold(
-                    initial: T,
-                    operation: (acc: T, element: E) -> T
-                ): T = throw UnsupportedError("Empty")
-                override fun all(predicate: (element: E) -> Boolean): Boolean = false
-                override fun joinToString(separator: String): String = ""
-                override fun any(predicate: (element: E) -> Boolean): Boolean = false
-                override fun toList(growable: Boolean) = this
-                override fun isEmpty(): Boolean = true
-                override fun isNotEmpty(): Boolean = false
-                override fun take(n: Int) = this
-                override fun takeWhile(predicate: (value: E) -> Boolean) = this
-                override fun drop(n: Int) = this
-                override fun dropWhile(predicate: (value: E) -> Boolean) = this
-                override var first: E = throw UnsupportedError("Empty")
-                override var last: E = throw UnsupportedError("Empty")
-                override fun single(): E = throw UnsupportedError("Empty")
-                override fun first(
-                    orElse: (() -> @UnsafeVariance E)?,
-                    predicate: (element: E) -> Boolean
-                ): E = throw UnsupportedError("Empty")
-                override fun last(
-                    orElse: (() -> @UnsafeVariance E)?,
-                    predicate: (element: E) -> Boolean
-                ): E = throw UnsupportedError("Empty")
-                override fun single(
-                    orElse: (() -> @UnsafeVariance E)?,
-                    predicate: (element: E) -> Boolean
-                ): E = throw UnsupportedError("Empty")
-                override fun elementAt(index: Int): E = throw UnsupportedError("Empty")
-                override fun toSet(): Set<E> = throw UnsupportedError("Empty")
-
-                override operator fun set(index: Int, value: E): E = throw UnsupportedError("")
-                override fun setAll(index: Int, @DartName("iterable") elements: Iterable<E>) {}
-
-                override fun setSlice(
-                    start: Int,
-                    end: Int,
-                    elements: Iterable<E>,
-                    dropCount: Int
-                ) {}
-
-                override fun fillSlice(start: Int, end: Int, fill: E?) {}
-                override fun sort(selector: ((a: E, b: E) -> Int)?) {}
-                override fun shuffle(random: Random?) {}
- 
-                override fun add(value: E): Unit {}
-            
-                override fun addAll(elements: Iterable<E>): Unit {}
-            
-                override fun clear(): Unit {}
-            
-                override fun remove(value: Any?): Boolean = false
-                override fun removeIf(predicate: (element: E) -> Boolean): Unit {}
-                override fun retainIf(predicate: (element: E) -> Boolean): Unit {}
-
-                override fun add(index: Int, element: E): Unit {}
-                
-                override fun addAll(index: Int, elements: Iterable<E>): Unit {}
-                
-                override fun removeAt(index: Int): E = throw "no"
-            
-                override fun removeLast(): E = throw "no"
-                
-                override fun removeSlice(start: Int, end: Int): Unit {}
-                override fun replaceSlice(start: Int, end: Int, @DartName("replacements") elements: Iterable<E>): Unit {}
-            }
-            """
-        )
-
         dart(
             """
             class MaybeMutableList<E> implements List<E> {
@@ -573,6 +368,16 @@ class List : BaseTest {
             """,
             Path("lib/maybe.dart"),
             assert = false
+        )
+
+        kotlin(
+            """
+            import pkg.test.maybe.MaybeMutableList
+
+            fun main() {
+                val myList: ImmutableList<Int> = MaybeMutableList<Int>()
+            }
+            """
         )
 
         dart(
@@ -588,26 +393,25 @@ class List : BaseTest {
 
     @Test
     fun `is List`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                val obj = calculate()
-                if (obj is List<Int>) {
-                    obj[0]
-                }
-            }
-
-            @DartLibrary("calc.dart")
-            external fun calculate(): Any
-            """
-        )
-
         dart(
             """
             Object calculate() => 3;
             """,
             Path("lib/calc.dart"),
             assert = false
+        )
+
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            fun main() {
+                val obj = calculate()
+                if (obj is List<Int>) {
+                    obj[0]
+                }
+            }
+            """
         )
 
         dart(
@@ -626,26 +430,25 @@ class List : BaseTest {
 
     @Test
     fun `!is List`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                val obj = calculate()
-                if (obj !is List<Int>) {
-
-                }
-            }
-
-            @DartLibrary("calc.dart")
-            external fun calculate(): Any
-            """
-        )
-
         dart(
             """
             Object calculate() => 3;
             """,
             Path("lib/calc.dart"),
             assert = false
+        )
+
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            fun main() {
+                val obj = calculate()
+                if (obj !is List<Int>) {
+
+                }
+            }
+            """
         )
 
         dart(
@@ -662,26 +465,25 @@ class List : BaseTest {
 
     @Test
     fun `is ImmutableList`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                val obj = calculate()
-                if (obj is ImmutableList<Int>) {
-                    obj[0]
-                }
-            }
-
-            @DartLibrary("calc.dart")
-            external fun calculate(): Any
-            """
-        )
-
         dart(
             """
             Object calculate() => 3;
             """,
             Path("lib/calc.dart"),
             assert = false
+        )
+
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            fun main() {
+                val obj = calculate()
+                if (obj is ImmutableList<Int>) {
+                    obj[0]
+                }
+            }
+            """
         )
 
         dart(
@@ -702,26 +504,25 @@ class List : BaseTest {
 
     @Test
     fun `!is ImmutableList`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                val obj = calculate()
-                if (obj !is ImmutableList<Int>) {
-                    
-                }
-            }
-
-            @DartLibrary("calc.dart")
-            external fun calculate(): Any
-            """
-        )
-
         dart(
             """
             Object calculate() => 3;
             """,
             Path("lib/calc.dart"),
             assert = false
+        )
+
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            fun main() {
+                val obj = calculate()
+                if (obj !is ImmutableList<Int>) {
+                    
+                }
+            }
+            """
         )
 
         dart(
@@ -740,26 +541,25 @@ class List : BaseTest {
 
     @Test
     fun `is WriteableList`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                val obj = calculate()
-                if (obj is WriteableList<Int>) {
-                    obj[0]
-                }
-            }
-
-            @DartLibrary("calc.dart")
-            external fun calculate(): Any
-            """
-        )
-
         dart(
             """
             Object calculate() => 3;
             """,
             Path("lib/calc.dart"),
             assert = false
+        )
+
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            fun main() {
+                val obj = calculate()
+                if (obj is WriteableList<Int>) {
+                    obj[0]
+                }
+            }
+            """
         )
 
         dart(
@@ -780,26 +580,25 @@ class List : BaseTest {
 
     @Test
     fun `!is WriteableList`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                val obj = calculate()
-                if (obj !is WriteableList<Int>) {
-                    
-                }
-            }
-
-            @DartLibrary("calc.dart")
-            external fun calculate(): Any
-            """
-        )
-
         dart(
             """
             Object calculate() => 3;
             """,
             Path("lib/calc.dart"),
             assert = false
+        )
+
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            fun main() {
+                val obj = calculate()
+                if (obj !is WriteableList<Int>) {
+                    
+                }
+            }
+            """
         )
 
         dart(
@@ -818,26 +617,25 @@ class List : BaseTest {
 
     @Test
     fun `is Array`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                val obj = calculate()
-                if (obj is Array<Int>) {
-                    obj[0]
-                }
-            }
-
-            @DartLibrary("calc.dart")
-            external fun calculate(): Any
-            """
-        )
-
         dart(
             """
             Object calculate() => 3;
             """,
             Path("lib/calc.dart"),
             assert = false
+        )
+
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            fun main() {
+                val obj = calculate()
+                if (obj is Array<Int>) {
+                    obj[0]
+                }
+            }
+            """
         )
 
         dart(
@@ -858,26 +656,25 @@ class List : BaseTest {
 
     @Test
     fun `!is Array`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                val obj = calculate()
-                if (obj !is Array<Int>) {
-                    
-                }
-            }
-
-            @DartLibrary("calc.dart")
-            external fun calculate(): Any
-            """
-        )
-
         dart(
             """
             Object calculate() => 3;
             """,
             Path("lib/calc.dart"),
             assert = false
+        )
+
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            fun main() {
+                val obj = calculate()
+                if (obj !is Array<Int>) {
+                    
+                }
+            }
+            """
         )
 
         dart(
@@ -899,26 +696,25 @@ class List : BaseTest {
     @Disabled
     @Test
     fun `is FixedSizeList`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                val obj = calculate()
-                if (obj is FixedSizeList<Int>) {
-                    obj[0]
-                }
-            }
-
-            @DartLibrary("calc.dart")
-            external fun calculate(): Any
-            """
-        )
-
         dart(
             """
             Object calculate() => 3;
             """,
             Path("lib/calc.dart"),
             assert = false
+        )
+
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            fun main() {
+                val obj = calculate()
+                if (obj is FixedSizeList<Int>) {
+                    obj[0]
+                }
+            }
+            """
         )
 
         dart(
@@ -939,26 +735,25 @@ class List : BaseTest {
     @Disabled
     @Test
     fun `!is FixedSizeList`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                val obj = calculate()
-                if (obj !is FixedSizeList<Int>) {
-                    
-                }
-            }
-
-            @DartLibrary("calc.dart")
-            external fun calculate(): Any
-            """
-        )
-
         dart(
             """
             Object calculate() => 3;
             """,
             Path("lib/calc.dart"),
             assert = false
+        )
+
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            fun main() {
+                val obj = calculate()
+                if (obj !is FixedSizeList<Int>) {
+                    
+                }
+            }
+            """
         )
 
         dart(
@@ -974,26 +769,25 @@ class List : BaseTest {
 
     @Test
     fun `is MutableList`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                val obj = calculate()
-                if (obj is MutableList<Int>) {
-                    obj[0]
-                }
-            }
-
-            @DartLibrary("calc.dart")
-            external fun calculate(): Any
-            """
-        )
-
         dart(
             """
             Object calculate() => 3;
             """,
             Path("lib/calc.dart"),
             assert = false
+        )
+
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            fun main() {
+                val obj = calculate()
+                if (obj is MutableList<Int>) {
+                    obj[0]
+                }
+            }
+            """
         )
 
         dart(
@@ -1014,26 +808,25 @@ class List : BaseTest {
 
     @Test
     fun `!is MutableList`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                val obj = calculate()
-                if (obj !is MutableList<Int>) {
-                    
-                }
-            }
-
-            @DartLibrary("calc.dart")
-            external fun calculate(): Any
-            """
-        )
-
         dart(
             """
             Object calculate() => 3;
             """,
             Path("lib/calc.dart"),
             assert = false
+        )
+
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            fun main() {
+                val obj = calculate()
+                if (obj !is MutableList<Int>) {
+                    
+                }
+            }
+            """
         )
 
         dart(
@@ -1293,7 +1086,7 @@ class List : BaseTest {
               }
             
               @override
-              EmptyImmutableList<E> toList({bool growable = true}) {
+              EmptyImmutableList<E> toList({bool growable = false}) {
                 return this;
               }
             
@@ -1782,7 +1575,7 @@ class List : BaseTest {
               }
             
               @override
-              EmptyWriteableList<E> toList({bool growable = true}) {
+              EmptyWriteableList<E> toList({bool growable = false}) {
                 return this;
               }
             
@@ -2236,7 +2029,7 @@ class List : BaseTest {
               }
             
               @override
-              EmptyArray<E> toList({bool growable = true}) {
+              EmptyArray<E> toList({bool growable = false}) {
                 return this;
               }
             
@@ -2701,7 +2494,7 @@ class List : BaseTest {
               }
             
               @override
-              EmptyMutableList<E> toList({bool growable = true}) {
+              EmptyMutableList<E> toList({bool growable = false}) {
                 return this;
               }
             
@@ -3131,7 +2924,7 @@ class List : BaseTest {
               }
             
               @override
-              EmptyArray<E> toList({bool growable = true}) {
+              EmptyArray<E> toList({bool growable = false}) {
                 return this;
               }
             

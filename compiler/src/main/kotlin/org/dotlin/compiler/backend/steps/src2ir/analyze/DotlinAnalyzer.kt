@@ -24,7 +24,6 @@ import org.dotlin.compiler.backend.descriptors.DartDescriptorContext
 import org.dotlin.compiler.backend.descriptors.DartPackageFragmentProvider
 import org.dotlin.compiler.backend.steps.src2ir.DartElementLocator
 import org.dotlin.compiler.backend.steps.src2ir.DartPlatform
-import org.dotlin.compiler.backend.steps.src2ir.DotlinTypeTransformer
 import org.dotlin.compiler.backend.steps.src2ir.analyze.checkers.file.DartDuplicateImportChecker
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
@@ -94,7 +93,6 @@ class DotlinAnalyzer(
                 languageVersionSettings = config.languageVersionSettings,
             )
 
-            useInstance(DotlinTypeTransformer())
             configureStandardResolveComponents()
             useInstance(ExpectActualTracker.DoNothing)
             useInstance(

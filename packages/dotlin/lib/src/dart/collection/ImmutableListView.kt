@@ -53,7 +53,7 @@ external class ImmutableListView<out E>(source: Iterable<E>) : ImmutableList<E> 
     override fun all(predicate: (element: E) -> Boolean): Boolean
     override fun joinToString(separator: String): String
     override fun any(predicate: (element: E) -> Boolean): Boolean
-    override fun toList(growable: Boolean): Flex<AnyList<@UnsafeVariance E>, List<@UnsafeVariance E>>
+    override fun toList(growable: Boolean): List<@UnsafeVariance E>
     override fun isEmpty(): Boolean
     override fun isNotEmpty(): Boolean
     override fun take(n: Int): Iterable<E>
@@ -76,5 +76,5 @@ external class ImmutableListView<out E>(source: Iterable<E>) : ImmutableList<E> 
         predicate: (element: E) -> Boolean
     ): E
     override fun elementAt(index: Int): E
-    override fun toSet(): Flex<AnySet<E>, Set<E>>
+    override fun toSet(): Set<E>
 }

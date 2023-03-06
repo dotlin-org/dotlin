@@ -30,19 +30,6 @@ import kotlin.io.path.Path
 class Collection : BaseTest {
     @Test
     fun `assign Dart List to Kotlin Collection variable`() = assertCompile {
-        kotlin(
-            """
-            import dotlin.intrinsics.*
-
-            fun main() {
-                val myCollection: Collection<Int> = calculate()
-            }
-
-            @DartLibrary("calc.dart")
-            external fun calculate(): Flex<AnyList<Int>, List<Int>>
-            """
-        )
-
         dart(
             """
             List<int> calculate() => [];
@@ -51,10 +38,21 @@ class Collection : BaseTest {
             assert = false,
         )
 
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            fun main() {
+                val myCollection: Collection<Int> = calculate()
+            }
+            """
+        )
+
         dart(
             """
             import "calc.dart" show calculate;
-            import "package:dotlin/src/dotlin/intrinsics/flex.dt.g.dart" show AnyCollection;
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_bounds.dt.g.dart"
+                show AnyCollection;
 
             void main() {
               final AnyCollection<int> myCollection = calculate();
@@ -65,17 +63,6 @@ class Collection : BaseTest {
 
     @Test
     fun `assign Dart List to Kotlin Collection property`() = assertCompile {
-        kotlin(
-            """
-            import dotlin.intrinsics.*
-
-            val myCollection: Collection<Int> = calculate()
-
-            @DartLibrary("calc.dart")
-            external fun calculate(): Flex<AnyList<Int>, List<Int>>
-            """
-        )
-
         dart(
             """
             List<int> calculate() => [];
@@ -84,10 +71,19 @@ class Collection : BaseTest {
             assert = false,
         )
 
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            val myCollection: Collection<Int> = calculate()
+            """
+        )
+
         dart(
             """
             import "calc.dart" show calculate;
-            import "package:dotlin/src/dotlin/intrinsics/flex.dt.g.dart" show AnyCollection;
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_bounds.dt.g.dart"
+                show AnyCollection;
 
             final AnyCollection<int> myCollection = calculate();
             """
@@ -96,22 +92,6 @@ class Collection : BaseTest {
 
     @Test
     fun `pass Dart List to Kotlin Collection parameter`() = assertCompile {
-        kotlin(
-            """
-            import dotlin.intrinsics.*
-
-            fun main() {
-                val myList = calculate()
-                process(myList)
-            }
-
-            fun process(collection: Collection<Int>) {}
-
-            @DartLibrary("calc.dart")
-            external fun calculate(): Flex<AnyList<Int>, List<Int>>
-            """
-        )
-
         dart(
             """
             List<int> calculate() => [];
@@ -120,10 +100,25 @@ class Collection : BaseTest {
             assert = false,
         )
 
+        // TODO: Handle case if `AnyCollection` is used in Kotlin code.
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            fun main() {
+                val myList = calculate()
+                process(myList)
+            }
+
+            fun process(collection: Collection<Int>) {}
+            """
+        )
+
         dart(
             """
             import "calc.dart" show calculate;
-            import "package:dotlin/src/dotlin/intrinsics/flex.dt.g.dart" show AnyCollection;
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_bounds.dt.g.dart"
+                show AnyCollection;
 
             void main() {
               final List<int> myList = calculate();
@@ -137,26 +132,25 @@ class Collection : BaseTest {
 
     @Test
     fun `(dynamic) is Collection`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                val obj = calculate()
-                if (obj is Collection<Int>) {
-                    obj.cast<Number>()
-                }
-            }
-
-            @DartLibrary("calc.dart")
-            external fun calculate(): dynamic
-            """
-        )
-
         dart(
             """
             dynamic calculate() => null;
             """,
             Path("lib/calc.dart"),
             assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            fun main() {
+                val obj = calculate()
+                if (obj is Collection<Int>) {
+                    obj.cast<Number>()
+                }
+            }
+            """
         )
 
         dart(
@@ -166,7 +160,8 @@ class Collection : BaseTest {
                 show isCollection;
             import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show Collection;
-            import "package:dotlin/src/dotlin/intrinsics/flex.dt.g.dart" show AnyCollection;
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_bounds.dt.g.dart"
+                show AnyCollection;
 
             void main() {
               final dynamic obj = calculate();
@@ -180,26 +175,25 @@ class Collection : BaseTest {
 
     @Test
     fun `(Any) is Collection`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                val obj = calculate()
-                if (obj is Collection<Int>) {
-                    obj.cast<Number>()
-                }
-            }
-
-            @DartLibrary("calc.dart")
-            external fun calculate(): Any
-            """
-        )
-
         dart(
             """
             Object calculate() => 0;
             """,
             Path("lib/calc.dart"),
             assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            fun main() {
+                val obj = calculate()
+                if (obj is Collection<Int>) {
+                    obj.cast<Number>()
+                }
+            }
+            """
         )
 
         dart(
@@ -209,7 +203,8 @@ class Collection : BaseTest {
                 show isCollection;
             import "package:dotlin/src/kotlin/collections/collection.dt.g.dart"
                 show Collection;
-            import "package:dotlin/src/dotlin/intrinsics/flex.dt.g.dart" show AnyCollection;
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_bounds.dt.g.dart"
+                show AnyCollection;
 
             void main() {
               final Object obj = calculate();
@@ -223,26 +218,25 @@ class Collection : BaseTest {
 
     @Test
     fun `(dynamic) !is Collection`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                val obj = calculate()
-                if (obj !is Collection<Int>) {
-                    
-                }
-            }
-
-            @DartLibrary("calc.dart")
-            external fun calculate(): dynamic
-            """
-        )
-
         dart(
             """
             dynamic calculate() => null;
             """,
             Path("lib/calc.dart"),
             assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            fun main() {
+                val obj = calculate()
+                if (obj !is Collection<Int>) {
+                    
+                }
+            }
+            """
         )
 
         dart(
@@ -259,23 +253,8 @@ class Collection : BaseTest {
         )
     }
 
-    @Disabled
     @Test
     fun `(Any) !is Collection`() = assertCompile {
-        kotlin(
-            """
-            fun main() {
-                val obj = calculate()
-                if (obj !is Collection<Int>) {
-
-                }
-            }
-
-            @DartLibrary("calc.dart")
-            external fun calculate(): Any
-            """
-        )
-
         dart(
             """
             Object calculate() => 3;
@@ -284,11 +263,25 @@ class Collection : BaseTest {
             assert = false,
         )
 
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            fun main() {
+                val obj = calculate()
+                if (obj !is Collection<Int>) {
+
+                }
+            }
+            """
+        )
+
         dart(
             """
             import "calc.dart" show calculate;
             import "package:dotlin/src/dotlin/intrinsics/collection_type_checks.dt.g.dart"
                 show isCollection;
+
             void main() {
               final Object obj = calculate();
               if (!isCollection<int>(obj)) {}
@@ -299,109 +292,6 @@ class Collection : BaseTest {
 
     @Test
     fun `assign Dart List subtype to Kotlin Collection`() = assertCompile {
-        kotlin(
-            """
-            import dotlin.intrinsics.*
-            import dart.math.*
-
-            fun main() {
-                val myList: Collection<Int> = MyList<Int>()
-            }
-
-            @DartLibrary("my_list.dart")
-            external class MyList<E> : Flex<AnyList<E>, List<E>> {
-                override var size: Int = 0
-                override fun <R> cast() = MyList<R>()
-                override operator fun get(index: Int): E = throw UnsupportedError("Empty")
-                override fun reversed() = this
-                override fun indexOf(element: @UnsafeVariance E, start: Int): Int = -1
-                override fun indexOfFirst(start: Int, predicate: (element: E) -> Boolean): Int = -1
-                override fun indexOfLast(start: Int?, predicate: (element: E) -> Boolean): Int = -1
-                override fun lastIndexOf(element: @UnsafeVariance E, start: Int?): Int = -1
-                override operator fun plus(other: List<@UnsafeVariance E>) = other
-                override fun subList(start: Int, end: Int?) = MyList<E>()
-                override fun slice(start: Int, end: Int) = MyList<E>()
-                override fun asMap(): Map<Int, E> = throw UnsupportedError("Empty")
-                override fun equals(other: Any?) = other is List<E> && other.isEmpty()
-                override fun iterator(): MutableIterator<E> = throw UnsupportedError("Empty")
-                override fun plus(elements: Iterable<@UnsafeVariance E>): Iterable<E> = elements
-                override fun <T> map(transform: (element: E) -> T) = MyList<T>()
-                override fun filter(predicate: (element: E) -> Boolean) = this
-                override fun <T> filterIsInstance() = MyList<T>()
-                override fun <T> flatMap(transform: (element: E) -> Iterable<T>) = MyList<T>()
-                override fun contains(element: Any?): Boolean = false
-                override fun forEach(action: (element: E) -> Unit) {}
-                override fun reduce(operator: (acc: E, element: E) -> @UnsafeVariance E): E = throw UnsupportedError("Empty")
-                override fun <T> fold(
-                    initial: T,
-                    operation: (acc: T, element: E) -> T
-                ): T = throw UnsupportedError("Empty")
-                override fun all(predicate: (element: E) -> Boolean): Boolean = false
-                override fun joinToString(separator: String): String = ""
-                override fun any(predicate: (element: E) -> Boolean): Boolean = false
-                override fun toList(growable: Boolean) = this
-                override fun isEmpty(): Boolean = true
-                override fun isNotEmpty(): Boolean = false
-                override fun take(n: Int) = this
-                override fun takeWhile(predicate: (value: E) -> Boolean) = this
-                override fun drop(n: Int) = this
-                override fun dropWhile(predicate: (value: E) -> Boolean) = this
-                override var first: E = throw UnsupportedError("Empty")
-                override var last: E = throw UnsupportedError("Empty")
-                override fun single(): E = throw UnsupportedError("Empty")
-                override fun first(
-                    orElse: (() -> @UnsafeVariance E)?,
-                    predicate: (element: E) -> Boolean
-                ): E = throw UnsupportedError("Empty")
-                override fun last(
-                    orElse: (() -> @UnsafeVariance E)?,
-                    predicate: (element: E) -> Boolean
-                ): E = throw UnsupportedError("Empty")
-                override fun single(
-                    orElse: (() -> @UnsafeVariance E)?,
-                    predicate: (element: E) -> Boolean
-                ): E = throw UnsupportedError("Empty")
-                override fun elementAt(index: Int): E = throw UnsupportedError("Empty")
-                override fun toSet(): Set<E> = throw UnsupportedError("Empty")
-
-                override operator fun set(index: Int, value: E): E = throw UnsupportedError("")
-                override fun setAll(index: Int, @DartName("iterable") elements: Iterable<E>) {}
-
-                override fun setSlice(
-                    start: Int,
-                    end: Int,
-                    elements: Iterable<E>,
-                    dropCount: Int
-                ) {}
-
-                override fun fillSlice(start: Int, end: Int, fill: E?) {}
-                override fun sort(selector: ((a: E, b: E) -> Int)?) {}
-                override fun shuffle(random: Random?) {}
- 
-                override fun add(value: E): Unit {}
-            
-                override fun addAll(elements: Iterable<E>): Unit {}
-            
-                override fun clear(): Unit {}
-            
-                override fun remove(value: Any?): Boolean = false
-                override fun removeIf(predicate: (element: E) -> Boolean): Unit {}
-                override fun retainIf(predicate: (element: E) -> Boolean): Unit {}
-
-                override fun add(index: Int, element: E): Unit {}
-                
-                override fun addAll(index: Int, elements: Iterable<E>): Unit {}
-                
-                override fun removeAt(index: Int): E = throw "no"
-            
-                override fun removeLast(): E = throw "no"
-                
-                override fun removeSlice(start: Int, end: Int): Unit {}
-                override fun replaceSlice(start: Int, end: Int, @DartName("replacements") elements: Iterable<E>): Unit {}
-            }
-            """
-        )
-
         dart(
             """
             class MyList<E> implements List<E> {
@@ -412,10 +302,21 @@ class Collection : BaseTest {
             assert = false
         )
 
+        kotlin(
+            """
+            import pkg.test.my_list.MyList
+
+            fun main() {
+                val myList: Collection<Int> = MyList<Int>()
+            }
+            """
+        )
+
         dart(
             """
             import "my_list.dart" show MyList;
-            import "package:dotlin/src/dotlin/intrinsics/flex.dt.g.dart" show AnyCollection;
+            import "package:dotlin/src/dotlin/intrinsics/collection_type_bounds.dt.g.dart"
+                show AnyCollection;
 
             void main() {
               final AnyCollection<int> myList = MyList<int>();

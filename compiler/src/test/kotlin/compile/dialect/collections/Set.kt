@@ -166,69 +166,63 @@ class Set : BaseTest {
 
 
     @Test
-    fun `use Kotlin ImmutableSet as Dart Set in Kotlin external function`() = assertCompile {
-        kotlin(
-            """
-            import dotlin.intrinsics.*
-
-            fun main() {
-                test(setOf())
-            }
-
-            @DartLibrary("test.dart")
-            external fun test(set: Flex<AnySet<Int>, Set<Int>>)
-            """
-        )
-
+    fun `use Kotlin ImmutableSet as Dart Set in Dart function`() = assertCompile {
         dart(
             """
-            void test(Set<int> set) {}
+            void calc(Set<int> set) {}
             """,
-            Path("lib/test.dart"),
+            Path("lib/calc.dart"),
             assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.calc.calc
+
+            fun main() {
+                calc(setOf())
+            }
+            """
         )
 
         dart(
             """
             import "dart:collection" show UnmodifiableSetView;
-            import "test.dart" show test;
+            import "calc.dart" show calc;
 
             void main() {
-              test(UnmodifiableSetView<int>(<int>{}));
+              calc(UnmodifiableSetView<int>(<int>{}));
             }
             """
         )
     }
 
     @Test
-    fun `use Kotlin MutableSet as Dart Set in external function`() = assertCompile {
-        kotlin(
-            """
-            import dotlin.intrinsics.*
-
-            fun main() {
-                test(mutableSetOf())
-            }
-
-            @DartLibrary("test.dart")
-            external fun test(set: Flex<AnySet<Int>, Set<Int>>)
-            """
-        )
-
+    fun `use Kotlin MutableSet as Dart Set in Dart function`() = assertCompile {
         dart(
             """
-            void test(Set<int> set) {}
+            void exec(Set<int> set) {}
             """,
-            Path("lib/test.dart"),
+            Path("lib/exec.dart"),
             assert = false,
         )
 
+        kotlin(
+            """
+            import pkg.test.exec.exec
+
+            fun main() {
+                exec(mutableSetOf())
+            }
+            """
+        )
+
         dart(
             """
-            import "test.dart" show test;
+            import "exec.dart" show exec;
 
             void main() {
-              test(<int>{});
+              exec(<int>{});
             }
             """
         )
@@ -236,79 +230,6 @@ class Set : BaseTest {
 
     @Test
     fun `assign Dart Set subtype to Kotlin MutableSet`() = assertCompile {
-        kotlin(
-            """
-            import dotlin.intrinsics.*
-
-            fun main() {
-                val mySet: MutableSet<Int> = MySet<Int>()
-            }
-
-            @DartLibrary("my_set.dart")
-            external class MySet<E> : Flex<AnySet<E>, Set<E>> {
-                override var size: Int
-                override fun iterator(): MutableIterator<E>
-                override fun add(value: E): Boolean
-                override fun addAll(elements: Iterable<E>): Unit
-                override fun clear(): Unit
-                override fun remove(value: Any?): Boolean
-                override fun removeIf(predicate: (element: E) -> Boolean): Unit
-                override fun retainIf(predicate: (element: E) -> Boolean): Unit
-                override fun equals(other: Any?): Boolean
-                override fun <R> cast(): MutableSet<R>
-                
-                override fun plus(elements: Iterable<@UnsafeVariance E>): Iterable<E> = elements
-                override fun <T> map(transform: (element: E) -> T) = MySet<T>()
-                override fun filter(predicate: (element: E) -> Boolean) = this
-                override fun <T> filterIsInstance() = MySet<T>()
-                override fun <T> flatMap(transform: (element: E) -> Iterable<T>) = MySet<T>()
-                override fun contains(element: Any?): Boolean = false
-                override fun forEach(action: (element: E) -> Unit) {}
-                override fun reduce(operator: (acc: E, element: E) -> @UnsafeVariance E): E = throw UnsupportedError("Empty")
-                override fun <T> fold(
-                    initial: T,
-                    operation: (acc: T, element: E) -> T
-                ): T = throw UnsupportedError("Empty")
-                override fun all(predicate: (element: E) -> Boolean): Boolean = false
-                override fun joinToString(separator: String): String = ""
-                override fun any(predicate: (element: E) -> Boolean): Boolean = false
-                override fun toList(growable: Boolean): List<E>
-                override fun isEmpty(): Boolean = true
-                override fun isNotEmpty(): Boolean = false
-                override fun take(n: Int) = this
-                override fun takeWhile(predicate: (value: E) -> Boolean) = this
-                override fun drop(n: Int) = this
-                override fun dropWhile(predicate: (value: E) -> Boolean) = this
-                override val first: E = throw UnsupportedError("Empty")
-                override val last: E = throw UnsupportedError("Empty")
-                override fun single(): E = throw UnsupportedError("Empty")
-                override fun first(
-                    orElse: (() -> @UnsafeVariance E)?,
-                    predicate: (element: E) -> Boolean
-                ): E = throw UnsupportedError("Empty")
-                override fun last(
-                    orElse: (() -> @UnsafeVariance E)?,
-                    predicate: (element: E) -> Boolean
-                ): E = throw UnsupportedError("Empty")
-                override fun single(
-                    orElse: (() -> @UnsafeVariance E)?,
-                    predicate: (element: E) -> Boolean
-                ): E = throw UnsupportedError("Empty")
-                override fun elementAt(index: Int): E = throw UnsupportedError("Empty")
-                override fun toSet(): Set<E> = throw UnsupportedError("Empty")
-                
-                override fun lookup(element: Any?): E?
-                override fun containsAll(other: Iterable<Any?>): Boolean
-                override fun intersect(other: Set<Any?>): MutableSet<E>
-                override fun union(other: Set<E>): MutableSet<E>
-                override fun subtract(other: Set<Any?>): MutableSet<E>
-                
-                override fun removeAll(other: Iterable<Any?>): Unit
-                override fun retainAll(other: Iterable<Any?>): Unit
-            }
-            """
-        )
-
         dart(
             """
             class MySet<E> implements Set<E> {
@@ -317,6 +238,16 @@ class Set : BaseTest {
             """,
             Path("lib/my_set.dart"),
             assert = false
+        )
+
+        kotlin(
+            """
+            import pkg.test.my_set.MySet
+
+            fun main() {
+                val mySet: MutableSet<Int> = MySet<Int>()
+            }
+            """
         )
 
         dart(
@@ -332,25 +263,22 @@ class Set : BaseTest {
 
     @Test
     fun `assign Dart Set to Kotlin ImmutableSet`() = assertCompile {
-        kotlin(
-            """
-            import dotlin.intrinsics.*
-
-            fun main() {
-                val myList: ImmutableSet<Int> = calculate()
-            }
-
-            @DartLibrary("calc.dart")
-            external fun calculate(): Flex<AnySet<Int>, Set<Int>>
-            """
-        )
-
         dart(
             """
             Set<int> calculate() => {};
             """,
             Path("lib/calc.dart"),
             assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.calc.calculate
+
+            fun main() {
+                val myList: ImmutableSet<Int> = calculate()
+            }
+            """
         )
 
         dart(
@@ -366,79 +294,6 @@ class Set : BaseTest {
 
     @Test
     fun `assign Dart Set subtype to Kotlin ImmutableSet`() = assertCompile {
-        kotlin(
-            """
-            import dotlin.intrinsics.*
-
-            fun main() {
-                val mySet: ImmutableSet<Int> = MySet<Int>()
-            }
-
-            @DartLibrary("my_set.dart")
-            external class MySet<E> : Flex<AnySet<E>, Set<E>> {
-                override var size: Int
-                override fun iterator(): MutableIterator<E>
-                override fun add(value: E): Boolean
-                override fun addAll(elements: Iterable<E>): Unit
-                override fun clear(): Unit
-                override fun remove(value: Any?): Boolean
-                override fun removeIf(predicate: (element: E) -> Boolean): Unit
-                override fun retainIf(predicate: (element: E) -> Boolean): Unit
-                override fun equals(other: Any?): Boolean
-                override fun <R> cast(): MutableSet<R>
-                
-                override fun plus(elements: Iterable<@UnsafeVariance E>): Iterable<E> = elements
-                override fun <T> map(transform: (element: E) -> T) = MySet<T>()
-                override fun filter(predicate: (element: E) -> Boolean) = this
-                override fun <T> filterIsInstance() = MySet<T>()
-                override fun <T> flatMap(transform: (element: E) -> Iterable<T>) = MySet<T>()
-                override fun contains(element: Any?): Boolean = false
-                override fun forEach(action: (element: E) -> Unit) {}
-                override fun reduce(operator: (acc: E, element: E) -> @UnsafeVariance E): E = throw UnsupportedError("Empty")
-                override fun <T> fold(
-                    initial: T,
-                    operation: (acc: T, element: E) -> T
-                ): T = throw UnsupportedError("Empty")
-                override fun all(predicate: (element: E) -> Boolean): Boolean = false
-                override fun joinToString(separator: String): String = ""
-                override fun any(predicate: (element: E) -> Boolean): Boolean = false
-                override fun toList(growable: Boolean): List<E>
-                override fun isEmpty(): Boolean = true
-                override fun isNotEmpty(): Boolean = false
-                override fun take(n: Int) = this
-                override fun takeWhile(predicate: (value: E) -> Boolean) = this
-                override fun drop(n: Int) = this
-                override fun dropWhile(predicate: (value: E) -> Boolean) = this
-                override val first: E = throw UnsupportedError("Empty")
-                override val last: E = throw UnsupportedError("Empty")
-                override fun single(): E = throw UnsupportedError("Empty")
-                override fun first(
-                    orElse: (() -> @UnsafeVariance E)?,
-                    predicate: (element: E) -> Boolean
-                ): E = throw UnsupportedError("Empty")
-                override fun last(
-                    orElse: (() -> @UnsafeVariance E)?,
-                    predicate: (element: E) -> Boolean
-                ): E = throw UnsupportedError("Empty")
-                override fun single(
-                    orElse: (() -> @UnsafeVariance E)?,
-                    predicate: (element: E) -> Boolean
-                ): E = throw UnsupportedError("Empty")
-                override fun elementAt(index: Int): E = throw UnsupportedError("Empty")
-                override fun toSet(): Set<E> = throw UnsupportedError("Empty")
-                
-                override fun lookup(element: Any?): E?
-                override fun containsAll(other: Iterable<Any?>): Boolean
-                override fun intersect(other: Set<Any?>): MutableSet<E>
-                override fun union(other: Set<E>): MutableSet<E>
-                override fun subtract(other: Set<Any?>): MutableSet<E>
-                
-                override fun removeAll(other: Iterable<Any?>): Unit
-                override fun retainAll(other: Iterable<Any?>): Unit
-            }
-            """
-        )
-
         dart(
             """
             class MySet<E> implements Set<E> {
@@ -447,6 +302,16 @@ class Set : BaseTest {
             """,
             Path("lib/my_set.dart"),
             assert = false
+        )
+
+        kotlin(
+            """
+            import pkg.test.my_set.MySet
+
+            fun main() {
+                val mySet: ImmutableSet<Int> = MySet<Int>()
+            }
+            """
         )
 
         dart(
@@ -820,7 +685,7 @@ class Set : BaseTest {
               }
             
               @override
-              Never toList({bool growable = true}) {
+              Never toList({bool growable = false}) {
                 throw "";
               }
             
@@ -1130,7 +995,7 @@ class Set : BaseTest {
               }
             
               @override
-              Never toList({bool growable = true}) {
+              Never toList({bool growable = false}) {
                 throw "";
               }
             

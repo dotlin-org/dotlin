@@ -70,10 +70,9 @@ external abstract class Iterable<out E> const constructor() {
 
     open fun any(@DartName("test") predicate: (element: E) -> Boolean): Boolean
 
-    // TODO: Split up `growable: false` and `growable: true`
-    open fun toList(growable: Boolean = true): Flex<AnyList<E>, List<E>>
+    open fun toList(@DartDifferentDefaultValue growable: Boolean = false): List<E>
 
-    open fun toSet(): Flex<AnySet<E>, Set<E>>
+    open fun toSet(): Set<E>
 
     //@DartGetter
     //open fun count(): Int

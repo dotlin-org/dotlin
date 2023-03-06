@@ -49,7 +49,7 @@ external class ImmutableSetView<out E>(source: Set<E>) : ImmutableSet<E> {
     override fun all(predicate: (element: E) -> Boolean): Boolean
     override fun joinToString(separator: String): String
     override fun any(predicate: (element: E) -> Boolean): Boolean
-    override fun toList(growable: Boolean): Flex<AnyList<E>, List<E>>
+    override fun toList(growable: Boolean): List<E>
     override fun isEmpty(): Boolean
     override fun isNotEmpty(): Boolean
     override fun take(n: Int): Iterable<E>
@@ -72,7 +72,7 @@ external class ImmutableSetView<out E>(source: Set<E>) : ImmutableSet<E> {
         predicate: (element: E) -> Boolean
     ): E
     override fun elementAt(index: Int): E
-    override fun toSet(): Flex<AnySet<E>, Set<E>>
+    override fun toSet(): Set<E>
 
     fun removeAll(other: Iterable<Any?>): Unit
     fun retainAll(other: Iterable<Any?>): Unit
