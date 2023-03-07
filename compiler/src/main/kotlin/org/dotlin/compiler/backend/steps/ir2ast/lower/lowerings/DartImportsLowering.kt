@@ -36,6 +36,7 @@ import org.dotlin.compiler.backend.steps.src2ir.dotlinModule
 import org.dotlin.compiler.backend.util.annotationsWithRuntimeRetention
 import org.dotlin.compiler.backend.util.descriptor
 import org.dotlin.compiler.backend.util.importAliasIn
+import org.dotlin.compiler.backend.util.toPosixString
 import org.jetbrains.kotlin.backend.jvm.ir.getKtFile
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.ir.IrElement
@@ -53,7 +54,6 @@ import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameOrNull
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
-import java.nio.file.Path
 import kotlin.io.path.relativeTo
 
 /**
@@ -234,10 +234,10 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
 
             // If the imported declaration is from our module, the library URI is just a relative path.
             if (module == currentFile.module.descriptor) {
-                exportedPackageFragmentOf(descriptor)?.let { return@run it.relativeDartPath.toUriString() }
+                exportedPackageFragmentOf(descriptor)?.let { return@run it.relativeDartPath.toPosixString() }
 
                 // TODO: Make relativeDartPath work without IrFiles (#81)
-                return@run irFragmentOfDeclaration.relativeDartPath.toUriString()
+                return@run irFragmentOfDeclaration.relativeDartPath.toPosixString()
             }
 
             // At this point, the declaration is from a dependency and thus the module must be a
@@ -248,7 +248,7 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
             val filePath = when (descriptor) {
                 is DartDescriptor, is DartInteropDescriptor -> {
                     val fragment = exportedPackageFragmentOf(descriptor) ?: descriptor.dartPackageFragment
-                    fragment.library.path.toUriString()
+                    fragment.library.path.toPosixString()
                 }
                 // Make filePath relative to packageRoot, example:
                 // Package root: ${pkg.path}/lib/
@@ -256,7 +256,7 @@ class DartImportsLowering(override val context: DotlinLoweringContext) : IrFileL
                 // Result: somewhere/else.dart
                 else -> pkg.path.resolve(irFragmentOfDeclaration.dartPath)
                     .relativeTo(pkg.packagePath)
-                    .toUriString()
+                    .toPosixString()
             }
 
 
@@ -303,5 +303,3 @@ private fun IrFile.exportedPackageFragmentOf(descriptor: DeclarationDescriptor):
 
     return packageFragment.fragment
 }
-
-private fun Path.toUriString() = joinToString("/") { it.toString() }

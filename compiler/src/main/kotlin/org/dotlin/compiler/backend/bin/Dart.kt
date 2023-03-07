@@ -23,6 +23,7 @@ package org.dotlin.compiler.backend.bin
 
 import org.dotlin.compiler.backend.util.runCommand
 import java.nio.file.Path
+import kotlin.io.path.absolutePathString
 
 object dart {
     object pub {
@@ -37,4 +38,6 @@ object dart {
 
     suspend fun analyze(workingDirectory: Path? = null) =
         runCommand("dart", "analyze", workingDirectory = workingDirectory)
+
+    suspend fun format(projectPath: Path) = runCommand("dart", "format", projectPath.absolutePathString())
 }

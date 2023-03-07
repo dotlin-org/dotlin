@@ -24,6 +24,7 @@ import com.intellij.openapi.util.Disposer
 import kotlinx.coroutines.runBlocking
 import org.dotlin.compiler.backend.DartPathGenerator
 import org.dotlin.compiler.backend.DartProject
+import org.dotlin.compiler.backend.bin.dart
 import org.dotlin.compiler.backend.steps.ast2dart.dartAstToDartSource
 import org.dotlin.compiler.backend.steps.ir2ast.irToDartAst
 import org.dotlin.compiler.backend.steps.ir2klib.writeToKlib
@@ -43,7 +44,6 @@ import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import java.nio.file.Path
-import kotlin.io.path.absolutePathString
 import kotlin.io.path.createDirectories
 import kotlin.io.path.isDirectory
 import kotlin.io.path.writeText
@@ -90,7 +90,7 @@ object KotlinToDartCompiler {
             }
 
             if (format) {
-                dartFormat(project.path.absolutePathString())
+                runBlocking { dart.format(project.path) }
             }
 
             return CompilationResult(
@@ -149,9 +149,6 @@ object KotlinToDartCompiler {
     }
 
     class Arguments : CommonCompilerArguments()
-
-    private fun dartFormat(vararg args: String): Int =
-        Runtime.getRuntime().exec("dart format ${args.joinToString(" ")}").waitFor()
 }
 
 data class CompilationResult(

@@ -23,7 +23,7 @@ import org.dotlin.compiler.KotlinToDartCompiler
 import org.dotlin.compiler.backend.DotlinCompilationException
 import org.dotlin.compiler.backend.bin.DotlinGenerator
 import org.dotlin.compiler.backend.bin.dart
-import org.dotlin.compiler.backend.util.LazyVar
+import org.dotlin.compiler.backend.util.*
 import org.dotlin.compiler.factories
 import org.dotlin.compiler.warnings
 import org.intellij.lang.annotations.Language
@@ -43,8 +43,18 @@ import kotlin.text.RegexOption.MULTILINE
 
 abstract class DartTestProject {
     companion object {
-        private val pubCachePath: Path = System.getenv()["PUB_CACHE"]?.let { Path(it) }
-            ?: Path(System.getProperty("user.home")).resolve(".pub-cache")
+        private val pubCachePath: Path = envPath("PUB_CACHE")
+            ?: when {
+                onWindows() -> {
+                    val appDataPath = envPath("LOCALAPPDATA")
+                        ?: envPath("APPDATA")?.resolve("Local")
+                        ?: homePath!!.resolve("AppData").resolve("Local")
+
+                    appDataPath.resolve("Pub").resolve("Cache")
+                }
+
+                else -> homePath!!.resolve(".pub-cache")
+            }
 
         @Language("yaml")
         private fun defaultPubspec(name: String, publishTo: String): String =
@@ -59,16 +69,18 @@ abstract class DartTestProject {
     
             dependencies:
               dotlin:
-                path: ${stdlibPath.toRealPath()}
+                path: ${stdlibPath.toRealPath().toPosixString()}
                 
             dev_dependencies:
               dotlin_generator:
-                path: ${DotlinGenerator.projectPath.toRealPath()}
+                path: ${DotlinGenerator.projectPath.toRealPath().toPosixString()}
             """.trimIndent()
 
         private fun defaultPackageConfig(name: String): String {
-            fun pubCache(path: String) = "file://${pubCachePath.resolve("hosted/pub.dartlang.org").resolve(path)}"
-            fun relative(path: String) = "file://${Path(path).toRealPath()}"
+            fun pubCache(path: String) = pubCachePath.resolve("hosted/pub.dev").resolve(path)
+                .toUri().toString()
+
+            fun relative(path: String) = Path(path).toRealPath().toUri().toString()
 
             // language=json
             @Suppress("JsonStandardCompliance")
@@ -162,7 +174,7 @@ abstract class DartTestProject {
                 },
                 {
                   "name": "meta",
-                  "rootUri": "${pubCache("meta-1.8.0")}",
+                  "rootUri": "${pubCache("meta-1.9.0")}",
                   "packageUri": "lib/",
                   "languageVersion": "2.12"
                 },
@@ -323,14 +335,14 @@ abstract class DartTestProject {
           dotlin:
             dependency: "direct main"
             description:
-              path: "${stdlibPath.toRealPath()}"
+              path: ${stdlibPath.toPosixString()}
               relative: false
             source: path
             version: "0.0.1"
           dotlin_generator:
             dependency: "direct dev"
             description:
-              path: "${DotlinGenerator.projectPath.toRealPath()}"
+              path: ${DotlinGenerator.projectPath.toRealPath().toPosixString()}
               relative: false
             source: path
             version: "0.0.1"
@@ -361,7 +373,7 @@ abstract class DartTestProject {
               name: meta
               url: "https://pub.dartlang.org"
             source: hosted
-            version: "1.8.0"
+            version: "1.9.0"
           package_config:
             dependency: transitive
             description:
@@ -499,7 +511,7 @@ abstract class DartTestProject {
             """
             dependencies:
               ${dependency.name}:
-                path: ${dependency.path}
+                path: ${dependency.path.toPosixString()}
 
             """.trimIndent(),
         )

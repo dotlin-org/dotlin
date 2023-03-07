@@ -17,6 +17,8 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:io';
+
 import 'package:analyzer/dart/element/element.dart';
 import 'package:dartx/dartx_io.dart';
 import 'package:dotlin_generator/src/generated/elements.pb.dart';
@@ -38,6 +40,15 @@ class DartElementSerializer {
     final libUri = Uri.parse(library.identifier);
     var libPath = libUri.path;
 
+    // On Windows, paths are separated with a forward slash instead of
+    // a black slash, fix that.
+    if (Platform.isWindows) {
+      if (libPath.startsWith('/')) {
+        libPath = libPath.replaceFirst('/', '');
+      }
+      libPath = libPath.replaceAll('/', r'\');
+    }
+
     switch (libUri.scheme) {
       // If "pub get" has not been run, library.identifier will be a
       // an absolute path file URI.
@@ -45,9 +56,9 @@ class DartElementSerializer {
         libPath = path.relative(libPath, from: packagePath);
         break;
       // Otherwise, it's a package URI.
-      case "package":
-        // ignore: unnecessary_string_escapes
-        libPath = libPath.replaceFirst(RegExp("^[A-Za-z_]+\/"), "");
+      case 'package':
+        final separator = Platform.isWindows ? r'\\' : '/';
+        libPath = libPath.replaceFirst(RegExp('^[A-Za-z_]+$separator'), '');
         break;
       default:
         throw StateError("Unexpected library uri scheme: ${libUri.scheme}");

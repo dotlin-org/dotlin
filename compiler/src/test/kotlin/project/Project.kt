@@ -22,6 +22,7 @@ package project
 import BaseTest
 import assertCanCompile
 import org.dotlin.compiler.backend.bin.DotlinGenerator
+import org.dotlin.compiler.backend.util.toPosixString
 import org.junit.jupiter.api.Test
 import stdlibPath
 import kotlin.io.path.relativeTo
@@ -43,11 +44,11 @@ class Project : BaseTest {
     
             dependencies:
               dotlin:
-                path: ${stdlibPath.toRealPath().relativeTo(path)}
+                path: ${stdlibPath.toRealPath().relativeTo(path).toPosixString()}
                 
             dev_dependencies:
               dotlin_generator:
-                path: ${DotlinGenerator.projectPath.toRealPath().relativeTo(path)}
+                path: ${DotlinGenerator.projectPath.toRealPath().relativeTo(path).toPosixString()}
             """.trimIndent()
 
         // pubspec.lock should be clear to trigger a `dart pub get`.
