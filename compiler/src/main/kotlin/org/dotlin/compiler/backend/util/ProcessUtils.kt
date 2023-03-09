@@ -37,10 +37,20 @@ private fun findBinary(name: String): Path {
     }
     val paths = System.getenv("PATH")
         .split(File.pathSeparator)
-        .let {
+        .let { paths ->
             when {
-                home != null -> it.map { p -> p.replaceFirst(Regex("^~" + File.separator), home) }
-                else -> it
+                home != null -> paths.map { p ->
+                    val separator = File.separator.let {
+                        when (it) {
+                            // \ -> \\ (escaping backslash)
+                            "\\" -> "\\\\"
+                            else -> it
+                        }
+                    }
+                    p.replaceFirst(Regex("^~$separator"), home)
+                }
+
+                else -> paths
             }
         }
 
@@ -51,6 +61,7 @@ private fun findBinary(name: String): Path {
                     val extensions by lazy { listOf("bat", "exe") }
                     it.flatMap { p -> extensions.map { ext -> File(p, "$name.$ext") } }
                 }
+
                 else -> it.map { p -> File(p, name) }
             }
         }
