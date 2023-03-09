@@ -14,7 +14,9 @@ import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
 import org.jetbrains.kotlin.ir.linkage.IrProvider
 import org.jetbrains.kotlin.ir.symbols.*
+import org.jetbrains.kotlin.ir.types.impl.originalKotlinType
 import org.jetbrains.kotlin.ir.util.SymbolTable
+import org.jetbrains.kotlin.ir.util.referenceClassifier
 import org.jetbrains.kotlin.psi2ir.generators.DeclarationStubGeneratorImpl
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
@@ -48,7 +50,14 @@ class DartIrProvider(
 
         val declaration = stubGenerator.run {
             when (symbol) {
-                is IrClassSymbol -> generateClassStub(descriptor as ClassDescriptor)
+                is IrClassSymbol -> generateClassStub(descriptor as ClassDescriptor).apply {
+                    // We need to reference classifiers used in super types ourselves, otherwise we still have
+                    // unbound symbols that can be referenced.
+                    // TODO: This might happen for all IrTypes, if so do this everywhere with a generic solution.
+                    superTypes
+                        .mapNotNull { it.originalKotlinType?.constructor?.declarationDescriptor }
+                        .forEach { symbolTable.referenceClassifier(it) }
+                }
                 is IrPropertySymbol -> generatePropertyStub(descriptor as PropertyDescriptor)
                 is IrConstructorSymbol -> generateConstructorStub(descriptor as ClassConstructorDescriptor)
                 is IrFunctionSymbol -> generateFunctionStub(descriptor as FunctionDescriptor)

@@ -21,14 +21,12 @@ package org.dotlin.compiler.backend.descriptors
 
 import org.dotlin.compiler.backend.descriptors.type.toKotlinType
 import org.dotlin.compiler.dart.element.DartClassElement
-import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
-import org.jetbrains.kotlin.descriptors.ClassKind
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.descriptors.SourceElement
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.impl.ClassDescriptorImpl
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.storage.getValue
-import org.jetbrains.kotlin.types.ClassTypeConstructorImpl
+import org.jetbrains.kotlin.types.AbstractClassTypeConstructor
+import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeConstructor
 import org.jetbrains.kotlin.types.checker.KotlinTypeRefiner
 
@@ -46,14 +44,19 @@ class DartClassDescriptor(
     false,
     context.storageManager,
 ), DartDescriptor {
-    private val _typeConstructor by storageManager.createLazyValue {
-        ClassTypeConstructorImpl(
-            this,
-            declaredTypeParameters,
-            element.superTypes.map { it.toKotlinType() },
-            context.storageManager,
-        )
+    private inner class DartClassTypeConstructor : AbstractClassTypeConstructor(context.storageManager) {
+        private val superTypes by storageManager.createLazyValue {
+            element.superTypes.map { it.toKotlinType() }
+        }
+
+        override fun computeSupertypes(): Collection<KotlinType> = superTypes
+        override fun getDeclarationDescriptor(): ClassDescriptor = this@DartClassDescriptor
+        override fun getParameters(): List<TypeParameterDescriptor> = declaredTypeParameters
+        override fun isDenotable(): Boolean = true
+        override val supertypeLoopChecker: SupertypeLoopChecker = SupertypeLoopChecker.EMPTY
     }
+
+    private val _typeConstructor by storageManager.createLazyValue { DartClassTypeConstructor() }
 
     override fun getTypeConstructor(): TypeConstructor = _typeConstructor
 

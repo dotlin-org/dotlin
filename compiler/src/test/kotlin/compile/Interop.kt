@@ -1277,4 +1277,37 @@ class Interop : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `use Dart class that references its own type in super type`() = assertCompile {
+        dart(
+            """
+            class A<T> {}
+
+            class B extends A<B> {}
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.B
+
+            fun main() {
+                val x = B()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show B;
+
+            void main() {
+              final B x = B();
+            }
+            """
+        )
+    }
 }
