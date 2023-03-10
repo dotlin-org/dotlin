@@ -21,7 +21,7 @@ package analysis
 
 import BaseTest
 import assertCompilesWithError
-import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart.DUPLICATE_IMPORT
+import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.ErrorsDart.*
 import org.jetbrains.kotlin.diagnostics.Errors.UNRESOLVED_REFERENCE
 import org.jetbrains.kotlin.diagnostics.Errors.UPPER_BOUND_VIOLATED
 import org.junit.jupiter.api.DisplayName
@@ -212,4 +212,28 @@ class Interop : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `error if initializing const val with Dart named non-const constructor`() =
+        assertCompilesWithError(CONST_INITIALIZED_WITH_NON_CONSTANT_VALUE) {
+            dart(
+                """
+                class Alpha {
+                  Alpha.named();
+                }
+                """,
+                Path("lib/alphabet.dart"),
+                assert = false,
+            )
+
+            kotlin(
+                """
+                import pkg.test.alphabet.Alpha
+
+                fun main() {
+                    const val x = Alpha.named()
+                }
+                """
+            )
+        }
 }

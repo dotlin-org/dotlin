@@ -66,7 +66,14 @@ class DartClassDescriptor(
     private fun memberScope(static: Boolean) = DartMemberScope(
         owner = this,
         context,
-        elements = (element.properties + element.methods).filter { it.isStatic == static },
+        elements = buildList {
+            addAll(element.properties)
+            addAll(element.methods)
+
+            if (static) {
+                addAll(element.constructors.filter { it.name.isNotEmpty })
+            }
+        }.filter { it.isStatic == static },
     )
 
     private val instanceMemberScope by storageManager.createLazyValue { memberScope(static = false) }
@@ -85,13 +92,15 @@ class DartClassDescriptor(
     override fun getDeclaredTypeParameters() = typeParameters
 
     private val _constructors by storageManager.createLazyValue {
-        element.constructors.map {
-            DartConstructorDescriptor(
-                element = it,
-                context,
-                container = this,
-            )
-        }
+        element.constructors
+            .filter { it.name.isEmpty }
+            .map {
+                DartConstructorDescriptor(
+                    element = it,
+                    context,
+                    container = this,
+                )
+            }
     }
 
     override fun getConstructors(): List<DartConstructorDescriptor> = _constructors

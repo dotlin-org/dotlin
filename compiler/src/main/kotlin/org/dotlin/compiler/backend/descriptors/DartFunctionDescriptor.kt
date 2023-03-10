@@ -24,6 +24,7 @@ import org.dotlin.compiler.dart.element.DartExecutableElement
 import org.dotlin.compiler.dart.element.DartFunctionElement
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ClassConstructorDescriptorImpl
@@ -31,8 +32,11 @@ import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
 import org.jetbrains.kotlin.storage.getValue
 import org.jetbrains.kotlin.types.KotlinType
 
+/**
+ * Also represents named Dart constructors, in case [element] is [DartConstructorElement].
+ */
 class DartSimpleFunctionDescriptor(
-    override val element: DartFunctionElement,
+    override val element: DartExecutableElement,
     override val context: DartDescriptorContext,
     container: DeclarationDescriptor,
     original: DartSimpleFunctionDescriptor? = null,
@@ -45,16 +49,21 @@ class DartSimpleFunctionDescriptor(
     SourceElement.NO_SOURCE // TODO: SourceElement
 ), DartDescriptor {
     init {
+        val (receiver, modality) = when (element) {
+            is DartFunctionElement -> element.kotlinReceiver to element.kotlinModality
+            else -> null to Modality.FINAL
+        }
+
         initialize(
             null, // TODO
-            element.kotlinReceiver,
+            receiver,
             emptyList(),
             element.typeParameters.kotlinTypeParametersOf(this),
             element.kotlinValueParametersOf(this),
             // Return type is lazily evaluated, because if it contains a type parameter defined in this function
             // we'll get recursion.
             null,
-            element.kotlinModality,
+            modality,
             element.kotlinVisibility,
         )
     }

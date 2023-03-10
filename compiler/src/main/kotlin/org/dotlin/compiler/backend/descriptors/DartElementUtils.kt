@@ -52,7 +52,7 @@ val DartDeclarationElement.kotlinVisibility: DescriptorVisibility
     }
 
 context(DartDescriptor)
-val DartFunctionElement.kotlinReturnType
+val DartExecutableElement.kotlinReturnType
     get() = type.returnType.toKotlinType()
 
 val DartElement.callableMemberDescriptorKind: CallableMemberDescriptor.Kind

@@ -1310,4 +1310,72 @@ class Interop : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `call Dart named constructor of class which also has unnamed constructor`() = assertCompile {
+        dart(
+            """
+            class Alpha {
+              Alpha();
+
+              Alpha.named();
+            }
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.Alpha
+
+            fun main() {
+                val x = Alpha.named()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show Alpha;
+
+            void main() {
+              final Alpha x = Alpha.named();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call Dart named const constructor`() = assertCompile {
+        dart(
+            """
+            class Alpha {
+              const Alpha.named();
+            }
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.Alpha
+
+            fun main() {
+                const val x = Alpha.named()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show Alpha;
+
+            void main() {
+              const Alpha x = Alpha.named();
+            }
+            """
+        )
+    }
 }

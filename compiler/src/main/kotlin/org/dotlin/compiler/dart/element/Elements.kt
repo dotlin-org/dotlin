@@ -269,7 +269,7 @@ data class DartConstructorElement(
     override val isAbstract = false
 
     @Transient
-    override val isStatic = false
+    override val isStatic = true
 
     @Transient
     override val isAsync = false

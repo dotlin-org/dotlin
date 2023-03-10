@@ -122,8 +122,8 @@ class DartMemberScope(
                 container = owner,
             )
 
-            is DartFunctionElement -> DartSimpleFunctionDescriptor(
-                element = it,
+            is DartFunctionElement, is DartConstructorElement -> DartSimpleFunctionDescriptor(
+                element = it as DartExecutableElement,
                 context,
                 container = owner,
             )
