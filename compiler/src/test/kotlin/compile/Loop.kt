@@ -300,4 +300,80 @@ class Loop : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `while loop with single statement`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                var i = 0
+                while (i <= 10) {
+                    i++
+                }
+            }
+            """
+        )
+
+        dart(
+            """
+            void main() {
+              int i = 0;
+              while (i <= 10) {
+                i++;
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `do while loop with single statement`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                var i = 0
+                do {
+                    i++
+                } while (i <= 10)
+            }
+            """
+        )
+
+        dart(
+            """
+            void main() {
+              int i = 0;
+              do {
+                i++;
+              } while (i <= 10);
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `for loop with single statement`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                for (i in 0..10) {
+                    i
+                }
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:dotlin/src/kotlin/native/int.dt.g.dart" show IntRangeTo;
+            import "package:dotlin/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
+
+            void main() {
+              for (int i = 0; i <= 10; i += 1) {
+                i;
+              }
+            }
+            """
+        )
+    }
 }

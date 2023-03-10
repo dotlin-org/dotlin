@@ -137,7 +137,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
 
     override fun DartAstTransformContext.visitLoop(loop: IrLoop, context: DartAstTransformContext): DartStatement {
         val condition = loop.condition.accept(context)
-        val body = loop.body!!.acceptAsStatement(context)
+        val body = loop.body!!.acceptAsStatement(context).wrapInBlock()
 
         return when (loop) {
             is IrWhileLoop -> DartSimpleWhileStatement(condition, body)
@@ -170,7 +170,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
                 /**
                  * Should be accessed after [loopVariables].
                  */
-                val body by lazy { irBody.acceptAsStatement(context) }
+                val body by lazy { irBody.acceptAsStatement(context).wrapInBlock() }
 
                 when {
                     // `x until y`, `x..y` and `x downTo y` calls are translated as traditional for-loops.
