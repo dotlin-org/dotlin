@@ -193,6 +193,9 @@ abstract class IrContext : IrAttributes {
                             parentClass.isDartConst() -> true
                             // If the argument(s) in the $Return are all const, make it const.
                             parentClass.defaultType.isDotlinReturn() -> areArgumentsDartConst()
+                            // We don't check the arguments for $Continue/$Break, because we know it will
+                            // always be an int literal, which is const.
+                            parentClass.defaultType.isDotlinLoopJump() -> true
                             else -> false
                         }
                     }

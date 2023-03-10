@@ -525,6 +525,18 @@ abstract class DartAstNodeTransformer : DartAstNodeVisitor<String, DartGeneratio
     open fun DartGenerationContext.visitReturnStatement(statement: DartReturnStatement) =
         super.visitReturnStatement(statement, this)
 
+    final override fun visitContinueStatement(statement: DartContinueStatement, context: DartGenerationContext): String =
+        with(context) { runAndReportCodeGenerationError(statement) { visitContinueStatement(it) } }
+
+    open fun DartGenerationContext.visitContinueStatement(statement: DartContinueStatement) =
+        super.visitContinueStatement(statement, this)
+
+    final override fun visitBreakStatement(statement: DartBreakStatement, context: DartGenerationContext): String =
+        with(context) { runAndReportCodeGenerationError(statement) { visitBreakStatement(it) } }
+
+    open fun DartGenerationContext.visitBreakStatement(statement: DartBreakStatement) =
+        super.visitBreakStatement(statement, this)
+
     final override fun visitIfStatement(statement: DartIfStatement, context: DartGenerationContext): String =
         with(context) { runAndReportCodeGenerationError(statement) { visitIfStatement(it) } }
 

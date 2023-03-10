@@ -72,7 +72,9 @@ class Loop : BaseTest {
             """
             void main() {
               int i = 0;
-              while (i <= 10) i++;
+              while (i <= 10) {
+                i++;
+              }
             }
             """
         )
@@ -131,7 +133,9 @@ class Loop : BaseTest {
             import "package:dotlin/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
 
             void main() {
-              for (int i = 0; i < 10; i += 1) process(i);
+              for (int i = 0; i < 10; i += 1) {
+                process(i);
+              }
             }
 
             void process(int number) {}
@@ -166,7 +170,7 @@ class Loop : BaseTest {
                 process(i);
               }
             }
-            
+
             void process(int number) {}
             """
         )
@@ -231,7 +235,9 @@ class Loop : BaseTest {
             import "package:dotlin/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
 
             void main() {
-              for (int i = 0; i < 14; i += 2) process(i);
+              for (int i = 0; i < 14; i += 2) {
+                process(i);
+              }
             }
 
             void process(int number) {}
@@ -265,7 +271,9 @@ class Loop : BaseTest {
             import "package:dotlin/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
 
             void main() {
-              for (int i = 0; i < 14; i += 3) process(i);
+              for (int i = 0; i < 14; i += 3) {
+                process(i);
+              }
             }
 
             void process(int number) {}
@@ -293,7 +301,9 @@ class Loop : BaseTest {
             void main() {
               final List<int> elements =
                   List<int>.of(<int>[1, 2, 3, 4, 5], growable: false);
-              for (int i in elements) process(i);
+              for (int i in elements) {
+                process(i);
+              }
             }
 
             void process(int number) {}

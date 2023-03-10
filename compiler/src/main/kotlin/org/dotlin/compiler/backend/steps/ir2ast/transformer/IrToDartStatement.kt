@@ -77,6 +77,12 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
             }
         )
 
+    override fun DartAstTransformContext.visitContinue(expression: IrContinue, context: DartAstTransformContext) =
+        DartContinueStatement
+
+    override fun DartAstTransformContext.visitBreak(expression: IrBreak, context: DartAstTransformContext) =
+        DartBreakStatement
+
     override fun DartAstTransformContext.visitWhen(irWhen: IrWhen, context: DartAstTransformContext) =
         irWhen.branches.reversed().toList().run {
             drop(1).fold(
@@ -153,17 +159,23 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
                     ((irBlock.statements.first() as IrVariable).initializer as IrCall).dispatchReceiver
 
                 val irWhileLoop = irBlock.statements.last() as IrWhileLoop
-                val irBody = irWhileLoop.body as IrBlock
+                val irLoopBody = when (val body = irWhileLoop.body) {
+                    is IrBlock -> body
+                    // Can be IrTry because of `JumpExpressionsLowering`.
+                    is IrTry -> body.tryResult as IrBlock
+                    else -> throw UnsupportedOperationException("Unexpected for loop body: $body")
+                }
+                val irBody = irWhileLoop.body!!
 
                 /**
                  * Note: Removes the variable from the loop block.
                  */
                 val loopVariables by lazy {
-                    (irBody.statements.first() as IrVariable)
+                    (irLoopBody.statements.first() as IrVariable)
                         .acceptAsStatement(context)
                         .variables.copy(isFinal = false)
                         .also {
-                            irBody.statements.removeAt(0)
+                            irLoopBody.statements.removeAt(0)
                         }
                 }
 
@@ -197,6 +209,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
                                 it is IrConstructorCall && it.origin == EXTENSION_CONSTRUCTOR_CALL -> {
                                     it.valueArguments[0]!!
                                 }
+
                                 else -> it
                             }.accept(context)
                         }
@@ -220,6 +233,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
                                             isInclusive -> Operators.GREATER_OR_EQUAL
                                             else -> Operators.GREATER
                                         }
+
                                         else -> when {
                                             isInclusive -> Operators.LESS_OR_EQUAL
                                             else -> Operators.LESS
@@ -241,6 +255,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
                             body = body
                         )
                     }
+
                     irPossibleSubject?.type?.isDartIterable() == true -> {
                         val subject = irPossibleSubject.accept(context)
 
@@ -256,6 +271,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
                     }
                 }
             }
+
             PLUSEQ, MINUSEQ, MULTEQ, DIVEQ -> {
                 val irOriginalReceiver = irBlock.statements.first().cast<IrVariable>().initializer!!
                 val irSetField = irBlock.statements.last().cast<IrSetField>()
@@ -294,6 +310,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
                 isStepCall() -> return (this as? IrCall)?.let { thisCall ->
                     thisCall.dispatchReceiver ?: thisCall.extensionReceiverOrNull
                 }.findCallInReceivers(block)
+
                 else -> null
             }
         }
@@ -335,6 +352,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
                 it !is IrCall -> null
                 it.dispatchReceiver?.type?.isDartInt() == true &&
                         it.symbol.owner.name == Name.identifier("rangeTo") -> it
+
                 else -> null
             }
         }

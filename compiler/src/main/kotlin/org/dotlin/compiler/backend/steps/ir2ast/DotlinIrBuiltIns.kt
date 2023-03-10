@@ -99,6 +99,8 @@ class DotlinIrBuiltIns(private val context: DotlinLoweringContext) {
 
     // Intrinsics
     val returnClass = classSymbolAt(dotlin.intrinsics.`$Return`)
+    val continueClass = classSymbolAt(dotlin.intrinsics.`$Continue`)
+    val breakClass = classSymbolAt(dotlin.intrinsics.`$Break`)
     val dotlinExternal = classSymbolAt(dotlin.intrinsics.DotlinExternal)
     val specialInheritedType = classSymbolAt(dotlin.intrinsics.SpecialInheritedType)
 

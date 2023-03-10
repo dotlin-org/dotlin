@@ -373,7 +373,7 @@ class Statement : BaseTest {
     }
 
     @Nested
-    inner class Return {
+    inner class Jump {
         @Test
         fun `return without value`() = assertCompile {
             kotlin(
@@ -412,6 +412,130 @@ class Statement : BaseTest {
                     return "null";
                   }
                   return x.toString();
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `continue`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    while (true) {
+                        if (false) continue
+                    }
+                }
+                """
+            )
+
+            dart(
+                """
+                void main() {
+                  while (true) {
+                    if (false) {
+                      continue;
+                    }
+                  }
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `nested continue targeting outer loop`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    loop0@ while (true)  {
+                        while (false) {
+                            continue@loop0
+                        }
+                    }
+                }
+                """
+            )
+
+            dart(
+                """
+                import "package:dotlin/src/dotlin/intrinsics/jump.dt.g.dart" show ${'$'}Continue;
+
+                void main() {
+                  while (true) {
+                    try {
+                      while (false) {
+                        throw const ${'$'}Continue(3370151);
+                      }
+                    } on ${'$'}Continue catch (tmp0_continue) {
+                      if (tmp0_continue.target == 3370151) {
+                        continue;
+                      } else {
+                        throw tmp0_continue;
+                      }
+                    }
+                  }
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `break`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    while (true) {
+                        if (false) break
+                    }
+                }
+                """
+            )
+
+            dart(
+                """
+                void main() {
+                  while (true) {
+                    if (false) {
+                      break;
+                    }
+                  }
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `nested break targeting outer loop`() = assertCompile {
+            kotlin(
+                """
+                fun main() {
+                    loop0@ while (true)  {
+                        while (false) {
+                            break@loop0
+                        }
+                    }
+                }
+                """
+            )
+
+            dart(
+                """
+                import "package:dotlin/src/dotlin/intrinsics/jump.dt.g.dart" show ${'$'}Break;
+
+                void main() {
+                  while (true) {
+                    try {
+                      while (false) {
+                        throw const ${'$'}Break(3370058);
+                      }
+                    } on ${'$'}Break catch (tmp0_break) {
+                      if (tmp0_break.target == 3370058) {
+                        break;
+                      } else {
+                        throw tmp0_break;
+                      }
+                    }
+                  }
                 }
                 """
             )

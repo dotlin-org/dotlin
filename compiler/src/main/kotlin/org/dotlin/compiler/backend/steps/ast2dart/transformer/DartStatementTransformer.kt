@@ -41,6 +41,9 @@ object DartStatementTransformer : DartAstNodeTransformer() {
         "return$value;"
     }
 
+    override fun DartGenerationContext.visitContinueStatement(statement: DartContinueStatement) = "continue;"
+    override fun DartGenerationContext.visitBreakStatement(statement: DartBreakStatement) = "break;"
+
     override fun DartGenerationContext.visitIfStatement(statement: DartIfStatement) = statement.run {
         val condition = "if (${acceptChild { condition }})"
         val thenStatement = acceptChild { thenStatement }

@@ -77,7 +77,7 @@ class Function : BaseTest {
             fun returnsString(): String {
                 return "test"
             }
-            
+
             fun test(arg: String = returnsString()) {}
             """
         )
@@ -87,7 +87,7 @@ class Function : BaseTest {
             String returnsString() {
               return "test";
             }
-            
+
             void test({String? arg = null}) {
               arg = arg == null ? returnsString() : arg;
             }
@@ -113,7 +113,7 @@ class Function : BaseTest {
             fun returnsString(): String {
                 return "test"
             }
-            
+
             fun test(arg: String? = returnsString()) {}
             """
         )
@@ -125,11 +125,11 @@ class Function : BaseTest {
             String returnsString() {
               return "test";
             }
-            
+
             void test({dynamic arg = const _$DefaultValue()}) {
               arg = arg == const _$DefaultValue() ? returnsString() : arg as String?;
             }
-            
+
             @sealed
             class _$DefaultValue {
               const _$DefaultValue();
@@ -261,7 +261,7 @@ class Function : BaseTest {
             fun returnsString(): String {
                 return "test"
             }
-            
+
             fun test(arg1: String = returnsString(), arg2: String = returnsString()) {}
             """
         )
@@ -271,7 +271,7 @@ class Function : BaseTest {
             String returnsString() {
               return "test";
             }
-            
+
             void test({
               String? arg1 = null,
               String? arg2 = null,
@@ -304,7 +304,7 @@ class Function : BaseTest {
             fun returnsString(): String {
                 return "test"
             }
-            
+
             fun test(arg1: String? = returnsString(), arg2: String? = returnsString()) {}
             """
         )
@@ -316,7 +316,7 @@ class Function : BaseTest {
             String returnsString() {
               return "test";
             }
-            
+
             void test({
               dynamic arg1 = const _$DefaultValue(),
               dynamic arg2 = const _$DefaultValue(),
@@ -324,7 +324,7 @@ class Function : BaseTest {
               arg1 = arg1 == const _$DefaultValue() ? returnsString() : arg1 as String?;
               arg2 = arg2 == const _$DefaultValue() ? returnsString() : arg2 as String?;
             }
-            
+
             @sealed
             class _$DefaultValue {
               const _$DefaultValue();
@@ -1604,7 +1604,7 @@ class Function : BaseTest {
             fun main() {
                 val test = process(1) {
                     val x = 34
-                    
+
                     if (x == 100) return
 
                     it * x
@@ -1615,7 +1615,7 @@ class Function : BaseTest {
 
         dart(
             """
-            import "package:dotlin/src/dotlin/intrinsics/internal.dt.g.dart" show ${'$'}Return;
+            import "package:dotlin/src/dotlin/intrinsics/jump.dt.g.dart" show ${'$'}Return;
 
             @pragma("vm:always-consider-inlining")
             int process(
@@ -1633,12 +1633,12 @@ class Function : BaseTest {
                 final int test = process(1, (int it) {
                   final int x = 34;
                   if (x == 100) {
-                    throw const ${'$'}Return<void>(null, 3343801);
+                    throw const ${'$'}Return<void>(null, 3514952);
                   }
                   return it * x;
                 });
               } on ${'$'}Return<void> catch (tmp0_return) {
-                if (tmp0_return.target == 3343801) {
+                if (tmp0_return.target == 3514952) {
                   return;
                 } else {
                   throw tmp0_return;
@@ -1662,7 +1662,7 @@ class Function : BaseTest {
             fun main() {
                 val test = process(1) {
                     val x = 34
-                    
+
                     when (x) {
                         100 -> return
                         101 -> return@process 0
@@ -1676,7 +1676,7 @@ class Function : BaseTest {
 
         dart(
             """
-            import "package:dotlin/src/dotlin/intrinsics/internal.dt.g.dart" show ${'$'}Return;
+            import "package:dotlin/src/dotlin/intrinsics/jump.dt.g.dart" show ${'$'}Return;
 
             @pragma("vm:always-consider-inlining")
             int process(
@@ -1697,14 +1697,14 @@ class Function : BaseTest {
                     {
                       final int tmp0_subject = x;
                       if (tmp0_subject == 100) {
-                        throw const ${'$'}Return<void>(null, 3343801);
+                        throw const ${'$'}Return<void>(null, 3516874);
                       } else if (tmp0_subject == 101) {
-                        throw const ${'$'}Return<int>(0, 6798);
+                        throw const ${'$'}Return<int>(0, 1585849394);
                       }
                     }
                     return it * x;
                   } on ${'$'}Return<int> catch (tmp0_return) {
-                    if (tmp0_return.target == 6798) {
+                    if (tmp0_return.target == 1585849394) {
                       return tmp0_return.value;
                     } else {
                       throw tmp0_return;
@@ -1712,7 +1712,7 @@ class Function : BaseTest {
                   }
                 });
               } on ${'$'}Return<void> catch (tmp0_return) {
-                if (tmp0_return.target == 3343801) {
+                if (tmp0_return.target == 3516874) {
                   return;
                 } else {
                   throw tmp0_return;
@@ -1736,7 +1736,7 @@ class Function : BaseTest {
             fun main() {
                 val test = process(1) {
                     val x = 34
-                    
+
                     val y = when (x) {
                         100 -> return
                         101 -> return@process 40
@@ -1751,7 +1751,7 @@ class Function : BaseTest {
 
         dart(
             """
-            import "package:dotlin/src/dotlin/intrinsics/internal.dt.g.dart" show ${'$'}Return;
+            import "package:dotlin/src/dotlin/intrinsics/jump.dt.g.dart" show ${'$'}Return;
 
             @pragma("vm:always-consider-inlining")
             int process(
@@ -1772,14 +1772,14 @@ class Function : BaseTest {
                     final int y = () {
                       final int tmp0_subject = x;
                       return tmp0_subject == 100
-                          ? throw const ${'$'}Return<void>(null, 3343801)
+                          ? throw const ${'$'}Return<void>(null, 3517990)
                           : tmp0_subject == 101
-                              ? throw const ${'$'}Return<int>(40, 6834)
+                              ? throw const ${'$'}Return<int>(40, 1585850510)
                               : 10;
                     }.call();
                     return it * x * y;
                   } on ${'$'}Return<int> catch (tmp0_return) {
-                    if (tmp0_return.target == 6834) {
+                    if (tmp0_return.target == 1585850510) {
                       return tmp0_return.value;
                     } else {
                       throw tmp0_return;
@@ -1787,7 +1787,7 @@ class Function : BaseTest {
                   }
                 });
               } on ${'$'}Return<void> catch (tmp0_return) {
-                if (tmp0_return.target == 3343801) {
+                if (tmp0_return.target == 3517990) {
                   return;
                 } else {
                   throw tmp0_return;
@@ -1822,7 +1822,7 @@ class Function : BaseTest {
 
         dart(
             """
-            import "package:dotlin/src/dotlin/intrinsics/internal.dt.g.dart" show ${'$'}Return;
+            import "package:dotlin/src/dotlin/intrinsics/jump.dt.g.dart" show ${'$'}Return;
 
             @pragma("vm:always-consider-inlining")
             void process(void Function(int) z) {
@@ -1837,13 +1837,13 @@ class Function : BaseTest {
                     final int y = () {
                       final int tmp0_subject = x;
                       return tmp0_subject == 100
-                          ? throw const ${'$'}Return<void>(null, 3343801)
+                          ? throw const ${'$'}Return<void>(null, 3402112)
                           : tmp0_subject == 101
-                              ? throw const ${'$'}Return<void>(null, 2995)
+                              ? throw const ${'$'}Return<void>(null, 1585731749)
                               : 10;
                     }.call();
                   } on ${'$'}Return<void> catch (tmp0_return) {
-                    if (tmp0_return.target == 2995) {
+                    if (tmp0_return.target == 1585731749) {
                       return;
                     } else {
                       throw tmp0_return;
@@ -1851,7 +1851,7 @@ class Function : BaseTest {
                   }
                 });
               } on ${'$'}Return<void> catch (tmp0_return) {
-                if (tmp0_return.target == 3343801) {
+                if (tmp0_return.target == 3402112) {
                   return;
                 } else {
                   throw tmp0_return;

@@ -21,6 +21,8 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.ir
 
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionTransformDirection.INSIDE_OUT
+import org.dotlin.compiler.backend.steps.ir2ast.ir.IrExpressionTransformDirection.OUTSIDE_IN
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.*
@@ -71,6 +73,7 @@ open class IrExpressionWithContextTransformer : IrElementTransformer<IrExpressio
                     newContainer?.let {
                         IrExpressionContext(it, newInitializerContainer)
                     }
+
                 else -> context
             }
         }
@@ -89,7 +92,7 @@ open class IrExpressionWithContextTransformer : IrElementTransformer<IrExpressio
     open fun visitExpressionWithContext(
         expression: IrExpression,
         context: IrExpressionContext
-    ): IrExpression{
+    ): IrExpression {
         expression.transformChildren(context)
         return expression
     }
@@ -101,8 +104,14 @@ open class IrExpressionWithContextTransformer : IrElementTransformer<IrExpressio
 typealias Transform =
         IrExpressionWithContextTransformer.(expression: IrExpression, context: IrExpressionContext) -> IrExpression
 
+enum class IrExpressionTransformDirection {
+    INSIDE_OUT,
+    OUTSIDE_IN,
+}
+
 private fun IrElement.transformExpressionsWithOptionalParent(
     initialParent: IrDeclaration?,
+    direction: IrExpressionTransformDirection,
     transform: Transform
 ) = transformChildren(
     object : IrExpressionWithContextTransformer() {
@@ -110,8 +119,17 @@ private fun IrElement.transformExpressionsWithOptionalParent(
             expression: IrExpression,
             context: IrExpressionContext
         ): IrExpression {
-            expression.transformChildren(context)
-            return transform(this, expression, context)
+            return when (direction) {
+                INSIDE_OUT -> {
+                    expression.transformChildren(context)
+                    transform(this, expression, context)
+                }
+
+                OUTSIDE_IN -> transform(this, expression, context).apply {
+                    transformChildren(context)
+                }
+            }
+
         }
     },
     when (initialParent) {
@@ -125,9 +143,11 @@ private fun IrElement.transformExpressionsWithOptionalParent(
 
 fun IrElement.transformExpressions(
     initialParent: IrDeclaration,
+    direction: IrExpressionTransformDirection = INSIDE_OUT,
     transform: Transform
-) = transformExpressionsWithOptionalParent(initialParent, transform)
+) = transformExpressionsWithOptionalParent(initialParent, direction, transform)
 
 fun IrElement.transformExpressions(
+    direction: IrExpressionTransformDirection = INSIDE_OUT,
     transform: Transform
-) = transformExpressionsWithOptionalParent(initialParent = null, transform)
+) = transformExpressionsWithOptionalParent(initialParent = null, direction, transform)

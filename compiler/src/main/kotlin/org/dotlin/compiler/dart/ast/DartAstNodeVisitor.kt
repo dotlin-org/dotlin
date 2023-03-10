@@ -220,6 +220,8 @@ interface DartAstNodeVisitor<R, C> {
         visitAstNode(statement, context)
 
     fun visitReturnStatement(statement: DartReturnStatement, context: C): R = visitAstNode(statement, context)
+    fun visitContinueStatement(statement: DartContinueStatement, context: C): R = visitAstNode(statement, context)
+    fun visitBreakStatement(statement: DartBreakStatement, context: C): R = visitAstNode(statement, context)
     fun visitIfStatement(statement: DartIfStatement, context: C): R = visitAstNode(statement, context)
     fun visitTryStatement(statement: DartTryStatement, context: C): R = visitAstNode(statement, context)
     fun visitWhileStatement(statement: DartWhileStatement, context: C): R = visitAstNode(statement, context)

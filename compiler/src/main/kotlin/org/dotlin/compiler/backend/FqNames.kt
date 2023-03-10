@@ -67,6 +67,8 @@ object dotlin : PackageFqNameWrapper {
         val MutableMapMarker = self.child("MutableMapMarker")
 
         val `$Return` = self.child("\$Return")
+        val `$Continue` = self.child("\$Continue")
+        val `$Break` = self.child("\$Break")
         val DotlinExternal = self.child("DotlinExternal")
         val SpecialInheritedType = self.child("SpecialInheritedType")
 

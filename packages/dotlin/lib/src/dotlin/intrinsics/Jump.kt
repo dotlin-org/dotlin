@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Wilko Manger
+ * Copyright 2023 Wilko Manger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,4 +16,12 @@
 
 package dotlin.intrinsics
 
-internal annotation class DotlinExternal
+// TODO: Kotlin-only internal (@DartPublic)
+
+internal sealed interface `$Jump` {
+    val target: Int
+}
+
+internal class `$Return`<T> const constructor(val value: T, override val target: Int) : `$Jump`
+internal class `$Break` const constructor(override val target: Int) : `$Jump`
+internal class `$Continue` const constructor(override val target: Int) : `$Jump`

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Wilko Manger
+ * Copyright 2023 Wilko Manger
  *
  * This file is part of Dotlin.
  *
@@ -17,14 +17,13 @@
  * along with Dotlin.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dotlin.compiler.backend.util
+package org.dotlin.compiler.dart.ast.statement
 
-import org.dotlin.compiler.backend.dotlin
-import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.classFqName
+import org.dotlin.compiler.dart.ast.DartAstNodeVisitor
 
-fun IrType.isDotlinReturn(): Boolean = classFqName == dotlin.intrinsics.`$Return`
+object DartContinueStatement : DartStatement {
+    override fun <R, C> accept(visitor: DartAstNodeVisitor<R, C>, data: C): R =
+        visitor.visitContinueStatement(this, data)
 
-fun IrType.isDotlinLoopJump(): Boolean = with(dotlin.intrinsics) {
-    classFqName.let { it == `$Continue` || it == `$Break` }
+    override fun <D> acceptChildren(visitor: DartAstNodeVisitor<Nothing?, D>, data: D) {}
 }
