@@ -25,7 +25,7 @@ import kotlin.io.path.Path
 fun onWindows(): Boolean = System.getProperty("os.name").startsWith("Windows")
 
 val homePathString: String?
-    get() = System.getenv("HOME")
+    get() = System.getProperty("user.home") ?: System.getenv("HOME")
 
 val homePath: Path?
     get() = homePathString?.let { Path(it) }
