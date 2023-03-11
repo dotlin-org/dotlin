@@ -540,6 +540,168 @@ class Statement : BaseTest {
                 """
             )
         }
+
+        @Test
+        fun `for loop with conditional continue and nested for each loop with single break`() = assertCompile {
+            kotlin(
+                """
+                fun process() {
+                    for (i in 0 until 10) {
+                        if (true) {
+                            continue
+                        }
+
+                        for (x in emptyList<Int>()) {
+                            break
+                        }
+                    }
+                }
+                """
+            )
+
+            dart(
+                """
+                import "package:dotlin/src/kotlin/ranges/ranges_ext.dt.g.dart"
+                    show IntRangeFactoryExt;
+                import "package:dotlin/src/dotlin/intrinsics/jump.dt.g.dart"
+                    show ${'$'}Continue, ${'$'}Break;
+                import "dart:collection" show UnmodifiableListView;
+                import "package:dotlin/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
+
+                void process() {
+                  for (int i = 0; i < 10; i += 1) {
+                    try {
+                      {
+                        if (true) {
+                          throw const ${'$'}Continue(-309494340);
+                        }
+                        for (int x in UnmodifiableListView<int>(<int>[])) {
+                          try {
+                            throw const ${'$'}Break(-309413802);
+                          } on ${'$'}Break catch (tmp1_break) {
+                            if (tmp1_break.target == -309413802) {
+                              break;
+                            } else {
+                              throw tmp1_break;
+                            }
+                          }
+                        }
+                      }
+                    } on ${'$'}Continue catch (tmp0_continue) {
+                      if (tmp0_continue.target == -309494340) {
+                        continue;
+                      } else {
+                        throw tmp0_continue;
+                      }
+                    }
+                  }
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `multiple continues`() = assertCompile {
+            kotlin(
+                """
+                fun exec() {
+                    for (item in listOf<String>()) {
+                        if (item == "x") {
+                            continue
+                        }
+
+                        if (item == "y") {
+                            continue
+                        }
+                    }
+                }
+                """
+            )
+
+            dart(
+                """
+                import "dart:collection" show UnmodifiableListView;
+                import "package:dotlin/src/dotlin/intrinsics/jump.dt.g.dart" show ${'$'}Continue;
+
+                void exec() {
+                  for (String item in UnmodifiableListView<String>(<String>[])) {
+                    try {
+                      {
+                        if (item == "x") {
+                          throw const ${'$'}Continue(3149110);
+                        }
+                        if (item == "y") {
+                          throw const ${'$'}Continue(3149110);
+                        }
+                      }
+                    } on ${'$'}Continue catch (tmp0_continue) {
+                      if (tmp0_continue.target == 3149110) {
+                        continue;
+                      } else {
+                        throw tmp0_continue;
+                      }
+                    }
+                  }
+                }
+                """
+            )
+        }
+
+        @Test
+        fun `break and continue in same loop`() = assertCompile {
+            kotlin(
+                """
+                fun exec() {
+                    for (value in listOf<String>()) {
+                        if (value == "x") {
+                            break
+                        }
+
+                        if (value == "y") {
+                            continue
+                        }
+                    }
+                }
+                """
+            )
+
+            dart(
+                """
+                import "dart:collection" show UnmodifiableListView;
+                import "package:dotlin/src/dotlin/intrinsics/jump.dt.g.dart"
+                    show ${'$'}Break, ${'$'}Continue;
+
+                void exec() {
+                  for (String value in UnmodifiableListView<String>(<String>[])) {
+                    try {
+                      try {
+                        {
+                          if (value == "x") {
+                            throw const ${'$'}Break(3149110);
+                          }
+                          if (value == "y") {
+                            throw const ${'$'}Continue(3149110);
+                          }
+                        }
+                      } on ${'$'}Continue catch (tmp0_continue) {
+                        if (tmp0_continue.target == 3149110) {
+                          continue;
+                        } else {
+                          throw tmp0_continue;
+                        }
+                      }
+                    } on ${'$'}Break catch (tmp1_break) {
+                      if (tmp1_break.target == 3149110) {
+                        break;
+                      } else {
+                        throw tmp1_break;
+                      }
+                    }
+                  }
+                }
+                """
+            )
+        }
     }
 
     @Nested

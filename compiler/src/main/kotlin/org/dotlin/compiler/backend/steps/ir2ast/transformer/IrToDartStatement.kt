@@ -159,12 +159,20 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
                     ((irBlock.statements.first() as IrVariable).initializer as IrCall).dispatchReceiver
 
                 val irWhileLoop = irBlock.statements.last() as IrWhileLoop
-                val irLoopBody = when (val body = irWhileLoop.body) {
-                    is IrBlock -> body
+
+                fun findIrLoopBody(body: IrExpression?): IrBlock = when (body) {
+                    // The `JumpExpressionsLowering` `try`s result contain a block, which can contain another
+                    // `try` from `JumpExpressionsLowering`.
+                    is IrBlock -> when (val singleStatement = body.statements.singleOrNull()) {
+                        is IrTry -> findIrLoopBody(singleStatement.tryResult)
+                        else -> body
+                    }
                     // Can be IrTry because of `JumpExpressionsLowering`.
-                    is IrTry -> body.tryResult as IrBlock
-                    else -> throw UnsupportedOperationException("Unexpected for loop body: $body")
+                    is IrTry -> findIrLoopBody(body.tryResult)
+                    else -> error("Unexpected for loop body: $body")
                 }
+
+                val irLoopBody = findIrLoopBody(irWhileLoop.body)
                 val irBody = irWhileLoop.body!!
 
                 /**
