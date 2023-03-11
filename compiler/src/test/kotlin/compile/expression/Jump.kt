@@ -95,6 +95,54 @@ class Jump : BaseTest {
     }
 
     @Test
+    fun `return with possibly const but non-const value`() = assertCompile {
+        kotlin(
+            """
+            class MaybeConst const constructor()
+
+            fun main() {
+                test(null)
+            }
+
+            fun test(x: MaybeConst?): MaybeConst {
+                val y = x ?: return MaybeConst()
+                return (@const MaybeConst())
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:meta/meta.dart" show sealed;
+            import "package:dotlin/src/dotlin/intrinsics/jump.dt.g.dart" show ${'$'}Return;
+
+            @sealed
+            class MaybeConst {
+              const MaybeConst() : super();
+            }
+
+            void main() {
+              test(null);
+            }
+
+            MaybeConst test(MaybeConst? x) {
+              try {
+                final MaybeConst y =
+                    x ?? (throw ${'$'}Return<MaybeConst>(MaybeConst(), 3628356));
+                return const MaybeConst();
+              } on ${'$'}Return<MaybeConst> catch (tmp0_return) {
+                if (tmp0_return.target == 3628356) {
+                  return tmp0_return.value;
+                } else {
+                  throw tmp0_return;
+                }
+              }
+            }
+            """
+        )
+    }
+
+    @Test
     fun `return with non-const value`() = assertCompile {
         kotlin(
             """
