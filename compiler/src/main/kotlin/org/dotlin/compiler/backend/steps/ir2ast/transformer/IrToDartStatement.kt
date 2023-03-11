@@ -329,7 +329,7 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
     }
 
     private fun IrType.isDartIterable(): Boolean =
-        classFqName == dart.core.Iterable ||
+        classFqName == kotlin.collections.Iterable || classFqName == dart.core.Iterable ||
                 isArray() || isByteArray() || isShortArray() || isIntArray() || isLongArray() ||
                 superTypes().any { it.isDartIterable() }
 

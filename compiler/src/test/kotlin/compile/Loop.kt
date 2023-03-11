@@ -282,7 +282,7 @@ class Loop : BaseTest {
     }
 
     @Test
-    fun `for each loop`() = assertCompile {
+    fun `for each loop with array`() = assertCompile {
         kotlin(
             """
             fun main() {
@@ -301,6 +301,37 @@ class Loop : BaseTest {
             void main() {
               final List<int> elements =
                   List<int>.of(<int>[1, 2, 3, 4, 5], growable: false);
+              for (int i in elements) {
+                process(i);
+              }
+            }
+
+            void process(int number) {}
+            """
+        )
+    }
+
+    @Test
+    fun `for each loop with list`() = assertCompile {
+        kotlin(
+            """
+            fun main() {
+                val elements = listOf(1, 2, 3, 4, 5)
+                for (i in elements) {
+                    process(i)
+                }
+            }
+
+            fun process(number: Int) {}
+            """
+        )
+
+        dart(
+            """
+            import "dart:collection" show UnmodifiableListView;
+
+            void main() {
+              final List<int> elements = UnmodifiableListView<int>(<int>[1, 2, 3, 4, 5]);
               for (int i in elements) {
                 process(i);
               }
@@ -381,6 +412,65 @@ class Loop : BaseTest {
             void main() {
               for (int i = 0; i <= 10; i += 1) {
                 i;
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `for loop with conditional continue and nested for each loop with single break`() = assertCompile {
+        kotlin(
+            """
+            fun process() {
+                for (i in 0 until 10) {
+                    if (true) {
+                        continue
+                    }
+
+                    for (x in emptyList<Int>()) {
+                        break
+                    }
+                }
+            }
+            """
+        )
+
+        dart(
+            """
+            import "package:dotlin/src/kotlin/ranges/ranges_ext.dt.g.dart"
+                show IntRangeFactoryExt;
+            import "package:dotlin/src/dotlin/intrinsics/jump.dt.g.dart"
+                show ${'$'}Continue, ${'$'}Break;
+            import "dart:collection" show UnmodifiableListView;
+            import "package:dotlin/src/kotlin/ranges/ranges.dt.g.dart" show IntRange;
+
+            void process() {
+              for (int i = 0; i < 10; i += 1) {
+                try {
+                  {
+                    if (true) {
+                      throw const ${'$'}Continue(-309494340);
+                    }
+                    for (int x in UnmodifiableListView<int>(<int>[])) {
+                      try {
+                        throw const ${'$'}Break(-309413802);
+                      } on ${'$'}Break catch (tmp1_break) {
+                        if (tmp1_break.target == -309413802) {
+                          break;
+                        } else {
+                          throw tmp1_break;
+                        }
+                      }
+                    }
+                  }
+                } on ${'$'}Continue catch (tmp0_continue) {
+                  if (tmp0_continue.target == -309494340) {
+                    continue;
+                  } else {
+                    throw tmp0_continue;
+                  }
+                }
               }
             }
             """

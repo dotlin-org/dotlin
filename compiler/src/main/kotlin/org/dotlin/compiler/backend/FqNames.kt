@@ -135,6 +135,7 @@ object kotlin : PackageFqNameWrapper {
     object collections : PackageFqNameWrapper {
         override val self = kotlin.self.child("collections")
 
+        val Iterable = self.child("Iterable")
         val Iterator = self.child("Iterator")
 
         val Collection = self.child("Collection")
