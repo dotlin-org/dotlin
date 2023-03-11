@@ -109,7 +109,7 @@ interface IrExpressionLowering : IrSingleLowering<IrExpression> {
                 ): IrExpression {
                     expression.transformChildren(expContext)
                     return with(context) {
-                        runAndReportLoweringError(expression) {
+                        runAndReportLoweringError(expression, expContext) {
                             expression.transformBy { exp ->
                                 transform(exp, expContext)
                             }
