@@ -16,7 +16,7 @@ suspend fun runCommand(vararg command: String, workingDirectory: Path? = null): 
         }.toTypedArray()
 
         val process = ProcessBuilder(*resolvedCommand)
-            .directory(workingDirectory?.toFile())
+            .directory(workingDirectory?.toAbsolutePath()?.toFile())
             .start()
 
         val printInput = launch { process.inputStream.printAll() }
