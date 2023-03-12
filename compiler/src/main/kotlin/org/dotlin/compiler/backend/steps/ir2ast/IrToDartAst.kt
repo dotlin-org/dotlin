@@ -35,7 +35,7 @@ fun irToDartAst(
     config: CompilerConfiguration,
     ir: IrResult,
 ): IrToDartAstResult {
-    val loweringContext = ir.lower(config, ir.loweringContext)
+    val loweringContext = ir.lower(config, ir.loweringContext, ir.dotlinIrBuiltIns)
 
     // Some analysis must be done after lowering.
     DartIrAnalyzer(

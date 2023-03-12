@@ -57,6 +57,7 @@ class DotlinLoweringContext(
     val irModuleFragment: IrModuleFragment,
     override val dartNameGenerator: DartNameGenerator,
     override val dartProject: DartProject,
+    val dotlinIrBuiltIns: DotlinIrBuiltIns,
     private val irAttributes: IrAttributes,
 ) : IrContext(), CommonBackendContext, IrAttributes by irAttributes {
     override val builtIns = irModuleFragment.descriptor.builtIns
@@ -70,8 +71,6 @@ class DotlinLoweringContext(
 
     @PublishedApi
     internal val irBuilders = mutableMapOf<IrSymbol, IrBuilderWithScope>()
-
-    val dotlinIrBuiltIns = DotlinIrBuiltIns(this)
 
     override val ir: Ir<CommonBackendContext> = object : Ir<DotlinLoweringContext>(this, irModuleFragment) {
         override val symbols = object : Symbols<DotlinLoweringContext>(

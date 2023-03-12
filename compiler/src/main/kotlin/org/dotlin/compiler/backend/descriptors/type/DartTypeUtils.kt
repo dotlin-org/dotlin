@@ -25,6 +25,7 @@ import org.dotlin.compiler.backend.descriptors.isNullable
 import org.dotlin.compiler.backend.descriptors.type.DartTypeFactory.toKotlinTypeProjections
 import org.dotlin.compiler.backend.steps.src2ir.DotlinBuiltIns
 import org.dotlin.compiler.dart.element.*
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.types.*
 
 context(DartDescriptor)
@@ -36,20 +37,20 @@ fun DartType.toKotlinType(context: DartDescriptorContext): KotlinType {
     val builtIns = context.module.builtIns as DotlinBuiltIns
     return when (this) {
         is DartInterfaceType -> {
-            fun toCollectionType(lower: TypeConstructor, upper: TypeConstructor): FlexibleType {
+            fun toCollectionType(lower: ClassDescriptor, upper: ClassDescriptor): FlexibleType {
                 val arguments = typeArguments.toKotlinTypeProjections(context)
                 val nullable = nullabilitySuffix.isNullable
 
                 return DartTypeFactory.flexibleType(
                     KotlinTypeFactory.simpleType(
                         TypeAttributes.Empty,
-                        lower,
+                        lower.typeConstructor,
                         arguments,
                         nullable,
                     ),
                     KotlinTypeFactory.simpleType(
                         TypeAttributes.Empty,
-                        upper,
+                        upper.typeConstructor,
                         arguments,
                         nullable
                     )
@@ -67,16 +68,18 @@ fun DartType.toKotlinType(context: DartDescriptorContext): KotlinType {
                 dartCore("Object") -> builtIns.anyType
                 dartCore("Never") -> builtIns.nothingType
                 dartCore("List") -> toCollectionType(
-                    lower = builtIns.anyList.typeConstructor,
-                    upper = builtIns.list.typeConstructor,
+                    lower = builtIns.anyList,
+                    upper = builtIns.list,
                 )
+
                 dartCore("Set") -> toCollectionType(
-                    lower = builtIns.anySet.typeConstructor,
-                    upper = builtIns.set.typeConstructor,
+                    lower = builtIns.anySet,
+                    upper = builtIns.set,
                 )
+
                 dartCore("Map") -> toCollectionType(
-                    lower = builtIns.anyMap.typeConstructor,
-                    upper = builtIns.map.typeConstructor,
+                    lower = builtIns.anyMap,
+                    upper = builtIns.map,
                 )
                 // TODO: Comparable
                 else -> DartTypeFactory.simpleType(this, context)

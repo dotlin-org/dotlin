@@ -1378,4 +1378,254 @@ class Interop : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `call Dart function with named parameter with default bool value`() = assertCompile {
+        dart(
+            """
+            void sing({bool reverse = false}) {}
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.sing
+
+            fun main() {
+                sing()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show sing;
+
+            void main() {
+              sing();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call Dart function with named parameter with default String value`() = assertCompile {
+        dart(
+            """
+            void sing({String sentence = "Home is behind, the world ahead."}) {}
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.sing
+
+            fun main() {
+                sing()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show sing;
+
+            void main() {
+              sing();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call Dart function with named parameter with default int value`() = assertCompile {
+        dart(
+            """
+            void sing({int times = 3}) {}
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.sing
+
+            fun main() {
+                sing()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show sing;
+
+            void main() {
+              sing();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call Dart function with named parameter with default double value`() = assertCompile {
+        dart(
+            """
+            void sing({double times = 3.6}) {}
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.sing
+
+            fun main() {
+                sing()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show sing;
+
+            void main() {
+              sing();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call Dart function with named parameter with default nullable String value that is null`() = assertCompile {
+        dart(
+            """
+            void sing({String? sentence = null}) {}
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.sing
+
+            fun main() {
+                sing()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show sing;
+
+            void main() {
+              sing();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call Dart function with named parameter with default List value that is empty`() = assertCompile {
+        dart(
+            """
+            void sing({List<String> letters = const []}) {}
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.sing
+
+            fun main() {
+                sing()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show sing;
+
+            void main() {
+              sing();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call Dart function with named parameter with default List value`() = assertCompile {
+        dart(
+            """
+            void sing({List<String> letters = const ["A", "B", "C"]}) {}
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.sing
+
+            fun main() {
+                sing()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show sing;
+
+            void main() {
+              sing();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call Dart function with named parameter with default String value that is a constant`() = assertCompile {
+        dart(
+            """
+            const lyric = "May it be an evening star, shines down upon you";
+
+            void sing({String sentence = lyric}) {}
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.sing
+
+            fun main() {
+                sing()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show sing;
+
+            void main() {
+              sing();
+            }
+            """
+        )
+    }
 }

@@ -19,6 +19,7 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.lower
 
+import org.dotlin.compiler.backend.steps.ir2ast.DotlinIrBuiltIns
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.*
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lowerings.builtins.ReplaceEnumValuesCalls
 import org.dotlin.compiler.backend.steps.src2ir.IrResult
@@ -93,20 +94,26 @@ private val lowerings: List<Lowering> = listOf(
     ::DartImportsLowering
 )
 
-fun IrResult.lower(configuration: CompilerConfiguration, context: DotlinLoweringContext?): DotlinLoweringContext {
+fun IrResult.lower(
+    configuration: CompilerConfiguration,
+    context: DotlinLoweringContext?,
+    dotlinIrBuiltIns: DotlinIrBuiltIns? = context?.dotlinIrBuiltIns,
+): DotlinLoweringContext {
     val builtInsLowerings = when (module.descriptor) {
         module.descriptor.builtIns.builtInsModule -> listOf<Lowering>(
             ::FunctionSubtypeDeclarationsLowering
         )
+
         else -> emptyList()
     }
 
-    return lower(configuration, context, builtInsLowerings + lowerings)
+    return lower(configuration, context, dotlinIrBuiltIns, builtInsLowerings + lowerings)
 }
 
 fun IrResult.lower(
     configuration: CompilerConfiguration,
     context: DotlinLoweringContext?,
+    dotlinIrBuiltIns: DotlinIrBuiltIns? = context?.dotlinIrBuiltIns,
     lowerings: List<Lowering>
 ): DotlinLoweringContext {
     val actualContext = context ?: DotlinLoweringContext(
@@ -116,6 +123,7 @@ fun IrResult.lower(
         irModuleFragment = module,
         dartNameGenerator,
         dartProject,
+        dotlinIrBuiltIns!!,
         irAttributes,
     )
 

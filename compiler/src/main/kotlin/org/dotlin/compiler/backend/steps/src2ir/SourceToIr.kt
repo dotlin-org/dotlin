@@ -25,6 +25,7 @@ import org.dotlin.compiler.backend.DartNameGenerator
 import org.dotlin.compiler.backend.DartProject
 import org.dotlin.compiler.backend.attributes.IrAttributes
 import org.dotlin.compiler.backend.dev
+import org.dotlin.compiler.backend.steps.ir2ast.DotlinIrBuiltIns
 import org.dotlin.compiler.backend.steps.ir2ast.IrExpressionSourceMapper
 import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.dotlin.compiler.backend.steps.ir2ast.lower.lower
@@ -77,6 +78,7 @@ fun sourceToIr(
             loweringContext = ir.lower(
                 config,
                 context = null,
+                ir.dotlinIrBuiltIns,
                 listOf(
                     ::AnnotateDartConstDeclarationsLowering,
                     ::AnnotateExternalCompanionObjectsLowering,
@@ -160,14 +162,18 @@ private fun loadIr(
         }
     }
 
+
+
     dependencyModules
         .filter { it.impl != mainModule.builtIns.builtInsModule } // Built-ins module is already done above.
         .forEach {
             irLinker.deserializeIrModuleHeader(it, it.klib, _moduleName = it.name.asString())
         }
 
+    val dotlinIrBuiltIns = DotlinIrBuiltIns(psi2IrContext.irBuiltIns, mainModule.builtIns.builtInsModule, symbolTable)
+
     val dartIrProviders = dependencyModules.plus(mainModule)
-        .map { DartIrProvider(it, symbolTable, psi2IrContext.irBuiltIns) }
+        .map { DartIrProvider(it, symbolTable, psi2IrContext.irBuiltIns, dotlinIrBuiltIns) }
 
     psi2IrContext.symbolTable.referenceMetaAnnotations(mainModule)
 
@@ -208,7 +214,8 @@ private fun loadIr(
         extraIrAttributes,
         dartNameGenerator,
         dartProject,
-        loweringContext = null
+        loweringContext = null,
+        dotlinIrBuiltIns,
     )
 }
 
@@ -245,5 +252,6 @@ data class IrResult(
     /**
      * A lowering context might be available if the IR output was already (partially) lowered.
      */
-    val loweringContext: DotlinLoweringContext?
+    val loweringContext: DotlinLoweringContext?,
+    val dotlinIrBuiltIns: DotlinIrBuiltIns,
 )

@@ -22,10 +22,11 @@ package org.dotlin.compiler.backend.steps.ir2ast
 import org.dotlin.compiler.backend.dart
 import org.dotlin.compiler.backend.dev
 import org.dotlin.compiler.backend.dotlin
-import org.dotlin.compiler.backend.steps.ir2ast.lower.DotlinLoweringContext
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
+import org.jetbrains.kotlin.ir.IrBuiltIns
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.builders.declarations.buildFun
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
@@ -37,25 +38,30 @@ import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.makeNullable
 import org.jetbrains.kotlin.ir.util.SYNTHETIC_OFFSET
+import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.ir.util.addChild
 import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 
+// TODO?: Inherit IrBuiltIns (delegate), so we don't have to pass DotlinIrBuiltIns separately.
 // TODO: Make lazy
 @OptIn(ObsoleteDescriptorBasedAPI::class)
-class DotlinIrBuiltIns(private val context: DotlinLoweringContext) {
-    private val builtInsModule = context.irModuleFragment.descriptor.builtIns.builtInsModule
-    private val symbolTable = context.symbolTable
+class DotlinIrBuiltIns(
+    private val irBuiltIns: IrBuiltIns,
+    private val builtInsModule: ModuleDescriptor,
+    private val symbolTable: SymbolTable
 
+) {
     val dart = Dart(this)
     val meta = Meta(this)
 
-    private val operatorsPackage = context.irBuiltIns.operatorsPackageFragment
+    private val irFactory = irBuiltIns.irFactory
+    private val operatorsPackage = irBuiltIns.operatorsPackageFragment
 
     // Fake functions for certain operators.
-    fun ifNull(type: IrType) = context.irFactory.buildFun {
+    fun ifNull(type: IrType) = irFactory.buildFun {
         origin = IrDeclarationOrigin.IR_BUILTINS_STUB
         name = Name.identifier("IF_NULL")
         returnType = type
@@ -63,13 +69,13 @@ class DotlinIrBuiltIns(private val context: DotlinLoweringContext) {
         val ifNull = this
 
         valueParameters = listOf(
-            context.irFactory.createValueParameter(
+            irFactory.createValueParameter(
                 SYNTHETIC_OFFSET, SYNTHETIC_OFFSET,
                 origin = IrDeclarationOrigin.IR_BUILTINS_STUB,
                 symbol = IrValueParameterSymbolImpl(),
                 name = Name.identifier("p$0"),
                 index = 0,
-                type = context.irBuiltIns.anyType.makeNullable(),
+                type = irBuiltIns.anyType.makeNullable(),
                 varargElementType = null,
                 isCrossinline = false,
                 isNoinline = false,
