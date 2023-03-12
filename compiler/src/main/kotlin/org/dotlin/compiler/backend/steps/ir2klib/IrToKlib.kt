@@ -22,7 +22,6 @@ package org.dotlin.compiler.backend.steps.ir2klib
 import org.dotlin.compiler.backend.DartProject
 import org.dotlin.compiler.backend.steps.src2ir.IrResult
 import org.dotlin.compiler.backend.steps.src2ir.klib
-import org.dotlin.compiler.backend.util.kotlinFiles
 import org.jetbrains.kotlin.backend.common.serialization.KlibIrVersion
 import org.jetbrains.kotlin.backend.common.serialization.metadata.KlibMetadataMonolithicSerializer
 import org.jetbrains.kotlin.backend.common.serialization.metadata.KlibMetadataVersion
@@ -97,7 +96,7 @@ private fun IrModuleFragment.withRelevantFiles(sourceRoot: Path, block: (IrModul
     // We want to serialize the file paths as relative to the source root.
     val originalFiles = files.toList()
     files.clear()
-    originalFiles.kotlinFiles().mapTo(files) {
+    originalFiles.mapTo(files) {
         IrFileImpl(
             fileEntry = it.fileEntry.let { entry ->
                 object : IrFileEntry {

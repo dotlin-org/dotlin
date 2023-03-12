@@ -26,7 +26,6 @@ import org.dotlin.compiler.backend.steps.src2ir.IrResult
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.DartIrAnalyzer
 import org.dotlin.compiler.backend.steps.src2ir.analyze.ir.checkers.post.DartNameChecker
 import org.dotlin.compiler.backend.steps.src2ir.throwIfHasErrors
-import org.dotlin.compiler.backend.util.kotlinFiles
 import org.dotlin.compiler.dart.ast.compilationunit.DartCompilationUnit
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.diagnostics.Diagnostic
@@ -52,7 +51,7 @@ fun irToDartAst(
 
     val context = DartAstTransformContext(loweringContext)
     val units = mutableMapOf<Path, DartCompilationUnit>()
-    for (file in ir.module.kotlinFiles) {
+    for (file in ir.module.files) {
         context.enterFile(file)
 
         file.accept(IrToDartCompilationUnitTransformer, context).let {

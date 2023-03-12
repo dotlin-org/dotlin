@@ -1,17 +1,11 @@
 package org.dotlin.compiler.backend.steps.src2ir
 
-import org.dotlin.compiler.backend.DartPackage
 import org.dotlin.compiler.backend.descriptors.DartDescriptor
 import org.dotlin.compiler.backend.descriptors.DartInteropDescriptor
-import org.dotlin.compiler.backend.descriptors.DartPackageFragmentDescriptor
-import org.dotlin.compiler.backend.isCurrent
-import org.dotlin.compiler.dart.element.DartLibraryElement
 import org.jetbrains.kotlin.backend.common.serialization.DescriptorByIdSignatureFinderImpl
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.*
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrFile
-import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
 import org.jetbrains.kotlin.ir.linkage.IrProvider
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.types.impl.originalKotlinType
@@ -70,35 +64,3 @@ class DartIrProvider(
         return declaration
     }
 }
-
-// TODO: Remove when #81 is completed.
-@Suppress("FunctionName")
-fun DartIrFile(packageFragment: DartPackageFragmentDescriptor) =
-    IrFileImpl(
-        DartIrFileEntry(packageFragment.library, packageFragment.context.pkg),
-        packageFragment,
-    )
-
-private class DartIrFileEntry(library: DartLibraryElement, dartPackage: DartPackage) : IrFileEntry {
-    override val maxOffset: Int = UNDEFINED_OFFSET
-    override val name: String = library.path.let {
-        when {
-            // If it's the current project, we need to add the packagePath as a root, because it's
-            // serialized without.
-            dartPackage.isCurrent() -> dartPackage.packagePath.resolve(it)
-            else -> it
-        }.toString()
-    }
-
-    override fun getColumnNumber(offset: Int): Int =
-        throw UnsupportedOperationException("Column number not available")
-
-    override fun getLineNumber(offset: Int): Int =
-        throw UnsupportedOperationException("Line number not available")
-
-    override fun getSourceRangeInfo(beginOffset: Int, endOffset: Int): SourceRangeInfo =
-        throw UnsupportedOperationException("Source range info not available")
-}
-
-val IrFile.isDartFile: Boolean
-    get() = fileEntry is DartIrFileEntry
