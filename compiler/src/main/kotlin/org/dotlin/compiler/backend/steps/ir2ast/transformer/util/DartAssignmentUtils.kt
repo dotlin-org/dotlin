@@ -15,12 +15,12 @@ import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 fun DartAstTransformContext.createDartAssignment(
     origin: IrStatementOrigin?,
-    receiver: DartExpression,
-    irReceiverType: IrType,
-    irValue: IrExpression,
+    lhs: DartExpression,
+    irType: IrType,
+    irRhs: IrExpression,
 ): DartAssignmentExpression {
     val irOperationAssignValue by lazy {
-        irValue.cast<IrFunctionAccessExpression>().getValueArgumentOrDefault(0)
+        irRhs.cast<IrFunctionAccessExpression>().getValueArgumentOrDefault(0)
     }
 
     val operator = when (origin) {
@@ -30,18 +30,18 @@ fun DartAstTransformContext.createDartAssignment(
         DIVEQ -> when {
             // Dart's int divide operator returns a double, while Kotlin's Int divide operator returns an
             // Int. So, we use the ~/ Dart operator, which returns an int.
-            irReceiverType.isDartInt() && irOperationAssignValue.type.isDartInt() -> INTEGER_DIVIDE
+            irType.isDartInt() && irOperationAssignValue.type.isDartInt() -> INTEGER_DIVIDE
             else -> DIVIDE
         }
         else -> ASSIGN
     }
 
     return DartAssignmentExpression(
-        left = receiver,
+        left = lhs,
         operator = operator,
         right = when {
             operator != ASSIGN -> irOperationAssignValue
-            else -> irValue
+            else -> irRhs
         }.accept(this)
     )
 }

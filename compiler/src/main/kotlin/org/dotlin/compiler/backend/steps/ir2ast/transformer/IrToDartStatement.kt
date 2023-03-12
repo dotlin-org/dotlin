@@ -25,7 +25,6 @@ import org.dotlin.compiler.backend.steps.ir2ast.DartAstTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.IrDotlinStatementOrigin.*
 import org.dotlin.compiler.backend.steps.ir2ast.ir.extensionReceiverOrNull
 import org.dotlin.compiler.backend.steps.ir2ast.ir.valueArguments
-import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.createDartAssignment
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartInt
 import org.dotlin.compiler.backend.util.isDartConst
 import org.dotlin.compiler.dart.ast.declaration.variable.DartVariableDeclaration
@@ -39,18 +38,15 @@ import org.dotlin.compiler.dart.ast.statement.declaration.DartVariableDeclaratio
 import org.dotlin.compiler.dart.ast.statement.trycatch.DartCatchClause
 import org.dotlin.compiler.dart.ast.statement.trycatch.DartTryStatement
 import org.jetbrains.kotlin.ir.IrStatement
-import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin.*
-import org.jetbrains.kotlin.ir.expressions.impl.IrGetFieldImpl
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
 import org.jetbrains.kotlin.ir.util.superTypes
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
@@ -278,25 +274,6 @@ object IrToDartStatementTransformer : IrDartAstTransformer<DartStatement>() {
                         )
                     }
                 }
-            }
-
-            PLUSEQ, MINUSEQ, MULTEQ, DIVEQ -> {
-                val irOriginalReceiver = irBlock.statements.first().cast<IrVariable>().initializer!!
-                val irSetField = irBlock.statements.last().cast<IrSetField>()
-                val irReceiver = IrGetFieldImpl(
-                    UNDEFINED_OFFSET, UNDEFINED_OFFSET,
-                    symbol = irSetField.symbol,
-                    type = irSetField.type,
-                ).apply {
-                    receiver = irOriginalReceiver
-                }
-
-                return createDartAssignment(
-                    irBlock.origin,
-                    receiver = irReceiver.accept(context),
-                    irReceiverType = irReceiver.type,
-                    irValue = irSetField.value
-                ).asStatement()
             }
         }
 

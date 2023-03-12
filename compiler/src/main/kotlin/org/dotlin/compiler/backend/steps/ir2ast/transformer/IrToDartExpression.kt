@@ -128,6 +128,13 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
                 }
             }
 
+            PLUSEQ, MINUSEQ, MULTEQ, DIVEQ -> createDartAssignment(
+                origin,
+                lhs = infixReceiver,
+                irType = irReceiver!!.type,
+                irRhs = irSingleArgument
+            )
+
             PERC -> DartModuloExpression(infixReceiver, infixSingleArgument)
             GT, GTEQ, LT, LTEQ -> {
                 val (actualLeft, actualRight) = if (irCallLike.valueArgumentsCount == 1) {
@@ -411,9 +418,9 @@ object IrToDartExpressionTransformer : IrDartAstTransformer<DartExpression>() {
     ): DartExpression {
         return createDartAssignment(
             irSetValue.origin,
-            receiver = irSetValue.symbol.owner.dartName,
-            irReceiverType = irSetValue.symbol.owner.type,
-            irValue = irSetValue.value
+            lhs = irSetValue.symbol.owner.dartName,
+            irType = irSetValue.symbol.owner.type,
+            irRhs = irSetValue.value
         )
     }
 

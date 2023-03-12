@@ -895,6 +895,53 @@ class Statement : BaseTest {
         }
 
         @Test
+        fun `+= on property of class defined in another file`() = assertCompile {
+            kotlin(
+                """
+                class Test {
+                    var x = ""
+                }
+                """
+            )
+
+            dart(
+                """
+                import "package:meta/meta.dart" show nonVirtual, sealed;
+
+                @sealed
+                class Test {
+                  @nonVirtual
+                  String x = "";
+                }
+                """
+            )
+
+            kotlin(
+                """
+                fun main() {
+                    val test = Test()
+
+                    val abc = "abc"
+                    test.x += abc
+                }
+                """
+            )
+
+            dart(
+                """
+                import "0.dt.g.dart" show Test;
+                import "package:dotlin/src/kotlin/library.dt.g.dart" show SafeStringPlus;
+
+                void main() {
+                  final Test test = Test();
+                  final String abc = "abc";
+                  test.x += abc;
+                }
+                """
+            )
+        }
+
+        @Test
         fun `-= on property`() = assertCompile {
             kotlin(
                 """

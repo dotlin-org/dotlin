@@ -86,6 +86,7 @@ private val lowerings: List<Lowering> = listOf(
     ::DartDifferentDefaultValueArgumentsLowering,
     ::CollectionTypeChecksLowering,
     ::CollectionFactoryCallsLowering,
+    ::AssignExpressionsLowering,
     RuntimeCollectionTypeLowering::Declarations,
     RuntimeCollectionTypeLowering::Casts,
     ::DartMetaAnnotationsLowering,
