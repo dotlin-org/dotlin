@@ -81,6 +81,7 @@ fun DartType.toKotlinType(context: DartDescriptorContext): KotlinType {
                     lower = builtIns.anyMap,
                     upper = builtIns.map,
                 )
+                dartCore("Enum") -> builtIns.enum.defaultType
                 // TODO: Comparable
                 else -> DartTypeFactory.simpleType(this, context)
             }

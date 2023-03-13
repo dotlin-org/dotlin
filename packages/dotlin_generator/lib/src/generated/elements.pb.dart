@@ -135,6 +135,7 @@ class DartCompilationUnitElement extends $pb.GeneratedMessage {
     ..pc<DartPropertyElement>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'properties', $pb.PbFieldType.PM, subBuilder: DartPropertyElement.create)
     ..pc<DartClassElement>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'classes', $pb.PbFieldType.PM, subBuilder: DartClassElement.create)
     ..pc<DartFunctionElement>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'functions', $pb.PbFieldType.PM, subBuilder: DartFunctionElement.create)
+    ..pc<DartEnumElement>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enums', $pb.PbFieldType.PM, subBuilder: DartEnumElement.create)
   ;
 
   DartCompilationUnitElement._() : super();
@@ -143,6 +144,7 @@ class DartCompilationUnitElement extends $pb.GeneratedMessage {
     $core.Iterable<DartPropertyElement>? properties,
     $core.Iterable<DartClassElement>? classes,
     $core.Iterable<DartFunctionElement>? functions,
+    $core.Iterable<DartEnumElement>? enums,
   }) {
     final _result = create();
     if (location != null) {
@@ -156,6 +158,9 @@ class DartCompilationUnitElement extends $pb.GeneratedMessage {
     }
     if (functions != null) {
       _result.functions.addAll(functions);
+    }
+    if (enums != null) {
+      _result.enums.addAll(enums);
     }
     return _result;
   }
@@ -197,6 +202,9 @@ class DartCompilationUnitElement extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(4)
   $core.List<DartFunctionElement> get functions => $_getList(3);
+
+  @$pb.TagNumber(5)
+  $core.List<DartEnumElement> get enums => $_getList(4);
 }
 
 class DartClassElement extends $pb.GeneratedMessage {
@@ -337,6 +345,130 @@ class DartClassElement extends $pb.GeneratedMessage {
   $core.List<DartInterfaceType> get superMixinTypes => $_getList(9);
 }
 
+class DartEnumElement extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DartEnumElement', createEmptyInstance: create)
+    ..aQS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'location')
+    ..aQS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
+    ..pc<DartTypeParameterElement>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'typeParameters', $pb.PbFieldType.PM, protoName: 'typeParameters', subBuilder: DartTypeParameterElement.create)
+    ..pc<DartConstructorElement>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'constructors', $pb.PbFieldType.PM, subBuilder: DartConstructorElement.create)
+    ..pc<DartPropertyElement>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'properties', $pb.PbFieldType.PM, subBuilder: DartPropertyElement.create)
+    ..pc<DartFunctionElement>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'methods', $pb.PbFieldType.PM, subBuilder: DartFunctionElement.create)
+    ..aOM<DartInterfaceType>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'superType', protoName: 'superType', subBuilder: DartInterfaceType.create)
+    ..pc<DartInterfaceType>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'superInterfaceTypes', $pb.PbFieldType.PM, protoName: 'superInterfaceTypes', subBuilder: DartInterfaceType.create)
+    ..pc<DartInterfaceType>(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'superMixinTypes', $pb.PbFieldType.PM, protoName: 'superMixinTypes', subBuilder: DartInterfaceType.create)
+  ;
+
+  DartEnumElement._() : super();
+  factory DartEnumElement({
+    $core.String? location,
+    $core.String? name,
+    $core.Iterable<DartTypeParameterElement>? typeParameters,
+    $core.Iterable<DartConstructorElement>? constructors,
+    $core.Iterable<DartPropertyElement>? properties,
+    $core.Iterable<DartFunctionElement>? methods,
+    DartInterfaceType? superType,
+    $core.Iterable<DartInterfaceType>? superInterfaceTypes,
+    $core.Iterable<DartInterfaceType>? superMixinTypes,
+  }) {
+    final _result = create();
+    if (location != null) {
+      _result.location = location;
+    }
+    if (name != null) {
+      _result.name = name;
+    }
+    if (typeParameters != null) {
+      _result.typeParameters.addAll(typeParameters);
+    }
+    if (constructors != null) {
+      _result.constructors.addAll(constructors);
+    }
+    if (properties != null) {
+      _result.properties.addAll(properties);
+    }
+    if (methods != null) {
+      _result.methods.addAll(methods);
+    }
+    if (superType != null) {
+      _result.superType = superType;
+    }
+    if (superInterfaceTypes != null) {
+      _result.superInterfaceTypes.addAll(superInterfaceTypes);
+    }
+    if (superMixinTypes != null) {
+      _result.superMixinTypes.addAll(superMixinTypes);
+    }
+    return _result;
+  }
+  factory DartEnumElement.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DartEnumElement.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  DartEnumElement clone() => DartEnumElement()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  DartEnumElement copyWith(void Function(DartEnumElement) updates) => super.copyWith((message) => updates(message as DartEnumElement)) as DartEnumElement; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static DartEnumElement create() => DartEnumElement._();
+  DartEnumElement createEmptyInstance() => create();
+  static $pb.PbList<DartEnumElement> createRepeated() => $pb.PbList<DartEnumElement>();
+  @$core.pragma('dart2js:noInline')
+  static DartEnumElement getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DartEnumElement>(create);
+  static DartEnumElement? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get location => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set location($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasLocation() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearLocation() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get name => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set name($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasName() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearName() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.List<DartTypeParameterElement> get typeParameters => $_getList(2);
+
+  @$pb.TagNumber(4)
+  $core.List<DartConstructorElement> get constructors => $_getList(3);
+
+  @$pb.TagNumber(5)
+  $core.List<DartPropertyElement> get properties => $_getList(4);
+
+  @$pb.TagNumber(6)
+  $core.List<DartFunctionElement> get methods => $_getList(5);
+
+  @$pb.TagNumber(7)
+  DartInterfaceType get superType => $_getN(6);
+  @$pb.TagNumber(7)
+  set superType(DartInterfaceType v) { setField(7, v); }
+  @$pb.TagNumber(7)
+  $core.bool hasSuperType() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearSuperType() => clearField(7);
+  @$pb.TagNumber(7)
+  DartInterfaceType ensureSuperType() => $_ensure(6);
+
+  @$pb.TagNumber(8)
+  $core.List<DartInterfaceType> get superInterfaceTypes => $_getList(7);
+
+  @$pb.TagNumber(9)
+  $core.List<DartInterfaceType> get superMixinTypes => $_getList(8);
+}
+
 class DartPropertyElement extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DartPropertyElement', createEmptyInstance: create)
     ..aQS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'location')
@@ -348,9 +480,10 @@ class DartPropertyElement extends $pb.GeneratedMessage {
     ..a<$core.bool>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isLate', $pb.PbFieldType.QB, protoName: 'isLate')
     ..a<$core.bool>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isStatic', $pb.PbFieldType.QB, protoName: 'isStatic')
     ..a<$core.bool>(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isSynthetic', $pb.PbFieldType.QB, protoName: 'isSynthetic')
-    ..aQM<DartType>(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', subBuilder: DartType.create)
-    ..aOM<DartPropertyAccessorElement>(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'getter', subBuilder: DartPropertyAccessorElement.create)
-    ..aOM<DartPropertyAccessorElement>(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'setter', subBuilder: DartPropertyAccessorElement.create)
+    ..a<$core.bool>(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isEnumConstant', $pb.PbFieldType.QB, protoName: 'isEnumConstant')
+    ..aQM<DartType>(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', subBuilder: DartType.create)
+    ..aOM<DartPropertyAccessorElement>(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'getter', subBuilder: DartPropertyAccessorElement.create)
+    ..aOM<DartPropertyAccessorElement>(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'setter', subBuilder: DartPropertyAccessorElement.create)
   ;
 
   DartPropertyElement._() : super();
@@ -364,6 +497,7 @@ class DartPropertyElement extends $pb.GeneratedMessage {
     $core.bool? isLate,
     $core.bool? isStatic,
     $core.bool? isSynthetic,
+    $core.bool? isEnumConstant,
     DartType? type,
     DartPropertyAccessorElement? getter,
     DartPropertyAccessorElement? setter,
@@ -395,6 +529,9 @@ class DartPropertyElement extends $pb.GeneratedMessage {
     }
     if (isSynthetic != null) {
       _result.isSynthetic = isSynthetic;
+    }
+    if (isEnumConstant != null) {
+      _result.isEnumConstant = isEnumConstant;
     }
     if (type != null) {
       _result.type = type;
@@ -510,37 +647,46 @@ class DartPropertyElement extends $pb.GeneratedMessage {
   void clearIsSynthetic() => clearField(9);
 
   @$pb.TagNumber(10)
-  DartType get type => $_getN(9);
+  $core.bool get isEnumConstant => $_getBF(9);
   @$pb.TagNumber(10)
-  set type(DartType v) { setField(10, v); }
+  set isEnumConstant($core.bool v) { $_setBool(9, v); }
   @$pb.TagNumber(10)
-  $core.bool hasType() => $_has(9);
+  $core.bool hasIsEnumConstant() => $_has(9);
   @$pb.TagNumber(10)
-  void clearType() => clearField(10);
-  @$pb.TagNumber(10)
-  DartType ensureType() => $_ensure(9);
+  void clearIsEnumConstant() => clearField(10);
 
   @$pb.TagNumber(11)
-  DartPropertyAccessorElement get getter => $_getN(10);
+  DartType get type => $_getN(10);
   @$pb.TagNumber(11)
-  set getter(DartPropertyAccessorElement v) { setField(11, v); }
+  set type(DartType v) { setField(11, v); }
   @$pb.TagNumber(11)
-  $core.bool hasGetter() => $_has(10);
+  $core.bool hasType() => $_has(10);
   @$pb.TagNumber(11)
-  void clearGetter() => clearField(11);
+  void clearType() => clearField(11);
   @$pb.TagNumber(11)
-  DartPropertyAccessorElement ensureGetter() => $_ensure(10);
+  DartType ensureType() => $_ensure(10);
 
   @$pb.TagNumber(12)
-  DartPropertyAccessorElement get setter => $_getN(11);
+  DartPropertyAccessorElement get getter => $_getN(11);
   @$pb.TagNumber(12)
-  set setter(DartPropertyAccessorElement v) { setField(12, v); }
+  set getter(DartPropertyAccessorElement v) { setField(12, v); }
   @$pb.TagNumber(12)
-  $core.bool hasSetter() => $_has(11);
+  $core.bool hasGetter() => $_has(11);
   @$pb.TagNumber(12)
-  void clearSetter() => clearField(12);
+  void clearGetter() => clearField(12);
   @$pb.TagNumber(12)
-  DartPropertyAccessorElement ensureSetter() => $_ensure(11);
+  DartPropertyAccessorElement ensureGetter() => $_ensure(11);
+
+  @$pb.TagNumber(13)
+  DartPropertyAccessorElement get setter => $_getN(12);
+  @$pb.TagNumber(13)
+  set setter(DartPropertyAccessorElement v) { setField(13, v); }
+  @$pb.TagNumber(13)
+  $core.bool hasSetter() => $_has(12);
+  @$pb.TagNumber(13)
+  void clearSetter() => clearField(13);
+  @$pb.TagNumber(13)
+  DartPropertyAccessorElement ensureSetter() => $_ensure(12);
 }
 
 class DartPropertyAccessorElement extends $pb.GeneratedMessage {

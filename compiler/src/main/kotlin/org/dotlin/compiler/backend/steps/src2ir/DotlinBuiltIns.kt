@@ -71,4 +71,6 @@ class DotlinBuiltIns : KotlinBuiltIns(LockBasedStorageManager("DotlinBuiltIns"))
 
         return getArrayType(Variance.INVARIANT, kotlinType)
     }
+
+    override fun getEnumType(argument: SimpleType): SimpleType = enum.defaultType
 }

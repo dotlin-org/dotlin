@@ -20,10 +20,7 @@
 package org.dotlin.compiler.backend.descriptors
 
 import org.dotlin.compiler.dart.element.*
-import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.descriptors.PropertyDescriptor
-import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.incremental.components.LookupLocation
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
@@ -43,8 +40,11 @@ class DartMemberScope(
 ) : MemberScope {
     private val storageManager = context.storageManager
 
-    val classElementsByKotlinName by storageManager.createLazyValue {
-        elements.filterIsInstance<DartClassElement>().associateBy { it.kotlinName }
+    val classifierElementsByKotlinName by storageManager.createLazyValue {
+        elements
+            .filterIsInstance<DartInterfaceElement>()
+            .plus(elements.filter { it is DartPropertyElement && it.isEnumConstant })
+            .associateBy { it.kotlinName }
     }
 
     val functionElementsByKotlinName by storageManager.createLazyValue {
@@ -55,16 +55,22 @@ class DartMemberScope(
         elements.filterIsInstance<DartVariableElement>().associateBy { it.kotlinName }
     }
 
-    override fun getClassifierNames(): Set<Name> = classElementsByKotlinName.keys
+    override fun getClassifierNames(): Set<Name> = classifierElementsByKotlinName.keys
     override fun getFunctionNames(): Set<Name> = functionElementsByKotlinName.keys
     override fun getVariableNames(): Set<Name> = variableElementsByKotlinName.keys
+
+    private val allNames by storageManager.createLazyValue {
+        getClassifierNames() + getFunctionNames() + getVariableNames()
+    }
+
+    override fun definitelyDoesNotContainName(name: Name): Boolean = name !in allNames
 
     private val relevantElementsByKotlinName =
         storageManager.createMemoizedFunction<DescriptorKindFilter, Map<Name, DartDeclarationElement>> {
             val maps = mutableListOf<Map<Name, DartDeclarationElement>>()
 
             if (it.acceptsKinds(CLASSIFIERS_MASK)) {
-                maps.add(classElementsByKotlinName)
+                maps.add(classifierElementsByKotlinName)
             }
 
             if (it.acceptsKinds(FUNCTIONS_MASK)) {
@@ -116,8 +122,8 @@ class DartMemberScope(
 
     private val toDescriptor = storageManager.createMemoizedFunction<DartDeclarationElement, DeclarationDescriptor> {
         when (it) {
-            is DartClassElement -> DartClassDescriptor(
-                element = it,
+            is DartClassElement, is DartEnumElement -> DartClassDescriptor(
+                element = it as DartInterfaceElement,
                 context,
                 container = owner,
             )
@@ -128,11 +134,19 @@ class DartMemberScope(
                 container = owner,
             )
 
-            is DartPropertyElement -> DartPropertyDescriptor(
-                element = it,
-                context,
-                container = owner,
-            )
+            is DartPropertyElement -> when {
+                it.isEnumConstant -> DartEnumEntryDescriptor(
+                    element = it,
+                    context,
+                    container = owner as ClassDescriptor,
+                )
+
+                else -> DartPropertyDescriptor(
+                    element = it,
+                    context,
+                    container = owner,
+                )
+            }
 
             else -> throw UnsupportedOperationException("Unsupported element: $it")
         }

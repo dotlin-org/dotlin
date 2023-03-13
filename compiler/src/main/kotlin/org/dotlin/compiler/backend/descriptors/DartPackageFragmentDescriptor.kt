@@ -36,7 +36,7 @@ class DartPackageFragmentDescriptor(
     override val annotations: Annotations = Annotations.EMPTY,
 ) : PackageFragmentDescriptorImpl(context.module, context.fqNameOf(library)), DartDescriptor {
     private val _memberScope by storageManager.createLazyValue {
-        DartMemberScope(owner = this, context, element.classes + element.functions + element.properties)
+        DartMemberScope(owner = this, context, element.classes + element.functions + element.enums + element.properties)
     }
 
     override fun getMemberScope(): DartMemberScope = _memberScope

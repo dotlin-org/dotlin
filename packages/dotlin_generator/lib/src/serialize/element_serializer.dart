@@ -92,6 +92,7 @@ class DartElementSerializer {
       DartCompilationUnitElement(
         location: unit.encodedLocation,
         classes: unit.classes.map((c) => serializeClass(c)),
+        enums: unit.enums.map((e) => serializeEnum(e)),
         functions: serializeFunctions(unit.functions),
         properties: serializePropertyInducingElements(unit.topLevelVariables)
             .followedBy(
@@ -102,20 +103,29 @@ class DartElementSerializer {
       );
 
   DartClassElement serializeClass(ClassElement c) => DartClassElement(
-      location: c.encodedLocation,
-      name: c.name,
-      isAbstract: c.isAbstract,
-      properties: serializePropertyInducingElements(c.fields),
-      constructors: c.constructors.map((ctor) => serializeConstructor(ctor)),
-      methods: serializeFunctions(c.methods),
-      typeParameters: serializeTypeParameters(c.typeParameters),
-      superType: c.supertype != null
-          ? _typeSerializer.serializeInterfaceType(c.supertype!)
-          : null,
-      superInterfaceTypes: _typeSerializer.serializeInterfaceTypes(
-        c.interfaces,
-      ),
-      superMixinTypes: _typeSerializer.serializeInterfaceTypes(c.mixins));
+        location: c.encodedLocation,
+        name: c.name,
+        isAbstract: c.isAbstract,
+        properties: serializePropertyInducingElements(c.fields),
+        constructors: serializeConstructors(c.constructors),
+        methods: serializeFunctions(c.methods),
+        typeParameters: serializeTypeParameters(c.typeParameters),
+        superType: _serializeSuperTypeOf(c),
+        superInterfaceTypes: _serializeSuperInterfaceTypesOf(c),
+        superMixinTypes: _serializeSuperMixinTypesOf(c),
+      );
+
+  DartEnumElement serializeEnum(EnumElement c) => DartEnumElement(
+        location: c.encodedLocation,
+        name: c.name,
+        properties: serializePropertyInducingElements(c.fields),
+        constructors: serializeConstructors(c.constructors),
+        methods: serializeFunctions(c.methods),
+        typeParameters: serializeTypeParameters(c.typeParameters),
+        superType: _serializeSuperTypeOf(c),
+        superInterfaceTypes: _serializeSuperInterfaceTypesOf(c),
+        superMixinTypes: _serializeSuperMixinTypesOf(c),
+      );
 
   DartConstructorElement serializeConstructor(ConstructorElement c) =>
       DartConstructorElement(
@@ -137,8 +147,12 @@ class DartElementSerializer {
         isConst: prop.isConst,
         isFinal: prop.isConst ? true : prop.isFinal,
         isLate: prop.isLate,
-        isStatic: prop.isStatic,
+        // Enum constants should not be considered static.
+        isStatic: prop is FieldElement
+            ? !prop.isEnumConstant && prop.isStatic
+            : prop.isStatic,
         isSynthetic: prop.isSynthetic,
+        isEnumConstant: prop is FieldElement ? prop.isEnumConstant : false,
         type: _typeSerializer.serializeType(prop.type),
         getter: serializePropertyAccessor(prop.getter),
         setter: serializePropertyAccessor(prop.setter),
@@ -202,6 +216,21 @@ class DartElementSerializer {
             ? _typeSerializer.serializeType(param.bound!)
             : null,
       );
+
+  DartInterfaceType? _serializeSuperTypeOf(InterfaceElement interface) =>
+      interface.supertype != null
+          ? _typeSerializer.serializeInterfaceType(interface.supertype!)
+          : null;
+
+  Iterable<DartInterfaceType> _serializeSuperInterfaceTypesOf(
+    InterfaceElement interface,
+  ) =>
+      _typeSerializer.serializeInterfaceTypes(interface.interfaces);
+
+  Iterable<DartInterfaceType> _serializeSuperMixinTypesOf(
+    InterfaceElement interface,
+  ) =>
+      _typeSerializer.serializeInterfaceTypes(interface.mixins);
 }
 
 extension DartMultiElementSerializer on DartElementSerializer {
@@ -223,5 +252,10 @@ extension DartMultiElementSerializer on DartElementSerializer {
   Iterable<DartFunctionElement> serializeFunctions(
     Iterable<ExecutableElement> funs,
   ) =>
-      funs.map((p) => serializeFunction(p));
+      funs.map((f) => serializeFunction(f));
+
+  Iterable<DartConstructorElement> serializeConstructors(
+    Iterable<ConstructorElement> ctors,
+  ) =>
+      ctors.map((ctor) => serializeConstructor(ctor));
 }

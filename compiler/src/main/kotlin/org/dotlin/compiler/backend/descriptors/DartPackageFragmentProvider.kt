@@ -97,7 +97,6 @@ class DartPackageFragmentProvider(
     @Deprecated("for usages use #packageFragments(FqName) at final point, for impl use #collectPackageFragments(FqName, MutableCollection<PackageFragmentDescriptor>)")
     override fun getPackageFragments(fqName: FqName): List<PackageFragmentDescriptor> = getFragmentsOf(fqName)
     override fun getSubPackagesOf(fqName: FqName, nameFilter: (Name) -> Boolean): Collection<FqName> {
-        // TODO: A module can contain multiple fqnames
         if (!fqName.startsWithPackageFqName()) {
             return emptyList()
         }
@@ -115,7 +114,8 @@ class DartPackageFragmentProvider(
         packageFragments.addAll(getFragmentsOf(fqName))
     }
 
-    override fun isEmpty(fqName: FqName): Boolean = !fqName.startsWithPackageFqName() // TODO: Can be more precise
+    override fun isEmpty(fqName: FqName): Boolean =
+        !fqName.startsWithPackageFqName() || fragments.none { it.fqName == fqName }
 
     private fun FqName.startsWithPackageFqName() = toString().startsWith(context.pkg.fqName.toString())
 }

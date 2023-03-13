@@ -21,6 +21,7 @@
     DartLibraryElement::class,
     DartCompilationUnitElement::class,
     DartClassElement::class,
+    DartEnumElement::class,
     DartTypeParameterElement::class,
     DartPropertyElement::class,
     DartPropertyAccessorElement::class,
@@ -109,7 +110,7 @@ data class DartCompilationUnitElement(
     val properties: List<DartPropertyElement> = emptyList(),
     val classes: List<DartClassElement> = emptyList(),
     val functions: List<DartFunctionElement> = emptyList(),
-    //val enums: List<DartEnumElement>, TODO
+    val enums: List<DartEnumElement>,
     //val extensions: List<DartExtensionElement>, TODO
     //val mixins: List<DartMixinElement>, TODO
     //val typeAliases: List<DartTypeAliasElement> TODO
@@ -161,6 +162,19 @@ data class DartClassElement(
 ) : DartInterfaceElement, DartAbstractableElement
 
 @Serializable
+data class DartEnumElement(
+    override val location: DartElementLocation,
+    override val name: DartSimpleIdentifier,
+    override val typeParameters: List<DartTypeParameterElement> = emptyList(),
+    override val constructors: List<DartConstructorElement> = emptyList(),
+    override val properties: List<DartPropertyElement> = emptyList(),
+    override val methods: List<DartFunctionElement> = emptyList(),
+    override val superType: DartInterfaceType?,
+    override val superInterfaceTypes: List<DartInterfaceType> = emptyList(),
+    override val superMixinTypes: List<DartInterfaceType> = emptyList(),
+) : DartInterfaceElement
+
+@Serializable
 sealed interface DartConstableElement : DartElement {
     val isConst: Boolean
 }
@@ -186,6 +200,7 @@ data class DartPropertyElement(
     override val isLate: Boolean,
     override val isStatic: Boolean,
     override val isSynthetic: Boolean,
+    val isEnumConstant: Boolean,
     override val type: DartType,
     val getter: DartPropertyAccessorElement?,
     val setter: DartPropertyAccessorElement?,

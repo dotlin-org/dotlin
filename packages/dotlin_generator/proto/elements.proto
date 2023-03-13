@@ -26,6 +26,7 @@ message DartCompilationUnitElement {
   repeated DartClassElement classes = 3;
   // WARNING: a default value decoded when value is missing
   repeated DartFunctionElement functions = 4;
+  repeated DartEnumElement enums = 5;
 }
 
 // serial name 'org.dotlin.compiler.dart.element.DartClassElement'
@@ -48,6 +49,25 @@ message DartClassElement {
   repeated DartInterfaceType superMixinTypes = 10;
 }
 
+// serial name 'org.dotlin.compiler.dart.element.DartEnumElement'
+message DartEnumElement {
+  required string location = 1;
+  required string name = 2;
+  // WARNING: a default value decoded when value is missing
+  repeated DartTypeParameterElement typeParameters = 3;
+  // WARNING: a default value decoded when value is missing
+  repeated DartConstructorElement constructors = 4;
+  // WARNING: a default value decoded when value is missing
+  repeated DartPropertyElement properties = 5;
+  // WARNING: a default value decoded when value is missing
+  repeated DartFunctionElement methods = 6;
+  optional DartInterfaceType superType = 7;
+  // WARNING: a default value decoded when value is missing
+  repeated DartInterfaceType superInterfaceTypes = 8;
+  // WARNING: a default value decoded when value is missing
+  repeated DartInterfaceType superMixinTypes = 9;
+}
+
 // serial name 'org.dotlin.compiler.dart.element.DartPropertyElement'
 message DartPropertyElement {
   required string location = 1;
@@ -59,9 +79,10 @@ message DartPropertyElement {
   required bool isLate = 7;
   required bool isStatic = 8;
   required bool isSynthetic = 9;
-  required DartType type = 10;
-  optional DartPropertyAccessorElement getter = 11;
-  optional DartPropertyAccessorElement setter = 12;
+  required bool isEnumConstant = 10;
+  required DartType type = 11;
+  optional DartPropertyAccessorElement getter = 12;
+  optional DartPropertyAccessorElement setter = 13;
 }
 
 // serial name 'org.dotlin.compiler.dart.element.DartPropertyAccessorElement'

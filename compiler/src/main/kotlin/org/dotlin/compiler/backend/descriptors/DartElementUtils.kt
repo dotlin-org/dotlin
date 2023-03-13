@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.utils.addIfNotNull
 
-val DartClassElement.superTypes: List<DartInterfaceType>
+val DartInterfaceElement.superTypes: List<DartInterfaceType>
     get() = buildList {
         addIfNotNull(superType)
         addAll(superInterfaceTypes)

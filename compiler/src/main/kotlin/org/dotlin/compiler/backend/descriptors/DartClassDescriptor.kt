@@ -21,7 +21,11 @@ package org.dotlin.compiler.backend.descriptors
 
 import org.dotlin.compiler.backend.descriptors.type.toKotlinType
 import org.dotlin.compiler.dart.element.DartClassElement
+import org.dotlin.compiler.dart.element.DartEnumElement
+import org.dotlin.compiler.dart.element.DartInterfaceElement
 import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.descriptors.ClassKind.CLASS
+import org.jetbrains.kotlin.descriptors.ClassKind.ENUM_CLASS
 import org.jetbrains.kotlin.descriptors.impl.ClassDescriptorImpl
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.storage.getValue
@@ -31,15 +35,21 @@ import org.jetbrains.kotlin.types.TypeConstructor
 import org.jetbrains.kotlin.types.checker.KotlinTypeRefiner
 
 class DartClassDescriptor(
-    override val element: DartClassElement,
+    override val element: DartInterfaceElement,
     override val context: DartDescriptorContext,
     container: DeclarationDescriptor,
 ) : ClassDescriptorImpl(
     container,
     element.kotlinName,
-    element.kotlinModality,
-    ClassKind.CLASS,
-    emptyList(), // TODO: superTypes
+    when (element) {
+        is DartClassElement -> element.kotlinModality
+        else -> Modality.FINAL
+    },
+    when (element) {
+        is DartEnumElement -> ENUM_CLASS
+        else -> CLASS
+    },
+    emptyList(), // Super types are evaluated lazily.
     SourceElement.NO_SOURCE, // TODO: SourceElement
     false,
     context.storageManager,

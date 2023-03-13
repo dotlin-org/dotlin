@@ -23,7 +23,7 @@ package kotlin
  * information on enum classes.
  */
 @DartLibrary("dart:core")
-external abstract class Enum<E : Enum<E>> const constructor(
+external abstract class Enum const constructor(
     /**
      * Returns the name of this enum constant, exactly as declared in its enum declaration.
      */
@@ -46,10 +46,10 @@ external abstract class Enum<E : Enum<E>> const constructor(
  * Returns an array containing enum T entries.
  */
 @SinceKotlin("1.1")
-external const inline fun <reified T : Enum<T>> enumValues(): Array<T>
+external const inline fun <T : Enum> enumValues(): Array<T>
 
 /**
  * Returns an enum entry with specified name.
  */
 @SinceKotlin("1.1")
-external inline fun <reified T : Enum<T>> enumValueOf(name: String): T
+external inline fun <T : Enum> enumValueOf(name: String): T

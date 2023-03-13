@@ -1628,4 +1628,223 @@ class Interop : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `use simple Dart enum`() = assertCompile {
+        dart(
+            """
+            enum Temperature {
+              cool,
+              hot
+            }
+            """,
+            Path("lib/temp.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.temp.Temperature
+
+            fun main() {
+                val x: Temperature = Temperature.cool
+            }
+            """
+        )
+
+        dart(
+            """
+            import "temp.dart" show Temperature;
+
+            void main() {
+              final Temperature x = Temperature.cool;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `import simple Dart enum entry`() = assertCompile {
+        dart(
+            """
+            enum Temperature {
+              cool,
+              hot
+            }
+            """,
+            Path("lib/temp.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.temp.Temperature
+            import pkg.test.temp.Temperature.cool
+
+            fun main() {
+                val x: Temperature = cool
+            }
+            """
+        )
+
+        dart(
+            """
+            import "temp.dart" show Temperature;
+
+            void main() {
+              final Temperature x = Temperature.cool;
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `use enhanced Dart enum`() = assertCompile {
+        dart(
+            """
+            abstract class SeatingArea {
+              bool canSeat(int people);
+            }
+
+            enum Table implements SeatingArea {
+              small(chairs: 2, candles: 1),
+              medium(chairs: 4, candles: 2),
+              large(chairs: 6, candles: 3);
+
+              const Table({
+                required this.chairs,
+                required this.candles,
+              });
+
+              final int chairs;
+              final int candles;
+
+              double get candlesPerChair => candles / chairs;
+
+              @override
+              bool canSeat(int people) => people <= chairs;
+            }
+            """,
+            Path("lib/restaurant.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.restaurant.SeatingArea
+            import pkg.test.restaurant.Table
+
+            fun main() {
+                val people = 3
+                val table: SeatingArea = Table.medium
+                table.canSeat(people)
+            }
+            """
+        )
+
+        dart(
+            """
+            import "restaurant.dart" show Table, SeatingArea;
+
+            void main() {
+              final int people = 3;
+              final SeatingArea table = Table.medium;
+              table.canSeat(people);
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `use generic enhanced Dart enum`() = assertCompile {
+        dart(
+            """
+            enum Env<T> {
+              apiKey<String>("ABCDEFGH12345"),
+              production<bool>(true);
+
+              const Env(this.value);
+
+              final T value;
+            }
+            """,
+            Path("lib/env.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.env.Env
+
+            fun main() {
+                val apiKey: String = Env.apiKey.value
+
+                if (Env.production.value) {
+                    apiKey
+                }
+            }
+            """
+        )
+
+        dart(
+            """
+            import "env.dart" show Env;
+
+            void main() {
+              final String apiKey = Env.apiKey.value;
+              if (Env.production.value) {
+                apiKey;
+              }
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `exhaustive when with simple Dart enum`() = assertCompile {
+        dart(
+            """
+            enum Temperature {
+              cool,
+              hot
+            }
+            """,
+            Path("lib/temp.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.temp.Temperature
+
+            fun main() {
+                val temp = Temperature.cool
+                val x = when (temp) {
+                    Temperature.cool -> 0
+                    Temperature.hot -> 1
+                }
+            }
+            """
+        )
+
+        dart(
+            """
+            import "temp.dart" show Temperature;
+            import "package:dotlin/src/dotlin/intrinsics/errors.dt.g.dart"
+                show NoWhenBranchMatchedError;
+
+            void main() {
+              final Temperature temp = Temperature.cool;
+              final int x = () {
+                final Temperature tmp0_subject = temp;
+                return tmp0_subject == Temperature.cool
+                    ? 0
+                    : tmp0_subject == Temperature.hot
+                        ? 1
+                        : throw NoWhenBranchMatchedError();
+              }.call();
+            }
+            """
+        )
+    }
 }

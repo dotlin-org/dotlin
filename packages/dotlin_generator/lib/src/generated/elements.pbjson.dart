@@ -51,11 +51,12 @@ const DartCompilationUnitElement$json = const {
     const {'1': 'properties', '3': 2, '4': 3, '5': 11, '6': '.DartPropertyElement', '10': 'properties'},
     const {'1': 'classes', '3': 3, '4': 3, '5': 11, '6': '.DartClassElement', '10': 'classes'},
     const {'1': 'functions', '3': 4, '4': 3, '5': 11, '6': '.DartFunctionElement', '10': 'functions'},
+    const {'1': 'enums', '3': 5, '4': 3, '5': 11, '6': '.DartEnumElement', '10': 'enums'},
   ],
 };
 
 /// Descriptor for `DartCompilationUnitElement`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List dartCompilationUnitElementDescriptor = $convert.base64Decode('ChpEYXJ0Q29tcGlsYXRpb25Vbml0RWxlbWVudBIaCghsb2NhdGlvbhgBIAIoCVIIbG9jYXRpb24SNAoKcHJvcGVydGllcxgCIAMoCzIULkRhcnRQcm9wZXJ0eUVsZW1lbnRSCnByb3BlcnRpZXMSKwoHY2xhc3NlcxgDIAMoCzIRLkRhcnRDbGFzc0VsZW1lbnRSB2NsYXNzZXMSMgoJZnVuY3Rpb25zGAQgAygLMhQuRGFydEZ1bmN0aW9uRWxlbWVudFIJZnVuY3Rpb25z');
+final $typed_data.Uint8List dartCompilationUnitElementDescriptor = $convert.base64Decode('ChpEYXJ0Q29tcGlsYXRpb25Vbml0RWxlbWVudBIaCghsb2NhdGlvbhgBIAIoCVIIbG9jYXRpb24SNAoKcHJvcGVydGllcxgCIAMoCzIULkRhcnRQcm9wZXJ0eUVsZW1lbnRSCnByb3BlcnRpZXMSKwoHY2xhc3NlcxgDIAMoCzIRLkRhcnRDbGFzc0VsZW1lbnRSB2NsYXNzZXMSMgoJZnVuY3Rpb25zGAQgAygLMhQuRGFydEZ1bmN0aW9uRWxlbWVudFIJZnVuY3Rpb25zEiYKBWVudW1zGAUgAygLMhAuRGFydEVudW1FbGVtZW50UgVlbnVtcw==');
 @$core.Deprecated('Use dartClassElementDescriptor instead')
 const DartClassElement$json = const {
   '1': 'DartClassElement',
@@ -75,6 +76,24 @@ const DartClassElement$json = const {
 
 /// Descriptor for `DartClassElement`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List dartClassElementDescriptor = $convert.base64Decode('ChBEYXJ0Q2xhc3NFbGVtZW50EhoKCGxvY2F0aW9uGAEgAigJUghsb2NhdGlvbhISCgRuYW1lGAIgAigJUgRuYW1lEkEKDnR5cGVQYXJhbWV0ZXJzGAMgAygLMhkuRGFydFR5cGVQYXJhbWV0ZXJFbGVtZW50Ug50eXBlUGFyYW1ldGVycxIeCgppc0Fic3RyYWN0GAQgAigIUgppc0Fic3RyYWN0EjsKDGNvbnN0cnVjdG9ycxgFIAMoCzIXLkRhcnRDb25zdHJ1Y3RvckVsZW1lbnRSDGNvbnN0cnVjdG9ycxI0Cgpwcm9wZXJ0aWVzGAYgAygLMhQuRGFydFByb3BlcnR5RWxlbWVudFIKcHJvcGVydGllcxIuCgdtZXRob2RzGAcgAygLMhQuRGFydEZ1bmN0aW9uRWxlbWVudFIHbWV0aG9kcxIwCglzdXBlclR5cGUYCCABKAsyEi5EYXJ0SW50ZXJmYWNlVHlwZVIJc3VwZXJUeXBlEkQKE3N1cGVySW50ZXJmYWNlVHlwZXMYCSADKAsyEi5EYXJ0SW50ZXJmYWNlVHlwZVITc3VwZXJJbnRlcmZhY2VUeXBlcxI8Cg9zdXBlck1peGluVHlwZXMYCiADKAsyEi5EYXJ0SW50ZXJmYWNlVHlwZVIPc3VwZXJNaXhpblR5cGVz');
+@$core.Deprecated('Use dartEnumElementDescriptor instead')
+const DartEnumElement$json = const {
+  '1': 'DartEnumElement',
+  '2': const [
+    const {'1': 'location', '3': 1, '4': 2, '5': 9, '10': 'location'},
+    const {'1': 'name', '3': 2, '4': 2, '5': 9, '10': 'name'},
+    const {'1': 'typeParameters', '3': 3, '4': 3, '5': 11, '6': '.DartTypeParameterElement', '10': 'typeParameters'},
+    const {'1': 'constructors', '3': 4, '4': 3, '5': 11, '6': '.DartConstructorElement', '10': 'constructors'},
+    const {'1': 'properties', '3': 5, '4': 3, '5': 11, '6': '.DartPropertyElement', '10': 'properties'},
+    const {'1': 'methods', '3': 6, '4': 3, '5': 11, '6': '.DartFunctionElement', '10': 'methods'},
+    const {'1': 'superType', '3': 7, '4': 1, '5': 11, '6': '.DartInterfaceType', '10': 'superType'},
+    const {'1': 'superInterfaceTypes', '3': 8, '4': 3, '5': 11, '6': '.DartInterfaceType', '10': 'superInterfaceTypes'},
+    const {'1': 'superMixinTypes', '3': 9, '4': 3, '5': 11, '6': '.DartInterfaceType', '10': 'superMixinTypes'},
+  ],
+};
+
+/// Descriptor for `DartEnumElement`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List dartEnumElementDescriptor = $convert.base64Decode('Cg9EYXJ0RW51bUVsZW1lbnQSGgoIbG9jYXRpb24YASACKAlSCGxvY2F0aW9uEhIKBG5hbWUYAiACKAlSBG5hbWUSQQoOdHlwZVBhcmFtZXRlcnMYAyADKAsyGS5EYXJ0VHlwZVBhcmFtZXRlckVsZW1lbnRSDnR5cGVQYXJhbWV0ZXJzEjsKDGNvbnN0cnVjdG9ycxgEIAMoCzIXLkRhcnRDb25zdHJ1Y3RvckVsZW1lbnRSDGNvbnN0cnVjdG9ycxI0Cgpwcm9wZXJ0aWVzGAUgAygLMhQuRGFydFByb3BlcnR5RWxlbWVudFIKcHJvcGVydGllcxIuCgdtZXRob2RzGAYgAygLMhQuRGFydEZ1bmN0aW9uRWxlbWVudFIHbWV0aG9kcxIwCglzdXBlclR5cGUYByABKAsyEi5EYXJ0SW50ZXJmYWNlVHlwZVIJc3VwZXJUeXBlEkQKE3N1cGVySW50ZXJmYWNlVHlwZXMYCCADKAsyEi5EYXJ0SW50ZXJmYWNlVHlwZVITc3VwZXJJbnRlcmZhY2VUeXBlcxI8Cg9zdXBlck1peGluVHlwZXMYCSADKAsyEi5EYXJ0SW50ZXJmYWNlVHlwZVIPc3VwZXJNaXhpblR5cGVz');
 @$core.Deprecated('Use dartPropertyElementDescriptor instead')
 const DartPropertyElement$json = const {
   '1': 'DartPropertyElement',
@@ -88,14 +107,15 @@ const DartPropertyElement$json = const {
     const {'1': 'isLate', '3': 7, '4': 2, '5': 8, '10': 'isLate'},
     const {'1': 'isStatic', '3': 8, '4': 2, '5': 8, '10': 'isStatic'},
     const {'1': 'isSynthetic', '3': 9, '4': 2, '5': 8, '10': 'isSynthetic'},
-    const {'1': 'type', '3': 10, '4': 2, '5': 11, '6': '.DartType', '10': 'type'},
-    const {'1': 'getter', '3': 11, '4': 1, '5': 11, '6': '.DartPropertyAccessorElement', '10': 'getter'},
-    const {'1': 'setter', '3': 12, '4': 1, '5': 11, '6': '.DartPropertyAccessorElement', '10': 'setter'},
+    const {'1': 'isEnumConstant', '3': 10, '4': 2, '5': 8, '10': 'isEnumConstant'},
+    const {'1': 'type', '3': 11, '4': 2, '5': 11, '6': '.DartType', '10': 'type'},
+    const {'1': 'getter', '3': 12, '4': 1, '5': 11, '6': '.DartPropertyAccessorElement', '10': 'getter'},
+    const {'1': 'setter', '3': 13, '4': 1, '5': 11, '6': '.DartPropertyAccessorElement', '10': 'setter'},
   ],
 };
 
 /// Descriptor for `DartPropertyElement`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List dartPropertyElementDescriptor = $convert.base64Decode('ChNEYXJ0UHJvcGVydHlFbGVtZW50EhoKCGxvY2F0aW9uGAEgAigJUghsb2NhdGlvbhISCgRuYW1lGAIgAigJUgRuYW1lEh4KCmlzQWJzdHJhY3QYAyACKAhSCmlzQWJzdHJhY3QSIAoLaXNDb3ZhcmlhbnQYBCACKAhSC2lzQ292YXJpYW50EhgKB2lzQ29uc3QYBSACKAhSB2lzQ29uc3QSGAoHaXNGaW5hbBgGIAIoCFIHaXNGaW5hbBIWCgZpc0xhdGUYByACKAhSBmlzTGF0ZRIaCghpc1N0YXRpYxgIIAIoCFIIaXNTdGF0aWMSIAoLaXNTeW50aGV0aWMYCSACKAhSC2lzU3ludGhldGljEh0KBHR5cGUYCiACKAsyCS5EYXJ0VHlwZVIEdHlwZRI0CgZnZXR0ZXIYCyABKAsyHC5EYXJ0UHJvcGVydHlBY2Nlc3NvckVsZW1lbnRSBmdldHRlchI0CgZzZXR0ZXIYDCABKAsyHC5EYXJ0UHJvcGVydHlBY2Nlc3NvckVsZW1lbnRSBnNldHRlcg==');
+final $typed_data.Uint8List dartPropertyElementDescriptor = $convert.base64Decode('ChNEYXJ0UHJvcGVydHlFbGVtZW50EhoKCGxvY2F0aW9uGAEgAigJUghsb2NhdGlvbhISCgRuYW1lGAIgAigJUgRuYW1lEh4KCmlzQWJzdHJhY3QYAyACKAhSCmlzQWJzdHJhY3QSIAoLaXNDb3ZhcmlhbnQYBCACKAhSC2lzQ292YXJpYW50EhgKB2lzQ29uc3QYBSACKAhSB2lzQ29uc3QSGAoHaXNGaW5hbBgGIAIoCFIHaXNGaW5hbBIWCgZpc0xhdGUYByACKAhSBmlzTGF0ZRIaCghpc1N0YXRpYxgIIAIoCFIIaXNTdGF0aWMSIAoLaXNTeW50aGV0aWMYCSACKAhSC2lzU3ludGhldGljEiYKDmlzRW51bUNvbnN0YW50GAogAigIUg5pc0VudW1Db25zdGFudBIdCgR0eXBlGAsgAigLMgkuRGFydFR5cGVSBHR5cGUSNAoGZ2V0dGVyGAwgASgLMhwuRGFydFByb3BlcnR5QWNjZXNzb3JFbGVtZW50UgZnZXR0ZXISNAoGc2V0dGVyGA0gASgLMhwuRGFydFByb3BlcnR5QWNjZXNzb3JFbGVtZW50UgZzZXR0ZXI=');
 @$core.Deprecated('Use dartPropertyAccessorElementDescriptor instead')
 const DartPropertyAccessorElement$json = const {
   '1': 'DartPropertyAccessorElement',
