@@ -1847,4 +1847,97 @@ class Interop : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `call Dart function with required named parameter`() = assertCompile {
+        dart(
+            """
+            void dance({required int bpm}) {}
+            """,
+            Path("lib/art.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.art.dance
+
+            fun main() {
+                dance(bpm = 70)
+            }
+            """
+        )
+
+        dart(
+            """
+            import "art.dart" show dance;
+
+            void main() {
+              dance(bpm: 70);
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call Dart function with optional named parameter`() = assertCompile {
+        dart(
+            """
+            void dance({int bpm = 30}) {}
+            """,
+            Path("lib/art.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.art.dance
+
+            fun main() {
+                dance(bpm = 70)
+            }
+            """
+        )
+
+        dart(
+            """
+            import "art.dart" show dance;
+
+            void main() {
+              dance(bpm: 70);
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call Dart function with optional positional parameter`() = assertCompile {
+        dart(
+            """
+            void dance([int bpm = 30]) {}
+            """,
+            Path("lib/art.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.art.dance
+
+            fun main() {
+                dance(bpm = 70)
+            }
+            """
+        )
+
+        dart(
+            """
+            import "art.dart" show dance;
+
+            void main() {
+              dance(70);
+            }
+            """
+        )
+    }
 }

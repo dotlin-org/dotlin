@@ -20,13 +20,14 @@
 package org.dotlin.compiler.backend
 
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
-import org.dotlin.compiler.backend.steps.ir2ast.ir.isStatic
-import org.dotlin.compiler.backend.util.*
+import org.dotlin.compiler.backend.util.getSingleAnnotationStringArgumentOf
+import org.dotlin.compiler.backend.util.getSingleOverriddenAnnotationStringArgumentOf
+import org.dotlin.compiler.backend.util.hasAnnotation
+import org.dotlin.compiler.backend.util.hasOverriddenAnnotation
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.util.fileOrNull
 import org.jetbrains.kotlin.ir.util.isGetter
 import org.jetbrains.kotlin.ir.util.isSetter
-import org.jetbrains.kotlin.ir.util.parentClassOrNull
 
 fun IrDeclaration.hasDartConstAnnotation() = hasAnnotation(dotlin.const)
 fun IrDeclaration.hasDartGetterAnnotation() = hasOverriddenAnnotation(dotlin.DartGetter)
@@ -52,8 +53,8 @@ val IrDeclaration.annotatedDartName: String?
         else -> this
     }.run { getSingleOverriddenAnnotationStringArgumentOf(dotlin.DartName) }
 
-val IrValueParameter.isDartPositional: Boolean
-    get() = (parent as? IrFunction)?.hasDartPositionalAnnotation() == true
+fun IrValueParameter.hasDartPositionalAnnotation(): Boolean =
+    (parent as? IrFunction)?.hasDartPositionalAnnotation() == true
 
 val IrDeclaration.dartExtensionName: String?
     get() = getSingleAnnotationStringArgumentOf(dotlin.DartExtensionName)

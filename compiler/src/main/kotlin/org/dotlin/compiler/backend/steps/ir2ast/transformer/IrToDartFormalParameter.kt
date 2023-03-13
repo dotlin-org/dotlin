@@ -19,12 +19,14 @@
 
 package org.dotlin.compiler.backend.steps.ir2ast.transformer
 
-import org.dotlin.compiler.backend.isDartPositional
+import org.dotlin.compiler.backend.hasDartPositionalAnnotation
 import org.dotlin.compiler.backend.steps.ir2ast.DartAstTransformContext
 import org.dotlin.compiler.backend.steps.ir2ast.ir.correspondingProperty
 import org.dotlin.compiler.backend.steps.ir2ast.transformer.util.isDartFactory
+import org.dotlin.compiler.backend.util.dartElementAs
 import org.dotlin.compiler.backend.util.dartIndex
 import org.dotlin.compiler.dart.ast.parameter.*
+import org.dotlin.compiler.dart.element.DartParameterElement
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 
@@ -59,14 +61,20 @@ fun IrValueParameter.accept(context: DartAstTransformContext): DartFormalParamet
         )
     }
 
-    if (defaultValue == null) {
+    val dartElement = dartElementAs<DartParameterElement>()
+
+    val isDefaultParameter = dartElement?.let { it.isNamed || (it.isPositional && it.hasDefaultValue) }
+        ?: (defaultValue != null)
+
+    if (!isDefaultParameter) {
         return normalParameter
     }
 
     return DartDefaultFormalParameter(
-        // By default, parameters with default values will be named in Dart. This is overridden if
-        // the containing function is annotated with @DartPositional.
-        isNamed = !irValueParameter.isDartPositional,
+        isNamed = dartElement?.isNamed == true ||
+                // By default, Kotlin parameters with default values will become named in Dart. This is overridden if
+                // the containing function is annotated with @DartPositional.
+                (dartElement == null && !irValueParameter.hasDartPositionalAnnotation()),
         defaultValue = defaultValue,
         parameter = normalParameter,
     )

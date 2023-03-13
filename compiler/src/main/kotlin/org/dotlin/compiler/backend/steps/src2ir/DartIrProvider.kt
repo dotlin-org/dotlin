@@ -118,7 +118,7 @@ class DartIrProvider(
                     is DartCodeValue -> IrCallImpl(
                         UNDEFINED_OFFSET, UNDEFINED_OFFSET,
                         // We purposefully set the type to that of the expression
-                        // (instead of `dart(..)`s return type, `dynamic`), in case we need to the more specific type.
+                        // (instead of `dart(..)`s return type, `dynamic`), in case we need the more specific type.
                         type,
                         dotlinIrBuiltIns.dartFun,
                         typeArgumentsCount = 0,
