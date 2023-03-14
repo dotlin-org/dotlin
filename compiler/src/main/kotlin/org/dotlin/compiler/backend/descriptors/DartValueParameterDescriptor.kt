@@ -36,7 +36,6 @@ import org.jetbrains.kotlin.types.typeUtil.isDouble
 import org.jetbrains.kotlin.types.typeUtil.isInt
 
 class DartValueParameterDescriptor private constructor(
-    container: FunctionDescriptor,
     override val index: Int,
     override val annotations: Annotations,
     override val element: DartParameterElement,
@@ -50,7 +49,7 @@ class DartValueParameterDescriptor private constructor(
         element: DartParameterElement,
         context: DartDescriptorContext,
     ) : this(
-        container, index, annotations, element, context,
+        index, annotations, element, context,
         // We have to use delegate instead of inherit, because `ValueParameterDescriptorImpl` overrides
         // `getCompileTimeInitializer` with  a return type of `Nothing?`, making it impossible for a useful override.
         ValueParameterDescriptorImpl(
@@ -60,7 +59,7 @@ class DartValueParameterDescriptor private constructor(
             annotations,
             element.kotlinName,
             element.type.toKotlinType(context),
-            element.hasDefaultValue,
+            !element.isRequired,
             isCrossinline = false,
             isNoinline = false,
             varargElementType = null,
@@ -72,33 +71,42 @@ class DartValueParameterDescriptor private constructor(
     override fun isVar(): Boolean = true
 
     private val parsedDefaultValue by storageManager.createNullableLazyValue parse@{
-        val dartCode = element.defaultValueCode ?: return@parse null
+        if (element.isRequired) return@parse null
+        val dartCode = element.defaultValueCode
         val type = this.type
 
         val parsed = when {
-            type.isNullable() && dartCode == "null" -> NullValue()
-            type.isBoolean() -> when (dartCode) {
-                "true" -> true
-                "false" -> false
-                else -> null
-            }?.let { BooleanValue(it) }
-
-            type.isInt() -> IntValue(dartCode.toInt())
-            type.isDouble() -> DoubleValue(dartCode.toDouble())
-            // Drop quotes.
-            type.isString() -> {
-                val quotes = listOf('"', '\'')
-
-                when {
-                    // Only if the Dart code is quoted is it a String literal, otherwise it's an identifier.
-                    dartCode.first() in quotes && dartCode.last() in quotes -> StringValue(dartCode.drop(1).dropLast(1))
+            type.isNullable() && (dartCode == null || dartCode == "null") -> NullValue()
+            else -> when {
+                // Dart code must be not null at this point.
+                dartCode == null -> error("No default value for non-nullable optional parameter: $this")
+                type.isBoolean() -> when (dartCode) {
+                    "true" -> true
+                    "false" -> false
                     else -> null
+                }?.let { BooleanValue(it) }
+
+                type.isInt() -> IntValue(dartCode.toInt())
+                type.isDouble() -> DoubleValue(dartCode.toDouble())
+                // Drop quotes.
+                type.isString() -> {
+                    val quotes = listOf('"', '\'')
+
+                    when {
+                        // Only if the Dart code is quoted is it a String literal, otherwise it's an identifier.
+                        dartCode.first() in quotes && dartCode.last() in quotes -> StringValue(
+                            dartCode.drop(1).dropLast(1)
+                        )
+
+                        else -> null
+                    }
                 }
+
+                else -> null
             }
-            else -> null
         }
 
-        parsed ?: DartCodeValue(dartCode, type)
+        parsed ?: DartCodeValue(dartCode!!, type)
     }
 
     override fun getCompileTimeInitializer(): ConstantValue<*>? = parsedDefaultValue

@@ -63,18 +63,17 @@ fun IrValueParameter.accept(context: DartAstTransformContext): DartFormalParamet
 
     val dartElement = dartElementAs<DartParameterElement>()
 
-    val isDefaultParameter = dartElement?.let { it.isNamed || (it.isPositional && it.hasDefaultValue) }
-        ?: (defaultValue != null)
-
-    if (!isDefaultParameter) {
+    // It's a normal parameter if:
+    // - From Dart: Not named, not optional.
+    // - From Kotlin: No default value is set.
+    if (dartElement?.let { it.isRequired && !it.isNamed } ?: (defaultValue == null)) {
         return normalParameter
     }
 
     return DartDefaultFormalParameter(
-        isNamed = dartElement?.isNamed == true ||
-                // By default, Kotlin parameters with default values will become named in Dart. This is overridden if
-                // the containing function is annotated with @DartPositional.
-                (dartElement == null && !irValueParameter.hasDartPositionalAnnotation()),
+        // By default, Kotlin parameters with default values will become named in Dart. This is overridden if
+        // the containing function is annotated with @DartPositional.
+        isNamed = dartElement?.isNamed ?: !irValueParameter.hasDartPositionalAnnotation(),
         defaultValue = defaultValue,
         parameter = normalParameter,
     )

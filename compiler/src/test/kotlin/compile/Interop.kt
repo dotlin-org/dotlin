@@ -1942,7 +1942,7 @@ class Interop : BaseTest {
     }
 
     @Test
-    fun `call factory constructor in abstract class`() = assertCompile {
+    fun `call Dart factory constructor in abstract class`() = assertCompile {
         dart(
             """
             abstract class Bird {
@@ -1977,7 +1977,7 @@ class Interop : BaseTest {
     }
 
     @Test
-    fun `call const factory constructor in abstract class`() = assertCompile {
+    fun `call Dart const factory constructor in abstract class`() = assertCompile {
         dart(
             """
             abstract class Bird {
@@ -2014,7 +2014,7 @@ class Interop : BaseTest {
     }
 
     @Test
-    fun `call named factory constructor in abstract class`() = assertCompile {
+    fun `call Dart named factory constructor in abstract class`() = assertCompile {
         dart(
             """
             abstract class Bird {
@@ -2049,7 +2049,7 @@ class Interop : BaseTest {
     }
 
     @Test
-    fun `call named const factory constructor in abstract class`() = assertCompile {
+    fun `call Dart named const factory constructor in abstract class`() = assertCompile {
         dart(
             """
             abstract class Bird {
@@ -2080,6 +2080,68 @@ class Interop : BaseTest {
 
             void main() {
               const Bird bird = Bird.magpie();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call Dart function with nullable optional parameter`() = assertCompile {
+        dart(
+            """
+            void think([bool? outLoud]) {}
+            """,
+            Path("lib/thought.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.thought.think
+
+            fun main() {
+                val x = think()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "thought.dart" show think;
+
+            void main() {
+              final void x = think();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call Dart function with named nullable optional parameter`() = assertCompile {
+        dart(
+            """
+            void think({bool? outLoud}) {}
+            """,
+            Path("lib/thought.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.thought.think
+
+            fun main() {
+                val x = think()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "thought.dart" show think;
+
+            void main() {
+              final void x = think();
             }
             """
         )

@@ -59,6 +59,7 @@ fun DartType.toKotlinType(context: DartDescriptorContext): KotlinType {
 
             fun dartCore(className: String) = "dart:core;dart:core/${className.lowercase()}.dart;$className"
 
+            // Handle dart:core types.
             when (elementLocation.toString()) {
                 dartCore("bool") -> builtIns.booleanType
                 dartCore("int") -> builtIns.intType
@@ -81,10 +82,11 @@ fun DartType.toKotlinType(context: DartDescriptorContext): KotlinType {
                     lower = builtIns.anyMap,
                     upper = builtIns.map,
                 )
+
                 dartCore("Enum") -> builtIns.enum.defaultType
                 // TODO: Comparable
-                else -> DartTypeFactory.simpleType(this, context)
-            }
+                else -> null
+            }?.makeNullableAsSpecified(nullabilitySuffix.isNullable) ?: DartTypeFactory.simpleType(this, context)
         }
 
         DartDynamicType -> DynamicType(
