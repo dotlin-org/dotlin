@@ -119,9 +119,10 @@ message DartConstructorElement {
   required string location = 1;
   required string name = 2;
   required bool isConst = 3;
-  required DartFunctionType type = 4;
+  required bool isFactory = 4;
+  required DartFunctionType type = 5;
   // WARNING: a default value decoded when value is missing
-  repeated DartParameterElement parameters = 5;
+  repeated DartParameterElement parameters = 6;
 }
 
 // serial name 'org.dotlin.compiler.dart.element.DartParameterElement'

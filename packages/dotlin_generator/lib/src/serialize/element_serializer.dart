@@ -132,6 +132,7 @@ class DartElementSerializer {
         location: c.encodedLocation,
         name: c.name,
         isConst: c.isConst,
+        isFactory: c.isFactory,
         type: _typeSerializer.serializeFunctionType(c.type),
         parameters: serializeParameters(c.parameters),
       );

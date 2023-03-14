@@ -277,6 +277,7 @@ data class DartConstructorElement(
     override val location: DartElementLocation,
     override val name: DartSimpleIdentifier,
     override val isConst: Boolean,
+    val isFactory: Boolean,
     override val type: DartFunctionType,
     override val parameters: List<DartParameterElement> = emptyList()
 ) : DartInterfaceMemberElement, DartExecutableElement, DartConstableElement {

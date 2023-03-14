@@ -1004,8 +1004,9 @@ class DartConstructorElement extends $pb.GeneratedMessage {
     ..aQS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'location')
     ..aQS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
     ..a<$core.bool>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isConst', $pb.PbFieldType.QB, protoName: 'isConst')
-    ..aQM<DartFunctionType>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', subBuilder: DartFunctionType.create)
-    ..pc<DartParameterElement>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'parameters', $pb.PbFieldType.PM, subBuilder: DartParameterElement.create)
+    ..a<$core.bool>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isFactory', $pb.PbFieldType.QB, protoName: 'isFactory')
+    ..aQM<DartFunctionType>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', subBuilder: DartFunctionType.create)
+    ..pc<DartParameterElement>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'parameters', $pb.PbFieldType.PM, subBuilder: DartParameterElement.create)
   ;
 
   DartConstructorElement._() : super();
@@ -1013,6 +1014,7 @@ class DartConstructorElement extends $pb.GeneratedMessage {
     $core.String? location,
     $core.String? name,
     $core.bool? isConst,
+    $core.bool? isFactory,
     DartFunctionType? type,
     $core.Iterable<DartParameterElement>? parameters,
   }) {
@@ -1025,6 +1027,9 @@ class DartConstructorElement extends $pb.GeneratedMessage {
     }
     if (isConst != null) {
       _result.isConst = isConst;
+    }
+    if (isFactory != null) {
+      _result.isFactory = isFactory;
     }
     if (type != null) {
       _result.type = type;
@@ -1083,18 +1088,27 @@ class DartConstructorElement extends $pb.GeneratedMessage {
   void clearIsConst() => clearField(3);
 
   @$pb.TagNumber(4)
-  DartFunctionType get type => $_getN(3);
+  $core.bool get isFactory => $_getBF(3);
   @$pb.TagNumber(4)
-  set type(DartFunctionType v) { setField(4, v); }
+  set isFactory($core.bool v) { $_setBool(3, v); }
   @$pb.TagNumber(4)
-  $core.bool hasType() => $_has(3);
+  $core.bool hasIsFactory() => $_has(3);
   @$pb.TagNumber(4)
-  void clearType() => clearField(4);
-  @$pb.TagNumber(4)
-  DartFunctionType ensureType() => $_ensure(3);
+  void clearIsFactory() => clearField(4);
 
   @$pb.TagNumber(5)
-  $core.List<DartParameterElement> get parameters => $_getList(4);
+  DartFunctionType get type => $_getN(4);
+  @$pb.TagNumber(5)
+  set type(DartFunctionType v) { setField(5, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasType() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearType() => clearField(5);
+  @$pb.TagNumber(5)
+  DartFunctionType ensureType() => $_ensure(4);
+
+  @$pb.TagNumber(6)
+  $core.List<DartParameterElement> get parameters => $_getList(5);
 }
 
 class DartParameterElement extends $pb.GeneratedMessage {

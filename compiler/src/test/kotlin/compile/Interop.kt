@@ -1940,4 +1940,148 @@ class Interop : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `call factory constructor in abstract class`() = assertCompile {
+        dart(
+            """
+            abstract class Bird {
+              factory Bird() = Magpie;
+            }
+
+            class Magpie implements Bird {}
+            """,
+            Path("lib/aviation.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.aviation.Bird
+
+            fun main() {
+                val bird = Bird()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "aviation.dart" show Bird;
+
+            void main() {
+              final Bird bird = Bird();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call const factory constructor in abstract class`() = assertCompile {
+        dart(
+            """
+            abstract class Bird {
+              const factory Bird() = Magpie;
+            }
+
+            class Magpie implements Bird {
+              const Magpie();
+            }
+            """,
+            Path("lib/aviation.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.aviation.Bird
+
+            fun main() {
+                const val bird = Bird()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "aviation.dart" show Bird;
+
+            void main() {
+              const Bird bird = Bird();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call named factory constructor in abstract class`() = assertCompile {
+        dart(
+            """
+            abstract class Bird {
+              factory Bird.magpie() = Magpie;
+            }
+
+            class Magpie implements Bird {}
+            """,
+            Path("lib/aviation.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.aviation.Bird
+
+            fun main() {
+                val bird = Bird.magpie()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "aviation.dart" show Bird;
+
+            void main() {
+              final Bird bird = Bird.magpie();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call named const factory constructor in abstract class`() = assertCompile {
+        dart(
+            """
+            abstract class Bird {
+              const factory Bird.magpie() = Magpie;
+            }
+
+            class Magpie implements Bird {
+              const Magpie();
+            }
+            """,
+            Path("lib/aviation.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.aviation.Bird
+
+            fun main() {
+                const val bird = Bird.magpie()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "aviation.dart" show Bird;
+
+            void main() {
+              const Bird bird = Bird.magpie();
+            }
+            """
+        )
+    }
 }

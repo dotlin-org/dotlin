@@ -160,13 +160,14 @@ const DartConstructorElement$json = const {
     const {'1': 'location', '3': 1, '4': 2, '5': 9, '10': 'location'},
     const {'1': 'name', '3': 2, '4': 2, '5': 9, '10': 'name'},
     const {'1': 'isConst', '3': 3, '4': 2, '5': 8, '10': 'isConst'},
-    const {'1': 'type', '3': 4, '4': 2, '5': 11, '6': '.DartFunctionType', '10': 'type'},
-    const {'1': 'parameters', '3': 5, '4': 3, '5': 11, '6': '.DartParameterElement', '10': 'parameters'},
+    const {'1': 'isFactory', '3': 4, '4': 2, '5': 8, '10': 'isFactory'},
+    const {'1': 'type', '3': 5, '4': 2, '5': 11, '6': '.DartFunctionType', '10': 'type'},
+    const {'1': 'parameters', '3': 6, '4': 3, '5': 11, '6': '.DartParameterElement', '10': 'parameters'},
   ],
 };
 
 /// Descriptor for `DartConstructorElement`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List dartConstructorElementDescriptor = $convert.base64Decode('ChZEYXJ0Q29uc3RydWN0b3JFbGVtZW50EhoKCGxvY2F0aW9uGAEgAigJUghsb2NhdGlvbhISCgRuYW1lGAIgAigJUgRuYW1lEhgKB2lzQ29uc3QYAyACKAhSB2lzQ29uc3QSJQoEdHlwZRgEIAIoCzIRLkRhcnRGdW5jdGlvblR5cGVSBHR5cGUSNQoKcGFyYW1ldGVycxgFIAMoCzIVLkRhcnRQYXJhbWV0ZXJFbGVtZW50UgpwYXJhbWV0ZXJz');
+final $typed_data.Uint8List dartConstructorElementDescriptor = $convert.base64Decode('ChZEYXJ0Q29uc3RydWN0b3JFbGVtZW50EhoKCGxvY2F0aW9uGAEgAigJUghsb2NhdGlvbhISCgRuYW1lGAIgAigJUgRuYW1lEhgKB2lzQ29uc3QYAyACKAhSB2lzQ29uc3QSHAoJaXNGYWN0b3J5GAQgAigIUglpc0ZhY3RvcnkSJQoEdHlwZRgFIAIoCzIRLkRhcnRGdW5jdGlvblR5cGVSBHR5cGUSNQoKcGFyYW1ldGVycxgGIAMoCzIVLkRhcnRQYXJhbWV0ZXJFbGVtZW50UgpwYXJhbWV0ZXJz');
 @$core.Deprecated('Use dartParameterElementDescriptor instead')
 const DartParameterElement$json = const {
   '1': 'DartParameterElement',
