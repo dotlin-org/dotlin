@@ -2146,4 +2146,115 @@ class Interop : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `call Dart inherited method`() = assertCompile {
+        dart(
+            """
+            class A {
+              void exec() {}
+            }
+
+            class B extends A {}
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.B
+
+            fun main() {
+                val b = B()
+                b.exec()
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show B;
+
+            void main() {
+              final B b = B();
+              b.exec();
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call Dart inherited method with class type parameter`() = assertCompile {
+        dart(
+            """
+            class A<T> {
+              T exec(T arg) => arg;
+            }
+
+            class B<T> extends A<T> {}
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.B
+
+            fun main() {
+                val b = B<Int>()
+                val x: Int = b.exec(30)
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show B;
+
+            void main() {
+              final B<int> b = B<int>();
+              final int x = b.exec(30);
+            }
+            """
+        )
+    }
+
+    @Test
+    fun `call Dart inherited property`() = assertCompile {
+        dart(
+            """
+            class A {
+              final int prop;
+            }
+
+            class B extends A {}
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.B
+
+            fun main() {
+                val b = B()
+                val x: Int = b.prop
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show B;
+
+            void main() {
+              final B b = B();
+              final int x = b.prop;
+            }
+            """
+        )
+    }
 }

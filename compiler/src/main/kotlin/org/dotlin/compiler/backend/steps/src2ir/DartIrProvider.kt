@@ -21,10 +21,7 @@
 
 package org.dotlin.compiler.backend.steps.src2ir
 
-import org.dotlin.compiler.backend.descriptors.DartCodeValue
-import org.dotlin.compiler.backend.descriptors.DartDescriptor
-import org.dotlin.compiler.backend.descriptors.DartInteropDescriptor
-import org.dotlin.compiler.backend.descriptors.DartValueParameterDescriptor
+import org.dotlin.compiler.backend.descriptors.*
 import org.dotlin.compiler.backend.steps.ir2ast.DotlinIrBuiltIns
 import org.jetbrains.kotlin.backend.common.serialization.DescriptorByIdSignatureFinderImpl
 import org.jetbrains.kotlin.descriptors.*
@@ -70,7 +67,12 @@ class DartIrProvider(
 
         if (descriptor.module != module) return null
 
-        if (descriptor !is DartDescriptor && descriptor !is DartInteropDescriptor) return null
+        if (descriptor !is DartDescriptor &&
+            descriptor !is DartInteropDescriptor &&
+            !descriptor.isOverrideOfDartDescriptor()
+        ) {
+            return null
+        }
 
         val declaration = stubGenerator.run {
             when (symbol) {
@@ -134,4 +136,7 @@ class DartIrProvider(
             )
         }
     }
+
+    private fun DeclarationDescriptor.isOverrideOfDartDescriptor() =
+        this is CallableMemberDescriptor && overriddenDescriptors.any { it.original is DartDescriptor }
 }

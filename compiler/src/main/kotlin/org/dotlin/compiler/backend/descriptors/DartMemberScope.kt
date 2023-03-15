@@ -22,7 +22,10 @@ package org.dotlin.compiler.backend.descriptors
 import org.dotlin.compiler.dart.element.*
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.incremental.components.LookupLocation
+import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.resolve.OverridingStrategy
+import org.jetbrains.kotlin.resolve.OverridingUtil
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter.Companion.ALL
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter.Companion.CLASSIFIERS_MASK
@@ -30,6 +33,7 @@ import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter.Companion.FUNCTI
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter.Companion.VARIABLES_MASK
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.storage.getValue
+import org.jetbrains.kotlin.types.typeUtil.supertypes
 import org.jetbrains.kotlin.utils.Printer
 
 
@@ -112,12 +116,64 @@ class DartMemberScope(
     )
 
     private val getDescriptor =
-        storageManager.createMemoizedFunctionWithNullableValues<GetDescriptorRequest, DeclarationDescriptor> { (name, kindFilter, element) ->
+        storageManager.createMemoizedFunctionWithNullableValues<GetDescriptorRequest, DeclarationDescriptor> getDescriptor@{ (name, kindFilter, element) ->
             // If an element is passed, no need to search
-            element?.let { return@createMemoizedFunctionWithNullableValues toDescriptor(it) }
+            element?.let { return@getDescriptor toDescriptor(it) }
+
+            require(name != null) { "name must be passed if element not given" }
 
             val elementsByName = relevantElementsByKotlinName(kindFilter)
-            elementsByName[name]?.let { toDescriptor(it) }
+            val foundDescriptor = elementsByName[name]?.let { toDescriptor(it) }
+
+            when {
+                // Handle fake override.
+                foundDescriptor == null && owner is ClassDescriptor -> {
+                    val fromSuperTypes = owner.defaultType.supertypes()
+                        .flatMap {
+                            it.memberScope.run {
+                                getContributedFunctions(name, NoLookupLocation.FROM_BACKEND) +
+                                        getContributedVariables(name, NoLookupLocation.FROM_BACKEND)
+                            }
+                        }
+
+                    if (fromSuperTypes.isEmpty()) return@getDescriptor null
+
+                    var result: CallableMemberDescriptor? = null
+
+                    OverridingUtil.DEFAULT.generateOverridesInFunctionGroup(
+                        name,
+                        fromSuperTypes,
+                        emptyList(),
+                        owner,
+                        object : OverridingStrategy() {
+                            override fun addFakeOverride(fakeOverride: CallableMemberDescriptor) {
+                                when (result) {
+                                    null -> result = fakeOverride
+                                    else -> error("Fake override already set: $result (wants to become $fakeOverride)")
+                                }
+                            }
+
+                            override fun inheritanceConflict(
+                                first: CallableMemberDescriptor,
+                                second: CallableMemberDescriptor
+                            ) = error("Inheritance conflict: first: $first second: $second")
+
+                            override fun overrideConflict(
+                                fromSuper: CallableMemberDescriptor,
+                                fromCurrent: CallableMemberDescriptor
+                            ) = error("Override conflict: super: $fromSuper current: $fromCurrent")
+                        }
+                    )
+
+                    OverridingUtil.resolveUnknownVisibilityForMember(result!!) {
+                        error("Cannot infer visibility for: $it")
+                    }
+
+                    result
+                }
+
+                else -> foundDescriptor
+            }
         }
 
     private val toDescriptor = storageManager.createMemoizedFunction<DartDeclarationElement, DeclarationDescriptor> {
