@@ -2257,4 +2257,44 @@ class Interop : BaseTest {
             """
         )
     }
+
+    @Test
+    fun `use Dart inherited property with class type parameter`() = assertCompile {
+        dart(
+            """
+            class A<T> {
+              A(this.prop);
+              final T prop;
+            }
+
+            class B<T> extends A<T> {
+              B(T prop) : super(prop);
+            }
+            """,
+            Path("lib/alphabet.dart"),
+            assert = false,
+        )
+
+        kotlin(
+            """
+            import pkg.test.alphabet.B
+
+            fun main() {
+                val b = B<Int>(34)
+                val x: Int = b.prop
+            }
+            """
+        )
+
+        dart(
+            """
+            import "alphabet.dart" show B;
+
+            void main() {
+              final B<int> b = B<int>(34);
+              final int x = b.prop;
+            }
+            """
+        )
+    }
 }
